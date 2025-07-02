@@ -7,3 +7,4 @@
 - 2025-07-02 16:05: test(collision): verify player bounding box floor snapping
 - 2025-07-02 17:06: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-02 18:59: docs(engine): document voxel coordinate transformation pipeline
+- 2025-07-02 20:47: feat(postprocessing): bloom and atmospheric fog pass in Three.js
