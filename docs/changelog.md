@@ -9,3 +9,4 @@
 - 2025-07-02 18:59: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-02 20:47: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-02 21:26: refactor(blocks): bit-packed voxel state representation
+- 2025-07-02 22:00: feat(ui): inventory hotbar HUD and interactive crosshair
