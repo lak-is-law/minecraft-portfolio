@@ -5,3 +5,4 @@
 - 2025-07-02 13:02: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-07-02 14:28: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-07-02 16:05: test(collision): verify player bounding box floor snapping
+- 2025-07-02 17:06: docs(engine): document voxel coordinate transformation pipeline
