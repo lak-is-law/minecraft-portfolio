@@ -17,3 +17,4 @@
 - 2025-07-06 13:07: refactor(blocks): bit-packed voxel state representation
 - 2025-07-06 14:04: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-06 15:44: test(engine): benchmark frame time consistency under 60 FPS load
+- 2025-07-06 16:38: refactor(terrain): Perlin noise octaves for procedural valleys
