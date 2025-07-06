@@ -13,3 +13,4 @@
 - 2025-07-04 18:06: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-07-06 10:54: feat(monument): LK brick monument voxel texture atlas
 - 2025-07-06 11:27: docs(engine): document voxel coordinate transformation pipeline
+- 2025-07-06 12:44: perf(shaders): optimize ambient occlusion fragment pass
