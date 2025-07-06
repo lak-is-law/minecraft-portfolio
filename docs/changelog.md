@@ -15,3 +15,4 @@
 - 2025-07-06 11:27: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-06 12:44: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-07-06 13:07: refactor(blocks): bit-packed voxel state representation
+- 2025-07-06 14:04: docs(engine): document voxel coordinate transformation pipeline
