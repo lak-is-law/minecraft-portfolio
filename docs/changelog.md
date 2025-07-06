@@ -22,3 +22,4 @@
 - 2025-07-06 19:41: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-06 20:49: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-07-06 21:55: refactor(blocks): bit-packed voxel state representation
+- 2025-07-06 22:37: perf(shaders): optimize ambient occlusion fragment pass
