@@ -26,3 +26,4 @@
 - 2025-07-07 12:45: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-07-07 13:39: test(collision): verify player bounding box floor snapping
 - 2025-07-07 14:15: perf(worker): offload terrain generation to web workers
+- 2025-07-07 17:48: perf(render): frustum culling for non-visible chunk boundaries
