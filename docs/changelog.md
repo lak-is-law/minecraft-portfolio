@@ -28,3 +28,4 @@
 - 2025-07-07 14:15: perf(worker): offload terrain generation to web workers
 - 2025-07-07 17:48: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-07-07 18:00: feat(monument): LK brick monument voxel texture atlas
+- 2025-07-07 19:25: perf(worker): offload terrain generation to web workers
