@@ -41,3 +41,4 @@
 - 2025-07-08 17:11: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-07-08 18:14: perf(worker): offload terrain generation to web workers
 - 2025-07-08 19:47: docs(engine): document voxel coordinate transformation pipeline
+- 2025-07-08 20:07: test(collision): verify player bounding box floor snapping
