@@ -31,3 +31,4 @@
 - 2025-07-07 19:25: perf(worker): offload terrain generation to web workers
 - 2025-07-07 21:17: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-07-07 22:50: refactor(blocks): bit-packed voxel state representation
+- 2025-07-08 10:33: feat(lighting): directional sunlight ray casting across voxel faces
