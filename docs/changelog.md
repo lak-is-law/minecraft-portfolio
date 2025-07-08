@@ -38,3 +38,4 @@
 - 2025-07-08 14:29: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-08 15:05: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-08 16:53: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-07-08 17:11: refactor(terrain): Perlin noise octaves for procedural valleys
