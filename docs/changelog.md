@@ -34,3 +34,4 @@
 - 2025-07-08 10:33: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-07-08 11:31: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-07-08 12:36: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-07-08 13:51: fix(camera): pitch clamp preventing gimbal lock at zenith
