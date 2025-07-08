@@ -32,3 +32,4 @@
 - 2025-07-07 21:17: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-07-07 22:50: refactor(blocks): bit-packed voxel state representation
 - 2025-07-08 10:33: feat(lighting): directional sunlight ray casting across voxel faces
+- 2025-07-08 11:31: fix(controls): pointer lock sensitivity on high-DPI displays
