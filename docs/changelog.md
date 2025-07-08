@@ -35,3 +35,4 @@
 - 2025-07-08 11:31: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-07-08 12:36: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-07-08 13:51: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-07-08 14:29: feat(audio): spatial distance attenuation for ambient loops
