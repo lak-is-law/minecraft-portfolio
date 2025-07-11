@@ -48,3 +48,4 @@
 - 2025-07-11 11:18: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-11 12:49: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-11 13:26: refactor(physics): AABB collision detection against voxel grid
+- 2025-07-11 14:03: fix(controls): pointer lock sensitivity on high-DPI displays
