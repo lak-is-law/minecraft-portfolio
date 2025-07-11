@@ -53,3 +53,4 @@
 - 2025-07-11 17:28: test(collision): verify player bounding box floor snapping
 - 2025-07-11 18:41: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-11 20:20: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-07-11 21:32: perf(worker): offload terrain generation to web workers
