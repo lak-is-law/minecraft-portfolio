@@ -45,3 +45,4 @@
 - 2025-07-08 21:20: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-07-08 22:49: test(collision): verify player bounding box floor snapping
 - 2025-07-11 10:08: refactor(physics): AABB collision detection against voxel grid
+- 2025-07-11 11:18: feat(audio): spatial distance attenuation for ambient loops
