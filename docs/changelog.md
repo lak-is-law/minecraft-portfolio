@@ -50,3 +50,4 @@
 - 2025-07-11 13:26: refactor(physics): AABB collision detection against voxel grid
 - 2025-07-11 14:03: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-07-11 16:01: test(engine): benchmark frame time consistency under 60 FPS load
+- 2025-07-11 17:28: test(collision): verify player bounding box floor snapping
