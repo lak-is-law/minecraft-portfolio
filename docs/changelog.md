@@ -57,3 +57,4 @@
 - 2025-07-11 22:05: refactor(blocks): bit-packed voxel state representation
 - 2025-07-12 10:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-07-12 11:38: refactor(physics): AABB collision detection against voxel grid
+- 2025-07-12 12:54: fix(controls): pointer lock sensitivity on high-DPI displays
