@@ -51,3 +51,4 @@
 - 2025-07-12 12:54: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-07-12 13:37: refactor(physics): AABB collision detection against voxel grid
 - 2025-07-12 15:51: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-07-12 21:19: refactor(blocks): bit-packed voxel state representation
