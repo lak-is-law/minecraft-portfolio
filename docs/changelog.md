@@ -55,3 +55,4 @@
 - 2025-07-11 20:20: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-07-11 21:32: perf(worker): offload terrain generation to web workers
 - 2025-07-11 22:05: refactor(blocks): bit-packed voxel state representation
+- 2025-07-12 10:55: feat(voxel): chunk mesh generation and greedy meshing
