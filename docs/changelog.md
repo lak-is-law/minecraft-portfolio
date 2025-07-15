@@ -56,3 +56,4 @@
 - 2025-07-15 14:08: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-15 15:55: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-15 16:02: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-07-15 17:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
