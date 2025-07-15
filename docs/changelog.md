@@ -54,3 +54,4 @@
 - 2025-07-12 21:19: refactor(blocks): bit-packed voxel state representation
 - 2025-07-15 10:34: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-15 14:08: feat(audio): spatial distance attenuation for ambient loops
+- 2025-07-15 15:55: test(engine): benchmark frame time consistency under 60 FPS load
