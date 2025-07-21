@@ -50,3 +50,4 @@
 - 2025-07-15 17:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-15 22:46: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-21 11:52: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-07-21 13:44: feat(postprocessing): bloom and atmospheric fog pass in Three.js
