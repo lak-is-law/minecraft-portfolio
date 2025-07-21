@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-02 22:00: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-07-04 18:06: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-07-06 10:54: feat(monument): LK brick monument voxel texture atlas
-- 2025-07-06 11:27: docs(engine): document voxel coordinate transformation pipeline
-- 2025-07-06 12:44: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-06 13:07: refactor(blocks): bit-packed voxel state representation
-- 2025-07-06 14:04: docs(engine): document voxel coordinate transformation pipeline
-- 2025-07-06 15:44: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-06 16:38: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-07-06 18:52: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-07-06 19:41: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-06 20:49: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2025-07-15 16:02: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-07-15 17:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-15 22:46: test(engine): benchmark frame time consistency under 60 FPS load
+- 2025-07-21 11:52: perf(render): frustum culling for non-visible chunk boundaries
