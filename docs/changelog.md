@@ -55,3 +55,4 @@
 - 2025-07-24 17:03: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-07-26 10:57: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-26 11:14: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-07-26 13:38: refactor(blocks): bit-packed voxel state representation
