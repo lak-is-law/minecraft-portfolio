@@ -51,3 +51,4 @@
 - 2025-08-01 10:29: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-08-01 10:35: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-08-01 11:29: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-08-01 12:28: feat(lighting): directional sunlight ray casting across voxel faces
