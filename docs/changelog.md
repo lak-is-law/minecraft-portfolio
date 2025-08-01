@@ -55,3 +55,4 @@
 - 2025-08-01 13:44: feat(audio): spatial distance attenuation for ambient loops
 - 2025-08-01 14:02: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-08-01 15:53: refactor(physics): AABB collision detection against voxel grid
+- 2025-08-01 16:55: fix(camera): pitch clamp preventing gimbal lock at zenith
