@@ -52,3 +52,4 @@
 - 2025-08-01 19:47: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-01 20:44: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-08-01 21:57: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-08-01 22:08: fix(camera): pitch clamp preventing gimbal lock at zenith
