@@ -57,3 +57,4 @@
 - 2025-07-26 11:14: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-07-26 13:38: refactor(blocks): bit-packed voxel state representation
 - 2025-07-26 19:20: feat(lighting): directional sunlight ray casting across voxel faces
+- 2025-08-01 10:29: feat(voxel): chunk mesh generation and greedy meshing
