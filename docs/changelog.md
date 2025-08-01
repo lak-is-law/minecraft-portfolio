@@ -51,3 +51,4 @@
 - 2025-08-01 18:16: refactor(physics): AABB collision detection against voxel grid
 - 2025-08-01 19:47: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-01 20:44: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-08-01 21:57: feat(voxel): chunk mesh generation and greedy meshing
