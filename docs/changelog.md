@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-06 18:52: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-07-06 19:41: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-06 20:49: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-06 21:55: refactor(blocks): bit-packed voxel state representation
-- 2025-07-06 22:37: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-07 12:45: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-07-07 13:39: test(collision): verify player bounding box floor snapping
-- 2025-07-07 14:15: perf(worker): offload terrain generation to web workers
-- 2025-07-07 17:48: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-07-07 18:00: feat(monument): LK brick monument voxel texture atlas
 - 2025-07-07 19:25: perf(worker): offload terrain generation to web workers
 - 2025-07-07 21:17: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2025-07-26 13:38: refactor(blocks): bit-packed voxel state representation
 - 2025-07-26 19:20: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-08-01 10:29: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-08-01 10:35: feat(voxel): chunk mesh generation and greedy meshing
