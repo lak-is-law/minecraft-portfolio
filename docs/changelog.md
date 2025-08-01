@@ -57,3 +57,4 @@
 - 2025-08-01 15:53: refactor(physics): AABB collision detection against voxel grid
 - 2025-08-01 16:55: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-08-01 17:58: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-08-01 18:16: refactor(physics): AABB collision detection against voxel grid
