@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-07 18:00: feat(monument): LK brick monument voxel texture atlas
-- 2025-07-07 19:25: perf(worker): offload terrain generation to web workers
-- 2025-07-07 21:17: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-07 22:50: refactor(blocks): bit-packed voxel state representation
-- 2025-07-08 10:33: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-07-08 11:31: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-07-08 12:36: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-07-08 13:51: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-07-08 14:29: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-08 15:05: docs(engine): document voxel coordinate transformation pipeline
 - 2025-07-08 16:53: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-07-08 17:11: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2025-08-01 16:55: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-08-01 17:58: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-08-01 18:16: refactor(physics): AABB collision detection against voxel grid
+- 2025-08-01 19:47: test(engine): benchmark frame time consistency under 60 FPS load
