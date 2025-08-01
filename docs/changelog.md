@@ -53,3 +53,4 @@
 - 2025-08-01 11:29: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-08-01 12:28: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-08-01 13:44: feat(audio): spatial distance attenuation for ambient loops
+- 2025-08-01 14:02: fix(camera): pitch clamp preventing gimbal lock at zenith
