@@ -56,3 +56,4 @@
 - 2025-08-02 19:48: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-08-04 15:18: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-08-04 17:59: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2025-08-04 21:51: perf(worker): offload terrain generation to web workers
