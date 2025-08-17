@@ -51,3 +51,4 @@
 - 2025-08-04 22:38: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-17 12:46: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-08-17 14:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2025-08-17 17:22: docs(engine): document voxel coordinate transformation pipeline
