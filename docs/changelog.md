@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-08 15:05: docs(engine): document voxel coordinate transformation pipeline
-- 2025-07-08 16:53: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-07-08 17:11: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-07-08 18:14: perf(worker): offload terrain generation to web workers
-- 2025-07-08 19:47: docs(engine): document voxel coordinate transformation pipeline
-- 2025-07-08 20:07: test(collision): verify player bounding box floor snapping
-- 2025-07-08 21:20: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-08 22:49: test(collision): verify player bounding box floor snapping
-- 2025-07-11 10:08: refactor(physics): AABB collision detection against voxel grid
 - 2025-07-11 11:18: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-11 12:49: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-11 13:26: refactor(physics): AABB collision detection against voxel grid
@@ -58,3 +49,4 @@
 - 2025-08-04 17:59: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-08-04 21:51: perf(worker): offload terrain generation to web workers
 - 2025-08-04 22:38: test(engine): benchmark frame time consistency under 60 FPS load
+- 2025-08-17 12:46: perf(shaders): optimize ambient occlusion fragment pass
