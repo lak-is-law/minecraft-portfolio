@@ -53,3 +53,4 @@
 - 2025-08-17 14:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-08-17 17:22: docs(engine): document voxel coordinate transformation pipeline
 - 2025-08-19 10:17: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-08-19 16:12: feat(postprocessing): bloom and atmospheric fog pass in Three.js
