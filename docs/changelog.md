@@ -57,3 +57,4 @@
 - 2025-08-19 19:22: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-23 20:58: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-08-23 21:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2025-08-23 22:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
