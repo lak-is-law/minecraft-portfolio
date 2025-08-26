@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-11 11:18: feat(audio): spatial distance attenuation for ambient loops
-- 2025-07-11 12:49: feat(audio): spatial distance attenuation for ambient loops
-- 2025-07-11 13:26: refactor(physics): AABB collision detection against voxel grid
-- 2025-07-11 14:03: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-07-11 16:01: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-11 17:28: test(collision): verify player bounding box floor snapping
-- 2025-07-11 18:41: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-07-11 20:20: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-07-11 21:32: perf(worker): offload terrain generation to web workers
 - 2025-07-11 22:05: refactor(blocks): bit-packed voxel state representation
 - 2025-07-12 10:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-07-12 11:38: refactor(physics): AABB collision detection against voxel grid
@@ -58,3 +49,4 @@
 - 2025-08-23 20:58: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-08-23 21:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-08-23 22:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2025-08-26 10:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
