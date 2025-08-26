@@ -50,3 +50,4 @@
 - 2025-08-23 21:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-08-23 22:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-08-26 10:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2025-08-26 16:07: test(engine): benchmark frame time consistency under 60 FPS load
