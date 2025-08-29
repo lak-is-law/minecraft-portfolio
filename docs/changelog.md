@@ -52,3 +52,4 @@
 - 2025-08-26 10:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-08-26 16:07: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-29 11:50: test(collision): verify player bounding box floor snapping
+- 2025-08-29 12:39: fix(camera): pitch clamp preventing gimbal lock at zenith
