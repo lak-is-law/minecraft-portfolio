@@ -55,3 +55,4 @@
 - 2025-08-29 12:39: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-08-29 16:17: perf(worker): offload terrain generation to web workers
 - 2025-08-30 13:40: test(collision): verify player bounding box floor snapping
+- 2025-08-30 15:49: test(engine): benchmark frame time consistency under 60 FPS load
