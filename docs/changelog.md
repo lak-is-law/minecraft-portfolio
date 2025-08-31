@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-11 22:05: refactor(blocks): bit-packed voxel state representation
-- 2025-07-12 10:55: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-07-12 11:38: refactor(physics): AABB collision detection against voxel grid
-- 2025-07-12 12:54: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-07-12 13:37: refactor(physics): AABB collision detection against voxel grid
-- 2025-07-12 15:51: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-07-12 21:19: refactor(blocks): bit-packed voxel state representation
-- 2025-07-15 10:34: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-15 14:08: feat(audio): spatial distance attenuation for ambient loops
 - 2025-07-15 15:55: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-07-15 16:02: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-07-15 17:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
@@ -58,3 +49,4 @@
 - 2025-08-30 15:49: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-30 16:49: feat(monument): LK brick monument voxel texture atlas
 - 2025-08-31 10:05: perf(worker): offload terrain generation to web workers
+- 2025-08-31 12:27: docs(engine): document voxel coordinate transformation pipeline
