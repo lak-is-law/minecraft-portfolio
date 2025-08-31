@@ -50,3 +50,4 @@
 - 2025-08-30 16:49: feat(monument): LK brick monument voxel texture atlas
 - 2025-08-31 10:05: perf(worker): offload terrain generation to web workers
 - 2025-08-31 12:27: docs(engine): document voxel coordinate transformation pipeline
+- 2025-08-31 15:30: refactor(physics): AABB collision detection against voxel grid
