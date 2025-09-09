@@ -54,3 +54,4 @@
 - 2025-08-31 21:07: refactor(blocks): bit-packed voxel state representation
 - 2025-09-09 11:04: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-09-09 14:46: feat(monument): LK brick monument voxel texture atlas
+- 2025-09-09 17:09: feat(audio): spatial distance attenuation for ambient loops
