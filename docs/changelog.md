@@ -55,3 +55,4 @@
 - 2025-09-09 11:04: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-09-09 14:46: feat(monument): LK brick monument voxel texture atlas
 - 2025-09-09 17:09: feat(audio): spatial distance attenuation for ambient loops
+- 2025-09-14 13:09: perf(memory): reuse Float32Array buffers across chunk re-meshes
