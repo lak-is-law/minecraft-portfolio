@@ -50,3 +50,4 @@
 - 2025-09-23 10:18: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-09-23 11:38: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-09-23 16:53: test(collision): verify player bounding box floor snapping
+- 2025-09-23 18:49: feat(voxel): chunk mesh generation and greedy meshing
