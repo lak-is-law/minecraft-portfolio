@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-07-15 15:55: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-15 16:02: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-07-15 17:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-07-15 22:46: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-07-21 11:52: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-07-21 13:44: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-07-22 20:37: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-07-24 17:03: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-07-26 10:57: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-07-26 11:14: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-07-26 13:38: refactor(blocks): bit-packed voxel state representation
 - 2025-07-26 19:20: feat(lighting): directional sunlight ray casting across voxel faces
@@ -58,3 +49,4 @@
 - 2025-09-14 13:09: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-09-23 10:18: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-09-23 11:38: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-09-23 16:53: test(collision): verify player bounding box floor snapping
