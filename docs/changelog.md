@@ -56,3 +56,4 @@
 - 2025-09-09 14:46: feat(monument): LK brick monument voxel texture atlas
 - 2025-09-09 17:09: feat(audio): spatial distance attenuation for ambient loops
 - 2025-09-14 13:09: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2025-09-23 10:18: feat(postprocessing): bloom and atmospheric fog pass in Three.js
