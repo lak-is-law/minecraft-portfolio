@@ -54,3 +54,4 @@
 - 2025-09-23 19:56: refactor(physics): AABB collision detection against voxel grid
 - 2025-09-23 20:29: feat(audio): spatial distance attenuation for ambient loops
 - 2025-09-27 15:20: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-09-27 17:25: refactor(terrain): Perlin noise octaves for procedural valleys
