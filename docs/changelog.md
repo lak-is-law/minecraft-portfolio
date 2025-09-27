@@ -55,3 +55,4 @@
 - 2025-09-23 20:29: feat(audio): spatial distance attenuation for ambient loops
 - 2025-09-27 15:20: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-09-27 17:25: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2025-09-27 19:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
