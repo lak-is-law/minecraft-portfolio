@@ -50,3 +50,4 @@
 - 2025-09-27 21:35: docs(engine): document voxel coordinate transformation pipeline
 - 2025-10-05 16:51: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-10-05 17:13: test(collision): verify player bounding box floor snapping
+- 2025-10-05 18:37: docs(engine): document voxel coordinate transformation pipeline
