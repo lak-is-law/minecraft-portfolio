@@ -57,3 +57,4 @@
 - 2025-09-27 17:25: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-09-27 19:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-09-27 21:35: docs(engine): document voxel coordinate transformation pipeline
+- 2025-10-05 16:51: feat(voxel): chunk mesh generation and greedy meshing
