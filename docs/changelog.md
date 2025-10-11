@@ -55,3 +55,4 @@
 - 2025-10-11 10:51: feat(monument): LK brick monument voxel texture atlas
 - 2025-10-11 11:32: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-10-11 13:18: test(collision): verify player bounding box floor snapping
+- 2025-10-11 14:53: perf(render): frustum culling for non-visible chunk boundaries
