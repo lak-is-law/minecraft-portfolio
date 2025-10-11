@@ -56,3 +56,4 @@
 - 2025-10-11 11:32: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-10-11 13:18: test(collision): verify player bounding box floor snapping
 - 2025-10-11 14:53: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-10-11 16:37: fix(controls): pointer lock sensitivity on high-DPI displays
