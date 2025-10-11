@@ -52,3 +52,4 @@
 - 2025-10-05 17:13: test(collision): verify player bounding box floor snapping
 - 2025-10-05 18:37: docs(engine): document voxel coordinate transformation pipeline
 - 2025-10-05 21:19: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2025-10-11 10:51: feat(monument): LK brick monument voxel texture atlas
