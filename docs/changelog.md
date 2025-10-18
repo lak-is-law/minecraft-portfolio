@@ -51,3 +51,4 @@
 - 2025-10-18 19:43: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-10-18 20:24: refactor(physics): AABB collision detection against voxel grid
 - 2025-10-18 21:05: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-10-18 22:59: refactor(physics): AABB collision detection against voxel grid
