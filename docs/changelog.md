@@ -51,3 +51,4 @@
 - 2025-10-11 18:17: perf(worker): offload terrain generation to web workers
 - 2025-10-11 21:29: feat(audio): spatial distance attenuation for ambient loops
 - 2025-10-18 10:34: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-10-18 11:44: test(engine): benchmark frame time consistency under 60 FPS load
