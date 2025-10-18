@@ -54,3 +54,4 @@
 - 2025-10-18 11:44: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-10-18 12:53: refactor(physics): AABB collision detection against voxel grid
 - 2025-10-18 15:48: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2025-10-18 16:22: refactor(terrain): Perlin noise octaves for procedural valleys
