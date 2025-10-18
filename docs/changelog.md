@@ -57,3 +57,4 @@
 - 2025-10-18 16:22: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-10-18 17:14: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-10-18 18:31: refactor(physics): AABB collision detection against voxel grid
+- 2025-10-18 19:43: feat(lighting): directional sunlight ray casting across voxel faces
