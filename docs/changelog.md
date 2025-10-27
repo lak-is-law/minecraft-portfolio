@@ -54,3 +54,4 @@
 - 2025-10-18 22:59: refactor(physics): AABB collision detection against voxel grid
 - 2025-10-27 11:24: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-10-27 14:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2025-10-27 19:22: fix(controls): pointer lock sensitivity on high-DPI displays
