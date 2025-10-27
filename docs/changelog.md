@@ -52,3 +52,4 @@
 - 2025-10-18 20:24: refactor(physics): AABB collision detection against voxel grid
 - 2025-10-18 21:05: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-10-18 22:59: refactor(physics): AABB collision detection against voxel grid
+- 2025-10-27 11:24: refactor(terrain): Perlin noise octaves for procedural valleys
