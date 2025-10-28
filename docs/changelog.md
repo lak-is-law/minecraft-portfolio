@@ -56,3 +56,4 @@
 - 2025-10-27 14:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-10-27 19:22: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-10-27 20:08: refactor(blocks): bit-packed voxel state representation
+- 2025-10-28 10:07: test(collision): verify player bounding box floor snapping
