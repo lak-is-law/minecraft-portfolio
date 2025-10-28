@@ -52,3 +52,4 @@
 - 2025-10-28 13:50: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-10-28 14:14: test(collision): verify player bounding box floor snapping
 - 2025-10-28 15:11: feat(lighting): directional sunlight ray casting across voxel faces
+- 2025-10-28 16:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
