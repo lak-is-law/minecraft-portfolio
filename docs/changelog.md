@@ -57,3 +57,4 @@
 - 2025-10-28 18:24: docs(engine): document voxel coordinate transformation pipeline
 - 2025-10-28 19:07: feat(monument): LK brick monument voxel texture atlas
 - 2025-10-28 20:43: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-10-28 22:36: feat(monument): LK brick monument voxel texture atlas
