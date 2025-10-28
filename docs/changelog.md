@@ -50,3 +50,4 @@
 - 2025-10-28 10:07: test(collision): verify player bounding box floor snapping
 - 2025-10-28 11:02: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-10-28 13:50: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2025-10-28 14:14: test(collision): verify player bounding box floor snapping
