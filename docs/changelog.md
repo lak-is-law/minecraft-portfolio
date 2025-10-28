@@ -55,3 +55,4 @@
 - 2025-10-28 16:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-10-28 17:24: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-10-28 18:24: docs(engine): document voxel coordinate transformation pipeline
+- 2025-10-28 19:07: feat(monument): LK brick monument voxel texture atlas
