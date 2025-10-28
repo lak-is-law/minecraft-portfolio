@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-08-19 19:22: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-08-23 20:58: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-08-23 21:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-08-23 22:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-08-26 10:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-08-26 16:07: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-08-29 11:50: test(collision): verify player bounding box floor snapping
-- 2025-08-29 12:39: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-08-29 16:17: perf(worker): offload terrain generation to web workers
 - 2025-08-30 13:40: test(collision): verify player bounding box floor snapping
 - 2025-08-30 15:49: test(engine): benchmark frame time consistency under 60 FPS load
 - 2025-08-30 16:49: feat(monument): LK brick monument voxel texture atlas
@@ -58,3 +49,4 @@
 - 2025-10-27 20:08: refactor(blocks): bit-packed voxel state representation
 - 2025-10-28 10:07: test(collision): verify player bounding box floor snapping
 - 2025-10-28 11:02: feat(lighting): directional sunlight ray casting across voxel faces
+- 2025-10-28 13:50: fix(controls): pointer lock sensitivity on high-DPI displays
