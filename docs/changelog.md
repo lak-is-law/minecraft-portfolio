@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-08-30 13:40: test(collision): verify player bounding box floor snapping
-- 2025-08-30 15:49: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-08-30 16:49: feat(monument): LK brick monument voxel texture atlas
-- 2025-08-31 10:05: perf(worker): offload terrain generation to web workers
-- 2025-08-31 12:27: docs(engine): document voxel coordinate transformation pipeline
-- 2025-08-31 15:30: refactor(physics): AABB collision detection against voxel grid
-- 2025-08-31 21:07: refactor(blocks): bit-packed voxel state representation
-- 2025-09-09 11:04: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-09-09 14:46: feat(monument): LK brick monument voxel texture atlas
 - 2025-09-09 17:09: feat(audio): spatial distance attenuation for ambient loops
 - 2025-09-14 13:09: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-09-23 10:18: feat(postprocessing): bloom and atmospheric fog pass in Three.js
@@ -58,3 +49,4 @@
 - 2025-10-28 19:07: feat(monument): LK brick monument voxel texture atlas
 - 2025-10-28 20:43: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-10-28 22:36: feat(monument): LK brick monument voxel texture atlas
+- 2025-10-30 10:43: feat(ui): inventory hotbar HUD and interactive crosshair
