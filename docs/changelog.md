@@ -50,3 +50,4 @@
 - 2025-10-28 20:43: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-10-28 22:36: feat(monument): LK brick monument voxel texture atlas
 - 2025-10-30 10:43: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-10-30 21:21: fix(controls): pointer lock sensitivity on high-DPI displays
