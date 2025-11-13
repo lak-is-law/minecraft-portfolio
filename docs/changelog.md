@@ -54,3 +54,4 @@
 - 2025-11-03 13:55: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-11-13 14:55: docs(engine): document voxel coordinate transformation pipeline
 - 2025-11-13 15:14: feat(monument): LK brick monument voxel texture atlas
+- 2025-11-13 21:16: perf(worker): offload terrain generation to web workers
