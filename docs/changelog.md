@@ -52,3 +52,4 @@
 - 2025-10-30 10:43: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-10-30 21:21: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-11-03 13:55: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-11-13 14:55: docs(engine): document voxel coordinate transformation pipeline
