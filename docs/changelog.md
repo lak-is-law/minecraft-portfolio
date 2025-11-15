@@ -57,3 +57,4 @@
 - 2025-11-13 21:16: perf(worker): offload terrain generation to web workers
 - 2025-11-13 22:39: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-11-15 10:09: test(collision): verify player bounding box floor snapping
+- 2025-11-15 14:02: refactor(terrain): Perlin noise octaves for procedural valleys
