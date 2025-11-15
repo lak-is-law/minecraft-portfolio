@@ -50,3 +50,4 @@
 - 2025-11-15 10:09: test(collision): verify player bounding box floor snapping
 - 2025-11-15 14:02: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-11-15 16:54: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-11-15 20:01: perf(worker): offload terrain generation to web workers
