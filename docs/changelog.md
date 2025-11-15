@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-09-09 17:09: feat(audio): spatial distance attenuation for ambient loops
-- 2025-09-14 13:09: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-09-23 10:18: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-09-23 11:38: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-09-23 16:53: test(collision): verify player bounding box floor snapping
-- 2025-09-23 18:49: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-09-23 19:56: refactor(physics): AABB collision detection against voxel grid
-- 2025-09-23 20:29: feat(audio): spatial distance attenuation for ambient loops
-- 2025-09-27 15:20: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-09-27 17:25: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-09-27 19:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-09-27 21:35: docs(engine): document voxel coordinate transformation pipeline
@@ -58,3 +49,4 @@
 - 2025-11-13 22:39: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-11-15 10:09: test(collision): verify player bounding box floor snapping
 - 2025-11-15 14:02: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2025-11-15 16:54: feat(ui): inventory hotbar HUD and interactive crosshair
