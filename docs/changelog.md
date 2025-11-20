@@ -52,3 +52,4 @@
 - 2025-11-20 18:37: feat(monument): LK brick monument voxel texture atlas
 - 2025-11-20 19:23: perf(worker): offload terrain generation to web workers
 - 2025-11-20 20:23: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-11-20 21:04: feat(voxel): chunk mesh generation and greedy meshing
