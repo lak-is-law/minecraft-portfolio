@@ -55,3 +55,4 @@
 - 2025-11-20 11:00: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-11-20 12:58: test(collision): verify player bounding box floor snapping
 - 2025-11-20 14:39: perf(worker): offload terrain generation to web workers
+- 2025-11-20 15:29: test(collision): verify player bounding box floor snapping
