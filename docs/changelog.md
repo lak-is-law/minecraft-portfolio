@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-09-27 17:25: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-09-27 19:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-09-27 21:35: docs(engine): document voxel coordinate transformation pipeline
-- 2025-10-05 16:51: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-10-05 17:13: test(collision): verify player bounding box floor snapping
-- 2025-10-05 18:37: docs(engine): document voxel coordinate transformation pipeline
-- 2025-10-05 21:19: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-10-11 10:51: feat(monument): LK brick monument voxel texture atlas
-- 2025-10-11 11:32: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-10-11 13:18: test(collision): verify player bounding box floor snapping
 - 2025-10-11 14:53: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-10-11 16:37: fix(controls): pointer lock sensitivity on high-DPI displays
@@ -58,3 +49,4 @@
 - 2025-11-20 15:29: test(collision): verify player bounding box floor snapping
 - 2025-11-20 16:08: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-11-20 17:26: feat(lighting): directional sunlight ray casting across voxel faces
+- 2025-11-20 18:37: feat(monument): LK brick monument voxel texture atlas
