@@ -50,3 +50,4 @@
 - 2025-11-20 16:08: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-11-20 17:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-11-20 18:37: feat(monument): LK brick monument voxel texture atlas
+- 2025-11-20 19:23: perf(worker): offload terrain generation to web workers
