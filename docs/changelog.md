@@ -53,3 +53,4 @@
 - 2025-11-15 20:01: perf(worker): offload terrain generation to web workers
 - 2025-11-20 10:15: feat(audio): spatial distance attenuation for ambient loops
 - 2025-11-20 11:00: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2025-11-20 12:58: test(collision): verify player bounding box floor snapping
