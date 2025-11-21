@@ -54,3 +54,4 @@
 - 2025-11-20 20:23: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-20 21:04: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-11-20 22:23: perf(render): frustum culling for non-visible chunk boundaries
+- 2025-11-21 10:29: perf(worker): offload terrain generation to web workers
