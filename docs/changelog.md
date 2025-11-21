@@ -50,3 +50,4 @@
 - 2025-11-21 13:57: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 18:09: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 21:41: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-11-21 22:59: perf(render): frustum culling for non-visible chunk boundaries
