@@ -57,3 +57,4 @@
 - 2025-11-21 10:29: perf(worker): offload terrain generation to web workers
 - 2025-11-21 12:51: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 13:57: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-11-21 18:09: perf(shaders): optimize ambient occlusion fragment pass
