@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-10-11 13:18: test(collision): verify player bounding box floor snapping
-- 2025-10-11 14:53: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-10-11 16:37: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-10-11 18:17: perf(worker): offload terrain generation to web workers
-- 2025-10-11 21:29: feat(audio): spatial distance attenuation for ambient loops
-- 2025-10-18 10:34: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-10-18 11:44: test(engine): benchmark frame time consistency under 60 FPS load
-- 2025-10-18 12:53: refactor(physics): AABB collision detection against voxel grid
-- 2025-10-18 15:48: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-10-18 16:22: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-10-18 17:14: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-10-18 18:31: refactor(physics): AABB collision detection against voxel grid
@@ -58,3 +49,4 @@
 - 2025-11-21 12:51: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 13:57: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 18:09: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-11-21 21:41: fix(camera): pitch clamp preventing gimbal lock at zenith
