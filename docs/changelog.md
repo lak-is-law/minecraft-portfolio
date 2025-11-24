@@ -56,3 +56,4 @@
 - 2025-11-24 15:41: refactor(physics): AABB collision detection against voxel grid
 - 2025-11-24 16:45: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-11-24 19:11: feat(audio): spatial distance attenuation for ambient loops
+- 2025-11-24 20:45: feat(ui): inventory hotbar HUD and interactive crosshair
