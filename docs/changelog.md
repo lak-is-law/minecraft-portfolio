@@ -53,3 +53,4 @@
 - 2025-11-21 22:59: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-11-24 12:06: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-11-24 13:33: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2025-11-24 15:41: refactor(physics): AABB collision detection against voxel grid
