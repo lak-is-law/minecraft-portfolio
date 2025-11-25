@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-10-18 16:22: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-10-18 17:14: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-10-18 18:31: refactor(physics): AABB collision detection against voxel grid
-- 2025-10-18 19:43: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-10-18 20:24: refactor(physics): AABB collision detection against voxel grid
-- 2025-10-18 21:05: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-10-18 22:59: refactor(physics): AABB collision detection against voxel grid
-- 2025-10-27 11:24: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-10-27 14:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-10-27 19:22: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-10-27 20:08: refactor(blocks): bit-packed voxel state representation
 - 2025-10-28 10:07: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2025-11-24 19:11: feat(audio): spatial distance attenuation for ambient loops
 - 2025-11-24 20:45: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-11-25 16:21: perf(worker): offload terrain generation to web workers
+- 2025-11-25 18:52: feat(lighting): directional sunlight ray casting across voxel faces
