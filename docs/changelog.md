@@ -51,3 +51,4 @@
 - 2025-11-25 16:21: perf(worker): offload terrain generation to web workers
 - 2025-11-25 18:52: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-11-29 16:26: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2025-11-29 17:05: feat(ui): inventory hotbar HUD and interactive crosshair
