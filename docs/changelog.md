@@ -57,3 +57,4 @@
 - 2025-12-01 12:28: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-01 15:13: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-12-03 10:30: feat(audio): spatial distance attenuation for ambient loops
+- 2025-12-03 14:41: feat(voxel): chunk mesh generation and greedy meshing
