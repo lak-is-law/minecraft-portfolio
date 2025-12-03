@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-10-27 19:22: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-10-27 20:08: refactor(blocks): bit-packed voxel state representation
-- 2025-10-28 10:07: test(collision): verify player bounding box floor snapping
-- 2025-10-28 11:02: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-10-28 13:50: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-10-28 14:14: test(collision): verify player bounding box floor snapping
-- 2025-10-28 15:11: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-10-28 16:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-10-28 17:24: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-10-28 18:24: docs(engine): document voxel coordinate transformation pipeline
 - 2025-10-28 19:07: feat(monument): LK brick monument voxel texture atlas
 - 2025-10-28 20:43: feat(ui): inventory hotbar HUD and interactive crosshair
@@ -58,3 +49,4 @@
 - 2025-12-01 15:13: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-12-03 10:30: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-03 14:41: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-12-03 15:16: fix(camera): pitch clamp preventing gimbal lock at zenith
