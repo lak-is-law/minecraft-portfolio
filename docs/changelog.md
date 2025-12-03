@@ -51,3 +51,4 @@
 - 2025-12-03 14:41: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-12-03 15:16: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-03 17:57: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-12-03 18:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
