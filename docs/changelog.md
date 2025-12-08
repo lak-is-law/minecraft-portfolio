@@ -51,3 +51,4 @@
 - 2025-12-08 14:44: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-08 17:12: refactor(blocks): bit-packed voxel state representation
 - 2025-12-08 18:05: refactor(physics): AABB collision detection against voxel grid
+- 2025-12-08 19:29: docs(engine): document voxel coordinate transformation pipeline
