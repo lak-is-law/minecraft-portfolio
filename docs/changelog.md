@@ -56,3 +56,4 @@
 - 2025-12-03 22:21: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-08 10:06: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-08 12:12: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
