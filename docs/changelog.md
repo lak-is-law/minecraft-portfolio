@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-10-28 18:24: docs(engine): document voxel coordinate transformation pipeline
-- 2025-10-28 19:07: feat(monument): LK brick monument voxel texture atlas
-- 2025-10-28 20:43: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-10-28 22:36: feat(monument): LK brick monument voxel texture atlas
-- 2025-10-30 10:43: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-10-30 21:21: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-11-03 13:55: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-11-13 14:55: docs(engine): document voxel coordinate transformation pipeline
-- 2025-11-13 15:14: feat(monument): LK brick monument voxel texture atlas
 - 2025-11-13 21:16: perf(worker): offload terrain generation to web workers
 - 2025-11-13 22:39: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-11-15 10:09: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2025-12-08 12:12: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
 - 2025-12-08 14:44: feat(monument): LK brick monument voxel texture atlas
+- 2025-12-08 17:12: refactor(blocks): bit-packed voxel state representation
