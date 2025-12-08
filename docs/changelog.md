@@ -50,3 +50,4 @@
 - 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
 - 2025-12-08 14:44: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-08 17:12: refactor(blocks): bit-packed voxel state representation
+- 2025-12-08 18:05: refactor(physics): AABB collision detection against voxel grid
