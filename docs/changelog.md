@@ -54,3 +54,4 @@
 - 2025-12-03 18:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2025-12-03 19:16: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-12-03 22:21: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-12-08 10:06: feat(audio): spatial distance attenuation for ambient loops
