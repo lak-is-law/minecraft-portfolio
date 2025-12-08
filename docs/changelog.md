@@ -57,3 +57,4 @@
 - 2025-12-08 10:06: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-08 12:12: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
+- 2025-12-08 14:44: feat(monument): LK brick monument voxel texture atlas
