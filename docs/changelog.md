@@ -52,3 +52,4 @@
 - 2025-12-08 17:12: refactor(blocks): bit-packed voxel state representation
 - 2025-12-08 18:05: refactor(physics): AABB collision detection against voxel grid
 - 2025-12-08 19:29: docs(engine): document voxel coordinate transformation pipeline
+- 2025-12-09 16:49: refactor(terrain): Perlin noise octaves for procedural valleys
