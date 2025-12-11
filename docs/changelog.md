@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-11-13 21:16: perf(worker): offload terrain generation to web workers
-- 2025-11-13 22:39: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-11-15 10:09: test(collision): verify player bounding box floor snapping
-- 2025-11-15 14:02: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-11-15 16:54: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-11-15 20:01: perf(worker): offload terrain generation to web workers
-- 2025-11-20 10:15: feat(audio): spatial distance attenuation for ambient loops
-- 2025-11-20 11:00: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-11-20 12:58: test(collision): verify player bounding box floor snapping
 - 2025-11-20 14:39: perf(worker): offload terrain generation to web workers
 - 2025-11-20 15:29: test(collision): verify player bounding box floor snapping
 - 2025-11-20 16:08: fix(controls): pointer lock sensitivity on high-DPI displays
@@ -58,3 +49,4 @@
 - 2025-12-11 10:11: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-11 13:19: refactor(blocks): bit-packed voxel state representation
 - 2025-12-11 14:56: feat(monument): LK brick monument voxel texture atlas
+- 2025-12-11 21:48: refactor(terrain): Perlin noise octaves for procedural valleys
