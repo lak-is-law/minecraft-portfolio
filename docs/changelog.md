@@ -55,3 +55,4 @@
 - 2025-12-09 16:49: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-09 18:49: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-09 19:18: feat(monument): LK brick monument voxel texture atlas
+- 2025-12-11 10:11: refactor(terrain): Perlin noise octaves for procedural valleys
