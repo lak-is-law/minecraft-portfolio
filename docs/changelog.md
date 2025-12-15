@@ -50,3 +50,4 @@
 - 2025-12-11 13:19: refactor(blocks): bit-packed voxel state representation
 - 2025-12-11 14:56: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-11 21:48: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2025-12-15 10:36: perf(shaders): optimize ambient occlusion fragment pass
