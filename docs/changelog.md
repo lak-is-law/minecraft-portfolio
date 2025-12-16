@@ -56,3 +56,4 @@
 - 2025-12-15 21:18: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-12-16 10:36: test(collision): verify player bounding box floor snapping
 - 2025-12-16 11:47: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-12-16 13:21: perf(shaders): optimize ambient occlusion fragment pass
