@@ -54,3 +54,4 @@
 - 2025-12-15 13:06: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-12-15 18:21: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-12-15 21:18: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2025-12-16 10:36: test(collision): verify player bounding box floor snapping
