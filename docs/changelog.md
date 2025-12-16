@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-11-20 14:39: perf(worker): offload terrain generation to web workers
-- 2025-11-20 15:29: test(collision): verify player bounding box floor snapping
-- 2025-11-20 16:08: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-11-20 17:26: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-11-20 18:37: feat(monument): LK brick monument voxel texture atlas
-- 2025-11-20 19:23: perf(worker): offload terrain generation to web workers
-- 2025-11-20 20:23: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-11-20 21:04: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-11-20 22:23: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-11-21 10:29: perf(worker): offload terrain generation to web workers
 - 2025-11-21 12:51: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-11-21 13:57: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2025-12-16 11:47: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-16 13:21: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-16 16:37: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-12-16 19:16: fix(controls): pointer lock sensitivity on high-DPI displays
