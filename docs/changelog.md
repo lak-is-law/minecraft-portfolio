@@ -51,3 +51,4 @@
 - 2025-12-16 16:37: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-16 19:16: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-12-16 20:07: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2025-12-16 21:24: feat(ui): inventory hotbar HUD and interactive crosshair
