@@ -57,3 +57,4 @@
 - 2025-12-16 10:36: test(collision): verify player bounding box floor snapping
 - 2025-12-16 11:47: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-16 13:21: perf(shaders): optimize ambient occlusion fragment pass
+- 2025-12-16 16:37: fix(camera): pitch clamp preventing gimbal lock at zenith
