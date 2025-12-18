@@ -56,3 +56,4 @@
 - 2025-12-18 15:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-12-18 17:32: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-18 19:01: feat(monument): LK brick monument voxel texture atlas
+- 2025-12-18 20:51: refactor(terrain): Perlin noise octaves for procedural valleys
