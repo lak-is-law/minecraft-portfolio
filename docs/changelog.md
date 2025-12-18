@@ -53,3 +53,4 @@
 - 2025-12-16 20:07: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-16 21:24: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2025-12-18 14:13: feat(voxel): chunk mesh generation and greedy meshing
+- 2025-12-18 15:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
