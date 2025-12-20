@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-11-21 10:29: perf(worker): offload terrain generation to web workers
-- 2025-11-21 12:51: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-11-21 13:57: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-11-21 18:09: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-11-21 21:41: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-11-21 22:59: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-11-24 12:06: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-11-24 13:33: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-11-24 15:41: refactor(physics): AABB collision detection against voxel grid
 - 2025-11-24 16:45: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-11-24 19:11: feat(audio): spatial distance attenuation for ambient loops
 - 2025-11-24 20:45: feat(ui): inventory hotbar HUD and interactive crosshair
@@ -58,3 +49,4 @@
 - 2025-12-18 19:01: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-18 20:51: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-20 14:00: feat(audio): spatial distance attenuation for ambient loops
+- 2025-12-20 21:18: docs(engine): document voxel coordinate transformation pipeline
