@@ -53,3 +53,4 @@
 - 2025-12-26 10:06: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-26 11:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-12-26 13:03: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-12-26 16:18: feat(monument): LK brick monument voxel texture atlas
