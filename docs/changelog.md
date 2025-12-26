@@ -54,3 +54,4 @@
 - 2025-12-26 11:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-12-26 13:03: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-26 16:18: feat(monument): LK brick monument voxel texture atlas
+- 2025-12-26 17:34: feat(lighting): directional sunlight ray casting across voxel faces
