@@ -51,3 +51,4 @@
 - 2025-12-20 14:00: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-20 21:18: docs(engine): document voxel coordinate transformation pipeline
 - 2025-12-26 10:06: feat(audio): spatial distance attenuation for ambient loops
+- 2025-12-26 11:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
