@@ -57,3 +57,4 @@
 - 2025-12-26 17:34: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-12-26 18:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-12-26 22:35: test(collision): verify player bounding box floor snapping
+- 2025-12-27 19:19: refactor(blocks): bit-packed voxel state representation
