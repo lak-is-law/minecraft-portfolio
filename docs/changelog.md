@@ -50,3 +50,4 @@
 - 2025-12-26 22:35: test(collision): verify player bounding box floor snapping
 - 2025-12-27 19:19: refactor(blocks): bit-packed voxel state representation
 - 2025-12-31 12:10: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2025-12-31 20:47: perf(render): frustum culling for non-visible chunk boundaries
