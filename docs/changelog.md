@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-11-24 16:45: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-11-24 19:11: feat(audio): spatial distance attenuation for ambient loops
-- 2025-11-24 20:45: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-11-25 16:21: perf(worker): offload terrain generation to web workers
-- 2025-11-25 18:52: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-11-29 16:26: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-11-29 17:05: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-11-29 18:45: refactor(blocks): bit-packed voxel state representation
-- 2025-11-30 20:15: perf(worker): offload terrain generation to web workers
 - 2025-12-01 12:28: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-01 15:13: feat(voxel): chunk mesh generation and greedy meshing
 - 2025-12-03 10:30: feat(audio): spatial distance attenuation for ambient loops
@@ -58,3 +49,4 @@
 - 2025-12-26 18:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-12-26 22:35: test(collision): verify player bounding box floor snapping
 - 2025-12-27 19:19: refactor(blocks): bit-packed voxel state representation
+- 2025-12-31 12:10: fix(camera): pitch clamp preventing gimbal lock at zenith
