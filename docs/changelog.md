@@ -57,3 +57,4 @@
 - 2026-01-18 13:20: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-18 15:42: perf(worker): offload terrain generation to web workers
 - 2026-01-18 17:31: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-01-18 19:34: refactor(terrain): Perlin noise octaves for procedural valleys
