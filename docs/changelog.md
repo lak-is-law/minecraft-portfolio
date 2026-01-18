@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-01 12:28: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-01 15:13: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-12-03 10:30: feat(audio): spatial distance attenuation for ambient loops
-- 2025-12-03 14:41: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-12-03 15:16: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-03 17:57: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-12-03 18:26: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2025-12-03 19:16: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-12-03 22:21: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-08 10:06: feat(audio): spatial distance attenuation for ambient loops
 - 2025-12-08 12:12: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2026-01-18 15:42: perf(worker): offload terrain generation to web workers
 - 2026-01-18 17:31: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-18 19:34: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-01-18 20:17: test(collision): verify player bounding box floor snapping
