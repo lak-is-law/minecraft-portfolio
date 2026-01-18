@@ -53,3 +53,4 @@
 - 2025-12-31 20:47: perf(render): frustum culling for non-visible chunk boundaries
 - 2025-12-31 22:32: test(collision): verify player bounding box floor snapping
 - 2026-01-18 11:30: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-18 12:41: feat(monument): LK brick monument voxel texture atlas
