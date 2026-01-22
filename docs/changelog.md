@@ -52,3 +52,4 @@
 - 2026-01-22 11:37: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-22 12:29: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-01-22 12:38: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-01-22 13:24: feat(audio): spatial distance attenuation for ambient loops
