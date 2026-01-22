@@ -54,3 +54,4 @@
 - 2026-01-22 12:38: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-01-22 13:24: feat(audio): spatial distance attenuation for ambient loops
 - 2026-01-22 14:00: docs(engine): document voxel coordinate transformation pipeline
+- 2026-01-22 15:31: feat(lighting): directional sunlight ray casting across voxel faces
