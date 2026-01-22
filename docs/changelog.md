@@ -55,3 +55,4 @@
 - 2026-01-22 13:24: feat(audio): spatial distance attenuation for ambient loops
 - 2026-01-22 14:00: docs(engine): document voxel coordinate transformation pipeline
 - 2026-01-22 15:31: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-01-22 16:50: refactor(physics): AABB collision detection against voxel grid
