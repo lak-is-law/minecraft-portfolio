@@ -52,3 +52,4 @@
 - 2026-01-22 19:41: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-22 20:53: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-01-22 21:52: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-01-22 22:22: perf(memory): reuse Float32Array buffers across chunk re-meshes
