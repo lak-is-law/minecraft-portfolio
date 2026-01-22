@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-08 10:06: feat(audio): spatial distance attenuation for ambient loops
-- 2025-12-08 12:12: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-08 13:52: test(collision): verify player bounding box floor snapping
-- 2025-12-08 14:44: feat(monument): LK brick monument voxel texture atlas
-- 2025-12-08 17:12: refactor(blocks): bit-packed voxel state representation
-- 2025-12-08 18:05: refactor(physics): AABB collision detection against voxel grid
-- 2025-12-08 19:29: docs(engine): document voxel coordinate transformation pipeline
-- 2025-12-09 16:49: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-09 18:49: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-09 19:18: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-11 10:11: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-11 13:19: refactor(blocks): bit-packed voxel state representation
@@ -58,3 +49,4 @@
 - 2026-01-22 10:13: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-01-22 10:53: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-01-22 11:17: perf(worker): offload terrain generation to web workers
+- 2026-01-22 11:37: feat(ui): inventory hotbar HUD and interactive crosshair
