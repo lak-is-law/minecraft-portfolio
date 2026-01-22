@@ -56,3 +56,4 @@
 - 2026-01-22 14:00: docs(engine): document voxel coordinate transformation pipeline
 - 2026-01-22 15:31: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-22 16:50: refactor(physics): AABB collision detection against voxel grid
+- 2026-01-22 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
