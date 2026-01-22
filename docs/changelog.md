@@ -51,3 +51,4 @@
 - 2026-01-22 11:17: perf(worker): offload terrain generation to web workers
 - 2026-01-22 11:37: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-22 12:29: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-22 12:38: perf(shaders): optimize ambient occlusion fragment pass
