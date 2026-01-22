@@ -56,3 +56,4 @@
 - 2026-01-19 19:16: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-01-19 22:58: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-22 10:13: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-01-22 10:53: perf(shaders): optimize ambient occlusion fragment pass
