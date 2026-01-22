@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-09 19:18: feat(monument): LK brick monument voxel texture atlas
-- 2025-12-11 10:11: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-11 13:19: refactor(blocks): bit-packed voxel state representation
-- 2025-12-11 14:56: feat(monument): LK brick monument voxel texture atlas
-- 2025-12-11 21:48: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-15 10:36: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-12-15 13:06: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-12-15 18:21: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-12-15 21:18: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2025-12-16 10:36: test(collision): verify player bounding box floor snapping
 - 2025-12-16 11:47: perf(shaders): optimize ambient occlusion fragment pass
 - 2025-12-16 13:21: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2026-01-22 16:50: refactor(physics): AABB collision detection against voxel grid
 - 2026-01-22 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-22 18:50: docs(engine): document voxel coordinate transformation pipeline
+- 2026-01-22 19:41: feat(lighting): directional sunlight ray casting across voxel faces
