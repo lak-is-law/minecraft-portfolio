@@ -57,3 +57,4 @@
 - 2026-01-23 15:18: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-23 15:28: feat(monument): LK brick monument voxel texture atlas
 - 2026-01-23 16:49: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-01-23 16:53: test(engine): benchmark frame time consistency under 60 FPS load
