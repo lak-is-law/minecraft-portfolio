@@ -52,3 +52,4 @@
 - 2026-01-23 12:24: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-01-23 13:16: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-01-23 13:50: feat(monument): LK brick monument voxel texture atlas
+- 2026-01-23 14:37: feat(ui): inventory hotbar HUD and interactive crosshair
