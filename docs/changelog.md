@@ -53,3 +53,4 @@
 - 2026-01-23 17:31: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-01-23 18:54: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-23 19:38: test(collision): verify player bounding box floor snapping
+- 2026-01-23 20:55: docs(engine): document voxel coordinate transformation pipeline
