@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-16 10:36: test(collision): verify player bounding box floor snapping
-- 2025-12-16 11:47: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-12-16 13:21: perf(shaders): optimize ambient occlusion fragment pass
-- 2025-12-16 16:37: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-16 19:16: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2025-12-16 20:07: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-16 21:24: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2025-12-18 14:13: feat(voxel): chunk mesh generation and greedy meshing
-- 2025-12-18 15:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2025-12-18 17:32: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2025-12-18 19:01: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-18 20:51: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-01-23 11:40: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-23 11:50: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-01-23 12:21: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-01-23 12:24: feat(voxel): chunk mesh generation and greedy meshing
