@@ -56,3 +56,4 @@
 - 2026-01-23 10:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-23 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-01-23 11:40: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-01-23 11:50: test(engine): benchmark frame time consistency under 60 FPS load
