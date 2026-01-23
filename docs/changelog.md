@@ -51,3 +51,4 @@
 - 2026-01-23 16:53: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-01-23 17:00: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-23 17:31: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-23 18:54: feat(postprocessing): bloom and atmospheric fog pass in Three.js
