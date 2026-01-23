@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-18 17:32: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-18 19:01: feat(monument): LK brick monument voxel texture atlas
-- 2025-12-18 20:51: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2025-12-20 14:00: feat(audio): spatial distance attenuation for ambient loops
-- 2025-12-20 21:18: docs(engine): document voxel coordinate transformation pipeline
-- 2025-12-26 10:06: feat(audio): spatial distance attenuation for ambient loops
-- 2025-12-26 11:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2025-12-26 13:03: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-26 16:18: feat(monument): LK brick monument voxel texture atlas
 - 2025-12-26 17:34: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-12-26 18:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2025-12-26 22:35: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2026-01-23 15:28: feat(monument): LK brick monument voxel texture atlas
 - 2026-01-23 16:49: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-23 16:53: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-01-23 17:00: feat(ui): inventory hotbar HUD and interactive crosshair
