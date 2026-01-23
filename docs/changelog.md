@@ -55,3 +55,4 @@
 - 2026-01-22 22:22: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-23 10:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-23 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-01-23 11:40: refactor(terrain): Perlin noise octaves for procedural valleys
