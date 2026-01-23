@@ -50,3 +50,4 @@
 - 2026-01-23 11:50: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-01-23 12:21: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-01-23 12:24: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-23 13:16: fix(controls): pointer lock sensitivity on high-DPI displays
