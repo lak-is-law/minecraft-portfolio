@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2025-12-26 17:34: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-12-26 18:26: feat(lighting): directional sunlight ray casting across voxel faces
-- 2025-12-26 22:35: test(collision): verify player bounding box floor snapping
-- 2025-12-27 19:19: refactor(blocks): bit-packed voxel state representation
-- 2025-12-31 12:10: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2025-12-31 20:47: perf(render): frustum culling for non-visible chunk boundaries
-- 2025-12-31 22:32: test(collision): verify player bounding box floor snapping
-- 2026-01-18 11:30: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-01-18 12:41: feat(monument): LK brick monument voxel texture atlas
 - 2026-01-18 13:20: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-18 15:42: perf(worker): offload terrain generation to web workers
 - 2026-01-18 17:31: perf(render): frustum culling for non-visible chunk boundaries
@@ -58,3 +49,4 @@
 - 2026-01-23 22:37: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 10:06: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-24 10:18: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-01-24 11:22: refactor(physics): AABB collision detection against voxel grid
