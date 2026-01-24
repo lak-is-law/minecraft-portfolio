@@ -54,3 +54,4 @@
 - 2026-01-24 16:55: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-01-24 17:13: refactor(blocks): bit-packed voxel state representation
 - 2026-01-24 17:31: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-01-24 18:18: perf(memory): reuse Float32Array buffers across chunk re-meshes
