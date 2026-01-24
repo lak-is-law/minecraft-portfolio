@@ -50,3 +50,4 @@
 - 2026-01-24 10:06: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-24 10:18: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-24 11:22: refactor(physics): AABB collision detection against voxel grid
+- 2026-01-24 11:34: fix(controls): pointer lock sensitivity on high-DPI displays
