@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-19 22:58: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-01-22 10:13: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-01-22 10:53: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-01-22 11:17: perf(worker): offload terrain generation to web workers
-- 2026-01-22 11:37: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-01-22 12:29: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-01-22 12:38: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-01-22 13:24: feat(audio): spatial distance attenuation for ambient loops
-- 2026-01-22 14:00: docs(engine): document voxel coordinate transformation pipeline
 - 2026-01-22 15:31: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-22 16:50: refactor(physics): AABB collision detection against voxel grid
 - 2026-01-22 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-01-24 18:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-24 19:22: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 19:40: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-01-24 20:58: test(engine): benchmark frame time consistency under 60 FPS load
