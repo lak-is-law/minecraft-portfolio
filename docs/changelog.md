@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-18 13:20: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-01-18 15:42: perf(worker): offload terrain generation to web workers
-- 2026-01-18 17:31: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-01-18 19:34: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-01-18 20:17: test(collision): verify player bounding box floor snapping
-- 2026-01-19 10:58: feat(monument): LK brick monument voxel texture atlas
-- 2026-01-19 16:37: perf(worker): offload terrain generation to web workers
-- 2026-01-19 18:11: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-01-19 19:16: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-01-19 22:58: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-22 10:13: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-01-22 10:53: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2026-01-24 14:07: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 14:09: refactor(blocks): bit-packed voxel state representation
 - 2026-01-24 15:24: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-24 15:56: perf(memory): reuse Float32Array buffers across chunk re-meshes
