@@ -50,3 +50,4 @@
 - 2026-01-24 14:09: refactor(blocks): bit-packed voxel state representation
 - 2026-01-24 15:24: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-01-24 15:56: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-01-24 16:04: feat(audio): spatial distance attenuation for ambient loops
