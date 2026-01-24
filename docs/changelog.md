@@ -50,3 +50,4 @@
 - 2026-01-24 19:22: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 19:40: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-01-24 20:58: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-01-24 21:48: refactor(physics): AABB collision detection against voxel grid
