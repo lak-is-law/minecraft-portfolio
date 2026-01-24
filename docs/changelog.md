@@ -52,3 +52,4 @@
 - 2026-01-24 15:56: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-24 16:04: feat(audio): spatial distance attenuation for ambient loops
 - 2026-01-24 16:55: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-01-24 17:13: refactor(blocks): bit-packed voxel state representation
