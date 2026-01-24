@@ -55,3 +55,4 @@
 - 2026-01-24 12:55: docs(engine): document voxel coordinate transformation pipeline
 - 2026-01-24 13:13: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-24 13:53: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-01-24 14:07: feat(postprocessing): bloom and atmospheric fog pass in Three.js
