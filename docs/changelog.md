@@ -57,3 +57,4 @@
 - 2026-01-23 21:53: test(collision): verify player bounding box floor snapping
 - 2026-01-23 22:37: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 10:06: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-01-24 10:18: feat(ui): inventory hotbar HUD and interactive crosshair
