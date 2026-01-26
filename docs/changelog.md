@@ -52,3 +52,4 @@
 - 2026-01-24 20:58: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-01-24 21:48: refactor(physics): AABB collision detection against voxel grid
 - 2026-01-24 22:54: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-01-26 10:03: feat(audio): spatial distance attenuation for ambient loops
