@@ -50,3 +50,4 @@
 - 2026-01-26 16:17: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-26 17:45: refactor(physics): AABB collision detection against voxel grid
 - 2026-01-26 18:37: feat(audio): spatial distance attenuation for ambient loops
+- 2026-01-26 19:00: perf(worker): offload terrain generation to web workers
