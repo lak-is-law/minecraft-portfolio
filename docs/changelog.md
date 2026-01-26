@@ -53,3 +53,4 @@
 - 2026-01-26 19:00: perf(worker): offload terrain generation to web workers
 - 2026-01-26 20:13: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-26 21:48: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-01-26 22:21: feat(postprocessing): bloom and atmospheric fog pass in Three.js
