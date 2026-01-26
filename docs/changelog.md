@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-22 15:31: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-01-22 16:50: refactor(physics): AABB collision detection against voxel grid
-- 2026-01-22 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-01-22 18:50: docs(engine): document voxel coordinate transformation pipeline
-- 2026-01-22 19:41: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-01-22 20:53: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-01-22 21:52: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-01-22 22:22: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-01-23 10:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-23 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-01-23 11:40: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-23 11:50: test(engine): benchmark frame time consistency under 60 FPS load
@@ -58,3 +49,4 @@
 - 2026-01-26 15:44: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-26 16:17: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-26 17:45: refactor(physics): AABB collision detection against voxel grid
+- 2026-01-26 18:37: feat(audio): spatial distance attenuation for ambient loops
