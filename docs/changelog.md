@@ -57,3 +57,4 @@
 - 2026-01-27 16:03: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-30 16:54: test(collision): verify player bounding box floor snapping
 - 2026-01-30 19:44: test(collision): verify player bounding box floor snapping
+- 2026-01-30 20:31: perf(worker): offload terrain generation to web workers
