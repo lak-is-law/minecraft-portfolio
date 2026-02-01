@@ -50,3 +50,4 @@
 - 2026-01-30 19:44: test(collision): verify player bounding box floor snapping
 - 2026-01-30 20:31: perf(worker): offload terrain generation to web workers
 - 2026-02-01 10:08: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-02-01 16:53: fix(camera): pitch clamp preventing gimbal lock at zenith
