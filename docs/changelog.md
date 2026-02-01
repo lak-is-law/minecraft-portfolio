@@ -52,3 +52,4 @@
 - 2026-02-01 10:08: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-01 16:53: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-01 17:45: feat(monument): LK brick monument voxel texture atlas
+- 2026-02-01 18:35: refactor(blocks): bit-packed voxel state representation
