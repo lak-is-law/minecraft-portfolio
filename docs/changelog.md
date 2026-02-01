@@ -51,3 +51,4 @@
 - 2026-01-30 20:31: perf(worker): offload terrain generation to web workers
 - 2026-02-01 10:08: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-01 16:53: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-02-01 17:45: feat(monument): LK brick monument voxel texture atlas
