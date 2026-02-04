@@ -56,3 +56,4 @@
 - 2026-02-01 20:46: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-02-04 11:55: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-02-04 14:37: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-02-04 15:37: feat(ui): inventory hotbar HUD and interactive crosshair
