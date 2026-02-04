@@ -50,3 +50,4 @@
 - 2026-02-04 15:37: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-02-04 16:28: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-04 19:44: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-02-04 20:26: docs(engine): document voxel coordinate transformation pipeline
