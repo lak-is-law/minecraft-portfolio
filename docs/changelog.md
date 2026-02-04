@@ -57,3 +57,4 @@
 - 2026-02-04 11:55: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-02-04 14:37: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-04 15:37: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-02-04 16:28: feat(monument): LK brick monument voxel texture atlas
