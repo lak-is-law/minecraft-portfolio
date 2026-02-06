@@ -53,3 +53,4 @@
 - 2026-02-04 20:26: docs(engine): document voxel coordinate transformation pipeline
 - 2026-02-04 22:58: test(collision): verify player bounding box floor snapping
 - 2026-02-06 12:37: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-02-06 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
