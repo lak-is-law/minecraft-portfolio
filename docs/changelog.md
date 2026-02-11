@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-23 21:53: test(collision): verify player bounding box floor snapping
-- 2026-01-23 22:37: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-01-24 10:06: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-01-24 10:18: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-01-24 11:22: refactor(physics): AABB collision detection against voxel grid
-- 2026-01-24 11:34: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-01-24 12:21: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-01-24 12:55: docs(engine): document voxel coordinate transformation pipeline
-- 2026-01-24 13:13: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-01-24 13:53: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 14:07: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-01-24 14:09: refactor(blocks): bit-packed voxel state representation
@@ -58,3 +49,4 @@
 - 2026-02-11 10:55: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-11 11:10: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-11 11:22: perf(worker): offload terrain generation to web workers
+- 2026-02-11 12:05: feat(postprocessing): bloom and atmospheric fog pass in Three.js
