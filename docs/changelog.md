@@ -56,3 +56,4 @@
 - 2026-02-06 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-11 10:41: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-02-11 10:55: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-02-11 11:10: fix(camera): pitch clamp preventing gimbal lock at zenith
