@@ -50,3 +50,4 @@
 - 2026-02-11 18:12: test(collision): verify player bounding box floor snapping
 - 2026-02-11 19:24: docs(engine): document voxel coordinate transformation pipeline
 - 2026-02-11 20:05: refactor(blocks): bit-packed voxel state representation
+- 2026-02-11 21:15: fix(controls): pointer lock sensitivity on high-DPI displays
