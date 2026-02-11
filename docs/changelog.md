@@ -51,3 +51,4 @@
 - 2026-02-11 11:22: perf(worker): offload terrain generation to web workers
 - 2026-02-11 12:05: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-02-11 12:34: feat(audio): spatial distance attenuation for ambient loops
+- 2026-02-11 13:15: perf(render): frustum culling for non-visible chunk boundaries
