@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-24 13:53: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-01-24 14:07: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-01-24 14:09: refactor(blocks): bit-packed voxel state representation
-- 2026-01-24 15:24: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-01-24 15:56: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-01-24 16:04: feat(audio): spatial distance attenuation for ambient loops
-- 2026-01-24 16:55: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-01-24 17:13: refactor(blocks): bit-packed voxel state representation
-- 2026-01-24 17:31: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-01-24 18:18: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-24 18:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-01-24 19:22: feat(postprocessing): bloom and atmospheric fog pass in Three.js
@@ -58,3 +49,4 @@
 - 2026-02-11 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-02-11 18:12: test(collision): verify player bounding box floor snapping
 - 2026-02-11 19:24: docs(engine): document voxel coordinate transformation pipeline
+- 2026-02-11 20:05: refactor(blocks): bit-packed voxel state representation
