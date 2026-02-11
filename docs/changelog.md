@@ -54,3 +54,4 @@
 - 2026-02-04 22:58: test(collision): verify player bounding box floor snapping
 - 2026-02-06 12:37: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-02-06 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-02-11 10:41: fix(controls): pointer lock sensitivity on high-DPI displays
