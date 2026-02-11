@@ -54,3 +54,4 @@
 - 2026-02-11 13:15: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-11 14:46: perf(worker): offload terrain generation to web workers
 - 2026-02-11 15:11: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-02-11 16:42: perf(shaders): optimize ambient occlusion fragment pass
