@@ -50,3 +50,4 @@
 - 2026-02-12 14:56: perf(worker): offload terrain generation to web workers
 - 2026-02-12 15:28: refactor(blocks): bit-packed voxel state representation
 - 2026-02-12 16:19: refactor(physics): AABB collision detection against voxel grid
+- 2026-02-12 17:09: perf(worker): offload terrain generation to web workers
