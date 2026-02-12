@@ -52,3 +52,4 @@
 - 2026-02-11 20:05: refactor(blocks): bit-packed voxel state representation
 - 2026-02-11 21:15: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-02-11 22:35: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-02-12 10:54: feat(audio): spatial distance attenuation for ambient loops
