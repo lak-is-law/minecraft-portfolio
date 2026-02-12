@@ -55,3 +55,4 @@
 - 2026-02-12 10:54: feat(audio): spatial distance attenuation for ambient loops
 - 2026-02-12 11:30: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-12 12:23: refactor(blocks): bit-packed voxel state representation
+- 2026-02-12 13:30: fix(camera): pitch clamp preventing gimbal lock at zenith
