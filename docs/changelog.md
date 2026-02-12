@@ -54,3 +54,4 @@
 - 2026-02-12 19:25: refactor(blocks): bit-packed voxel state representation
 - 2026-02-12 20:11: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-12 21:05: docs(engine): document voxel coordinate transformation pipeline
+- 2026-02-12 22:54: test(engine): benchmark frame time consistency under 60 FPS load
