@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-01-24 18:18: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-01-24 18:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-01-24 19:22: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-01-24 19:40: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-01-24 20:58: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-01-24 21:48: refactor(physics): AABB collision detection against voxel grid
-- 2026-01-24 22:54: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-01-26 10:03: feat(audio): spatial distance attenuation for ambient loops
-- 2026-01-26 13:54: feat(monument): LK brick monument voxel texture atlas
 - 2026-01-26 14:17: feat(audio): spatial distance attenuation for ambient loops
 - 2026-01-26 15:44: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-01-26 16:17: feat(lighting): directional sunlight ray casting across voxel faces
@@ -58,3 +49,4 @@
 - 2026-02-12 13:30: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-12 14:56: perf(worker): offload terrain generation to web workers
 - 2026-02-12 15:28: refactor(blocks): bit-packed voxel state representation
+- 2026-02-12 16:19: refactor(physics): AABB collision detection against voxel grid
