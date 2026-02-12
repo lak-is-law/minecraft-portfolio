@@ -57,3 +57,4 @@
 - 2026-02-12 12:23: refactor(blocks): bit-packed voxel state representation
 - 2026-02-12 13:30: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-12 14:56: perf(worker): offload terrain generation to web workers
+- 2026-02-12 15:28: refactor(blocks): bit-packed voxel state representation
