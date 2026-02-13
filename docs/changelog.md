@@ -56,3 +56,4 @@
 - 2026-02-12 21:05: docs(engine): document voxel coordinate transformation pipeline
 - 2026-02-12 22:54: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-02-13 12:16: docs(engine): document voxel coordinate transformation pipeline
+- 2026-02-13 15:28: fix(camera): pitch clamp preventing gimbal lock at zenith
