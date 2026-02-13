@@ -50,3 +50,4 @@
 - 2026-02-13 15:28: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-13 16:28: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-02-13 18:57: refactor(physics): AABB collision detection against voxel grid
+- 2026-02-13 20:49: refactor(physics): AABB collision detection against voxel grid
