@@ -52,3 +52,4 @@
 - 2026-02-13 18:57: refactor(physics): AABB collision detection against voxel grid
 - 2026-02-13 20:49: refactor(physics): AABB collision detection against voxel grid
 - 2026-02-13 22:13: refactor(physics): AABB collision detection against voxel grid
+- 2026-02-15 11:18: perf(shaders): optimize ambient occlusion fragment pass
