@@ -55,3 +55,4 @@
 - 2026-02-24 16:31: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 17:36: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-24 18:33: test(collision): verify player bounding box floor snapping
+- 2026-02-24 20:22: feat(monument): LK brick monument voxel texture atlas
