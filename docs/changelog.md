@@ -57,3 +57,4 @@
 - 2026-02-24 18:33: test(collision): verify player bounding box floor snapping
 - 2026-02-24 20:22: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 21:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-02-24 22:46: perf(shaders): optimize ambient occlusion fragment pass
