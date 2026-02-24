@@ -50,3 +50,4 @@
 - 2026-02-24 11:48: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-24 12:54: refactor(physics): AABB collision detection against voxel grid
 - 2026-02-24 13:58: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-02-24 14:43: feat(monument): LK brick monument voxel texture atlas
