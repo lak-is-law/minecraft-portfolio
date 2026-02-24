@@ -57,3 +57,4 @@
 - 2026-02-18 13:54: docs(engine): document voxel coordinate transformation pipeline
 - 2026-02-24 10:15: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 11:48: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-02-24 12:54: refactor(physics): AABB collision detection against voxel grid
