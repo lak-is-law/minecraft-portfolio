@@ -55,3 +55,4 @@
 - 2026-02-15 11:18: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-02-15 14:34: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-18 13:54: docs(engine): document voxel coordinate transformation pipeline
+- 2026-02-24 10:15: feat(monument): LK brick monument voxel texture atlas
