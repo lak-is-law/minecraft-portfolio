@@ -55,3 +55,4 @@
 - 2026-02-25 14:58: refactor(physics): AABB collision detection against voxel grid
 - 2026-02-25 17:14: refactor(blocks): bit-packed voxel state representation
 - 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
