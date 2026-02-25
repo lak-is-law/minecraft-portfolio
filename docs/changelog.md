@@ -53,3 +53,4 @@
 - 2026-02-25 11:42: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-25 12:57: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-25 14:58: refactor(physics): AABB collision detection against voxel grid
+- 2026-02-25 17:14: refactor(blocks): bit-packed voxel state representation
