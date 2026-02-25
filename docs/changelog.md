@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-04 11:55: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-02-04 14:37: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-02-04 15:37: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-02-04 16:28: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-04 19:44: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-02-04 20:26: docs(engine): document voxel coordinate transformation pipeline
-- 2026-02-04 22:58: test(collision): verify player bounding box floor snapping
-- 2026-02-06 12:37: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-02-06 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-11 10:41: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-02-11 10:55: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-11 11:10: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-02-24 20:22: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 21:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-02-24 22:46: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-02-25 10:25: test(engine): benchmark frame time consistency under 60 FPS load
