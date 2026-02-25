@@ -52,3 +52,4 @@
 - 2026-02-25 10:25: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-02-25 11:42: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-25 12:57: feat(monument): LK brick monument voxel texture atlas
+- 2026-02-25 14:58: refactor(physics): AABB collision detection against voxel grid
