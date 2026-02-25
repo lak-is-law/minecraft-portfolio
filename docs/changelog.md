@@ -54,3 +54,4 @@
 - 2026-02-25 12:57: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-25 14:58: refactor(physics): AABB collision detection against voxel grid
 - 2026-02-25 17:14: refactor(blocks): bit-packed voxel state representation
+- 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
