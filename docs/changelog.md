@@ -56,3 +56,4 @@
 - 2026-02-25 17:14: refactor(blocks): bit-packed voxel state representation
 - 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
