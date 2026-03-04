@@ -50,3 +50,4 @@
 - 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-04 16:53: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-04 18:50: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-03-04 21:14: docs(engine): document voxel coordinate transformation pipeline
