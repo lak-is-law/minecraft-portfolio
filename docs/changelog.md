@@ -57,3 +57,4 @@
 - 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-03-04 16:53: refactor(physics): AABB collision detection against voxel grid
