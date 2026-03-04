@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-11 10:41: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-02-11 10:55: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-02-11 11:10: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-02-11 11:22: perf(worker): offload terrain generation to web workers
-- 2026-02-11 12:05: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-02-11 12:34: feat(audio): spatial distance attenuation for ambient loops
-- 2026-02-11 13:15: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-02-11 14:46: perf(worker): offload terrain generation to web workers
-- 2026-02-11 15:11: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-02-11 16:42: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-02-11 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-02-11 18:12: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-04 16:53: refactor(physics): AABB collision detection against voxel grid
+- 2026-03-04 18:50: feat(ui): inventory hotbar HUD and interactive crosshair
