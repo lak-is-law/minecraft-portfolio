@@ -52,3 +52,4 @@
 - 2026-03-04 18:50: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-03-04 21:14: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-06 10:28: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-03-06 11:19: test(engine): benchmark frame time consistency under 60 FPS load
