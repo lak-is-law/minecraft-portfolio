@@ -50,3 +50,4 @@
 - 2026-03-07 13:33: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-07 14:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-07 17:48: test(collision): verify player bounding box floor snapping
+- 2026-03-07 21:56: docs(engine): document voxel coordinate transformation pipeline
