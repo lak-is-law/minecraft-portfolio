@@ -57,3 +57,4 @@
 - 2026-03-06 21:59: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-03-07 10:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-03-07 13:33: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-03-07 14:22: refactor(physics): AABB collision detection against voxel grid
