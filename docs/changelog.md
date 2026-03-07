@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-11 16:42: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-02-11 17:23: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-02-11 18:12: test(collision): verify player bounding box floor snapping
-- 2026-02-11 19:24: docs(engine): document voxel coordinate transformation pipeline
-- 2026-02-11 20:05: refactor(blocks): bit-packed voxel state representation
-- 2026-02-11 21:15: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-02-11 22:35: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-02-12 10:54: feat(audio): spatial distance attenuation for ambient loops
-- 2026-02-12 11:30: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-02-12 12:23: refactor(blocks): bit-packed voxel state representation
 - 2026-02-12 13:30: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-12 14:56: perf(worker): offload terrain generation to web workers
@@ -58,3 +49,4 @@
 - 2026-03-07 10:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-03-07 13:33: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-07 14:22: refactor(physics): AABB collision detection against voxel grid
+- 2026-03-07 17:48: test(collision): verify player bounding box floor snapping
