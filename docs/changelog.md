@@ -52,3 +52,4 @@
 - 2026-03-07 17:48: test(collision): verify player bounding box floor snapping
 - 2026-03-07 21:56: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-09 13:38: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-03-09 17:41: docs(engine): document voxel coordinate transformation pipeline
