@@ -56,3 +56,4 @@
 - 2026-03-09 18:13: test(collision): verify player bounding box floor snapping
 - 2026-03-09 21:10: perf(worker): offload terrain generation to web workers
 - 2026-03-10 13:44: docs(engine): document voxel coordinate transformation pipeline
+- 2026-03-10 14:55: fix(controls): pointer lock sensitivity on high-DPI displays
