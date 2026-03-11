@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-12 22:54: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-02-13 12:16: docs(engine): document voxel coordinate transformation pipeline
-- 2026-02-13 15:28: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-02-13 16:28: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-02-13 18:57: refactor(physics): AABB collision detection against voxel grid
-- 2026-02-13 20:49: refactor(physics): AABB collision detection against voxel grid
-- 2026-02-13 22:13: refactor(physics): AABB collision detection against voxel grid
-- 2026-02-15 11:18: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-02-15 14:34: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-02-18 13:54: docs(engine): document voxel coordinate transformation pipeline
 - 2026-02-24 10:15: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 11:48: perf(render): frustum culling for non-visible chunk boundaries
@@ -58,3 +49,4 @@
 - 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-11 20:03: perf(worker): offload terrain generation to web workers
+- 2026-03-11 21:35: feat(postprocessing): bloom and atmospheric fog pass in Three.js
