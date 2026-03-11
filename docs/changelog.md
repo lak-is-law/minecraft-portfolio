@@ -55,3 +55,4 @@
 - 2026-03-11 11:44: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-03-11 15:47: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-03-11 16:17: feat(audio): spatial distance attenuation for ambient loops
+- 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
