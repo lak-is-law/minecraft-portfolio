@@ -56,3 +56,4 @@
 - 2026-03-11 15:47: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-03-11 16:17: feat(audio): spatial distance attenuation for ambient loops
 - 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
