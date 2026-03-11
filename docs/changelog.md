@@ -51,3 +51,4 @@
 - 2026-03-10 15:21: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-03-10 17:01: feat(audio): spatial distance attenuation for ambient loops
 - 2026-03-10 21:25: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-03-11 10:07: refactor(blocks): bit-packed voxel state representation
