@@ -57,3 +57,4 @@
 - 2026-03-11 16:17: feat(audio): spatial distance attenuation for ambient loops
 - 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
+- 2026-03-11 20:03: perf(worker): offload terrain generation to web workers
