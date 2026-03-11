@@ -50,3 +50,4 @@
 - 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-11 20:03: perf(worker): offload terrain generation to web workers
 - 2026-03-11 21:35: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-03-11 22:19: fix(camera): pitch clamp preventing gimbal lock at zenith
