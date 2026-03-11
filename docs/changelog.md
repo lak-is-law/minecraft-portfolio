@@ -53,3 +53,4 @@
 - 2026-03-10 21:25: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-11 10:07: refactor(blocks): bit-packed voxel state representation
 - 2026-03-11 11:44: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-03-11 15:47: fix(controls): pointer lock sensitivity on high-DPI displays
