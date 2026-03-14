@@ -57,3 +57,4 @@
 - 2026-03-14 14:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-14 16:52: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-14 17:03: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-03-14 20:33: perf(shaders): optimize ambient occlusion fragment pass
