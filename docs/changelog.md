@@ -51,3 +51,4 @@
 - 2026-03-11 20:03: perf(worker): offload terrain generation to web workers
 - 2026-03-11 21:35: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-03-11 22:19: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-03-14 10:08: fix(camera): pitch clamp preventing gimbal lock at zenith
