@@ -53,3 +53,4 @@
 - 2026-03-11 22:19: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-14 10:08: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-14 12:43: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-03-14 13:47: fix(controls): pointer lock sensitivity on high-DPI displays
