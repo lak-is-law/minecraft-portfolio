@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-18 13:54: docs(engine): document voxel coordinate transformation pipeline
-- 2026-02-24 10:15: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-24 11:48: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-02-24 12:54: refactor(physics): AABB collision detection against voxel grid
-- 2026-02-24 13:58: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-02-24 14:43: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-24 15:40: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-02-24 16:31: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-24 17:36: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-02-24 18:33: test(collision): verify player bounding box floor snapping
 - 2026-02-24 20:22: feat(monument): LK brick monument voxel texture atlas
 - 2026-02-24 21:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
@@ -58,3 +49,4 @@
 - 2026-03-14 16:52: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-14 17:03: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-03-14 20:33: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-03-14 21:02: docs(engine): document voxel coordinate transformation pipeline
