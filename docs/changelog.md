@@ -56,3 +56,4 @@
 - 2026-03-14 13:47: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-03-14 14:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-14 16:52: refactor(physics): AABB collision detection against voxel grid
+- 2026-03-14 17:03: perf(render): frustum culling for non-visible chunk boundaries
