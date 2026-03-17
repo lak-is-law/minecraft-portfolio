@@ -51,3 +51,4 @@
 - 2026-03-14 20:33: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-03-14 21:02: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-17 10:26: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-03-17 11:20: docs(engine): document voxel coordinate transformation pipeline
