@@ -55,3 +55,4 @@
 - 2026-03-17 12:43: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-17 17:06: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-03-17 20:22: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
