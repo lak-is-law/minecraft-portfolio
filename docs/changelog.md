@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-24 18:33: test(collision): verify player bounding box floor snapping
-- 2026-02-24 20:22: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-24 21:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-02-24 22:46: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-02-25 10:25: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-02-25 11:42: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-02-25 12:57: feat(monument): LK brick monument voxel texture atlas
-- 2026-02-25 14:58: refactor(physics): AABB collision detection against voxel grid
-- 2026-02-25 17:14: refactor(blocks): bit-packed voxel state representation
 - 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-03-18 10:51: test(collision): verify player bounding box floor snapping
+- 2026-03-18 11:12: feat(ui): inventory hotbar HUD and interactive crosshair
