@@ -57,3 +57,4 @@
 - 2026-03-17 20:22: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-03-18 10:51: test(collision): verify player bounding box floor snapping
