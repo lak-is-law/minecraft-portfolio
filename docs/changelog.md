@@ -57,3 +57,4 @@
 - 2026-03-18 13:33: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-18 14:40: refactor(blocks): bit-packed voxel state representation
 - 2026-03-18 14:50: feat(monument): LK brick monument voxel texture atlas
+- 2026-03-18 15:07: test(engine): benchmark frame time consistency under 60 FPS load
