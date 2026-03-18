@@ -56,3 +56,4 @@
 - 2026-03-18 13:17: refactor(blocks): bit-packed voxel state representation
 - 2026-03-18 13:33: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-18 14:40: refactor(blocks): bit-packed voxel state representation
+- 2026-03-18 14:50: feat(monument): LK brick monument voxel texture atlas
