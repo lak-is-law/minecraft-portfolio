@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-02-25 19:55: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-02-25 20:27: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-03-02 16:05: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-03-04 16:53: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-04 18:50: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-03-04 21:14: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-06 10:28: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-03-06 11:19: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-03-06 19:16: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-06 21:59: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-03-07 10:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-03-07 13:33: perf(memory): reuse Float32Array buffers across chunk re-meshes
@@ -58,3 +49,4 @@
 - 2026-03-18 14:40: refactor(blocks): bit-packed voxel state representation
 - 2026-03-18 14:50: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-18 15:07: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-03-18 16:15: test(engine): benchmark frame time consistency under 60 FPS load
