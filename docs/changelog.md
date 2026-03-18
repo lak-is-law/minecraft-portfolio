@@ -50,3 +50,4 @@
 - 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-03-18 10:51: test(collision): verify player bounding box floor snapping
 - 2026-03-18 11:12: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-03-18 11:40: feat(ui): inventory hotbar HUD and interactive crosshair
