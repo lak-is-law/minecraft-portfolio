@@ -52,3 +52,4 @@
 - 2026-03-18 16:15: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-18 17:27: perf(worker): offload terrain generation to web workers
 - 2026-03-18 18:50: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-03-18 19:11: perf(render): frustum culling for non-visible chunk boundaries
