@@ -56,3 +56,4 @@
 - 2026-03-17 17:06: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-03-17 20:22: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
+- 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
