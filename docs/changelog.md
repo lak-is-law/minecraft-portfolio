@@ -50,3 +50,4 @@
 - 2026-03-18 14:50: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-18 15:07: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-18 16:15: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-03-18 17:27: perf(worker): offload terrain generation to web workers
