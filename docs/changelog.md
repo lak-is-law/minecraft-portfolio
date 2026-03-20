@@ -56,3 +56,4 @@
 - 2026-03-18 20:09: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-18 21:19: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-03-18 22:29: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-03-20 10:54: feat(voxel): chunk mesh generation and greedy meshing
