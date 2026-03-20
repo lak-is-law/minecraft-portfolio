@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-03-06 21:59: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-03-07 10:26: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-03-07 13:33: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-03-07 14:22: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-07 17:48: test(collision): verify player bounding box floor snapping
-- 2026-03-07 21:56: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-09 13:38: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-03-09 17:41: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-09 18:13: test(collision): verify player bounding box floor snapping
 - 2026-03-09 21:10: perf(worker): offload terrain generation to web workers
 - 2026-03-10 13:44: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-10 14:55: fix(controls): pointer lock sensitivity on high-DPI displays
@@ -58,3 +49,4 @@
 - 2026-03-18 22:29: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-03-20 10:54: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-03-20 11:55: refactor(blocks): bit-packed voxel state representation
+- 2026-03-20 12:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
