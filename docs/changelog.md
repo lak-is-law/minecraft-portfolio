@@ -51,3 +51,4 @@
 - 2026-03-20 11:55: refactor(blocks): bit-packed voxel state representation
 - 2026-03-20 12:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-20 14:18: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-03-20 17:10: fix(camera): pitch clamp preventing gimbal lock at zenith
