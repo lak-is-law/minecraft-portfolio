@@ -50,3 +50,4 @@
 - 2026-03-20 10:54: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-03-20 11:55: refactor(blocks): bit-packed voxel state representation
 - 2026-03-20 12:31: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-03-20 14:18: feat(lighting): directional sunlight ray casting across voxel faces
