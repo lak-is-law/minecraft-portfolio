@@ -53,3 +53,4 @@
 - 2026-03-20 14:18: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-03-20 17:10: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-20 20:25: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-03-25 13:26: perf(shaders): optimize ambient occlusion fragment pass
