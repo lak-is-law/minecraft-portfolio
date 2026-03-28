@@ -56,3 +56,4 @@
 - 2026-03-25 13:26: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-03-25 16:11: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-03-25 22:55: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-03-28 10:44: feat(monument): LK brick monument voxel texture atlas
