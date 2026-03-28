@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-03-09 21:10: perf(worker): offload terrain generation to web workers
-- 2026-03-10 13:44: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-10 14:55: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-03-10 15:21: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-03-10 17:01: feat(audio): spatial distance attenuation for ambient loops
-- 2026-03-10 21:25: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-03-11 10:07: refactor(blocks): bit-packed voxel state representation
-- 2026-03-11 11:44: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-03-11 15:47: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-03-11 16:17: feat(audio): spatial distance attenuation for ambient loops
 - 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
@@ -58,3 +49,4 @@
 - 2026-03-25 22:55: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-28 10:44: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-28 11:22: feat(audio): spatial distance attenuation for ambient loops
+- 2026-03-28 13:52: test(collision): verify player bounding box floor snapping
