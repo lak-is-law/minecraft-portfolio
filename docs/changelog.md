@@ -51,3 +51,4 @@
 - 2026-03-28 11:22: feat(audio): spatial distance attenuation for ambient loops
 - 2026-03-28 13:52: test(collision): verify player bounding box floor snapping
 - 2026-03-28 14:37: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-03-28 16:06: feat(monument): LK brick monument voxel texture atlas
