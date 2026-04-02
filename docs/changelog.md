@@ -54,3 +54,4 @@
 - 2026-03-28 16:06: feat(monument): LK brick monument voxel texture atlas
 - 2026-03-28 18:28: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-03-28 20:23: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-04-02 16:18: refactor(physics): AABB collision detection against voxel grid
