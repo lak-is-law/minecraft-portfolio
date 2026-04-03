@@ -50,3 +50,4 @@
 - 2026-04-03 10:53: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-04-03 12:13: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-03 14:22: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-04-03 18:05: test(engine): benchmark frame time consistency under 60 FPS load
