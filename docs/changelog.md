@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-03-11 16:17: feat(audio): spatial distance attenuation for ambient loops
-- 2026-03-11 18:15: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-03-11 19:14: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-11 20:03: perf(worker): offload terrain generation to web workers
-- 2026-03-11 21:35: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-03-11 22:19: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-03-14 10:08: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-03-14 12:43: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-03-14 13:47: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-03-14 14:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-03-14 16:52: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-14 17:03: perf(render): frustum culling for non-visible chunk boundaries
@@ -58,3 +49,4 @@
 - 2026-04-02 17:26: refactor(physics): AABB collision detection against voxel grid
 - 2026-04-03 10:53: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-04-03 12:13: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-04-03 14:22: perf(render): frustum culling for non-visible chunk boundaries
