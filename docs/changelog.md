@@ -52,3 +52,4 @@
 - 2026-04-03 14:22: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-04-03 18:05: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-03 21:34: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-04-04 10:39: feat(lighting): directional sunlight ray casting across voxel faces
