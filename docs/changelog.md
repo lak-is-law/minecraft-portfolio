@@ -57,3 +57,4 @@
 - 2026-04-04 12:52: refactor(blocks): bit-packed voxel state representation
 - 2026-04-04 13:44: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-04 14:11: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-04-04 15:53: perf(worker): offload terrain generation to web workers
