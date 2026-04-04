@@ -50,3 +50,4 @@
 - 2026-04-04 14:11: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-04 15:53: perf(worker): offload terrain generation to web workers
 - 2026-04-04 16:13: perf(worker): offload terrain generation to web workers
+- 2026-04-04 17:49: feat(audio): spatial distance attenuation for ambient loops
