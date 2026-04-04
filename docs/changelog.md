@@ -55,3 +55,4 @@
 - 2026-04-04 10:39: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-04-04 11:32: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-04 12:52: refactor(blocks): bit-packed voxel state representation
+- 2026-04-04 13:44: perf(shaders): optimize ambient occlusion fragment pass
