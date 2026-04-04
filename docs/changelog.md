@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-03-14 14:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-03-14 16:52: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-14 17:03: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-03-14 20:33: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-03-14 21:02: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-17 10:26: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-03-17 11:20: docs(engine): document voxel coordinate transformation pipeline
-- 2026-03-17 12:43: feat(monument): LK brick monument voxel texture atlas
-- 2026-03-17 17:06: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-03-17 20:22: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
@@ -58,3 +49,4 @@
 - 2026-04-04 13:44: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-04 14:11: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-04 15:53: perf(worker): offload terrain generation to web workers
+- 2026-04-04 16:13: perf(worker): offload terrain generation to web workers
