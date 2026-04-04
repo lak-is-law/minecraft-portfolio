@@ -52,3 +52,4 @@
 - 2026-04-04 16:13: perf(worker): offload terrain generation to web workers
 - 2026-04-04 17:49: feat(audio): spatial distance attenuation for ambient loops
 - 2026-04-04 19:42: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-04-04 20:17: feat(voxel): chunk mesh generation and greedy meshing
