@@ -54,3 +54,4 @@
 - 2026-04-04 19:42: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-04 20:17: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-04 21:50: refactor(blocks): bit-packed voxel state representation
+- 2026-04-04 22:11: fix(controls): pointer lock sensitivity on high-DPI displays
