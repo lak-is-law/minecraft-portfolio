@@ -50,3 +50,4 @@
 - 2026-04-06 12:17: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-06 13:20: refactor(blocks): bit-packed voxel state representation
 - 2026-04-06 14:53: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-04-06 17:29: perf(memory): reuse Float32Array buffers across chunk re-meshes
