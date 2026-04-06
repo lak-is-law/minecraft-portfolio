@@ -57,3 +57,4 @@
 - 2026-04-04 22:11: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-06 11:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-06 12:17: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-04-06 13:20: refactor(blocks): bit-packed voxel state representation
