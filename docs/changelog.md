@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-03-17 20:22: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-03-17 22:22: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-18 10:04: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-03-18 10:51: test(collision): verify player bounding box floor snapping
-- 2026-03-18 11:12: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-03-18 11:40: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-03-18 12:07: refactor(physics): AABB collision detection against voxel grid
-- 2026-03-18 12:33: test(collision): verify player bounding box floor snapping
-- 2026-03-18 13:17: refactor(blocks): bit-packed voxel state representation
 - 2026-03-18 13:33: docs(engine): document voxel coordinate transformation pipeline
 - 2026-03-18 14:40: refactor(blocks): bit-packed voxel state representation
 - 2026-03-18 14:50: feat(monument): LK brick monument voxel texture atlas
@@ -58,3 +49,4 @@
 - 2026-04-06 11:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-06 12:17: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-06 13:20: refactor(blocks): bit-packed voxel state representation
+- 2026-04-06 14:53: feat(voxel): chunk mesh generation and greedy meshing
