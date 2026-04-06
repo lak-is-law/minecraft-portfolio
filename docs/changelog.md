@@ -51,3 +51,4 @@
 - 2026-04-06 13:20: refactor(blocks): bit-packed voxel state representation
 - 2026-04-06 14:53: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-06 17:29: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-04-06 20:57: feat(postprocessing): bloom and atmospheric fog pass in Three.js
