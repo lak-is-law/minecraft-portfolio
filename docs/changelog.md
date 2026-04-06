@@ -55,3 +55,4 @@
 - 2026-04-04 20:17: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-04 21:50: refactor(blocks): bit-packed voxel state representation
 - 2026-04-04 22:11: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-04-06 11:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
