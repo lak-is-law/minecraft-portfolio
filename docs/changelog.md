@@ -54,3 +54,4 @@
 - 2026-04-10 18:08: test(collision): verify player bounding box floor snapping
 - 2026-04-10 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-04-10 20:26: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-04-10 22:20: fix(camera): pitch clamp preventing gimbal lock at zenith
