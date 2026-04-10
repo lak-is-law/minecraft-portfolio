@@ -53,3 +53,4 @@
 - 2026-04-06 17:29: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-06 20:57: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-10 10:52: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-04-10 11:57: refactor(terrain): Perlin noise octaves for procedural valleys
