@@ -55,3 +55,4 @@
 - 2026-04-10 10:52: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-10 11:57: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-10 12:21: refactor(blocks): bit-packed voxel state representation
+- 2026-04-10 13:08: fix(camera): pitch clamp preventing gimbal lock at zenith
