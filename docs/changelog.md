@@ -51,3 +51,4 @@
 - 2026-04-10 15:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-10 16:24: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-10 17:19: refactor(blocks): bit-packed voxel state representation
+- 2026-04-10 18:08: test(collision): verify player bounding box floor snapping
