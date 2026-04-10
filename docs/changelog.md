@@ -57,3 +57,4 @@
 - 2026-04-10 12:21: refactor(blocks): bit-packed voxel state representation
 - 2026-04-10 13:08: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-04-10 14:44: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-04-10 15:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
