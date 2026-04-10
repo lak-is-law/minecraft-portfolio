@@ -50,3 +50,4 @@
 - 2026-04-10 14:44: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-10 15:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-10 16:24: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-04-10 17:19: refactor(blocks): bit-packed voxel state representation
