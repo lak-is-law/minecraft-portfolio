@@ -50,3 +50,4 @@
 - 2026-04-15 19:12: feat(audio): spatial distance attenuation for ambient loops
 - 2026-04-15 20:23: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-15 21:04: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-04-15 22:32: fix(controls): pointer lock sensitivity on high-DPI displays
