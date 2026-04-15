@@ -55,3 +55,4 @@
 - 2026-04-15 15:07: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-15 16:00: refactor(physics): AABB collision detection against voxel grid
 - 2026-04-15 17:14: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-04-15 18:20: feat(monument): LK brick monument voxel texture atlas
