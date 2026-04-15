@@ -51,3 +51,4 @@
 - 2026-04-15 11:28: refactor(blocks): bit-packed voxel state representation
 - 2026-04-15 12:05: refactor(physics): AABB collision detection against voxel grid
 - 2026-04-15 13:18: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-04-15 14:34: feat(voxel): chunk mesh generation and greedy meshing
