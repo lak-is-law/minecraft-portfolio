@@ -56,3 +56,4 @@
 - 2026-04-15 16:00: refactor(physics): AABB collision detection against voxel grid
 - 2026-04-15 17:14: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-15 18:20: feat(monument): LK brick monument voxel texture atlas
+- 2026-04-15 19:12: feat(audio): spatial distance attenuation for ambient loops
