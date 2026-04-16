@@ -51,3 +51,4 @@
 - 2026-04-15 20:23: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-15 21:04: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-15 22:32: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-04-16 10:40: test(collision): verify player bounding box floor snapping
