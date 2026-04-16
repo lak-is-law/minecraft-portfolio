@@ -55,3 +55,4 @@
 - 2026-04-16 13:15: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-16 14:16: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-16 15:27: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-04-16 18:36: feat(monument): LK brick monument voxel texture atlas
