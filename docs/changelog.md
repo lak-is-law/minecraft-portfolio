@@ -54,3 +54,4 @@
 - 2026-04-17 16:45: test(collision): verify player bounding box floor snapping
 - 2026-04-17 17:01: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-04-17 18:51: perf(worker): offload terrain generation to web workers
+- 2026-04-17 19:25: fix(controls): pointer lock sensitivity on high-DPI displays
