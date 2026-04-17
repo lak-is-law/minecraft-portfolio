@@ -51,3 +51,4 @@
 - 2026-04-17 11:58: perf(worker): offload terrain generation to web workers
 - 2026-04-17 13:32: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-17 14:05: perf(worker): offload terrain generation to web workers
+- 2026-04-17 16:45: test(collision): verify player bounding box floor snapping
