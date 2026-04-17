@@ -57,3 +57,4 @@
 - 2026-04-16 15:27: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-04-16 18:36: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-16 20:44: test(collision): verify player bounding box floor snapping
+- 2026-04-17 11:58: perf(worker): offload terrain generation to web workers
