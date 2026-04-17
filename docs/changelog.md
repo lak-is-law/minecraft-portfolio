@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-02 16:18: refactor(physics): AABB collision detection against voxel grid
-- 2026-04-02 17:26: refactor(physics): AABB collision detection against voxel grid
-- 2026-04-03 10:53: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-04-03 12:13: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-03 14:22: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-04-03 18:05: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-03 21:34: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-04-04 10:39: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-04-04 11:32: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-04 12:52: refactor(blocks): bit-packed voxel state representation
 - 2026-04-04 13:44: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-04 14:11: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2026-04-16 18:36: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-16 20:44: test(collision): verify player bounding box floor snapping
 - 2026-04-17 11:58: perf(worker): offload terrain generation to web workers
+- 2026-04-17 13:32: feat(ui): inventory hotbar HUD and interactive crosshair
