@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-04 12:52: refactor(blocks): bit-packed voxel state representation
-- 2026-04-04 13:44: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-04 14:11: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-04 15:53: perf(worker): offload terrain generation to web workers
-- 2026-04-04 16:13: perf(worker): offload terrain generation to web workers
-- 2026-04-04 17:49: feat(audio): spatial distance attenuation for ambient loops
-- 2026-04-04 19:42: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-04 20:17: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-04 21:50: refactor(blocks): bit-packed voxel state representation
 - 2026-04-04 22:11: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-06 11:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-06 12:17: feat(ui): inventory hotbar HUD and interactive crosshair
@@ -58,3 +49,4 @@
 - 2026-04-20 20:01: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-23 14:25: perf(worker): offload terrain generation to web workers
 - 2026-04-23 15:14: feat(audio): spatial distance attenuation for ambient loops
+- 2026-04-23 17:54: feat(monument): LK brick monument voxel texture atlas
