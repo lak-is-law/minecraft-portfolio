@@ -51,3 +51,4 @@
 - 2026-04-23 15:14: feat(audio): spatial distance attenuation for ambient loops
 - 2026-04-23 17:54: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-23 19:51: perf(worker): offload terrain generation to web workers
+- 2026-04-23 20:32: test(engine): benchmark frame time consistency under 60 FPS load
