@@ -56,3 +56,4 @@
 - 2026-04-17 18:51: perf(worker): offload terrain generation to web workers
 - 2026-04-17 19:25: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-20 20:01: feat(monument): LK brick monument voxel texture atlas
+- 2026-04-23 14:25: perf(worker): offload terrain generation to web workers
