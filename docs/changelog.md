@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-04 22:11: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-04-06 11:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-04-06 12:17: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-04-06 13:20: refactor(blocks): bit-packed voxel state representation
-- 2026-04-06 14:53: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-06 17:29: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-04-06 20:57: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-04-10 10:52: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-10 11:57: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-10 12:21: refactor(blocks): bit-packed voxel state representation
 - 2026-04-10 13:08: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-04-10 14:44: feat(voxel): chunk mesh generation and greedy meshing
@@ -58,3 +49,4 @@
 - 2026-04-25 12:40: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-25 13:35: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-25 14:58: test(collision): verify player bounding box floor snapping
+- 2026-04-25 15:05: feat(lighting): directional sunlight ray casting across voxel faces
