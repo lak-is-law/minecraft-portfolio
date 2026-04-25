@@ -55,3 +55,4 @@
 - 2026-04-23 21:05: perf(worker): offload terrain generation to web workers
 - 2026-04-25 10:43: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-25 11:02: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-04-25 12:40: feat(ui): inventory hotbar HUD and interactive crosshair
