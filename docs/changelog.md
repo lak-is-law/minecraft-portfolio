@@ -54,3 +54,4 @@
 - 2026-04-23 20:32: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-23 21:05: perf(worker): offload terrain generation to web workers
 - 2026-04-25 10:43: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-04-25 11:02: perf(memory): reuse Float32Array buffers across chunk re-meshes
