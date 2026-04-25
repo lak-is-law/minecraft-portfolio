@@ -56,3 +56,4 @@
 - 2026-04-25 10:43: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-25 11:02: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-25 12:40: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-04-25 13:35: refactor(terrain): Perlin noise octaves for procedural valleys
