@@ -51,3 +51,4 @@
 - 2026-04-25 14:58: test(collision): verify player bounding box floor snapping
 - 2026-04-25 15:05: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-04-25 16:46: perf(worker): offload terrain generation to web workers
+- 2026-04-25 17:44: perf(memory): reuse Float32Array buffers across chunk re-meshes
