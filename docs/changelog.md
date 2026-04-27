@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-10 12:21: refactor(blocks): bit-packed voxel state representation
-- 2026-04-10 13:08: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-04-10 14:44: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-10 15:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-04-10 16:24: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-10 17:19: refactor(blocks): bit-packed voxel state representation
-- 2026-04-10 18:08: test(collision): verify player bounding box floor snapping
-- 2026-04-10 19:47: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-04-10 20:26: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-04-10 22:20: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-04-15 10:35: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-15 10:59: feat(lighting): directional sunlight ray casting across voxel faces
@@ -58,3 +49,4 @@
 - 2026-04-27 11:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-04-27 12:15: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-27 14:28: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-04-27 15:26: feat(monument): LK brick monument voxel texture atlas
