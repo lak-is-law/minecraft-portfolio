@@ -50,3 +50,4 @@
 - 2026-04-27 12:15: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-27 14:28: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-27 15:26: feat(monument): LK brick monument voxel texture atlas
+- 2026-04-27 16:08: perf(shaders): optimize ambient occlusion fragment pass
