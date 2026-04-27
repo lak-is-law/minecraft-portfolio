@@ -55,3 +55,4 @@
 - 2026-04-27 18:31: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-27 19:51: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-27 20:22: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-04-27 21:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
