@@ -55,3 +55,4 @@
 - 2026-04-25 18:30: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-25 19:30: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-25 22:08: perf(worker): offload terrain generation to web workers
+- 2026-04-27 11:04: feat(lighting): directional sunlight ray casting across voxel faces
