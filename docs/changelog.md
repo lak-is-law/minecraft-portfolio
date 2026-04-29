@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-10 22:20: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-04-15 10:35: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-04-15 10:59: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-04-15 11:28: refactor(blocks): bit-packed voxel state representation
-- 2026-04-15 12:05: refactor(physics): AABB collision detection against voxel grid
-- 2026-04-15 13:18: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-04-15 14:34: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-15 15:07: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-15 16:00: refactor(physics): AABB collision detection against voxel grid
 - 2026-04-15 17:14: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-15 18:20: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-15 19:12: feat(audio): spatial distance attenuation for ambient loops
@@ -58,3 +49,4 @@
 - 2026-04-27 21:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-27 22:25: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-29 11:22: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-04-29 13:41: perf(worker): offload terrain generation to web workers
