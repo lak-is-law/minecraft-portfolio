@@ -51,3 +51,4 @@
 - 2026-04-29 11:22: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-04-29 13:41: perf(worker): offload terrain generation to web workers
 - 2026-04-29 16:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-04-29 17:07: refactor(physics): AABB collision detection against voxel grid
