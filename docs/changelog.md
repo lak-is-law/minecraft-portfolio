@@ -57,3 +57,4 @@
 - 2026-04-27 20:22: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-27 21:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-27 22:25: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-04-29 11:22: feat(voxel): chunk mesh generation and greedy meshing
