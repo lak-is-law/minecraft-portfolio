@@ -55,3 +55,4 @@
 - 2026-04-29 18:14: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-29 20:18: feat(audio): spatial distance attenuation for ambient loops
 - 2026-04-29 21:40: test(collision): verify player bounding box floor snapping
+- 2026-05-03 10:26: fix(controls): pointer lock sensitivity on high-DPI displays
