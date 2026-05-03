@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-15 17:14: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-04-15 18:20: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-15 19:12: feat(audio): spatial distance attenuation for ambient loops
-- 2026-04-15 20:23: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-15 21:04: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-15 22:32: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-04-16 10:40: test(collision): verify player bounding box floor snapping
-- 2026-04-16 13:15: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-16 14:16: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-16 15:27: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-04-16 18:36: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-16 20:44: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2026-05-03 10:26: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-05-03 12:15: feat(audio): spatial distance attenuation for ambient loops
 - 2026-05-03 13:15: test(collision): verify player bounding box floor snapping
+- 2026-05-03 18:29: perf(shaders): optimize ambient occlusion fragment pass
