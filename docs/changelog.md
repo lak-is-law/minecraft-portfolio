@@ -54,3 +54,4 @@
 - 2026-05-04 13:17: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-04 15:11: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-05-04 16:48: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-05-04 20:39: refactor(physics): AABB collision detection against voxel grid
