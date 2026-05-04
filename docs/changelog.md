@@ -52,3 +52,4 @@
 - 2026-05-03 18:29: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-04 12:15: perf(worker): offload terrain generation to web workers
 - 2026-05-04 13:17: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-04 15:11: feat(postprocessing): bloom and atmospheric fog pass in Three.js
