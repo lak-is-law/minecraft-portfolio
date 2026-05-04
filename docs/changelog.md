@@ -50,3 +50,4 @@
 - 2026-05-03 12:15: feat(audio): spatial distance attenuation for ambient loops
 - 2026-05-03 13:15: test(collision): verify player bounding box floor snapping
 - 2026-05-03 18:29: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-05-04 12:15: perf(worker): offload terrain generation to web workers
