@@ -57,3 +57,4 @@
 - 2026-05-04 20:39: refactor(physics): AABB collision detection against voxel grid
 - 2026-05-04 21:24: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-12 10:00: feat(monument): LK brick monument voxel texture atlas
+- 2026-05-12 12:44: test(engine): benchmark frame time consistency under 60 FPS load
