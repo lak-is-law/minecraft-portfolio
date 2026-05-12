@@ -50,3 +50,4 @@
 - 2026-05-12 10:00: feat(monument): LK brick monument voxel texture atlas
 - 2026-05-12 12:44: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-12 13:04: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-05-12 15:50: perf(render): frustum culling for non-visible chunk boundaries
