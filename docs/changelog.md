@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-16 15:27: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-04-16 18:36: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-16 20:44: test(collision): verify player bounding box floor snapping
-- 2026-04-17 11:58: perf(worker): offload terrain generation to web workers
-- 2026-04-17 13:32: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-04-17 14:05: perf(worker): offload terrain generation to web workers
-- 2026-04-17 16:45: test(collision): verify player bounding box floor snapping
-- 2026-04-17 17:01: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-04-17 18:51: perf(worker): offload terrain generation to web workers
 - 2026-04-17 19:25: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-04-20 20:01: feat(monument): LK brick monument voxel texture atlas
 - 2026-04-23 14:25: perf(worker): offload terrain generation to web workers
@@ -58,3 +49,4 @@
 - 2026-05-04 21:24: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-12 10:00: feat(monument): LK brick monument voxel texture atlas
 - 2026-05-12 12:44: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-12 13:04: feat(ui): inventory hotbar HUD and interactive crosshair
