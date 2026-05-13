@@ -51,3 +51,4 @@
 - 2026-05-13 15:50: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-13 16:19: feat(audio): spatial distance attenuation for ambient loops
 - 2026-05-13 17:38: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-05-13 18:29: refactor(physics): AABB collision detection against voxel grid
