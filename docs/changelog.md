@@ -50,3 +50,4 @@
 - 2026-05-13 14:07: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-13 15:50: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-13 16:19: feat(audio): spatial distance attenuation for ambient loops
+- 2026-05-13 17:38: fix(controls): pointer lock sensitivity on high-DPI displays
