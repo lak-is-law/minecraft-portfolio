@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-17 19:25: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-04-20 20:01: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-23 14:25: perf(worker): offload terrain generation to web workers
-- 2026-04-23 15:14: feat(audio): spatial distance attenuation for ambient loops
-- 2026-04-23 17:54: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-23 19:51: perf(worker): offload terrain generation to web workers
-- 2026-04-23 20:32: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-23 21:05: perf(worker): offload terrain generation to web workers
-- 2026-04-25 10:43: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-04-25 11:02: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-04-25 12:40: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-04-25 13:35: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-05-13 13:57: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-13 14:07: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-13 15:50: docs(engine): document voxel coordinate transformation pipeline
+- 2026-05-13 16:19: feat(audio): spatial distance attenuation for ambient loops
