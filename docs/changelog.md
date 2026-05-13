@@ -53,3 +53,4 @@
 - 2026-05-12 15:50: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-05-12 21:06: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-12 22:23: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-05-13 11:34: docs(engine): document voxel coordinate transformation pipeline
