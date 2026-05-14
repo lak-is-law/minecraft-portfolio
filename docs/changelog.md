@@ -55,3 +55,4 @@
 - 2026-05-13 19:56: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-05-13 20:16: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-05-13 22:36: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-14 15:14: perf(shaders): optimize ambient occlusion fragment pass
