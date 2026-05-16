@@ -52,3 +52,4 @@
 - 2026-05-16 12:12: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-05-16 13:41: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-05-16 14:22: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-16 15:39: feat(postprocessing): bloom and atmospheric fog pass in Three.js
