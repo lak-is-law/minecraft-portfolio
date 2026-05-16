@@ -51,3 +51,4 @@
 - 2026-05-16 11:01: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-16 12:12: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-05-16 13:41: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-05-16 14:22: test(engine): benchmark frame time consistency under 60 FPS load
