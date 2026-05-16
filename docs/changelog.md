@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-25 22:08: perf(worker): offload terrain generation to web workers
-- 2026-04-27 11:04: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-04-27 12:15: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-27 14:28: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-04-27 15:26: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-27 16:08: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-04-27 17:45: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-04-27 18:31: feat(monument): LK brick monument voxel texture atlas
-- 2026-04-27 19:51: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-04-27 20:22: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-04-27 21:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-27 22:25: feat(postprocessing): bloom and atmospheric fog pass in Three.js
@@ -58,3 +49,4 @@
 - 2026-05-16 19:45: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-16 20:06: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-16 21:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-05-16 22:04: feat(lighting): directional sunlight ray casting across voxel faces
