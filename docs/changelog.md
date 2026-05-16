@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-25 11:02: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-04-25 12:40: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-04-25 13:35: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-04-25 14:58: test(collision): verify player bounding box floor snapping
-- 2026-04-25 15:05: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-04-25 16:46: perf(worker): offload terrain generation to web workers
-- 2026-04-25 17:44: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-04-25 18:30: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-25 19:30: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-04-25 22:08: perf(worker): offload terrain generation to web workers
 - 2026-04-27 11:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-04-27 12:15: feat(monument): LK brick monument voxel texture atlas
@@ -58,3 +49,4 @@
 - 2026-05-14 15:14: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-16 10:02: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-05-16 11:01: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-05-16 12:12: perf(render): frustum culling for non-visible chunk boundaries
