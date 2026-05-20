@@ -50,3 +50,4 @@
 - 2026-05-20 13:54: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-20 14:46: feat(monument): LK brick monument voxel texture atlas
 - 2026-05-20 15:09: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-05-20 16:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
