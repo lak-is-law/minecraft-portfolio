@@ -53,3 +53,4 @@
 - 2026-05-20 16:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-05-20 17:09: refactor(physics): AABB collision detection against voxel grid
 - 2026-05-20 18:54: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-20 19:34: refactor(blocks): bit-packed voxel state representation
