@@ -55,3 +55,4 @@
 - 2026-05-20 11:07: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-05-20 11:10: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-20 12:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-05-20 12:56: docs(engine): document voxel coordinate transformation pipeline
