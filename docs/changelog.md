@@ -51,3 +51,4 @@
 - 2026-05-16 21:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-05-16 22:04: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-05-20 10:13: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-05-20 10:30: perf(shaders): optimize ambient occlusion fragment pass
