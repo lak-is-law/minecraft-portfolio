@@ -53,3 +53,4 @@
 - 2026-05-20 10:13: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-20 10:30: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-20 11:07: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-05-20 11:10: refactor(terrain): Perlin noise octaves for procedural valleys
