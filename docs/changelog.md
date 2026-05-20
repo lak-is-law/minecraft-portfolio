@@ -56,3 +56,4 @@
 - 2026-05-20 19:34: refactor(blocks): bit-packed voxel state representation
 - 2026-05-20 20:59: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-20 21:27: refactor(blocks): bit-packed voxel state representation
+- 2026-05-20 22:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
