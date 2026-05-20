@@ -57,3 +57,4 @@
 - 2026-05-20 12:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-05-20 12:56: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-20 13:54: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-05-20 14:46: feat(monument): LK brick monument voxel texture atlas
