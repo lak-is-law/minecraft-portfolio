@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-27 20:22: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-04-27 21:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-04-27 22:25: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-04-29 11:22: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-04-29 13:41: perf(worker): offload terrain generation to web workers
-- 2026-04-29 16:12: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-04-29 17:07: refactor(physics): AABB collision detection against voxel grid
-- 2026-04-29 18:14: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-04-29 20:18: feat(audio): spatial distance attenuation for ambient loops
 - 2026-04-29 21:40: test(collision): verify player bounding box floor snapping
 - 2026-05-03 10:26: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-05-03 12:15: feat(audio): spatial distance attenuation for ambient loops
@@ -58,3 +49,4 @@
 - 2026-05-20 12:56: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-20 13:54: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-20 14:46: feat(monument): LK brick monument voxel texture atlas
+- 2026-05-20 15:09: perf(render): frustum culling for non-visible chunk boundaries
