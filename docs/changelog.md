@@ -54,3 +54,4 @@
 - 2026-05-20 17:09: refactor(physics): AABB collision detection against voxel grid
 - 2026-05-20 18:54: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-20 19:34: refactor(blocks): bit-packed voxel state representation
+- 2026-05-20 20:59: test(engine): benchmark frame time consistency under 60 FPS load
