@@ -50,3 +50,4 @@
 - 2026-05-20 22:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-05-24 12:19: refactor(blocks): bit-packed voxel state representation
 - 2026-05-24 14:42: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-05-24 21:32: test(engine): benchmark frame time consistency under 60 FPS load
