@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-04-29 21:40: test(collision): verify player bounding box floor snapping
-- 2026-05-03 10:26: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-05-03 12:15: feat(audio): spatial distance attenuation for ambient loops
-- 2026-05-03 13:15: test(collision): verify player bounding box floor snapping
-- 2026-05-03 18:29: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-05-04 12:15: perf(worker): offload terrain generation to web workers
-- 2026-05-04 13:17: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-05-04 15:11: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-05-04 16:48: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-05-04 20:39: refactor(physics): AABB collision detection against voxel grid
 - 2026-05-04 21:24: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-12 10:00: feat(monument): LK brick monument voxel texture atlas
@@ -58,3 +49,4 @@
 - 2026-05-20 21:27: refactor(blocks): bit-packed voxel state representation
 - 2026-05-20 22:01: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-05-24 12:19: refactor(blocks): bit-packed voxel state representation
+- 2026-05-24 14:42: feat(ui): inventory hotbar HUD and interactive crosshair
