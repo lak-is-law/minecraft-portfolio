@@ -52,3 +52,4 @@
 - 2026-05-24 14:42: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-05-24 21:32: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-28 13:40: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-05-28 15:03: feat(audio): spatial distance attenuation for ambient loops
