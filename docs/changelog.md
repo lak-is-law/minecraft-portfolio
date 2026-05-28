@@ -51,3 +51,4 @@
 - 2026-05-24 12:19: refactor(blocks): bit-packed voxel state representation
 - 2026-05-24 14:42: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-05-24 21:32: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-05-28 13:40: perf(render): frustum culling for non-visible chunk boundaries
