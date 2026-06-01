@@ -51,3 +51,4 @@
 - 2026-06-01 14:29: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-01 15:02: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-06-01 16:32: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-06-01 17:17: feat(voxel): chunk mesh generation and greedy meshing
