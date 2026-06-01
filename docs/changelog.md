@@ -56,3 +56,4 @@
 - 2026-06-01 19:50: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-06-01 20:07: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-06-01 21:47: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-06-01 22:15: feat(monument): LK brick monument voxel texture atlas
