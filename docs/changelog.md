@@ -56,3 +56,4 @@
 - 2026-06-01 10:59: perf(worker): offload terrain generation to web workers
 - 2026-06-01 11:03: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-06-01 12:25: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-06-01 13:17: feat(postprocessing): bloom and atmospheric fog pass in Three.js
