@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-05-04 20:39: refactor(physics): AABB collision detection against voxel grid
-- 2026-05-04 21:24: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-05-12 10:00: feat(monument): LK brick monument voxel texture atlas
-- 2026-05-12 12:44: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-05-12 13:04: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-05-12 15:50: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-05-12 21:06: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-05-12 22:23: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-05-13 11:34: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-13 12:06: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-13 13:57: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-13 14:07: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-06-01 12:25: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-01 13:17: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-01 14:29: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-06-01 15:02: feat(ui): inventory hotbar HUD and interactive crosshair
