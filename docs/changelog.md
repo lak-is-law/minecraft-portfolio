@@ -54,3 +54,4 @@
 - 2026-05-28 13:40: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-05-28 15:03: feat(audio): spatial distance attenuation for ambient loops
 - 2026-06-01 10:59: perf(worker): offload terrain generation to web workers
+- 2026-06-01 11:03: perf(memory): reuse Float32Array buffers across chunk re-meshes
