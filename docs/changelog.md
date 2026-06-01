@@ -53,3 +53,4 @@
 - 2026-06-01 16:32: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-06-01 17:17: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-01 18:08: refactor(blocks): bit-packed voxel state representation
+- 2026-06-01 19:50: test(engine): benchmark frame time consistency under 60 FPS load
