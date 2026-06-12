@@ -56,3 +56,4 @@
 - 2026-06-12 12:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-06-12 13:44: test(collision): verify player bounding box floor snapping
 - 2026-06-12 14:20: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-06-12 15:22: feat(voxel): chunk mesh generation and greedy meshing
