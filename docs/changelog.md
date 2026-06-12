@@ -51,3 +51,4 @@
 - 2026-06-12 16:59: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-12 17:31: test(collision): verify player bounding box floor snapping
 - 2026-06-12 18:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-06-12 19:00: feat(voxel): chunk mesh generation and greedy meshing
