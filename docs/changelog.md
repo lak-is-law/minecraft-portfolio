@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-05-13 22:36: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-05-14 15:14: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-05-16 10:02: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-05-16 11:01: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-05-16 12:12: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-05-16 13:41: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-05-16 14:22: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-05-16 15:39: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-05-16 16:23: feat(monument): LK brick monument voxel texture atlas
 - 2026-05-16 17:18: feat(monument): LK brick monument voxel texture atlas
 - 2026-05-16 19:45: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-05-16 20:06: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-06-12 14:20: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-06-12 15:22: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-12 16:59: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-06-12 17:31: test(collision): verify player bounding box floor snapping
