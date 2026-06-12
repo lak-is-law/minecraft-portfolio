@@ -53,3 +53,4 @@
 - 2026-06-12 18:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-06-12 19:00: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-12 20:12: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-06-12 21:56: feat(monument): LK brick monument voxel texture atlas
