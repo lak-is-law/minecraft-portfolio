@@ -52,3 +52,4 @@
 - 2026-06-12 10:23: test(collision): verify player bounding box floor snapping
 - 2026-06-12 10:39: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-12 11:13: refactor(physics): AABB collision detection against voxel grid
+- 2026-06-12 11:14: perf(shaders): optimize ambient occlusion fragment pass
