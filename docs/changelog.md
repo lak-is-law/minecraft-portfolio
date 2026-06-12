@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-05-13 12:06: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-05-13 13:57: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-05-13 14:07: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-05-13 15:50: docs(engine): document voxel coordinate transformation pipeline
-- 2026-05-13 16:19: feat(audio): spatial distance attenuation for ambient loops
-- 2026-05-13 17:38: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-05-13 18:29: refactor(physics): AABB collision detection against voxel grid
-- 2026-05-13 19:56: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-05-13 20:16: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-05-13 22:36: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-05-14 15:14: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-05-16 10:02: feat(ui): inventory hotbar HUD and interactive crosshair
@@ -58,3 +49,4 @@
 - 2026-06-01 21:47: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-01 22:15: feat(monument): LK brick monument voxel texture atlas
 - 2026-06-03 11:50: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-06-12 10:23: test(collision): verify player bounding box floor snapping
