@@ -54,3 +54,4 @@
 - 2026-06-12 19:00: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-12 20:12: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-06-12 21:56: feat(monument): LK brick monument voxel texture atlas
+- 2026-06-12 22:47: perf(shaders): optimize ambient occlusion fragment pass
