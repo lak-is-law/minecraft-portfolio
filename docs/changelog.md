@@ -57,3 +57,4 @@
 - 2026-06-12 22:47: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-06-13 10:16: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-13 10:33: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-06-13 11:21: feat(audio): spatial distance attenuation for ambient loops
