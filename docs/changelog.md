@@ -57,3 +57,4 @@
 - 2026-06-13 16:13: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-13 17:50: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-06-13 18:43: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-06-13 19:51: perf(memory): reuse Float32Array buffers across chunk re-meshes
