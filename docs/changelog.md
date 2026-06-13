@@ -50,3 +50,4 @@
 - 2026-06-13 18:43: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-13 19:51: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-06-13 20:13: test(collision): verify player bounding box floor snapping
+- 2026-06-13 21:48: feat(audio): spatial distance attenuation for ambient loops
