@@ -55,3 +55,4 @@
 - 2026-06-12 20:12: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-06-12 21:56: feat(monument): LK brick monument voxel texture atlas
 - 2026-06-12 22:47: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-06-13 10:16: fix(camera): pitch clamp preventing gimbal lock at zenith
