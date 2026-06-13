@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-05-16 17:18: feat(monument): LK brick monument voxel texture atlas
-- 2026-05-16 19:45: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-05-16 20:06: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-05-16 21:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-05-16 22:04: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-05-20 10:13: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-05-20 10:30: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-05-20 11:07: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-05-20 11:10: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-05-20 12:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-05-20 12:56: docs(engine): document voxel coordinate transformation pipeline
 - 2026-05-20 13:54: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-06-13 10:16: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-13 10:33: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-13 11:21: feat(audio): spatial distance attenuation for ambient loops
+- 2026-06-13 11:29: test(collision): verify player bounding box floor snapping
