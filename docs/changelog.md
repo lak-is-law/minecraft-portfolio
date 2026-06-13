@@ -52,3 +52,4 @@
 - 2026-06-13 11:29: test(collision): verify player bounding box floor snapping
 - 2026-06-13 12:32: feat(monument): LK brick monument voxel texture atlas
 - 2026-06-13 13:27: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-06-13 14:53: feat(monument): LK brick monument voxel texture atlas
