@@ -55,3 +55,4 @@
 - 2026-06-13 14:53: feat(monument): LK brick monument voxel texture atlas
 - 2026-06-13 15:58: test(collision): verify player bounding box floor snapping
 - 2026-06-13 16:13: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-06-13 17:50: fix(controls): pointer lock sensitivity on high-DPI displays
