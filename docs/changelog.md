@@ -55,3 +55,4 @@
 - 2026-06-25 10:46: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-25 12:05: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-25 14:12: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-06-25 15:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
