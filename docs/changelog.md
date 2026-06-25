@@ -52,3 +52,4 @@
 - 2026-06-13 20:13: test(collision): verify player bounding box floor snapping
 - 2026-06-13 21:48: feat(audio): spatial distance attenuation for ambient loops
 - 2026-06-13 22:03: refactor(blocks): bit-packed voxel state representation
+- 2026-06-25 10:46: feat(postprocessing): bloom and atmospheric fog pass in Three.js
