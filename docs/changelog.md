@@ -57,3 +57,4 @@
 - 2026-06-25 14:12: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-25 15:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-25 19:20: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-06-30 11:34: refactor(terrain): Perlin noise octaves for procedural valleys
