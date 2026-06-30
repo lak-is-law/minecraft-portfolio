@@ -52,3 +52,4 @@
 - 2026-06-30 12:06: test(collision): verify player bounding box floor snapping
 - 2026-06-30 13:51: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-30 14:46: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-06-30 19:23: refactor(physics): AABB collision detection against voxel grid
