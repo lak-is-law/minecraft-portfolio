@@ -50,3 +50,4 @@
 - 2026-06-25 19:20: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-06-30 11:34: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-06-30 12:06: test(collision): verify player bounding box floor snapping
+- 2026-06-30 13:51: feat(voxel): chunk mesh generation and greedy meshing
