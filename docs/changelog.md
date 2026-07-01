@@ -56,3 +56,4 @@
 - 2026-07-01 10:56: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-01 14:50: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-07-01 16:14: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-07-01 17:13: perf(shaders): optimize ambient occlusion fragment pass
