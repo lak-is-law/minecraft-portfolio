@@ -52,3 +52,4 @@
 - 2026-07-02 10:11: perf(worker): offload terrain generation to web workers
 - 2026-07-02 10:27: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-02 11:36: feat(audio): spatial distance attenuation for ambient loops
+- 2026-07-02 12:55: feat(ui): inventory hotbar HUD and interactive crosshair
