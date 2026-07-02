@@ -51,3 +51,4 @@
 - 2026-07-02 17:41: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-02 18:58: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-07-02 19:51: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-07-02 20:12: feat(monument): LK brick monument voxel texture atlas
