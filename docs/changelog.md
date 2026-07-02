@@ -57,3 +57,4 @@
 - 2026-07-02 14:35: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-02 15:58: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-02 16:43: test(collision): verify player bounding box floor snapping
+- 2026-07-02 17:41: refactor(physics): AABB collision detection against voxel grid
