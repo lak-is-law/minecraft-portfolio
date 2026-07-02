@@ -53,3 +53,4 @@
 - 2026-07-02 19:51: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-07-02 20:12: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-02 21:01: feat(audio): spatial distance attenuation for ambient loops
+- 2026-07-02 22:34: feat(lighting): directional sunlight ray casting across voxel faces
