@@ -50,3 +50,4 @@
 - 2026-07-01 17:13: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-01 20:42: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-02 10:11: perf(worker): offload terrain generation to web workers
+- 2026-07-02 10:27: feat(lighting): directional sunlight ray casting across voxel faces
