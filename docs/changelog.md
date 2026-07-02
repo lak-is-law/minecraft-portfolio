@@ -50,3 +50,4 @@
 - 2026-07-02 16:43: test(collision): verify player bounding box floor snapping
 - 2026-07-02 17:41: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-02 18:58: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-07-02 19:51: feat(postprocessing): bloom and atmospheric fog pass in Three.js
