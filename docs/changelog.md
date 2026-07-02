@@ -54,3 +54,4 @@
 - 2026-07-02 11:36: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-02 12:55: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-07-02 13:28: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-07-02 14:35: feat(monument): LK brick monument voxel texture atlas
