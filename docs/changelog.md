@@ -52,3 +52,4 @@
 - 2026-07-04 16:34: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-04 17:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-07-04 19:21: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-07-04 20:13: refactor(terrain): Perlin noise octaves for procedural valleys
