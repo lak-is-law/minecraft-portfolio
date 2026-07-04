@@ -56,3 +56,4 @@
 - 2026-07-02 22:34: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-04 12:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-07-04 13:03: test(collision): verify player bounding box floor snapping
+- 2026-07-04 14:48: docs(engine): document voxel coordinate transformation pipeline
