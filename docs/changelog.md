@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-06-12 13:44: test(collision): verify player bounding box floor snapping
-- 2026-06-12 14:20: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-06-12 15:22: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-06-12 16:59: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-06-12 17:31: test(collision): verify player bounding box floor snapping
-- 2026-06-12 18:05: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-06-12 19:00: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-06-12 20:12: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-06-12 21:56: feat(monument): LK brick monument voxel texture atlas
 - 2026-06-12 22:47: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-06-13 10:16: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-06-13 10:33: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-07-04 13:03: test(collision): verify player bounding box floor snapping
 - 2026-07-04 14:48: docs(engine): document voxel coordinate transformation pipeline
 - 2026-07-04 15:52: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-07-04 16:34: feat(monument): LK brick monument voxel texture atlas
