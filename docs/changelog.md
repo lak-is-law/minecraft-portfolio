@@ -50,3 +50,4 @@
 - 2026-07-04 14:48: docs(engine): document voxel coordinate transformation pipeline
 - 2026-07-04 15:52: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-04 16:34: feat(monument): LK brick monument voxel texture atlas
+- 2026-07-04 17:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
