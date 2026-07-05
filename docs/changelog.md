@@ -57,3 +57,4 @@
 - 2026-07-05 12:12: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-05 14:17: perf(worker): offload terrain generation to web workers
 - 2026-07-05 15:42: refactor(blocks): bit-packed voxel state representation
+- 2026-07-05 16:19: test(collision): verify player bounding box floor snapping
