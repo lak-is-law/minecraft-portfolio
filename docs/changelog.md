@@ -55,3 +55,4 @@
 - 2026-07-06 11:13: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-06 12:02: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-06 13:03: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-07-06 14:01: refactor(physics): AABB collision detection against voxel grid
