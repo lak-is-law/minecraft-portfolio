@@ -53,3 +53,4 @@
 - 2026-07-06 19:02: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-07-06 20:26: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-07-06 21:59: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-07-06 22:50: fix(controls): pointer lock sensitivity on high-DPI displays
