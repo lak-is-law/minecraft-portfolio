@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-06-13 16:13: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-06-13 17:50: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-06-13 18:43: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-06-13 19:51: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-06-13 20:13: test(collision): verify player bounding box floor snapping
-- 2026-06-13 21:48: feat(audio): spatial distance attenuation for ambient loops
-- 2026-06-13 22:03: refactor(blocks): bit-packed voxel state representation
-- 2026-06-25 10:46: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-06-25 12:05: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-06-25 14:12: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-25 15:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-06-25 19:20: perf(memory): reuse Float32Array buffers across chunk re-meshes
@@ -58,3 +49,4 @@
 - 2026-07-06 14:01: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-06 15:29: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-06 16:19: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-07-06 18:54: perf(render): frustum culling for non-visible chunk boundaries
