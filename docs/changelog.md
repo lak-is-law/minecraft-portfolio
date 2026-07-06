@@ -51,3 +51,4 @@
 - 2026-07-05 16:19: test(collision): verify player bounding box floor snapping
 - 2026-07-05 18:56: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-05 21:12: refactor(blocks): bit-packed voxel state representation
+- 2026-07-06 10:41: refactor(physics): AABB collision detection against voxel grid
