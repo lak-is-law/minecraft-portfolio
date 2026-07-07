@@ -56,3 +56,4 @@
 - 2026-07-06 22:50: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-07 12:39: test(collision): verify player bounding box floor snapping
 - 2026-07-07 17:11: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-07-07 18:42: docs(engine): document voxel coordinate transformation pipeline
