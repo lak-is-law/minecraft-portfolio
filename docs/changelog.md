@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-06-25 14:12: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-06-25 15:16: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-06-25 19:20: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-06-30 11:34: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-06-30 12:06: test(collision): verify player bounding box floor snapping
-- 2026-06-30 13:51: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-06-30 14:46: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-06-30 19:23: refactor(physics): AABB collision detection against voxel grid
-- 2026-07-01 10:56: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-01 14:50: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-07-01 16:14: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-07-01 17:13: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2026-07-07 17:11: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-07 18:42: docs(engine): document voxel coordinate transformation pipeline
 - 2026-07-07 19:36: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-07-07 21:16: feat(monument): LK brick monument voxel texture atlas
