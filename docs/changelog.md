@@ -52,3 +52,4 @@
 - 2026-07-08 19:39: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-08 20:23: test(collision): verify player bounding box floor snapping
 - 2026-07-08 21:44: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-07-08 22:48: feat(postprocessing): bloom and atmospheric fog pass in Three.js
