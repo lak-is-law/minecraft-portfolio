@@ -50,3 +50,4 @@
 - 2026-07-08 17:49: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-07-08 18:58: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-07-08 19:39: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-07-08 20:23: test(collision): verify player bounding box floor snapping
