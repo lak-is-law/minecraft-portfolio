@@ -57,3 +57,4 @@
 - 2026-07-08 15:35: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-08 16:01: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-08 17:49: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-07-08 18:58: test(engine): benchmark frame time consistency under 60 FPS load
