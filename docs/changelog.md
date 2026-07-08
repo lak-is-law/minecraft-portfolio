@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-01 14:50: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-07-01 16:14: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-07-01 17:13: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-01 20:42: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-02 10:11: perf(worker): offload terrain generation to web workers
-- 2026-07-02 10:27: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-07-02 11:36: feat(audio): spatial distance attenuation for ambient loops
-- 2026-07-02 12:55: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-07-02 13:28: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-07-02 14:35: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-02 15:58: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-02 16:43: test(collision): verify player bounding box floor snapping
@@ -58,3 +49,4 @@
 - 2026-07-08 16:01: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-08 17:49: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-07-08 18:58: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-07-08 19:39: fix(controls): pointer lock sensitivity on high-DPI displays
