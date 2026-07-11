@@ -55,3 +55,4 @@
 - 2026-07-08 22:48: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-07-09 13:04: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-07-11 16:49: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-07-11 21:05: perf(worker): offload terrain generation to web workers
