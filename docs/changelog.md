@@ -51,3 +51,4 @@
 - 2026-07-12 11:32: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-07-12 13:51: test(collision): verify player bounding box floor snapping
 - 2026-07-12 14:25: feat(monument): LK brick monument voxel texture atlas
+- 2026-07-12 15:00: docs(engine): document voxel coordinate transformation pipeline
