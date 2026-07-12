@@ -57,3 +57,4 @@
 - 2026-07-11 16:49: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-07-11 21:05: perf(worker): offload terrain generation to web workers
 - 2026-07-12 10:43: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-07-12 11:32: perf(memory): reuse Float32Array buffers across chunk re-meshes
