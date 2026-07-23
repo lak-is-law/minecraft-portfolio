@@ -54,3 +54,4 @@
 - 2026-07-12 15:00: docs(engine): document voxel coordinate transformation pipeline
 - 2026-07-12 16:10: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-12 22:46: refactor(blocks): bit-packed voxel state representation
+- 2026-07-23 10:50: perf(shaders): optimize ambient occlusion fragment pass
