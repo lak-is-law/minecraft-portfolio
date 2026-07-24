@@ -57,3 +57,4 @@
 - 2026-07-23 10:50: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-23 18:13: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-23 21:48: feat(audio): spatial distance attenuation for ambient loops
+- 2026-07-24 12:38: refactor(physics): AABB collision detection against voxel grid
