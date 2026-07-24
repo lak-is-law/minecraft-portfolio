@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-04 12:19: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-04 13:03: test(collision): verify player bounding box floor snapping
-- 2026-07-04 14:48: docs(engine): document voxel coordinate transformation pipeline
-- 2026-07-04 15:52: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-04 16:34: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-04 17:08: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-04 19:21: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-07-04 20:13: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-07-05 11:28: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-05 12:12: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-05 14:17: perf(worker): offload terrain generation to web workers
 - 2026-07-05 15:42: refactor(blocks): bit-packed voxel state representation
@@ -58,3 +49,4 @@
 - 2026-07-23 18:13: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-23 21:48: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-24 12:38: refactor(physics): AABB collision detection against voxel grid
+- 2026-07-24 14:21: test(engine): benchmark frame time consistency under 60 FPS load
