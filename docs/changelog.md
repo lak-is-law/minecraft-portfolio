@@ -50,3 +50,4 @@
 - 2026-07-23 21:48: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-24 12:38: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-24 14:21: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-07-24 17:55: feat(voxel): chunk mesh generation and greedy meshing
