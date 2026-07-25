@@ -52,3 +52,4 @@
 - 2026-07-24 14:21: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-07-24 17:55: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-07-24 22:28: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-07-25 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
