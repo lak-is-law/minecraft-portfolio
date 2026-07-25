@@ -55,3 +55,4 @@
 - 2026-07-25 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-07-25 11:01: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-25 13:00: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-07-25 20:13: perf(render): frustum culling for non-visible chunk boundaries
