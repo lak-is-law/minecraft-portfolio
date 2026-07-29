@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-05 12:12: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-07-05 14:17: perf(worker): offload terrain generation to web workers
-- 2026-07-05 15:42: refactor(blocks): bit-packed voxel state representation
-- 2026-07-05 16:19: test(collision): verify player bounding box floor snapping
-- 2026-07-05 18:56: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-05 21:12: refactor(blocks): bit-packed voxel state representation
-- 2026-07-06 10:41: refactor(physics): AABB collision detection against voxel grid
-- 2026-07-06 11:13: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-07-06 12:02: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-06 13:03: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-06 14:01: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-06 15:29: perf(shaders): optimize ambient occlusion fragment pass
@@ -58,3 +49,4 @@
 - 2026-07-25 20:13: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-25 22:05: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-29 15:30: refactor(blocks): bit-packed voxel state representation
+- 2026-07-29 17:11: fix(controls): pointer lock sensitivity on high-DPI displays
