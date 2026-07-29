@@ -57,3 +57,4 @@
 - 2026-07-25 13:00: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-07-25 20:13: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-25 22:05: feat(audio): spatial distance attenuation for ambient loops
+- 2026-07-29 15:30: refactor(blocks): bit-packed voxel state representation
