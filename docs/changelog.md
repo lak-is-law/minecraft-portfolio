@@ -50,3 +50,4 @@
 - 2026-07-25 22:05: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-29 15:30: refactor(blocks): bit-packed voxel state representation
 - 2026-07-29 17:11: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-07-29 20:21: refactor(terrain): Perlin noise octaves for procedural valleys
