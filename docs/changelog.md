@@ -51,3 +51,4 @@
 - 2026-07-31 17:41: perf(worker): offload terrain generation to web workers
 - 2026-07-31 20:14: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-31 21:47: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-07-31 22:27: perf(worker): offload terrain generation to web workers
