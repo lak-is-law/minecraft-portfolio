@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-06 13:03: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-06 14:01: refactor(physics): AABB collision detection against voxel grid
-- 2026-07-06 15:29: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-06 16:19: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-07-06 18:54: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-06 19:02: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-06 20:26: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-07-06 21:59: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-06 22:50: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-07 12:39: test(collision): verify player bounding box floor snapping
 - 2026-07-07 17:11: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-07 18:42: docs(engine): document voxel coordinate transformation pipeline
@@ -58,3 +49,4 @@
 - 2026-07-31 15:09: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-31 16:35: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-07-31 17:41: perf(worker): offload terrain generation to web workers
+- 2026-07-31 20:14: feat(monument): LK brick monument voxel texture atlas
