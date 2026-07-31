@@ -51,3 +51,4 @@
 - 2026-07-29 15:30: refactor(blocks): bit-packed voxel state representation
 - 2026-07-29 17:11: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-29 20:21: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-07-31 10:41: refactor(physics): AABB collision detection against voxel grid
