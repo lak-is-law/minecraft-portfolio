@@ -54,3 +54,4 @@
 - 2026-07-31 10:41: refactor(physics): AABB collision detection against voxel grid
 - 2026-07-31 11:40: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-31 12:53: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-07-31 14:15: perf(shaders): optimize ambient occlusion fragment pass
