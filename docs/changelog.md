@@ -56,3 +56,4 @@
 - 2026-07-31 12:53: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-07-31 14:15: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-31 15:09: feat(audio): spatial distance attenuation for ambient loops
+- 2026-07-31 16:35: refactor(terrain): Perlin noise octaves for procedural valleys
