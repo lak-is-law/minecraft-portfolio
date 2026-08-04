@@ -56,3 +56,4 @@
 - 2026-08-01 18:10: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-04 11:05: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-08-04 12:08: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
