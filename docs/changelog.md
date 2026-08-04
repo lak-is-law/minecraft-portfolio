@@ -57,3 +57,4 @@
 - 2026-08-04 11:05: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-08-04 12:08: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-08-04 16:53: perf(memory): reuse Float32Array buffers across chunk re-meshes
