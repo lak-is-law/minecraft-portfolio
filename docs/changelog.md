@@ -52,3 +52,4 @@
 - 2026-08-04 17:31: refactor(physics): AABB collision detection against voxel grid
 - 2026-08-04 18:36: refactor(blocks): bit-packed voxel state representation
 - 2026-08-04 19:12: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-08-04 20:37: feat(postprocessing): bloom and atmospheric fog pass in Three.js
