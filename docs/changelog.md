@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-07 12:39: test(collision): verify player bounding box floor snapping
-- 2026-07-07 17:11: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-07-07 18:42: docs(engine): document voxel coordinate transformation pipeline
-- 2026-07-07 19:36: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-07 21:16: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-08 10:20: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-08 11:13: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-08 12:12: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-07-08 14:39: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-07-08 15:35: feat(monument): LK brick monument voxel texture atlas
 - 2026-07-08 16:01: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-07-08 17:49: test(engine): benchmark frame time consistency under 60 FPS load
@@ -58,3 +49,4 @@
 - 2026-08-04 12:08: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-08-04 16:53: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-08-04 17:31: refactor(physics): AABB collision detection against voxel grid
