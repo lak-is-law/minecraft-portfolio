@@ -50,3 +50,4 @@
 - 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-08-04 16:53: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-08-04 17:31: refactor(physics): AABB collision detection against voxel grid
+- 2026-08-04 18:36: refactor(blocks): bit-packed voxel state representation
