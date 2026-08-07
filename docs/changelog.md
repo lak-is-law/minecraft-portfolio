@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-08 15:35: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-08 16:01: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-07-08 17:49: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-07-08 18:58: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-07-08 19:39: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-07-08 20:23: test(collision): verify player bounding box floor snapping
-- 2026-07-08 21:44: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-07-08 22:48: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-09 13:04: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-07-11 16:49: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-07-11 21:05: perf(worker): offload terrain generation to web workers
 - 2026-07-12 10:43: fix(camera): pitch clamp preventing gimbal lock at zenith
@@ -58,3 +49,4 @@
 - 2026-08-07 16:57: refactor(physics): AABB collision detection against voxel grid
 - 2026-08-07 17:35: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-08-07 18:40: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-08-07 21:33: test(collision): verify player bounding box floor snapping
