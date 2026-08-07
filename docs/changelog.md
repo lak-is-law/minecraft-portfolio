@@ -56,3 +56,4 @@
 - 2026-08-04 21:22: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-04 22:02: test(collision): verify player bounding box floor snapping
 - 2026-08-07 16:57: refactor(physics): AABB collision detection against voxel grid
+- 2026-08-07 17:35: refactor(terrain): Perlin noise octaves for procedural valleys
