@@ -53,3 +53,4 @@
 - 2026-08-08 12:59: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-08 15:41: refactor(physics): AABB collision detection against voxel grid
 - 2026-08-08 16:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-08-08 19:21: perf(render): frustum culling for non-visible chunk boundaries
