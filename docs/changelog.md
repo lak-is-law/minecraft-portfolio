@@ -51,3 +51,4 @@
 - 2026-08-07 18:40: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-08-07 21:33: test(collision): verify player bounding box floor snapping
 - 2026-08-08 12:59: feat(monument): LK brick monument voxel texture atlas
+- 2026-08-08 15:41: refactor(physics): AABB collision detection against voxel grid
