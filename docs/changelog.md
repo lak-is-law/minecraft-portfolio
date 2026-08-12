@@ -50,3 +50,4 @@
 - 2026-08-12 12:59: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-08-12 14:19: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-08-12 15:04: feat(audio): spatial distance attenuation for ambient loops
+- 2026-08-12 18:52: feat(lighting): directional sunlight ray casting across voxel faces
