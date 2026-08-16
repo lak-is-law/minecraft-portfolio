@@ -57,3 +57,4 @@
 - 2026-08-16 19:52: feat(audio): spatial distance attenuation for ambient loops
 - 2026-08-16 20:47: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-16 21:59: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-08-16 22:58: refactor(blocks): bit-packed voxel state representation
