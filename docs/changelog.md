@@ -52,3 +52,4 @@
 - 2026-08-12 15:04: feat(audio): spatial distance attenuation for ambient loops
 - 2026-08-12 18:52: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-16 10:46: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-08-16 11:19: feat(monument): LK brick monument voxel texture atlas
