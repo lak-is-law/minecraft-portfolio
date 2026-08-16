@@ -56,3 +56,4 @@
 - 2026-08-16 13:05: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-16 19:52: feat(audio): spatial distance attenuation for ambient loops
 - 2026-08-16 20:47: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-08-16 21:59: feat(lighting): directional sunlight ray casting across voxel faces
