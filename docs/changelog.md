@@ -55,3 +55,4 @@
 - 2026-08-16 11:19: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-16 13:05: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-16 19:52: feat(audio): spatial distance attenuation for ambient loops
+- 2026-08-16 20:47: feat(lighting): directional sunlight ray casting across voxel faces
