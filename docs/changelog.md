@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-23 10:50: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-23 18:13: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-23 21:48: feat(audio): spatial distance attenuation for ambient loops
-- 2026-07-24 12:38: refactor(physics): AABB collision detection against voxel grid
-- 2026-07-24 14:21: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-07-24 17:55: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-07-24 22:28: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-07-25 10:24: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-07-25 11:01: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-25 13:00: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-07-25 20:13: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-07-25 22:05: feat(audio): spatial distance attenuation for ambient loops
@@ -58,3 +49,4 @@
 - 2026-08-16 20:47: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-16 21:59: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-16 22:58: refactor(blocks): bit-packed voxel state representation
+- 2026-08-19 12:38: perf(render): frustum culling for non-visible chunk boundaries
