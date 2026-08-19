@@ -51,3 +51,4 @@
 - 2026-08-16 22:58: refactor(blocks): bit-packed voxel state representation
 - 2026-08-19 12:38: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-19 14:12: test(collision): verify player bounding box floor snapping
+- 2026-08-19 15:35: refactor(terrain): Perlin noise octaves for procedural valleys
