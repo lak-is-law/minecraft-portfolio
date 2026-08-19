@@ -53,3 +53,4 @@
 - 2026-08-19 14:12: test(collision): verify player bounding box floor snapping
 - 2026-08-19 15:35: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-08-19 19:39: perf(worker): offload terrain generation to web workers
+- 2026-08-19 21:33: fix(controls): pointer lock sensitivity on high-DPI displays
