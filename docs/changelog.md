@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-25 13:00: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-07-25 20:13: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-25 22:05: feat(audio): spatial distance attenuation for ambient loops
-- 2026-07-29 15:30: refactor(blocks): bit-packed voxel state representation
-- 2026-07-29 17:11: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-07-29 20:21: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-07-31 10:41: refactor(physics): AABB collision detection against voxel grid
-- 2026-07-31 11:40: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-07-31 12:53: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-07-31 14:15: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-07-31 15:09: feat(audio): spatial distance attenuation for ambient loops
 - 2026-07-31 16:35: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-08-23 15:01: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-08-24 12:22: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-24 13:27: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-08-24 14:52: test(collision): verify player bounding box floor snapping
