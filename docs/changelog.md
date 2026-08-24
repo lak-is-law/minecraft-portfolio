@@ -53,3 +53,4 @@
 - 2026-08-24 16:51: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-08-24 17:42: docs(engine): document voxel coordinate transformation pipeline
 - 2026-08-24 19:35: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-08-24 20:24: test(collision): verify player bounding box floor snapping
