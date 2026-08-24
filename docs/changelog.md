@@ -50,3 +50,4 @@
 - 2026-08-24 12:22: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-24 13:27: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-24 14:52: test(collision): verify player bounding box floor snapping
+- 2026-08-24 16:51: feat(postprocessing): bloom and atmospheric fog pass in Three.js
