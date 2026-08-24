@@ -56,3 +56,4 @@
 - 2026-08-19 21:33: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-08-23 10:02: test(collision): verify player bounding box floor snapping
 - 2026-08-23 15:01: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-08-24 12:22: feat(monument): LK brick monument voxel texture atlas
