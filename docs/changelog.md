@@ -50,3 +50,4 @@
 - 2026-09-03 12:51: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-03 18:10: refactor(blocks): bit-packed voxel state representation
 - 2026-09-03 19:22: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-09-03 20:15: perf(memory): reuse Float32Array buffers across chunk re-meshes
