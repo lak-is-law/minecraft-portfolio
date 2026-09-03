@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-07-31 14:15: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-31 15:09: feat(audio): spatial distance attenuation for ambient loops
-- 2026-07-31 16:35: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-07-31 17:41: perf(worker): offload terrain generation to web workers
-- 2026-07-31 20:14: feat(monument): LK brick monument voxel texture atlas
-- 2026-07-31 21:47: perf(shaders): optimize ambient occlusion fragment pass
-- 2026-07-31 22:27: perf(worker): offload terrain generation to web workers
-- 2026-08-01 15:20: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-08-01 18:10: feat(monument): LK brick monument voxel texture atlas
 - 2026-08-04 11:05: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-08-04 12:08: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
@@ -58,3 +49,4 @@
 - 2026-09-03 11:42: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-09-03 12:51: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-03 18:10: refactor(blocks): bit-packed voxel state representation
+- 2026-09-03 19:22: feat(lighting): directional sunlight ray casting across voxel faces
