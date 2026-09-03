@@ -55,3 +55,4 @@
 - 2026-08-24 19:35: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-08-24 20:24: test(collision): verify player bounding box floor snapping
 - 2026-09-03 10:20: feat(monument): LK brick monument voxel texture atlas
+- 2026-09-03 11:42: refactor(terrain): Perlin noise octaves for procedural valleys
