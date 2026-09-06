@@ -57,3 +57,4 @@
 - 2026-09-06 15:39: refactor(blocks): bit-packed voxel state representation
 - 2026-09-06 17:23: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-09-06 19:05: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-09-06 21:08: feat(audio): spatial distance attenuation for ambient loops
