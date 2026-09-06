@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-08-04 11:05: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-08-04 12:08: perf(render): frustum culling for non-visible chunk boundaries
-- 2026-08-04 13:00: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-08-04 16:53: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-08-04 17:31: refactor(physics): AABB collision detection against voxel grid
-- 2026-08-04 18:36: refactor(blocks): bit-packed voxel state representation
-- 2026-08-04 19:12: feat(lighting): directional sunlight ray casting across voxel faces
-- 2026-08-04 20:37: feat(postprocessing): bloom and atmospheric fog pass in Three.js
-- 2026-08-04 21:22: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-08-04 22:02: test(collision): verify player bounding box floor snapping
 - 2026-08-07 16:57: refactor(physics): AABB collision detection against voxel grid
 - 2026-08-07 17:35: refactor(terrain): Perlin noise octaves for procedural valleys
@@ -58,3 +49,4 @@
 - 2026-09-06 17:23: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-09-06 19:05: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-06 21:08: feat(audio): spatial distance attenuation for ambient loops
+- 2026-09-06 22:23: fix(camera): pitch clamp preventing gimbal lock at zenith
