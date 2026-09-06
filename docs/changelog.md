@@ -55,3 +55,4 @@
 - 2026-09-06 12:43: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-09-06 14:06: refactor(physics): AABB collision detection against voxel grid
 - 2026-09-06 15:39: refactor(blocks): bit-packed voxel state representation
+- 2026-09-06 17:23: perf(shaders): optimize ambient occlusion fragment pass
