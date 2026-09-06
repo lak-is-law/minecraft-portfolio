@@ -52,3 +52,4 @@
 - 2026-09-03 19:22: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-09-03 20:15: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-09-06 11:17: perf(shaders): optimize ambient occlusion fragment pass
+- 2026-09-06 12:43: test(engine): benchmark frame time consistency under 60 FPS load
