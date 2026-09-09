@@ -56,3 +56,4 @@
 - 2026-09-09 13:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-09-09 15:59: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-09-09 16:53: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-09-09 17:02: feat(monument): LK brick monument voxel texture atlas
