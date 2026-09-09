@@ -52,3 +52,4 @@
 - 2026-09-09 19:08: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-09 20:28: refactor(blocks): bit-packed voxel state representation
 - 2026-09-09 21:47: refactor(physics): AABB collision detection against voxel grid
+- 2026-09-09 22:05: fix(camera): pitch clamp preventing gimbal lock at zenith
