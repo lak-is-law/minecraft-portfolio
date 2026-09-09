@@ -55,3 +55,4 @@
 - 2026-09-09 12:25: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-09 13:22: refactor(physics): AABB collision detection against voxel grid
 - 2026-09-09 15:59: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-09-09 16:53: feat(voxel): chunk mesh generation and greedy meshing
