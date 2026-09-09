@@ -57,3 +57,4 @@
 - 2026-09-09 15:59: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-09-09 16:53: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-09-09 17:02: feat(monument): LK brick monument voxel texture atlas
+- 2026-09-09 18:26: refactor(blocks): bit-packed voxel state representation
