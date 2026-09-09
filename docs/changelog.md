@@ -50,3 +50,4 @@
 - 2026-09-09 17:02: feat(monument): LK brick monument voxel texture atlas
 - 2026-09-09 18:26: refactor(blocks): bit-packed voxel state representation
 - 2026-09-09 19:08: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-09-09 20:28: refactor(blocks): bit-packed voxel state representation
