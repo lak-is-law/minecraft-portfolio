@@ -53,3 +53,4 @@
 - 2026-09-09 10:50: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-09 11:45: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-09 12:25: feat(audio): spatial distance attenuation for ambient loops
+- 2026-09-09 13:22: refactor(physics): AABB collision detection against voxel grid
