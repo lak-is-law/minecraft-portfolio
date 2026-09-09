@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-08-04 22:02: test(collision): verify player bounding box floor snapping
-- 2026-08-07 16:57: refactor(physics): AABB collision detection against voxel grid
-- 2026-08-07 17:35: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-08-07 18:40: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-08-07 21:33: test(collision): verify player bounding box floor snapping
-- 2026-08-08 12:59: feat(monument): LK brick monument voxel texture atlas
-- 2026-08-08 15:41: refactor(physics): AABB collision detection against voxel grid
-- 2026-08-08 16:40: perf(memory): reuse Float32Array buffers across chunk re-meshes
-- 2026-08-08 19:21: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-08-08 21:55: perf(worker): offload terrain generation to web workers
 - 2026-08-09 18:12: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-08-12 12:59: feat(postprocessing): bloom and atmospheric fog pass in Three.js
@@ -58,3 +49,4 @@
 - 2026-09-09 16:53: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-09-09 17:02: feat(monument): LK brick monument voxel texture atlas
 - 2026-09-09 18:26: refactor(blocks): bit-packed voxel state representation
+- 2026-09-09 19:08: feat(ui): inventory hotbar HUD and interactive crosshair
