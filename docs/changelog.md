@@ -53,3 +53,4 @@
 - 2026-09-09 20:28: refactor(blocks): bit-packed voxel state representation
 - 2026-09-09 21:47: refactor(physics): AABB collision detection against voxel grid
 - 2026-09-09 22:05: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-09-10 13:42: fix(controls): pointer lock sensitivity on high-DPI displays
