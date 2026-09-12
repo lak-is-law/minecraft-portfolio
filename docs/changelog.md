@@ -57,3 +57,4 @@
 - 2026-09-10 19:19: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-12 11:00: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-09-12 12:04: refactor(blocks): bit-packed voxel state representation
+- 2026-09-12 13:34: feat(audio): spatial distance attenuation for ambient loops
