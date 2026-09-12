@@ -50,3 +50,4 @@
 - 2026-09-12 12:04: refactor(blocks): bit-packed voxel state representation
 - 2026-09-12 13:34: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-12 14:55: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-09-12 15:23: fix(camera): pitch clamp preventing gimbal lock at zenith
