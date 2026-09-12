@@ -55,3 +55,4 @@
 - 2026-09-09 22:05: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-10 13:42: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-09-10 19:19: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-09-12 11:00: perf(memory): reuse Float32Array buffers across chunk re-meshes
