@@ -53,3 +53,4 @@
 - 2026-09-12 15:23: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-12 19:49: feat(monument): LK brick monument voxel texture atlas
 - 2026-09-12 22:29: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-09-15 11:19: fix(camera): pitch clamp preventing gimbal lock at zenith
