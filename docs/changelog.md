@@ -50,3 +50,4 @@
 - 2026-09-15 17:13: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-15 18:44: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-15 20:47: feat(voxel): chunk mesh generation and greedy meshing
+- 2026-09-15 22:04: fix(camera): pitch clamp preventing gimbal lock at zenith
