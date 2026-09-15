@@ -56,3 +56,4 @@
 - 2026-09-15 11:19: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-15 15:35: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-09-15 16:28: feat(monument): LK brick monument voxel texture atlas
+- 2026-09-15 17:13: feat(ui): inventory hotbar HUD and interactive crosshair
