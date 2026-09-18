@@ -53,3 +53,4 @@
 - 2026-09-15 22:04: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-18 13:38: perf(worker): offload terrain generation to web workers
 - 2026-09-18 15:45: feat(audio): spatial distance attenuation for ambient loops
+- 2026-09-18 20:52: feat(audio): spatial distance attenuation for ambient loops
