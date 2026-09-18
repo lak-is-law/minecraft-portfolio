@@ -51,3 +51,4 @@
 - 2026-09-15 18:44: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-15 20:47: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-09-15 22:04: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-09-18 13:38: perf(worker): offload terrain generation to web workers
