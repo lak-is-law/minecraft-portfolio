@@ -56,3 +56,4 @@
 - 2026-09-18 20:52: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-18 22:07: refactor(physics): AABB collision detection against voxel grid
 - 2026-09-20 19:02: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-09-20 20:57: test(collision): verify player bounding box floor snapping
