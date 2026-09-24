@@ -50,3 +50,4 @@
 - 2026-09-20 20:57: test(collision): verify player bounding box floor snapping
 - 2026-09-21 11:17: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-21 18:21: docs(engine): document voxel coordinate transformation pipeline
+- 2026-09-24 10:58: feat(ui): inventory hotbar HUD and interactive crosshair
