@@ -54,3 +54,4 @@
 - 2026-09-24 11:43: docs(engine): document voxel coordinate transformation pipeline
 - 2026-09-24 13:15: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-24 14:07: perf(worker): offload terrain generation to web workers
+- 2026-09-24 16:33: perf(worker): offload terrain generation to web workers
