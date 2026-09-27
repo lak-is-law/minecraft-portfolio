@@ -57,3 +57,4 @@
 - 2026-09-24 16:33: perf(worker): offload terrain generation to web workers
 - 2026-09-24 17:41: perf(worker): offload terrain generation to web workers
 - 2026-09-24 19:58: feat(ui): inventory hotbar HUD and interactive crosshair
+- 2026-09-27 15:41: feat(audio): spatial distance attenuation for ambient loops
