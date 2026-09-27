@@ -52,3 +52,4 @@
 - 2026-09-27 17:18: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-27 18:11: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-27 19:06: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-09-27 22:22: test(engine): benchmark frame time consistency under 60 FPS load
