@@ -50,3 +50,4 @@
 - 2026-09-24 19:58: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-27 15:41: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-27 17:18: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-09-27 18:11: feat(audio): spatial distance attenuation for ambient loops
