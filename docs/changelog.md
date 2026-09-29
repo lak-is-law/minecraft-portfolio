@@ -56,3 +56,4 @@
 - 2026-09-29 10:56: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-29 11:27: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-09-29 12:31: feat(monument): LK brick monument voxel texture atlas
+- 2026-09-29 13:17: feat(audio): spatial distance attenuation for ambient loops
