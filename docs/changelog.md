@@ -50,3 +50,4 @@
 - 2026-09-29 13:17: feat(audio): spatial distance attenuation for ambient loops
 - 2026-09-29 14:31: feat(ui): inventory hotbar HUD and interactive crosshair
 - 2026-09-29 18:50: feat(postprocessing): bloom and atmospheric fog pass in Three.js
+- 2026-09-29 19:32: feat(postprocessing): bloom and atmospheric fog pass in Three.js
