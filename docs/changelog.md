@@ -54,3 +54,4 @@
 - 2026-09-27 19:06: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-09-27 22:22: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-09-29 10:56: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-09-29 11:27: perf(shaders): optimize ambient occlusion fragment pass
