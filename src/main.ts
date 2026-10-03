@@ -43,7 +43,8 @@ class Game {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
-      powerPreference: 'high-performance'
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

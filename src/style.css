@@ -247,6 +247,13 @@ body, html {
   box-shadow: inset 1px 1px #18181b, inset -1px -1px #71717a;
 }
 
+.mc-chip-btn.active {
+  background: #15803d !important;
+  border-color: #4ade80 !important;
+  color: #f0fdf4 !important;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.5) !important;
+}
+
 
 /* ==========================================================
    MINIMAP (TOP LEFT - TAP TO MAXIMISE)
@@ -1439,6 +1446,16 @@ body, html {
 }
 .mc-touch-place:active {
   background: rgba(249, 115, 22, 0.95);
+}
+
+.mc-touch-fly {
+  background: rgba(147, 51, 234, 0.78);
+  border-color: #a855f7;
+}
+.mc-touch-fly:active, .mc-touch-fly.active {
+  background: rgba(168, 85, 247, 0.95);
+  border-color: #c084fc;
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
 }
 
 /* Enhanced Responsive Scaling */

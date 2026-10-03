@@ -449,6 +449,12 @@ export class HUDManager {
     const flyBtn = document.getElementById('btn-quick-fly');
     if (flyBtn) {
       flyBtn.textContent = `[FLY: ${isFlying ? 'ON' : 'OFF'}]`;
+      flyBtn.classList.toggle('active', isFlying);
+    }
+    const touchFlyBtn = document.getElementById('btn-touch-fly');
+    if (touchFlyBtn) {
+      touchFlyBtn.textContent = isFlying ? '[FLYING]' : '[FLY]';
+      touchFlyBtn.classList.toggle('active', isFlying);
     }
   }
 

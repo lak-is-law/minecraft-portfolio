@@ -124,6 +124,12 @@ export class Player {
       this.startMobileSession();
     });
 
+    pauseOverlay?.addEventListener('click', (e) => {
+      if (e.target === pauseOverlay) {
+        handleStartGame(e);
+      }
+    });
+
     document.addEventListener('pointerlockchange', () => {
       this.isLocked = document.pointerLockElement === this.domElement;
       if (pauseOverlay) {
@@ -231,18 +237,24 @@ export class Player {
 
       // Fly toggle on 'KeyF'
       if (e.code === 'KeyF') {
+        if (e.repeat) return;
         this.isFlying = !this.isFlying;
         this.velocity.set(0, 0, 0);
+        sound.playClick();
       }
 
-      // Space double-tap for fly toggle
+      // Space double-tap for fly toggle (ignore continuous keydown repeats!)
       if (e.code === 'Space') {
+        if (e.repeat) return;
         const now = performance.now();
-        if (now - this.lastSpaceTime < 280) {
+        if (now - this.lastSpaceTime < 320) {
           this.isFlying = !this.isFlying;
           this.velocity.set(0, 0, 0);
+          sound.playClick();
+          this.lastSpaceTime = 0;
+        } else {
+          this.lastSpaceTime = now;
         }
-        this.lastSpaceTime = now;
       }
 
       // W double-tap for sprint
@@ -470,6 +482,12 @@ export class Player {
         this.avatarLegR.rotation.x = -1.45;
         this.avatarArmL.rotation.x = 0.25;
         this.avatarArmR.rotation.x = 0.25;
+      } else if (this.isFlying) {
+        // Minecraft Creative flying pose: legs trail back, arms forward
+        this.avatarLegL.rotation.x = 0.35;
+        this.avatarLegR.rotation.x = 0.35;
+        this.avatarArmL.rotation.x = -0.3;
+        this.avatarArmR.rotation.x = -0.3;
       } else if (horizSpeed > 0.1) {
         const swing = Math.sin(this.walkBobTime) * 0.65;
         this.avatarLegL.rotation.x = swing;
@@ -483,6 +501,16 @@ export class Player {
         this.avatarArmR.rotation.x = 0;
       }
     }
+  }
+
+  private checkInWater(): boolean {
+    const bx = Math.floor(this.position.x);
+    const byFeet = Math.floor(this.position.y);
+    const byWaist = Math.floor(this.position.y + 0.8);
+    const bz = Math.floor(this.position.z);
+    const bFeet = this.world.getBlock(bx, byFeet, bz);
+    const bWaist = this.world.getBlock(bx, byWaist, bz);
+    return bFeet?.type === 'water' || bWaist?.type === 'water';
   }
 
   private updateMovement(dt: number) {
@@ -499,33 +527,117 @@ export class Player {
     const isMoving = moveDir.lengthSq() > 0;
     if (isMoving) moveDir.normalize();
 
+    // Auto stand up if moving or jumping while sitting
+    if (this.isSitting && (isMoving || this.keys['Space'] || this.touchMove.jump)) {
+      this.isSitting = false;
+    }
+
     // Speed calculation
     let baseSpeed = 4.3; // standard Minecraft walking speed (m/s)
     this.isSneaking = !!this.keys['ShiftLeft'] || this.touchMove.sneak;
-    this.isSprinting = (!!this.keys['ControlLeft'] || this.isSprinting) && this.keys['KeyW'] && !this.isSneaking;
+    this.isSprinting = (!!this.keys['ControlLeft'] || this.isSprinting) && (this.keys['KeyW'] || this.touchMove.forward) && !this.isSneaking;
 
+    const inWater = this.checkInWater();
+
+    // ==========================================
+    // 1. Creative Flight Physics (Glide, Collision, Landing)
+    // ==========================================
     if (this.isFlying) {
-      baseSpeed = 10.0;
-    } else if (this.isSprinting) {
-      baseSpeed = 6.8;
-    } else if (this.isSneaking) {
-      baseSpeed = 1.6;
-    }
+      const isFastFlight = !!this.keys['ControlLeft'] || this.isSprinting;
+      const flySpeed = isFastFlight ? 20.0 : 10.5;
 
-    // Flying physics
-    if (this.isFlying) {
-      this.velocity.x = moveDir.x * baseSpeed;
-      this.velocity.z = moveDir.z * baseSpeed;
+      // Smooth horizontal inertia & glide
+      if (isMoving) {
+        this.velocity.x = THREE.MathUtils.lerp(this.velocity.x, moveDir.x * flySpeed, 0.35);
+        this.velocity.z = THREE.MathUtils.lerp(this.velocity.z, moveDir.z * flySpeed, 0.35);
+      } else {
+        this.velocity.x *= 0.82;
+        this.velocity.z *= 0.82;
+        if (Math.abs(this.velocity.x) < 0.05) this.velocity.x = 0;
+        if (Math.abs(this.velocity.z) < 0.05) this.velocity.z = 0;
+      }
 
-      let flyY = 0;
-      if (this.keys['Space'] || this.touchMove.jump) flyY += baseSpeed;
-      if (this.keys['ShiftLeft'] || this.touchMove.sneak) flyY -= baseSpeed;
-      this.velocity.y = flyY;
+      // Vertical flight speed
+      let targetFlyY = 0;
+      if (this.keys['Space'] || this.touchMove.jump) targetFlyY += flySpeed * 0.8;
+      if (this.keys['ShiftLeft'] || this.touchMove.sneak) targetFlyY -= flySpeed * 0.8;
+      this.velocity.y = THREE.MathUtils.lerp(this.velocity.y, targetFlyY, 0.35);
+      if (Math.abs(this.velocity.y) < 0.05 && targetFlyY === 0) this.velocity.y = 0;
 
-      this.position.addScaledVector(this.velocity, dt);
+      // Proposed vertical position
+      const proposedY = this.position.y + this.velocity.y * dt;
 
-      // Hard boundary clamp in flying mode: cannot cross outside the realm
+      // Ground detection beneath feet in flight mode
+      let highestFloor = -999;
+      const r = this.radius * 0.75;
+      const minX = Math.floor(this.position.x - r);
+      const maxX = Math.floor(this.position.x + r);
+      const minZ = Math.floor(this.position.z - r);
+      const maxZ = Math.floor(this.position.z + r);
+
+      const checkStartY = Math.ceil(this.position.y + 0.5);
+      const checkEndY = Math.max(-2, Math.floor(proposedY) - 1);
+
+      for (let y = checkStartY; y >= checkEndY; y--) {
+        let hasBlock = false;
+        for (let x = minX; x <= maxX; x++) {
+          for (let z = minZ; z <= maxZ; z++) {
+            if (this.world.hasSolidBlock(x, y, z)) {
+              hasBlock = true;
+              break;
+            }
+          }
+          if (hasBlock) break;
+        }
+        if (hasBlock) {
+          highestFloor = y + 1.0;
+          break;
+        }
+      }
+
+      // Landing: if flying down towards ground and feet reach solid floor, land cleanly!
+      if (targetFlyY < 0 && proposedY <= highestFloor + 0.15 && highestFloor > -900) {
+        this.position.y = highestFloor;
+        this.isFlying = false;
+        this.isGrounded = true;
+        this.velocity.set(0, 0, 0);
+        sound.playStep('grass');
+        if (this.onWorldNotice) {
+          this.onWorldNotice('Landed softly on the ground.');
+        }
+      } else {
+        // Enforce floor clamp so player never sinks inside terrain
+        if (highestFloor > -900 && proposedY < highestFloor) {
+          this.position.y = highestFloor;
+          this.velocity.y = 0;
+        } else {
+          this.position.y = Math.min(85.0, proposedY); // Sky ceiling clamp at Y = 85
+        }
+      }
+
+      // Horizontal movement with obstacle collision in flight mode
       const WORLD_BORDER = 135;
+      const moveX = this.velocity.x * dt;
+      if (Math.abs(moveX) > 0.0001) {
+        const nextX = this.position.x + moveX;
+        if (!this.checkHorizontalObstacle(nextX, this.position.y, this.position.z)) {
+          this.position.x = nextX;
+        } else {
+          this.velocity.x = 0;
+        }
+      }
+
+      const moveZ = this.velocity.z * dt;
+      if (Math.abs(moveZ) > 0.0001) {
+        const nextZ = this.position.z + moveZ;
+        if (!this.checkHorizontalObstacle(this.position.x, this.position.y, nextZ)) {
+          this.position.z = nextZ;
+        } else {
+          this.velocity.z = 0;
+        }
+      }
+
+      // World border clamp
       if (Math.abs(this.position.x) > WORLD_BORDER) {
         this.position.x = Math.sign(this.position.x) * WORLD_BORDER;
         this.velocity.x = 0;
@@ -535,10 +647,12 @@ export class Player {
         this.velocity.z = 0;
       }
 
-      // Big threshold safety: immediate rescue if falling below bedrock/floor
-      if (this.position.y < 0.2) {
+      // Void rescue safety
+      if (this.position.y < -8.0) {
         this.position.set(0, 1.0, 4);
         this.velocity.set(0, 0, 0);
+        this.isFlying = false;
+        this.isGrounded = true;
         sound.playLevelUp();
         if (this.onWorldNotice) {
           this.onWorldNotice('Void safety barrier saved you! Returned safely to Spawn Plaza.');
@@ -549,9 +663,19 @@ export class Player {
       return;
     }
 
-    // Normal walking / jumping physics
-    const acceleration = 40.0;
-    const friction = 14.0;
+    // ==========================================
+    // 2. Normal Walking & Swimming Physics
+    // ==========================================
+    if (inWater) {
+      baseSpeed = 2.8;
+    } else if (this.isSprinting) {
+      baseSpeed = 6.8;
+    } else if (this.isSneaking) {
+      baseSpeed = 1.6;
+    }
+
+    const acceleration = inWater ? 25.0 : 40.0;
+    const friction = inWater ? 8.0 : 14.0;
 
     if (isMoving) {
       this.velocity.x += moveDir.x * acceleration * dt;
@@ -565,30 +689,39 @@ export class Player {
         this.velocity.z *= factor;
       }
     } else {
-      // Apply friction
       this.velocity.x -= this.velocity.x * friction * dt;
       this.velocity.z -= this.velocity.z * friction * dt;
       if (Math.abs(this.velocity.x) < 0.05) this.velocity.x = 0;
       if (Math.abs(this.velocity.z) < 0.05) this.velocity.z = 0;
     }
 
-    // Gravity: constantly pull player down towards ground
-    const gravity = 28.0;
-    this.velocity.y -= gravity * dt;
-    if (this.velocity.y < -35.0) this.velocity.y = -35.0; // terminal velocity
+    // Gravity & Jumping / Swimming
+    if (inWater) {
+      const waterGravity = 4.0;
+      this.velocity.y -= waterGravity * dt;
+      if (this.velocity.y < -3.5) this.velocity.y = -3.5;
 
-    // Jump
-    if (this.isGrounded && this.keys['Space']) {
-      this.velocity.y = 8.5; // authentic Minecraft jump impulse
-      this.isGrounded = false;
-      sound.playClick();
+      if (this.keys['Space'] || this.touchMove.jump) {
+        this.velocity.y = 3.6; // Swim upward smoothly
+      }
+    } else {
+      const gravity = 28.0;
+      this.velocity.y -= gravity * dt;
+      if (this.velocity.y < -35.0) this.velocity.y = -35.0; // terminal velocity
+
+      // Jump
+      if (this.isGrounded && (this.keys['Space'] || this.touchMove.jump)) {
+        this.velocity.y = 8.5; // authentic Minecraft jump impulse
+        this.isGrounded = false;
+        sound.playStep('grass');
+      }
     }
 
     // Move with collision resolution
     this.moveWithCollision(dt);
 
     // Footstep sounds
-    if (this.isGrounded && isMoving) {
+    if (this.isGrounded && isMoving && !inWater) {
       const distTraveled = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.z * this.velocity.z) * dt;
       this.lastFootstepDist += distTraveled;
       if (this.lastFootstepDist > (this.isSprinting ? 1.5 : 2.0)) {
@@ -605,7 +738,7 @@ export class Player {
     // 1. Vertical resolution (Y axis)
     const prevY = this.position.y;
     const proposedY = this.position.y + this.velocity.y * dt;
-    const r = this.radius * 0.85;
+    const r = this.radius * 0.75;
 
     if (this.velocity.y <= 0) {
       // Falling down: check floor beneath feet with continuous vertical sweep
@@ -615,8 +748,7 @@ export class Player {
       const minCheckZ = Math.floor(this.position.z - r);
       const maxCheckZ = Math.floor(this.position.z + r);
 
-      // Sweep from highest possible foot level down to proposed foot level
-      const startCheckY = Math.ceil(prevY);
+      const startCheckY = Math.ceil(prevY + 0.5);
       const endCheckY = Math.floor(proposedY);
 
       for (let y = startCheckY; y >= endCheckY; y--) {
@@ -633,15 +765,14 @@ export class Player {
 
         if (hasBlockAtLevel) {
           const topOfBlock = y + 1.0;
-          if (prevY >= topOfBlock - 0.2 && proposedY <= topOfBlock) {
+          if (prevY >= topOfBlock - 0.75 && proposedY <= topOfBlock) {
             groundY = topOfBlock;
-            break; // Highest landing surface caught the player
+            break;
           }
         }
       }
 
       if (groundY !== null) {
-        // Firmly snap to ground!
         this.position.y = groundY;
         this.velocity.y = 0;
         this.isGrounded = true;
@@ -690,10 +821,10 @@ export class Player {
       if (!this.checkHorizontalObstacle(nextX, this.position.y, this.position.z)) {
         this.position.x = nextX;
       } else {
-        // Check step-up (only if grounded and obstacle is 1 block high with free headspace)
-        if (this.isGrounded && !this.checkHorizontalObstacle(nextX, this.position.y + 1.02, this.position.z)) {
-          this.position.x = nextX;
-          this.position.y += 1.0;
+        // Smooth auto-jump over 1-block steps when walking
+        if (this.isGrounded && this.velocity.y <= 0.1 && !this.checkHorizontalObstacle(nextX, this.position.y + 1.1, this.position.z)) {
+          this.velocity.y = 7.8;
+          this.isGrounded = false;
         } else {
           this.velocity.x = 0;
         }
@@ -711,9 +842,9 @@ export class Player {
       if (!this.checkHorizontalObstacle(this.position.x, this.position.y, nextZ)) {
         this.position.z = nextZ;
       } else {
-        if (this.isGrounded && !this.checkHorizontalObstacle(this.position.x, this.position.y + 1.02, nextZ)) {
-          this.position.z = nextZ;
-          this.position.y += 1.0;
+        if (this.isGrounded && this.velocity.y <= 0.1 && !this.checkHorizontalObstacle(this.position.x, this.position.y + 1.1, nextZ)) {
+          this.velocity.z = 7.8;
+          this.isGrounded = false;
         } else {
           this.velocity.z = 0;
         }
@@ -728,8 +859,8 @@ export class Player {
       this.position.z = Math.sign(this.position.z) * WORLD_BORDER;
     }
 
-    // Big threshold safety: immediate rescue if falling below bedrock/floor
-    if (this.position.y < 0.2) {
+    // Void safety barrier: only trigger below bedrock
+    if (this.position.y < -8.0) {
       this.position.set(0, 1.0, 4);
       this.velocity.set(0, 0, 0);
       this.isGrounded = true;
@@ -1170,19 +1301,25 @@ export class Player {
       this.isSitting = false;
       return;
     }
+    if (this.isFlying) {
+      // In flight mode, tapping jump ascends smoothly
+      this.velocity.y = 8.0;
+      return;
+    }
     const now = performance.now();
-    if (now - this.lastSpaceTime < 280) {
-      this.isFlying = !this.isFlying;
+    if (now - this.lastSpaceTime < 320) {
+      this.isFlying = true;
       this.velocity.set(0, 0, 0);
       sound.playClick();
+      this.lastSpaceTime = 0;
     } else {
-      if (this.isGrounded && !this.isFlying) {
+      if (this.isGrounded) {
         this.velocity.y = 8.5;
         this.isGrounded = false;
         sound.playStep('grass');
       }
+      this.lastSpaceTime = now;
     }
-    this.lastSpaceTime = now;
   }
 
   public handleTouchMine() {
