@@ -11,7 +11,7 @@ export interface Project {
   githubUrl?: string;
   accentColor: string;
   iconBlock: string;
-  bannerCoords: { x: number; y: number; z: number };
+  bannerCoords: { x: number; y: number; z: number; rotY?: number };
 }
 
 export interface Experience {
@@ -76,7 +76,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#22c55e",
       iconBlock: "emerald_block",
-      bannerCoords: { x: -20, y: 5, z: -68 }
+      bannerCoords: { x: 85, y: 4, z: -20, rotY: -Math.PI / 2 }
     },
     {
       id: "trackyourflight",
@@ -95,7 +95,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#0284c7",
       iconBlock: "diamond_block",
-      bannerCoords: { x: -10, y: 5, z: -68 }
+      bannerCoords: { x: 85, y: 4, z: -10, rotY: -Math.PI / 2 }
     },
     {
       id: "locateart",
@@ -114,7 +114,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#f59e0b",
       iconBlock: "gold_block",
-      bannerCoords: { x: 0, y: 5, z: -68 }
+      bannerCoords: { x: 85, y: 4, z: 0, rotY: -Math.PI / 2 }
     },
     {
       id: "redgambit",
@@ -133,7 +133,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#ef4444",
       iconBlock: "redstone_block",
-      bannerCoords: { x: 10, y: 5, z: -68 }
+      bannerCoords: { x: 85, y: 4, z: 10, rotY: -Math.PI / 2 }
     },
     {
       id: "spiderverse",
@@ -152,7 +152,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#a855f7",
       iconBlock: "amethyst_block",
-      bannerCoords: { x: 20, y: 5, z: -68 }
+      bannerCoords: { x: 85, y: 4, z: 20, rotY: -Math.PI / 2 }
     }
   ] as Project[],
 
@@ -411,23 +411,14 @@ export const PORTFOLIO_DATA = {
   ] as SkillCategory[],
 
   landmarks: [
-    { name: "Royal Corona Courtyard", coords: [0, 2, 0], tag: "[SPAWN]", desc: "Fairytale kingdom center with Sundrop sun mosaic and Lakshya guide" },
-    { name: "Corona Palace & Tapestry Hall", coords: [0, 2, -50], tag: "[PROJECTS]", desc: "Grand castle throne room with 5 giant hammerable project tapestries" },
-    { name: "Experience Castle Bastion", coords: [50, 2, -45], tag: "[EXP]", desc: "Medieval fortress keep with DAA, GenoSpark, 6Pistons, and SRMIST (4.37 CGPA)" },
-    { name: "Royal Council Great Hall", coords: [55, 2, 5], tag: "[LEAD]", desc: "Cathedral Great Hall with official EMCEE throne stage (5,000+ attendees)" },
-    { name: "Royal Alchemist Observatory", coords: [50, 2, 50], tag: "[RESEARCH]", desc: "Stargazing castle turret with celestial glass dome and Rockfall Prediction AI" },
-    { name: "Knights Tourney Colosseum", coords: [0, 2, 55], tag: "[SKILLS]", desc: "Medieval jousting arena with 4 guild bastions: Frontend, Backend, AI, Cloud" },
-    { name: "Snuggly Duckling Tavern", coords: [-50, 2, 50], tag: "[INTERESTS]", desc: "Tangled-inspired fairytale tavern with hearth, giant floor chessboard, and car showroom" },
-    { name: "Royal Diplomatic Pavilion", coords: [-55, 2, 5], tag: "[LANG]", desc: "Fairytale lakeside pavilion celebrating 9 languages and Korean honors" },
-    { name: "Rapunzel's Soaring Tower", coords: [-52, 2, -46], tag: "[BUILD]", desc: "Iconic 36-block-tall tower with climbing vines, flower balcony, and creative building studio" },
-    { name: "Sundrop Harbor & Beacon", coords: [0, 2, 25], tag: "[CONTACT]", desc: "Floating lanterns on water, sky beacon, and Ancient Resume Chest" },
-    { name: "The Taj Mahal", coords: [0, 16, -100], tag: "[TAJ MAHAL]", desc: "Architectural wonder of the world in white marble with 4 minarets, dome, and reflecting pool" },
-    { name: "Frostpeak Overlook", coords: [0, 18, -90], tag: "[NORTH]", desc: "Dizzying snowy mountain lookout over the clouds under the Frost Wyrm dragon" },
-    { name: "Mount Obsidian Caldera", coords: [-86, 3, -25], tag: "[VOLCANO]", desc: "Active volcano with glowing magma fissures and cascading molten lava waterfalls" },
-    { name: "The End & Obsidian Spires", coords: [-100, 3, 2], tag: "[THE END]", desc: "Obsidian pillars and glowing End Crystals under the starry sky with the Ender Dragon" },
-    { name: "The Singapore Merlion", coords: [18, 4, 90], tag: "[MERLION]", desc: "Mythical lion-headed fish statue spouting water into the southern ocean" },
-    { name: "Sunset Beach Bluff", coords: [10, 4, 80], tag: "[BEACH]", desc: "Warm coastal bluffs with mossy rocks, red flowers, sailing ships, and cat companion" },
-    { name: "Lak Tower (LK Monument)", coords: [90, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel Tower inspired wonder with illuminated LK monogram and observation sky deck" },
-    { name: "Emerald Valley Viewpoint", coords: [84, 14, -14], tag: "[VALLEY]", desc: "Sunlit mountain ledge overlooking the river canyon under the Emerald Dragon" }
+    { name: "Crossroads Citadel (Spawn)", coords: [0, 2, 0], tag: "[CITADEL]", desc: "Central drop-in nexus with marble compass rose, sky beacon, and Lakshya guide" },
+    { name: "Neo York Tech Metropolis", coords: [80, 2, 0], tag: "[NEO YORK]", desc: "Cyberpunk metropolis with glass skyscrapers, Times Square screens, and AI research labs" },
+    { name: "Lak Tower (\"LK\" Monument)", coords: [98, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel-inspired tower with illuminated LK monogram and observation skydeck" },
+    { name: "Imperial Raj Complex & Taj Mahal", coords: [55, 4, -95], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, reflecting pool, and SRMIST honors (4.37 CGPA)" },
+    { name: "Sakura Sanctuary & Pagoda", coords: [-68, 2, -88], tag: "[SAKURA]", desc: "Cherry blossom groves, 4-tier red pagoda, vermilion Torii gates, and Foreign Languages embassy" },
+    { name: "Pueblo Royale & Cantina", coords: [-75, 2, 38], tag: "[PUEBLO]", desc: "Sunbaked Mexican adobe village with terracotta arches, central well, and Builder's Arena" },
+    { name: "The Sunset Saloon & Beach Bar", coords: [6, 2, 58], tag: "[SALOON]", desc: "Beachfront timber tavern with glowing stone hearth, outdoor deck, and Lakshya's passions hub" },
+    { name: "Palm Paradise Beach & Merlion", coords: [15, 2, 110], tag: "[BEACH]", desc: "Tropical coconut palm beach, ocean surf, boardwalk pier, and the iconic Singapore Merlion" },
+    { name: "Frostpeak Mountain Overlook", coords: [0, 18, -95], tag: "[FROSTPEAK]", desc: "Snowy alpine ridges and dizzying suspension bridge under the soaring Frost Wyrm dragon" }
   ]
 };

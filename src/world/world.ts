@@ -107,10 +107,9 @@ export class VoxelWorld {
     }
   }
 
-  // Create BIG High-Definition Wall Banners for Projects in the Mega-Hall
+  // Create BIG High-Definition Wall Banners for Projects in Neo York Times Square Avenue
   private createBigProjectWallBanners() {
     const projects = PORTFOLIO_DATA.projects;
-    const bannerZ = -74.85; // Cleanly in front of North Wall of Corona Palace (Z = -75)
 
     projects.forEach((proj) => {
       const canvas = document.createElement('canvas');
@@ -209,8 +208,8 @@ export class VoxelWorld {
       const bannerMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
       const bannerMesh = new THREE.Mesh(bannerGeo, bannerMat);
 
-      bannerMesh.position.set(proj.bannerCoords.x, proj.bannerCoords.y + 1.2, bannerZ);
-      bannerMesh.rotation.y = 0; // facing South into the hall
+      bannerMesh.position.set(proj.bannerCoords.x, proj.bannerCoords.y + 1.2, proj.bannerCoords.z);
+      bannerMesh.rotation.y = proj.bannerCoords.rotY ?? 0;
       this.scene.add(bannerMesh);
 
       // Compute bounding box for raycasting with updated world matrix
@@ -301,8 +300,8 @@ export class VoxelWorld {
 
     this.blockIndices.set(key, { type, index: idx });
 
-    // Track minigame building arena (North-West: X in [-72, -36], Z in [-64, -30])
-    if (x >= -72 && x <= -36 && z >= -64 && z <= -30) {
+    // Track minigame building arena (Pueblo Royale: X in [-80, -45], Z in [35, 68])
+    if (x >= -80 && x <= -45 && z >= 35 && z <= 68) {
       this.minigameBlocksPlaced++;
       if (this.minigameBlocksPlaced === 10 || this.minigameBlocksPlaced === 25 || this.minigameBlocksPlaced === 50) {
         sound.playLevelUp();
@@ -430,28 +429,22 @@ export class VoxelWorld {
   // Animated 3D spinning badges/icons above project pedestals
   private createProjectPedestalVisuals() {
     const projects = PORTFOLIO_DATA.projects;
-    const stations = [
-      { x: -18, z: -66, p: projects[0] },
-      { x: -9, z: -66, p: projects[1] },
-      { x: 0, z: -66, p: projects[2] },
-      { x: 9, z: -66, p: projects[3] },
-      { x: 18, z: -66, p: projects[4] },
-    ];
 
-    stations.forEach((st) => {
+    projects.forEach((proj) => {
       const group = new THREE.Group();
-      group.position.set(st.x + 0.5, 3.4, st.z + 0.5);
+      // Positioned on pedestal beside banner on Neo York Broadway sidewalk
+      group.position.set(proj.bannerCoords.x - 2.2, 2.8, proj.bannerCoords.z);
 
       const geo = new THREE.OctahedronGeometry(0.45);
       const mat = new THREE.MeshLambertMaterial({
-        color: st.p.accentColor,
-        emissive: st.p.accentColor,
+        color: proj.accentColor,
+        emissive: proj.accentColor,
         emissiveIntensity: 0.35,
       });
       const gem = new THREE.Mesh(geo, mat);
       group.add(gem);
 
-      const light = new THREE.PointLight(st.p.accentColor, 1.2, 5);
+      const light = new THREE.PointLight(proj.accentColor, 1.2, 5);
       group.add(light);
 
       this.scene.add(group);
@@ -459,7 +452,7 @@ export class VoxelWorld {
     });
   }
 
-  // Active Beacon light beam
+  // Active Beacon light beam at Crossroads Citadel
   private createBeaconBeam() {
     const beamGeo = new THREE.CylinderGeometry(0.4, 0.4, 100, 8);
     const beamMat = new THREE.MeshBasicMaterial({
@@ -469,11 +462,11 @@ export class VoxelWorld {
       side: THREE.DoubleSide
     });
     this.beaconBeam = new THREE.Mesh(beamGeo, beamMat);
-    this.beaconBeam.position.set(0.5, 52, 27.5);
+    this.beaconBeam.position.set(0.5, 52, 0.5);
     this.scene.add(this.beaconBeam);
 
     const beaconLight = new THREE.PointLight(0x38bdf8, 3.0, 35);
-    beaconLight.position.set(0.5, 4, 27.5);
+    beaconLight.position.set(0.5, 3.5, 0.5);
     this.scene.add(beaconLight);
   }
 

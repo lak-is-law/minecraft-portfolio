@@ -792,6 +792,122 @@ export class TextureManager {
         }
       }
     }));
+
+    // 46. Sakura Leaves (Pastel Cherry Blossom Pink)
+    this.textures.set('sakura_leaves', createPixelTexture((ctx, s) => {
+      const rng = createRng(3101);
+      const pinks = ['#fbcfe8', '#f472b6', '#ec4899', '#db2777', '#fdf2f8'];
+      ctx.clearRect(0, 0, s, s);
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          if (rng() > 0.15) {
+            ctx.fillStyle = pinks[Math.floor(rng() * pinks.length)];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }));
+
+    // 47. Terracotta Adobe (Sunbaked Desert Clay Brick)
+    this.textures.set('terracotta_adobe', createPixelTexture((ctx, s) => {
+      const rng = createRng(3201);
+      const clay = ['#c2410c', '#ea580c', '#9a3412', '#b45309', '#d97706'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = clay[Math.floor(rng() * clay.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.fillStyle = '#7c2d12';
+      for (let y = 0; y < s; y += 4) {
+        ctx.fillRect(0, y, s, 1);
+      }
+    }));
+
+    // 48. Red Sandstone (Carved Desert Sandstone)
+    this.textures.set('red_sandstone', createPixelTexture((ctx, s) => {
+      const rng = createRng(3301);
+      const sands = ['#b45309', '#92400e', '#78350f', '#d97706'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = sands[Math.floor(rng() * sands.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(0, 0, s, 1);
+      ctx.fillRect(0, s - 1, s, 1);
+    }));
+
+    // 49. Cyber Glass (High-Tech Skyscraper Glass with Cyan Neon Trim)
+    this.textures.set('cyber_glass', createPixelTexture((ctx, s) => {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, s, s);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, s, s);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(1, 1, 3, 1);
+      ctx.fillRect(s - 4, s - 2, 3, 1);
+    }));
+
+    // 50. Asphalt Road (Dark Charcoal Pavement with White Dashed Centerline)
+    this.textures.set('asphalt_road', createPixelTexture((ctx, s) => {
+      const rng = createRng(3501);
+      const asphalt = ['#1e293b', '#0f172a', '#334155'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = asphalt[Math.floor(rng() * asphalt.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      // Center road dash
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(7, 3, 2, 10);
+    }));
+
+    // 51. Red Terracotta (Vermilion Lacquer for Pagodas and Torii Gates)
+    this.textures.set('red_terracotta', createPixelTexture((ctx, s) => {
+      const rng = createRng(3601);
+      const vermilion = ['#dc2626', '#b91c1c', '#991b1b', '#ef4444'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = vermilion[Math.floor(rng() * vermilion.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 52. Palm Wood (Ringed Tropical Trunk)
+    this.textures.set('palm_wood', createPixelTexture((ctx, s) => {
+      const rng = createRng(3701);
+      const palm = ['#78350f', '#92400e', '#451a03', '#a16207'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = palm[Math.floor(rng() * palm.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.fillStyle = '#291003';
+      for (let y = 0; y < s; y += 3) {
+        ctx.fillRect(0, y, s, 1);
+      }
+    }));
+
+    // 53. Palm Leaves (Tropical Palm Fronds)
+    this.textures.set('palm_leaves', createPixelTexture((ctx, s) => {
+      const rng = createRng(3801);
+      const greens = ['#15803d', '#16a34a', '#22c55e', '#14532d'];
+      ctx.clearRect(0, 0, s, s);
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          if (rng() > 0.16) {
+            ctx.fillStyle = greens[Math.floor(rng() * greens.length)];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }));
   }
 
   private createMaterials() {
@@ -942,5 +1058,36 @@ export class TextureManager {
 
     // Bedrock
     this.materials.set('bedrock', new THREE.MeshLambertMaterial({ map: this.getTexture('bedrock') }));
+
+    // Sakura / Japan Materials
+    this.materials.set('sakura_leaves', new THREE.MeshLambertMaterial({
+      map: this.getTexture('sakura_leaves'),
+      transparent: true,
+      alphaTest: 0.5,
+      side: THREE.DoubleSide
+    }));
+    this.materials.set('red_terracotta', new THREE.MeshLambertMaterial({ map: this.getTexture('red_terracotta') }));
+
+    // Mexican Pueblo Materials
+    this.materials.set('terracotta_adobe', new THREE.MeshLambertMaterial({ map: this.getTexture('terracotta_adobe') }));
+    this.materials.set('red_sandstone', new THREE.MeshLambertMaterial({ map: this.getTexture('red_sandstone') }));
+
+    // Neo York High-Tech Materials
+    this.materials.set('cyber_glass', new THREE.MeshLambertMaterial({
+      map: this.getTexture('cyber_glass'),
+      transparent: true,
+      opacity: 0.72,
+      side: THREE.DoubleSide
+    }));
+    this.materials.set('asphalt_road', new THREE.MeshLambertMaterial({ map: this.getTexture('asphalt_road') }));
+
+    // Tropical Palm Materials
+    this.materials.set('palm_wood', new THREE.MeshLambertMaterial({ map: this.getTexture('palm_wood') }));
+    this.materials.set('palm_leaves', new THREE.MeshLambertMaterial({
+      map: this.getTexture('palm_leaves'),
+      transparent: true,
+      alphaTest: 0.5,
+      side: THREE.DoubleSide
+    }));
   }
 }

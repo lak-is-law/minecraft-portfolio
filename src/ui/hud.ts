@@ -321,34 +321,70 @@ export class HUDManager {
     const cz = 65;
     const scale = 0.52;
 
-    // Biome boundary hints
-    // North (Snowy Peaks)
-    const northEdge = Math.max(0, cz - (80 + playerPos.z) * scale);
-    if (northEdge > 0) {
-      ctx.fillStyle = 'rgba(224, 242, 254, 0.2)';
-      ctx.fillRect(0, 0, w, northEdge);
-    }
+    const originX = cx - playerPos.x * scale;
+    const originZ = cz - playerPos.z * scale;
+    const islandR = 112 * scale;
 
-    // South (Beach & Sea)
-    const southEdge = Math.min(h, cz + (80 - playerPos.z) * scale);
-    if (southEdge < h) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
-      ctx.fillRect(0, southEdge, w, h - southEdge);
-    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, w, h);
+    ctx.clip();
 
-    // East (Emerald Valley)
-    const eastEdge = Math.min(w, cx + (75 - playerPos.x) * scale);
-    if (eastEdge < w) {
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.18)';
-      ctx.fillRect(eastEdge, 0, w - eastEdge, h);
-    }
+    // 1. Island landmass disk
+    ctx.fillStyle = '#15803d'; // Green base island
+    ctx.beginPath();
+    ctx.arc(originX, originZ, islandR, 0, Math.PI * 2);
+    ctx.fill();
 
-    // West (The End / Volcano)
-    const westEdge = Math.max(0, cx - (75 + playerPos.x) * scale);
-    if (westEdge > 0) {
-      ctx.fillStyle = 'rgba(192, 132, 252, 0.2)';
-      ctx.fillRect(0, 0, westEdge, h);
-    }
+    // North Frostpeaks tint
+    ctx.fillStyle = 'rgba(224, 242, 254, 0.45)';
+    ctx.beginPath();
+    ctx.arc(originX, originZ - 80 * scale, 38 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Northwest Sakura tint
+    ctx.fillStyle = 'rgba(244, 114, 182, 0.4)';
+    ctx.beginPath();
+    ctx.arc(originX - 65 * scale, originZ - 85 * scale, 30 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Northeast Raj tint
+    ctx.fillStyle = 'rgba(254, 240, 138, 0.4)';
+    ctx.beginPath();
+    ctx.arc(originX + 60 * scale, originZ - 90 * scale, 32 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // East Neo York tint
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.beginPath();
+    ctx.arc(originX + 80 * scale, originZ, 32 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // West Pueblo Royale tint
+    ctx.fillStyle = 'rgba(251, 146, 60, 0.4)';
+    ctx.beginPath();
+    ctx.arc(originX - 75 * scale, originZ + 40 * scale, 32 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // South Beach & Sunset tint
+    ctx.fillStyle = 'rgba(253, 224, 71, 0.4)';
+    ctx.beginPath();
+    ctx.arc(originX, originZ + 80 * scale, 36 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Central Citadel Moat & Hub
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 20 * scale, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#475569';
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
 
     // Crosshair grid lines
     ctx.strokeStyle = '#1e293b';
@@ -365,10 +401,14 @@ export class HUDManager {
 
       if (lx >= 5 && lx <= w - 5 && lz >= 5 && lz <= h - 5) {
         if (lm.tag === '[TAJ MAHAL]') ctx.fillStyle = '#ffffff';
-        else if (lm.tag === '[VOLCANO]') ctx.fillStyle = '#ea580c';
-        else if (lm.tag === '[MERLION]') ctx.fillStyle = '#06b6d4';
+        else if (lm.tag === '[SAKURA]') ctx.fillStyle = '#f472b6';
+        else if (lm.tag === '[PUEBLO]') ctx.fillStyle = '#fb923c';
+        else if (lm.tag === '[NEO YORK]') ctx.fillStyle = '#38bdf8';
         else if (lm.tag === '[LAK TOWER]') ctx.fillStyle = '#facc15';
-        else if (lm.tag === '[PROJECTS]') ctx.fillStyle = '#a855f7';
+        else if (lm.tag === '[FROSTPEAK]') ctx.fillStyle = '#e0f2fe';
+        else if (lm.tag === '[SALOON]') ctx.fillStyle = '#a16207';
+        else if (lm.tag === '[BEACH]') ctx.fillStyle = '#06b6d4';
+        else if (lm.tag === '[CITADEL]') ctx.fillStyle = '#4ade80';
         else ctx.fillStyle = '#94a3b8';
 
         ctx.fillRect(lx - 2, lz - 2, 4, 4);

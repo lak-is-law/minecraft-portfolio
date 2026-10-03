@@ -391,15 +391,17 @@ export class ModalManager {
       ctx.fillText('[REALM BIOMES]', 22, 34);
 
       const biomes = [
-        { name: 'North: Frostpeaks', color: '#e0f2fe', desc: 'Taj Mahal & Glaciers' },
-        { name: 'Central: Corona Castle', color: '#4ade80', desc: 'Moat & Palace' },
-        { name: 'South: Sunset Coast', color: '#38bdf8', desc: 'Ocean & Merlion' },
-        { name: 'East: Emerald Valley', color: '#22c55e', desc: 'River & Lak Tower' },
-        { name: 'West: The End Caldera', color: '#c084fc', desc: 'Volcano & Spires' }
+        { name: 'North: Frostpeaks', color: '#e0f2fe', desc: 'Snow Peaks & Overlook' },
+        { name: 'NW: Sakura Pagoda', color: '#f472b6', desc: 'Cherry Blossom & Zen' },
+        { name: 'NE: Imperial Raj', color: '#fef08a', desc: 'Taj Mahal & Honors' },
+        { name: 'Center: Citadel Hub', color: '#94a3b8', desc: 'Compass Rose & Moat' },
+        { name: 'East: Neo York', color: '#38bdf8', desc: 'Times Sq & Lak Tower' },
+        { name: 'West: Pueblo Royale', color: '#fb923c', desc: 'Adobe Village & Arena' },
+        { name: 'South: Sunset & Beach', color: '#fbbf24', desc: 'Saloon, Pier & Merlion' }
       ];
 
       biomes.forEach((b, i) => {
-        const by = 55 + i * 42;
+        const by = 48 + i * 38;
         ctx.fillStyle = b.color;
         ctx.fillRect(22, by, 10, 10);
         ctx.fillStyle = '#f8fafc';
@@ -407,7 +409,7 @@ export class ModalManager {
         ctx.fillText(b.name, 38, by + 9);
         ctx.fillStyle = '#94a3b8';
         ctx.font = '8px monospace';
-        ctx.fillText(b.desc, 38, by + 22);
+        ctx.fillText(b.desc, 38, by + 20);
       });
 
       // Compass Rose
@@ -463,87 +465,167 @@ export class ModalManager {
       ctx.rect(mapX, mapY, mapW, mapH);
       ctx.clip();
 
-      // Base Grass Floor (Central Realm)
-      ctx.fillStyle = '#3f7324';
+      // Base Open Ocean (Outer Waters)
+      ctx.fillStyle = '#0284c7';
       ctx.fillRect(mapX, mapY, mapW, mapH);
 
-      // Biome 1: North Frostpeak Glaciers (Z < -75)
-      const northSplitY = cy - 75 * scale;
-      ctx.fillStyle = '#dbeafe';
-      ctx.fillRect(mapX, mapY, mapW, northSplitY - mapY);
-      // North Mountain Peak Shading
-      ctx.fillStyle = '#f1f5f9';
+      // Island Landmass Coastline (Organic Circle)
+      ctx.save();
       ctx.beginPath();
-      ctx.moveTo(cx - 60 * scale, northSplitY);
-      ctx.lineTo(cx, cy - 130 * scale);
-      ctx.lineTo(cx + 60 * scale, northSplitY);
+      const numPts = 64;
+      for (let i = 0; i <= numPts; i++) {
+        const th = (i / numPts) * Math.PI * 2;
+        const r = (112 + Math.sin(th * 5) * 5 + Math.cos(th * 3) * 4) * scale;
+        const px = cx + Math.cos(th) * r;
+        const py = cy + Math.sin(th) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      // Outer golden beach ring
+      ctx.fillStyle = '#fde047';
+      ctx.fill();
+      ctx.clip(); // clip subsequent biome drawing inside island
+
+      // Inner Island Plains
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      for (let i = 0; i <= numPts; i++) {
+        const th = (i / numPts) * Math.PI * 2;
+        const r = (104 + Math.sin(th * 5) * 4 + Math.cos(th * 3) * 3) * scale;
+        const px = cx + Math.cos(th) * r;
+        const py = cy + Math.sin(th) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
       ctx.closePath();
       ctx.fill();
 
-      // Biome 2: South Sunset Coast & Ocean (Z > 75)
-      const southSandY = cy + 75 * scale;
-      const southOceanY = cy + 88 * scale;
-      // Sandy Beach
-      ctx.fillStyle = '#fef08a';
-      ctx.fillRect(mapX, southSandY, mapW, southOceanY - southSandY);
-      // Ocean Waters
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(mapX, southOceanY, mapW, mapY + mapH - southOceanY);
-
-      // Biome 3: East Emerald Valley (X > 75)
-      const eastSplitX = cx + 75 * scale;
-      ctx.fillStyle = '#166534';
-      ctx.fillRect(eastSplitX, cy - 55 * scale, mapX + mapW - eastSplitX, 110 * scale);
-      // Winding River
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 8;
+      // Biome 1: North Frostpeak Glaciers (Z <= -65, |X| <= 40)
+      ctx.fillStyle = '#e0f2fe';
       ctx.beginPath();
-      ctx.moveTo(cx + 70 * scale, cy);
-      ctx.bezierCurveTo(cx + 90 * scale, cy - 20 * scale, cx + 110 * scale, cy + 20 * scale, cx + 135 * scale, cy);
-      ctx.stroke();
-
-      // Biome 4: West The End & Volcano Caldera (X < -75)
-      const westSplitX = cx - 75 * scale;
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(mapX, cy - 65 * scale, westSplitX - mapX, 130 * scale);
-      // Volcano Cone & Lava
-      const volX = cx - 105 * scale;
-      const volY = cy - 25 * scale;
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.arc(volX, volY, 22 * scale, 0, Math.PI * 2);
+      ctx.moveTo(cx - 38 * scale, cy - 65 * scale);
+      ctx.lineTo(cx, cy - 128 * scale);
+      ctx.lineTo(cx + 38 * scale, cy - 65 * scale);
+      ctx.closePath();
       ctx.fill();
+      // Snow peak triangles
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(cx - 18 * scale, cy - 85 * scale);
+      ctx.lineTo(cx - 18 * scale, cy - 115 * scale);
+      ctx.lineTo(cx, cy - 95 * scale);
+      ctx.closePath();
+      ctx.fill();
+
+      // Biome 2: Northwest Sakura Sanctuary (X <= -25, Z <= -45)
+      ctx.fillStyle = '#fbcfe8';
+      ctx.beginPath();
+      ctx.ellipse(cx - 65 * scale, cy - 85 * scale, 35 * scale, 30 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Red Pagoda Icon
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(cx - 72 * scale, cy - 92 * scale, 8 * scale, 8 * scale);
+
+      // Biome 3: Northeast Imperial Raj Complex (X >= 25, Z <= -55)
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.ellipse(cx + 60 * scale, cy - 90 * scale, 38 * scale, 32 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Reflecting pool
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(cx + 51 * scale, cy - 86 * scale, 8 * scale, 18 * scale);
+      // Taj Mahal white plinth
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(cx + 46 * scale, cy - 108 * scale, 18 * scale, 16 * scale);
+
+      // Biome 4: East Neo York Tech Metropolis (X >= 45, |Z| <= 45)
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.ellipse(cx + 80 * scale, cy, 32 * scale, 40 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Broadway asphalt avenue
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(cx + 78 * scale, cy - 32 * scale, 8 * scale, 64 * scale);
+      // Cyber glass towers
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(cx + 60 * scale, cy - 25 * scale, 12 * scale, 18 * scale);
+      ctx.fillRect(cx + 60 * scale, cy + 8 * scale, 12 * scale, 18 * scale);
+      // Lak Tower marker
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(cx + 96 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
+
+      // Biome 5: West Pueblo Royale (X <= -35, Z in [8, 75])
       ctx.fillStyle = '#ea580c';
       ctx.beginPath();
-      ctx.arc(volX, volY, 7 * scale, 0, Math.PI * 2);
+      ctx.ellipse(cx - 75 * scale, cy + 40 * scale, 35 * scale, 32 * scale, 0, 0, Math.PI * 2);
       ctx.fill();
-      // Lava spillways
-      ctx.strokeStyle = '#ea580c';
-      ctx.lineWidth = 4;
+      // Adobe buildings
+      ctx.fillStyle = '#fed7aa';
+      ctx.fillRect(cx - 82 * scale, cy + 24 * scale, 14 * scale, 14 * scale);
+      // Builder's Arena outline
+      ctx.strokeStyle = '#c2410c';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx - 74 * scale, cy + 44 * scale, 24 * scale, 20 * scale);
+
+      // Biome 6: South Sunset Saloon & Beach (Z >= 50)
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(cx - 65 * scale, cy + 60 * scale, 130 * scale, 60 * scale);
+      // Saloon Timber Deck
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(cx - 4 * scale, cy + 52 * scale, 22 * scale, 14 * scale);
+      // Wooden Boardwalk Pier out into ocean
+      ctx.fillStyle = '#92400e';
+      ctx.fillRect(cx + 1 * scale, cy + 98 * scale, 5 * scale, 28 * scale);
+      // Merlion Cyan Marker
+      ctx.fillStyle = '#06b6d4';
       ctx.beginPath();
-      ctx.moveTo(volX, volY);
-      ctx.lineTo(volX + 18 * scale, volY);
+      ctx.arc(cx + 20 * scale, cy + 110 * scale, 5 * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Connecting Arterial Roads from Citadel
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 4 * scale;
+      ctx.beginPath();
+      // North Road
+      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 65 * scale);
+      // South Boardwalk
+      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy + 98 * scale);
+      // East Broadway
+      ctx.moveTo(cx, cy); ctx.lineTo(cx + 78 * scale, cy);
+      // West Trail
+      ctx.moveTo(cx, cy); ctx.lineTo(cx - 66 * scale, cy + 30 * scale);
+      // NE Taj Causeway
+      ctx.moveTo(cx, cy - 50 * scale); ctx.lineTo(cx + 50 * scale, cy - 86 * scale);
+      // NW Sakura Path
+      ctx.moveTo(cx, cy - 45 * scale); ctx.lineTo(cx - 50 * scale, cy - 70 * scale);
       ctx.stroke();
 
-      // Central Moat & Bridges
+      // Central Crossroads Citadel Moat & Plaza
       ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = 6 * scale;
+      ctx.lineWidth = 5 * scale;
       ctx.beginPath();
-      ctx.arc(cx, cy, 19 * scale, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 20 * scale, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Moat Bridges
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillRect(cx - 3 * scale, cy - 22 * scale, 6 * scale, 7 * scale);
-      ctx.fillRect(cx - 3 * scale, cy + 15 * scale, 6 * scale, 7 * scale);
-      ctx.fillRect(cx + 15 * scale, cy - 3 * scale, 7 * scale, 6 * scale);
-      ctx.fillRect(cx - 22 * scale, cy - 3 * scale, 7 * scale, 6 * scale);
+      // 4 Moat Bridges
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(cx - 3 * scale, cy - 23 * scale, 6 * scale, 6 * scale);
+      ctx.fillRect(cx - 3 * scale, cy + 17 * scale, 6 * scale, 6 * scale);
+      ctx.fillRect(cx + 17 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
+      ctx.fillRect(cx - 23 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
 
-      // Central Castle Foundation
-      ctx.fillStyle = '#64748b';
-      ctx.fillRect(cx - 10 * scale, cy - 10 * scale, 20 * scale, 20 * scale);
+      // Central Citadel Hub
+      ctx.fillStyle = '#475569';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 16 * scale, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = '#facc15';
-      ctx.fillRect(cx - 3 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4 * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore(); // restore clipping
 
       // Coordinate Grid Lines (every 50 blocks)
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
@@ -564,13 +646,14 @@ export class ModalManager {
 
         let col = '#facc15';
         if (lm.tag.includes('TAJ')) col = '#ffffff';
-        else if (lm.tag.includes('VOLCANO')) col = '#f97316';
-        else if (lm.tag.includes('MERLION')) col = '#06b6d4';
+        else if (lm.tag.includes('SAKURA')) col = '#f472b6';
+        else if (lm.tag.includes('PUEBLO')) col = '#fb923c';
+        else if (lm.tag.includes('NEO')) col = '#38bdf8';
         else if (lm.tag.includes('TOWER')) col = '#facc15';
-        else if (lm.tag.includes('PROJECTS')) col = '#a855f7';
-        else if (lm.tag.includes('EXPERIENCE')) col = '#3b82f6';
-        else if (lm.tag.includes('SKILLS')) col = '#22c55e';
-        else if (lm.tag.includes('RESUME')) col = '#eab308';
+        else if (lm.tag.includes('FROSTPEAK')) col = '#e0f2fe';
+        else if (lm.tag.includes('SALOON')) col = '#a16207';
+        else if (lm.tag.includes('BEACH')) col = '#06b6d4';
+        else if (lm.tag.includes('CITADEL')) col = '#4ade80';
 
         // Glowing outer halo
         ctx.fillStyle = col + '44';
@@ -697,7 +780,7 @@ export class ModalManager {
       // World Limit Labels
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 8px monospace';
-      ctx.fillText('REALM BORDER (±136)', mapX + 6, mapY + 12);
+      ctx.fillText('FORTNITE ISLAND (±136)', mapX + 6, mapY + 12);
     };
 
     draw();
@@ -746,7 +829,10 @@ export class ModalManager {
       if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
         if (this.onTeleportRequest) {
           sound.playLevelUp();
-          this.onTeleportRequest([wx, 2, wz]);
+          let targetY = 2;
+          if (wz <= -75 && Math.abs(wx) <= 35) targetY = 18;
+          else if (wz <= -80 && wx >= 35 && wx <= 75) targetY = 4;
+          this.onTeleportRequest([wx, targetY, wz]);
           this.close();
         }
       }
