@@ -62,61 +62,145 @@
   <!-- Bottom Hotbar & Status Bars (Hearts, Hunger, XP) -->
   <div id="mc-hotbar"></div>
 
+  <!-- Virtual Touch Controls for Phone & Touchscreen Devices -->
+  <div id="mc-touch-controls">
+    <!-- Left Movement D-Pad (Minecraft Bedrock Style) -->
+    <div class="mc-dpad" id="mc-dpad">
+      <button class="mc-dpad-btn mc-dpad-up" id="btn-touch-up" aria-label="Forward">[▲]</button>
+      <div class="mc-dpad-middle">
+        <button class="mc-dpad-btn mc-dpad-left" id="btn-touch-left" aria-label="Strafe Left">[◀]</button>
+        <button class="mc-dpad-btn mc-dpad-center" id="btn-touch-sneak" aria-label="Sneak">[●]</button>
+        <button class="mc-dpad-btn mc-dpad-right" id="btn-touch-right" aria-label="Strafe Right">[▶]</button>
+      </div>
+      <button class="mc-dpad-btn mc-dpad-down" id="btn-touch-down" aria-label="Backward">[▼]</button>
+    </div>
+
+    <!-- Right Action Buttons Cluster -->
+    <div class="mc-touch-actions" id="mc-touch-actions">
+      <button class="mc-touch-action-btn mc-touch-jump" id="btn-touch-jump">[JUMP]</button>
+      <button class="mc-touch-action-btn mc-touch-mine" id="btn-touch-mine">[MINE]</button>
+      <button class="mc-touch-action-btn mc-touch-place" id="btn-touch-place">[PLACE]</button>
+      <button class="mc-touch-action-btn mc-touch-use" id="btn-touch-use">[USE]</button>
+      <button class="mc-touch-action-btn mc-touch-fly" id="btn-touch-fly">[FLY]</button>
+    </div>
+  </div>
+
   <!-- Fullscreen Modal Container (Book/Quill, Chest, Skills, Fast Travel) -->
   <div id="modal-container"></div>
 
-  <!-- Welcome / Pause Overlay -->
+  <!-- Welcome / Pause Overlay (Revamped Authentic Minecraft Edition) -->
   <div id="pause-overlay">
-    <div class="pause-content">
-      <h1 class="pause-title">MINECRAFT PORTFOLIO</h1>
-      <p class="pause-subtitle">Welcome to Lakshya's 3D Voxel World.<br>Explore projects, experience, skills, and download the official resume.</p>
+    <div class="pause-content mc-menu-card">
+      <!-- 3D Minecraft Title Header & Dynamic Animated Yellow Splash -->
+      <div class="mc-menu-header">
+        <h1 class="mc-logo-title">MINECRAFT</h1>
+        <div class="mc-logo-subtitle">PORTFOLIO EDITION</div>
+        <div class="mc-splash-text" id="mc-splash-text">Now in 3D WebGL!</div>
+      </div>
 
-      <div class="pause-controls-grid">
-        <div class="control-item">
-          <span class="key-tag">W A S D</span> Walk / Strafe
+      <p class="pause-subtitle">
+        Welcome to Lakshya's 3D Voxel World - Software Engineer & Designer
+      </p>
+
+      <!-- Primary Action: Authentic Large Play Button -->
+      <button class="mc-btn mc-btn-primary mc-btn-large" id="play-button">
+        <span class="mc-btn-play-icon">[PLAY]</span>
+        <span id="play-btn-label">ENTER VOXEL WORLD</span>
+      </button>
+
+      <!-- Quick Action Navigation Grid -->
+      <div class="mc-menu-actions-grid">
+        <button class="mc-btn mc-btn-secondary" id="menu-btn-projects">
+          <span>[PROJECTS]</span>
+        </button>
+        <button class="mc-btn mc-btn-secondary" id="menu-btn-map">
+          <span>[WORLD MAP]</span>
+        </button>
+        <button class="mc-btn mc-btn-secondary" id="menu-btn-resume">
+          <span>[RESUME CHEST]</span>
+        </button>
+        <button class="mc-btn mc-btn-secondary" id="menu-btn-skills">
+          <span>[SKILLS]</span>
+        </button>
+      </div>
+
+      <!-- Controls & Keybindings Reference Drawer -->
+      <div class="mc-controls-section">
+        <div class="mc-controls-header">
+          <span class="mc-controls-title">CONTROLS & SHORTCUTS</span>
+          <button class="mc-controls-toggle-btn" id="btn-toggle-controls">HIDE</button>
         </div>
-        <div class="control-item">
-          <span class="key-tag">Mouse</span> Look Around
-        </div>
-        <div class="control-item">
-          <span class="key-tag">Space</span> Jump / <span class="key-tag">2x Space</span> Fly
-        </div>
-        <div class="control-item">
-          <span class="key-tag">Shift</span> Sneak / Descend
-        </div>
-        <div class="control-item">
-          <span class="key-tag">Left Click</span> Mine / Break Block
-        </div>
-        <div class="control-item">
-          <span class="key-tag">Right Click / R</span> Place Block
-        </div>
-        <div class="control-item">
-          <span class="key-tag">E</span> Open GUI / Inspect
-        </div>
-        <div class="control-item">
-          <span class="key-tag">ESC</span> Free / Unlock Cursor
-        </div>
-        <div class="control-item">
-          <span class="key-tag">F2</span> Take Screenshot
-        </div>
-        <div class="control-item">
-          <span class="key-tag">1-9</span> Hotbar Slots
-        </div>
-        <div class="control-item">
-          <span class="key-tag">M</span> Maximised Map
-        </div>
-        <div class="control-item">
-          <span class="key-tag">F5</span> 1P / 3P Camera
-        </div>
-        <div class="control-item">
-          <span class="key-tag">X</span> Sit / Rest Emote
-        </div>
-        <div class="control-item">
-          <span class="key-tag">F3</span> Debug Screen
+
+        <div class="mc-controls-grid" id="mc-controls-grid">
+          <!-- Movement Column -->
+          <div class="mc-control-col">
+            <div class="mc-col-heading">MOVEMENT</div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">W A S D</span>
+              <span class="mc-key-desc">Walk & Strafe</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">SPACE</span>
+              <span class="mc-key-desc">Jump</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">2x SPACE</span>
+              <span class="mc-key-desc">Toggle Fly</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">SHIFT</span>
+              <span class="mc-key-desc">Sneak / Descend</span>
+            </div>
+          </div>
+
+          <!-- Actions Column -->
+          <div class="mc-control-col">
+            <div class="mc-col-heading">ACTIONS</div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">LEFT CLICK</span>
+              <span class="mc-key-desc">Mine / Launch</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">RIGHT CLICK</span>
+              <span class="mc-key-desc">Place Block</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">1 - 9</span>
+              <span class="mc-key-desc">Hotbar Slots</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">E</span>
+              <span class="mc-key-desc">Inspect Target</span>
+            </div>
+          </div>
+
+          <!-- Exploration Column -->
+          <div class="mc-control-col">
+            <div class="mc-col-heading">EXPLORATION</div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">M</span>
+              <span class="mc-key-desc">World Map</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">F5</span>
+              <span class="mc-key-desc">1P / 3P View</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">X</span>
+              <span class="mc-key-desc">Sit & Rest</span>
+            </div>
+            <div class="mc-control-row">
+              <span class="mc-key-kbd">ESC</span>
+              <span class="mc-key-desc">Free Cursor</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <button class="pause-play-btn" id="play-button">CLICK TO PLAY</button>
+      <!-- Footer Info -->
+      <div class="mc-menu-footer">
+        <span>Lakshya • Software Engineer & Designer • <a href="https://lakshya.uk" target="_blank" class="mc-footer-link">lakshya.uk</a></span>
+      </div>
     </div>
   </div>
 

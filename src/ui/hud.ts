@@ -99,17 +99,14 @@ export class HUDManager {
     const quickBar = document.getElementById('mc-quick-nav')!;
     quickBar.innerHTML = `
       <div class="mc-quick-buttons">
-        <button class="mc-chip-btn" id="btn-quick-projects">[PROJECTS]</button>
-        <button class="mc-chip-btn" id="btn-quick-experience">[CITADEL]</button>
-        <button class="mc-chip-btn" id="btn-quick-skills">[SKILLS]</button>
-        <button class="mc-chip-btn" id="btn-quick-resume">[RESUME]</button>
-        <button class="mc-chip-btn" id="btn-quick-map">[MAP: M]</button>
-        <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1st / 3rd Person View (F5)">[VIEW: 1P/3P]</button>
-        <button class="mc-chip-btn" id="btn-quick-sit" title="Toggle Sit / Rest Emote (X)">[REST: X]</button>
-        <button class="mc-chip-btn" id="btn-quick-unlock" title="Free mouse cursor to switch windows or take screenshot (ESC)">[FREE CURSOR: ESC]</button>
-        <button class="mc-chip-btn" id="btn-quick-screenshot" title="Capture in-game screenshot PNG (F2)">[SCREENSHOT: F2]</button>
-        <button class="mc-chip-btn" id="btn-quick-sound">[AUDIO: ON]</button>
-        <button class="mc-chip-btn" id="btn-quick-fly">[FLY: OFF]</button>
+        <button class="mc-chip-btn" id="btn-quick-projects" title="View Project Portfolios">[PROJECTS]</button>
+        <button class="mc-chip-btn" id="btn-quick-map" title="Interactive World Map (Key: M)">[MAP: M]</button>
+        <button class="mc-chip-btn" id="btn-quick-skills" title="Skills Matrix">[SKILLS]</button>
+        <button class="mc-chip-btn" id="btn-quick-resume" title="Official Resume">[RESUME]</button>
+        <button class="mc-chip-btn" id="btn-quick-fly" title="Toggle Creative Flight">[FLY: OFF]</button>
+        <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1P / 3P View (F5)">[VIEW: 1P]</button>
+        <button class="mc-chip-btn" id="btn-quick-sound" title="Toggle Audio">[AUDIO: ON]</button>
+        <button class="mc-chip-btn" id="btn-quick-unlock" title="Open Pause Menu (Key: ESC)">[PAUSE: ESC]</button>
       </div>
     `;
 
@@ -118,7 +115,7 @@ export class HUDManager {
     minimapEl.innerHTML = `
       <div class="mc-minimap-box" id="mc-minimap-box" title="Click or Tap to Maximise World Map (Key: M)">
         <div class="mc-minimap-top-bar">
-          <span class="mc-minimap-title">[MAP: MAXIMISE]</span>
+          <span class="mc-minimap-title">[MAP: M]</span>
           <span class="mc-minimap-heading" id="minimap-heading">N</span>
         </div>
         <canvas id="minimap-canvas" width="130" height="130"></canvas>
@@ -127,12 +124,14 @@ export class HUDManager {
   }
 
   private setupListeners() {
-    // Click on hotbar slots
+    // Click / pointerdown on hotbar slots
     document.querySelectorAll('.mc-hotbar-slot').forEach(el => {
-      el.addEventListener('click', (e) => {
+      const handleSelect = (e: Event) => {
         const slotIdx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-slot') || '0', 10);
         this.selectSlot(slotIdx);
-      });
+      };
+      el.addEventListener('click', handleSelect);
+      el.addEventListener('pointerdown', handleSelect);
     });
 
     // F3 toggle
@@ -157,6 +156,11 @@ export class HUDManager {
     document.getElementById('btn-quick-unlock')?.addEventListener('click', () => {
       if (document.pointerLockElement) {
         document.exitPointerLock();
+      } else {
+        const pauseOverlay = document.getElementById('pause-overlay');
+        if (pauseOverlay) {
+          pauseOverlay.style.display = 'flex';
+        }
       }
     });
     document.getElementById('btn-quick-screenshot')?.addEventListener('click', () => {

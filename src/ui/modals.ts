@@ -34,8 +34,9 @@ export class ModalManager {
     this.modalContainer.style.display = 'none';
     sound.playClick();
 
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
     const pauseOverlay = document.getElementById('pause-overlay');
-    if (pauseOverlay && document.pointerLockElement === null) {
+    if (pauseOverlay && document.pointerLockElement === null && !isTouch) {
       pauseOverlay.style.display = 'flex';
     }
   }

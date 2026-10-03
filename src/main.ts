@@ -57,8 +57,8 @@ class Game {
     this.scene.background = new THREE.Color(0x78a7ff); // Minecraft blue sky
     this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.016);
 
-    // 3. Camera
-    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 120);
+    // 3. Camera (near 0.05 prevents face clipping, far 200 renders distant landmarks)
+    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 200);
 
     // 4. Managers
     this.textureManager = new TextureManager();
@@ -232,6 +232,175 @@ class Game {
       this.player.toggleSit();
       this.hud.pushChatMessage('Emote', this.player.isSitting ? 'Sitting down and resting.' : 'Standing up.');
     };
+
+    // Revamped Pause Menu Direct Actions
+    document.getElementById('menu-btn-projects')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
+    });
+
+    document.getElementById('menu-btn-map')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+    });
+
+    document.getElementById('menu-btn-resume')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.modals.openResumeChestModal();
+    });
+
+    document.getElementById('menu-btn-skills')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.modals.openSkillsModal();
+    });
+
+    // Controls drawer toggle
+    const toggleBtn = document.getElementById('btn-toggle-controls');
+    const controlsGrid = document.getElementById('mc-controls-grid');
+    toggleBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!controlsGrid) return;
+      const isHidden = controlsGrid.style.display === 'none';
+      controlsGrid.style.display = isHidden ? 'grid' : 'none';
+      if (toggleBtn) {
+        toggleBtn.textContent = isHidden ? 'HIDE' : 'SHOW';
+      }
+      sound.playClick();
+    });
+
+    // Dynamic rotating Minecraft splash text
+    const splashes = [
+      'Now in 3D WebGL!',
+      'Built with Three.js & TypeScript!',
+      'Full-Stack Craftsman!',
+      'Don\'t dig straight down!',
+      '100% Organic Pixels!',
+      'Smash banners with left-click!',
+      'Double-tap Space to fly!',
+      'Explore the cardinal biomes!',
+      'Hire me!',
+      'Dragons included!',
+      'Press M for World Map!',
+      'Try night mode with [T]!'
+    ];
+    const splashEl = document.getElementById('mc-splash-text');
+    if (splashEl) {
+      splashEl.textContent = splashes[Math.floor(Math.random() * splashes.length)];
+    }
+
+    // Virtual Touch Controls for Mobile & Touchscreen Devices
+    const setUpTouchBtn = (id: string, onDown: () => void, onUp: () => void) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const handleDown = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDown();
+      };
+      const handleUp = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onUp();
+      };
+      el.addEventListener('pointerdown', handleDown);
+      el.addEventListener('pointerup', handleUp);
+      el.addEventListener('pointercancel', handleUp);
+      el.addEventListener('pointerleave', handleUp);
+    };
+
+    setUpTouchBtn('btn-touch-up',
+      () => { this.player.touchMove.forward = true; },
+      () => { this.player.touchMove.forward = false; }
+    );
+    setUpTouchBtn('btn-touch-down',
+      () => { this.player.touchMove.backward = true; },
+      () => { this.player.touchMove.backward = false; }
+    );
+    setUpTouchBtn('btn-touch-left',
+      () => { this.player.touchMove.left = true; },
+      () => { this.player.touchMove.left = false; }
+    );
+    setUpTouchBtn('btn-touch-right',
+      () => { this.player.touchMove.right = true; },
+      () => { this.player.touchMove.right = false; }
+    );
+
+    // Sneak Toggle Button
+    const sneakBtn = document.getElementById('btn-touch-sneak');
+    sneakBtn?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.player.touchMove.sneak = !this.player.touchMove.sneak;
+      sneakBtn.classList.toggle('mc-active', this.player.touchMove.sneak);
+      sound.playClick();
+    });
+
+    // Jump Button (tap or hold to ascend while flying)
+    setUpTouchBtn('btn-touch-jump',
+      () => {
+        this.player.touchMove.jump = true;
+        this.player.handleTouchJump();
+      },
+      () => {
+        this.player.touchMove.jump = false;
+      }
+    );
+
+    // Mine Button (tap or hold to continuously mine)
+    const mineBtn = document.getElementById('btn-touch-mine');
+    let mineTimer: any = null;
+    const startMining = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.player.handleTouchMine();
+      if (!mineTimer) {
+        mineTimer = setInterval(() => {
+          this.player.handleTouchMine();
+        }, 300);
+      }
+    };
+    const stopMining = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (mineTimer) {
+        clearInterval(mineTimer);
+        mineTimer = null;
+      }
+    };
+    mineBtn?.addEventListener('pointerdown', startMining);
+    mineBtn?.addEventListener('pointerup', stopMining);
+    mineBtn?.addEventListener('pointercancel', stopMining);
+    mineBtn?.addEventListener('pointerleave', stopMining);
+
+    // Place Button
+    const placeBtn = document.getElementById('btn-touch-place');
+    placeBtn?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.player.handleTouchPlace();
+    });
+
+    // Use / Interact Button
+    const useBtn = document.getElementById('btn-touch-use');
+    useBtn?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.player.handleTouchUse();
+    });
+
+    // Fly Toggle Button
+    const flyBtn = document.getElementById('btn-touch-fly');
+    flyBtn?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.player.handleTouchFly();
+      this.hud.updateFlyStatus(this.player.isFlying);
+    });
+
+    // Reset lastTime on pointer lock changes to prevent dt lag jump
+    document.addEventListener('pointerlockchange', () => {
+      this.lastTime = performance.now();
+    });
   }
 
   // Handle interaction with objects in world
@@ -333,8 +502,11 @@ class Game {
       this.lastFpsUpdate = now;
     }
 
-    // 1. Update Player
-    if (!this.modals.isOpen) {
+    // 1. Update Player (ONLY when unpaused and actively playing)
+    const pauseOverlay = document.getElementById('pause-overlay');
+    const isPauseMenuOpen = pauseOverlay && pauseOverlay.style.display === 'flex';
+    const isPaused = (!this.player.isLocked && !this.player.isMobileActive) || this.modals.isOpen || isPauseMenuOpen;
+    if (!isPaused) {
       this.player.update(dt);
     }
 

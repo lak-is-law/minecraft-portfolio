@@ -22,14 +22,14 @@ export class Player {
   public world: VoxelWorld;
   public domElement: HTMLElement;
 
-  // Position & Movement
-  public position: THREE.Vector3 = new THREE.Vector3(0, 1.8, 4); // start near spawn
+  // Position & Movement: start firmly on Spawn Plaza surface (Y = 1.0)
+  public position: THREE.Vector3 = new THREE.Vector3(0, 1.0, 4);
   public velocity: THREE.Vector3 = new THREE.Vector3();
   public pitch: number = 0;
   public yaw: number = 0;
 
   // State flags
-  public isGrounded: boolean = false;
+  public isGrounded: boolean = true;
   public isFlying: boolean = false;
   public isSneaking: boolean = false;
   public isSprinting: boolean = false;
@@ -60,6 +60,13 @@ export class Player {
   // Selected hotbar block
   public selectedBlockType: string = 'cobblestone';
 
+  // Mobile & Touchscreen Support
+  public isTouchDevice: boolean = false;
+  public isMobileActive: boolean = false;
+  public touchMove = { forward: false, backward: false, left: false, right: false, sneak: false, jump: false };
+  private touchLookId: number | null = null;
+  private lastTouchLookPos = { x: 0, y: 0 };
+
   // Camera perspective & Sit emotes (Photo-Inspired Lakshya)
   public cameraMode: number = 0; // 0 = 1P, 1 = 3P Back, 2 = 3P Front
   public isSitting: boolean = false;
@@ -82,7 +89,9 @@ export class Player {
     this.world = world;
     this.domElement = domElement;
 
+    this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
     this.setupPointerLock();
+    this.setupTouchLook();
     this.setupKeyboard();
     this.setupFirstPersonHand();
     this.setupFirstPersonLegs();
@@ -100,9 +109,19 @@ export class Player {
       }
     };
 
-    playBtn?.addEventListener('click', (e) => {
+    const handleStartGame = (e: Event) => {
       e.stopPropagation();
-      requestLock();
+      if (this.isTouchDevice) {
+        this.startMobileSession();
+      } else {
+        requestLock();
+      }
+    };
+
+    playBtn?.addEventListener('click', handleStartGame);
+    playBtn?.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      this.startMobileSession();
     });
 
     document.addEventListener('pointerlockchange', () => {
@@ -111,6 +130,10 @@ export class Player {
         const modalContainer = document.getElementById('modal-container');
         const isModalOpen = modalContainer && modalContainer.style.display === 'flex';
         pauseOverlay.style.display = (this.isLocked || isModalOpen) ? 'none' : 'flex';
+      }
+      const label = document.getElementById('play-btn-label');
+      if (label) {
+        label.textContent = this.isLocked ? 'RESUME GAME' : 'RESUME GAME';
       }
     });
 
@@ -288,9 +311,9 @@ export class Player {
     this.handGroup = new THREE.Group();
     this.handGroup.position.set(0.38, -0.32, -0.6);
 
-    // Streetwear black t-shirt sleeve & skin forearm (Photos 1 & 4)
-    const armMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 });
-    const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    // Streetwear black t-shirt sleeve & skin forearm (Original Avatar)
+    const armMat = new THREE.MeshLambertMaterial({ color: 0x4d321f });
+    const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
 
     const armGeo = new THREE.BoxGeometry(0.18, 0.5, 0.18);
     const armMesh = new THREE.Mesh(armGeo, armMat);
@@ -468,17 +491,17 @@ export class Player {
     const right = new THREE.Vector3(Math.cos(this.yaw), 0, -Math.sin(this.yaw)).normalize();
 
     let moveDir = new THREE.Vector3();
-    if (this.keys['KeyW']) moveDir.add(forward);
-    if (this.keys['KeyS']) moveDir.sub(forward);
-    if (this.keys['KeyD']) moveDir.add(right);
-    if (this.keys['KeyA']) moveDir.sub(right);
+    if (this.keys['KeyW'] || this.touchMove.forward) moveDir.add(forward);
+    if (this.keys['KeyS'] || this.touchMove.backward) moveDir.sub(forward);
+    if (this.keys['KeyD'] || this.touchMove.right) moveDir.add(right);
+    if (this.keys['KeyA'] || this.touchMove.left) moveDir.sub(right);
 
     const isMoving = moveDir.lengthSq() > 0;
     if (isMoving) moveDir.normalize();
 
     // Speed calculation
     let baseSpeed = 4.3; // standard Minecraft walking speed (m/s)
-    this.isSneaking = !!this.keys['ShiftLeft'];
+    this.isSneaking = !!this.keys['ShiftLeft'] || this.touchMove.sneak;
     this.isSprinting = (!!this.keys['ControlLeft'] || this.isSprinting) && this.keys['KeyW'] && !this.isSneaking;
 
     if (this.isFlying) {
@@ -495,8 +518,8 @@ export class Player {
       this.velocity.z = moveDir.z * baseSpeed;
 
       let flyY = 0;
-      if (this.keys['Space']) flyY += baseSpeed;
-      if (this.keys['ShiftLeft']) flyY -= baseSpeed;
+      if (this.keys['Space'] || this.touchMove.jump) flyY += baseSpeed;
+      if (this.keys['ShiftLeft'] || this.touchMove.sneak) flyY -= baseSpeed;
       this.velocity.y = flyY;
 
       this.position.addScaledVector(this.velocity, dt);
@@ -513,8 +536,8 @@ export class Player {
       }
 
       // Big threshold safety: immediate rescue if falling below bedrock/floor
-      if (this.position.y < -1.5) {
-        this.position.set(0, 2.0, 4);
+      if (this.position.y < 0.2) {
+        this.position.set(0, 1.0, 4);
         this.velocity.set(0, 0, 0);
         sound.playLevelUp();
         if (this.onWorldNotice) {
@@ -577,33 +600,47 @@ export class Player {
     this.updateCameraTransform();
   }
 
-  // Robust Minecraft Voxel Collision & Ground Snapping
+  // Robust Minecraft Voxel Collision & Ground Snapping with Anti-Tunneling
   private moveWithCollision(dt: number) {
     // 1. Vertical resolution (Y axis)
+    const prevY = this.position.y;
     const proposedY = this.position.y + this.velocity.y * dt;
     const r = this.radius * 0.85;
 
     if (this.velocity.y <= 0) {
-      // Falling down: check floor beneath feet
+      // Falling down: check floor beneath feet with continuous vertical sweep
       let groundY: number | null = null;
       const minCheckX = Math.floor(this.position.x - r);
       const maxCheckX = Math.floor(this.position.x + r);
       const minCheckZ = Math.floor(this.position.z - r);
       const maxCheckZ = Math.floor(this.position.z + r);
-      const checkY = Math.floor(proposedY);
 
-      for (let x = minCheckX; x <= maxCheckX; x++) {
-        for (let z = minCheckZ; z <= maxCheckZ; z++) {
-          if (this.world.hasSolidBlock(x, checkY, z)) {
-            const topOfBlock = checkY + 1.0;
-            if (groundY === null || topOfBlock > groundY) {
-              groundY = topOfBlock;
+      // Sweep from highest possible foot level down to proposed foot level
+      const startCheckY = Math.ceil(prevY);
+      const endCheckY = Math.floor(proposedY);
+
+      for (let y = startCheckY; y >= endCheckY; y--) {
+        let hasBlockAtLevel = false;
+        for (let x = minCheckX; x <= maxCheckX; x++) {
+          for (let z = minCheckZ; z <= maxCheckZ; z++) {
+            if (this.world.hasSolidBlock(x, y, z)) {
+              hasBlockAtLevel = true;
+              break;
             }
+          }
+          if (hasBlockAtLevel) break;
+        }
+
+        if (hasBlockAtLevel) {
+          const topOfBlock = y + 1.0;
+          if (prevY >= topOfBlock - 0.2 && proposedY <= topOfBlock) {
+            groundY = topOfBlock;
+            break; // Highest landing surface caught the player
           }
         }
       }
 
-      if (groundY !== null && proposedY <= groundY) {
+      if (groundY !== null) {
         // Firmly snap to ground!
         this.position.y = groundY;
         this.velocity.y = 0;
@@ -692,8 +729,8 @@ export class Player {
     }
 
     // Big threshold safety: immediate rescue if falling below bedrock/floor
-    if (this.position.y < -1.5) {
-      this.position.set(0, 2.0, 4);
+    if (this.position.y < 0.2) {
+      this.position.set(0, 1.0, 4);
       this.velocity.set(0, 0, 0);
       this.isGrounded = true;
       sound.playLevelUp();
@@ -912,16 +949,15 @@ export class Player {
     sound.playClick();
   }
 
-  // Photo-Inspired 3D Lakshya Avatar
+  // Original Signature 3D Lakshya Avatar
   private createLakshyaAvatar() {
     this.playerAvatar = new THREE.Group();
 
-    const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 });
-    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
-    const denimMat = new THREE.MeshLambertMaterial({ color: 0x2563eb });
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x1c1917 });
-    const shoeBlack = new THREE.MeshLambertMaterial({ color: 0x18181b });
-    const shoeWhite = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0x4d321f });
+    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+    const denimMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x0a0a0a });
+    const shoeMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
 
     // Head
     const headGroup = new THREE.Group();
@@ -930,18 +966,14 @@ export class Player {
     const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
     headGroup.add(headMesh);
 
-    // Textured dark hair with modern side taper (Photos 2 & 4)
-    const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.22, 0.53), hairMat);
-    hairMesh.position.set(0, 0.18, 0);
+    // Jet black flat hair block
+    const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.2, 0.52), hairMat);
+    hairMesh.position.set(0, 0.17, 0);
     headGroup.add(hairMesh);
 
-    const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.15), hairMat);
-    fringe.position.set(0.02, 0.18, 0.24);
-    headGroup.add(fringe);
-
-    // Eyes
+    // Eyes: white square sclera + black pupil
     const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
     for (const side of [-0.12, 0.12]) {
       const eye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
       eye.position.set(side, 0.02, 0.255);
@@ -953,19 +985,14 @@ export class Player {
     this.avatarHead = headGroup;
     this.playerAvatar.add(headGroup);
 
-    // Torso (Oversized Black Graphic Streetwear Tee)
+    // Torso: Black T-shirt with signature pink chest rectangle
     const torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.28), shirtMat);
     torsoMesh.position.set(0, 0.9, 0);
     this.playerAvatar.add(torsoMesh);
 
-    // Pixel Graphic Print on Back & Front
-    const printFront = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.02), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
+    const printFront = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.28, 0.02), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
     printFront.position.set(0, 0.94, 0.145);
     this.playerAvatar.add(printFront);
-
-    const printBack = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.02), new THREE.MeshBasicMaterial({ color: 0xf1f5f9 }));
-    printBack.position.set(0, 0.92, -0.145);
-    this.playerAvatar.add(printBack);
 
     // Arms
     this.avatarArmL = new THREE.Group();
@@ -994,12 +1021,12 @@ export class Player {
     this.avatarArmR.add(handPick);
     this.playerAvatar.add(this.avatarArmR);
 
-    // Legs (Relaxed Denim Jeans + Two-Tone Skate Sneakers)
-    this.avatarLegL = this.createLegWithShoe(denimMat, shoeBlack, shoeWhite);
+    // Legs (Dark denim pants + dark shoes)
+    this.avatarLegL = this.createLegWithShoe(denimMat, shoeMat);
     this.avatarLegL.position.set(-0.14, 0.55, 0);
     this.playerAvatar.add(this.avatarLegL);
 
-    this.avatarLegR = this.createLegWithShoe(denimMat, shoeBlack, shoeWhite);
+    this.avatarLegR = this.createLegWithShoe(denimMat, shoeMat);
     this.avatarLegR.position.set(0.14, 0.55, 0);
     this.playerAvatar.add(this.avatarLegR);
 
@@ -1007,26 +1034,18 @@ export class Player {
     this.world.scene.add(this.playerAvatar);
   }
 
-  private createLegWithShoe(denimMat: THREE.Material, shoeBlack: THREE.Material, shoeWhite: THREE.Material): THREE.Group {
+  private createLegWithShoe(denimMat: THREE.Material, shoeMat: THREE.Material): THREE.Group {
     const group = new THREE.Group();
 
-    // Jeans
-    const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.45, 0.23), denimMat);
+    // Dark denim jeans
+    const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.48, 0.23), denimMat);
     pants.position.set(0, -0.22, 0);
     group.add(pants);
 
-    // Two-Tone Skate Sneakers (Photos 1, 3)
-    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.34), shoeWhite);
-    sole.position.set(0, -0.5, 0.04);
-    group.add(sole);
-
-    const upper = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.32), shoeBlack);
-    upper.position.set(0, -0.41, 0.04);
-    group.add(upper);
-
-    const jazzStripe = new THREE.Mesh(new THREE.BoxGeometry(0.245, 0.04, 0.22), shoeWhite);
-    jazzStripe.position.set(0, -0.41, 0.04);
-    group.add(jazzStripe);
+    // Classic dark shoes
+    const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.28), shoeMat);
+    shoe.position.set(0, -0.48, 0.02);
+    group.add(shoe);
 
     return group;
   }
@@ -1042,14 +1061,13 @@ export class Player {
     return group;
   }
 
-  // First-Person Legs visible when looking down in Sit Mode (Photos 1 & 3)
+  // First-Person Legs visible when looking down in Sit Mode
   private setupFirstPersonLegs() {
     this.firstPersonLegs = new THREE.Group();
     this.firstPersonLegs.position.set(0, -0.45, -0.45);
 
-    const denimMat = new THREE.MeshLambertMaterial({ color: 0x2563eb });
-    const shoeBlack = new THREE.MeshLambertMaterial({ color: 0x18181b });
-    const shoeWhite = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const denimMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
+    const shoeMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
 
     for (const side of [-0.18, 0.18]) {
       const leg = new THREE.Group();
@@ -1060,23 +1078,161 @@ export class Player {
       pants.rotation.x = -0.18;
       leg.add(pants);
 
-      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.08, 0.38), shoeWhite);
-      sole.position.set(0, -0.16, -0.62);
-      leg.add(sole);
-
-      const upper = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.36), shoeBlack);
-      upper.position.set(0, -0.06, -0.62);
-      leg.add(upper);
-
-      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.235, 0.04, 0.24), shoeWhite);
-      stripe.position.set(0, -0.06, -0.62);
-      leg.add(stripe);
+      const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.36), shoeMat);
+      shoe.position.set(0, -0.08, -0.62);
+      leg.add(shoe);
 
       this.firstPersonLegs.add(leg);
     }
 
     this.firstPersonLegs.visible = false;
     this.camera.add(this.firstPersonLegs);
+  }
+
+
+  // Mobile Touch Session Activation
+  public startMobileSession() {
+    this.isMobileActive = true;
+    this.isLocked = true;
+    const pauseOverlay = document.getElementById('pause-overlay');
+    if (pauseOverlay) {
+      pauseOverlay.style.display = 'none';
+    }
+  }
+
+  // Swipe-to-Look Camera on Right Half of Screen
+  private setupTouchLook() {
+    let lastTapTime = 0;
+
+    this.domElement.addEventListener('touchstart', (e: TouchEvent) => {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && (target.closest('#mc-touch-controls') || target.closest('#mc-hotbar') || target.closest('#mc-quick-nav') || target.closest('#mc-minimap') || target.closest('#modal-container') || target.closest('#pause-overlay'))) {
+          continue;
+        }
+
+        const isLeftDpad = touch.clientX < 220 && touch.clientY > window.innerHeight - 280;
+        const isRightActions = touch.clientX > window.innerWidth - 200 && touch.clientY > window.innerHeight - 340;
+
+        if (!isLeftDpad && !isRightActions && this.touchLookId === null) {
+          this.touchLookId = touch.identifier;
+          this.lastTouchLookPos = { x: touch.clientX, y: touch.clientY };
+
+          // Double tap on world to mine/hammer
+          const now = performance.now();
+          if (now - lastTapTime < 280) {
+            this.handleTouchMine();
+          }
+          lastTapTime = now;
+        }
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e: TouchEvent) => {
+      if (this.touchLookId === null) return;
+      if (e.cancelable) e.preventDefault();
+
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        if (touch.identifier === this.touchLookId) {
+          const dx = touch.clientX - this.lastTouchLookPos.x;
+          const dy = touch.clientY - this.lastTouchLookPos.y;
+          this.lastTouchLookPos = { x: touch.clientX, y: touch.clientY };
+
+          const sensitivity = 0.0038;
+          this.yaw -= dx * sensitivity;
+          this.pitch -= dy * sensitivity;
+
+          const maxPitch = Math.PI / 2 - 0.02;
+          this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
+          break;
+        }
+      }
+    }, { passive: false });
+
+    const endLook = (e: TouchEvent) => {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === this.touchLookId) {
+          this.touchLookId = null;
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('touchend', endLook, { passive: true });
+    window.addEventListener('touchcancel', endLook, { passive: true });
+  }
+
+  // Mobile Touch Action Triggers
+  public handleTouchJump() {
+    if (this.isSitting) {
+      this.isSitting = false;
+      return;
+    }
+    const now = performance.now();
+    if (now - this.lastSpaceTime < 280) {
+      this.isFlying = !this.isFlying;
+      this.velocity.set(0, 0, 0);
+      sound.playClick();
+    } else {
+      if (this.isGrounded && !this.isFlying) {
+        this.velocity.y = 8.5;
+        this.isGrounded = false;
+        sound.playStep('grass');
+      }
+    }
+    this.lastSpaceTime = now;
+  }
+
+  public handleTouchMine() {
+    this.triggerSwing();
+    if (this.currentTarget?.targetBanner) {
+      const banner = this.currentTarget.targetBanner;
+      this.world.spawnHammerSparkles(banner.mesh.position.x, banner.mesh.position.y, banner.mesh.position.z);
+      sound.playBlockBreak();
+      sound.playLevelUp();
+      if (this.onHammerBanner) {
+        this.onHammerBanner(banner.project);
+      }
+      if (banner.project.liveUrl) {
+        window.open(banner.project.liveUrl, '_blank');
+      }
+      return;
+    }
+
+    if (this.currentTarget && this.currentTarget.blockType) {
+      const { x, y, z } = this.currentTarget.blockPos;
+      const target = this.world.getBlock(x, y, z);
+      if (target && (target.type === 'bedrock' || y <= -2)) {
+        sound.playClick();
+        if (this.onWorldNotice) {
+          this.onWorldNotice('Bedrock foundation cannot be broken!');
+        }
+        return;
+      }
+      const broke = this.world.breakBlock(x, y, z);
+      if (broke) {
+        sound.playBlockBreak();
+      }
+    }
+  }
+
+  public handleTouchPlace() {
+    this.triggerSwing();
+    this.handleRightClick();
+  }
+
+  public handleTouchUse() {
+    if (this.currentTarget && this.onInteract) {
+      this.onInteract(this.currentTarget);
+    }
+  }
+
+  public handleTouchFly() {
+    this.isFlying = !this.isFlying;
+    this.velocity.set(0, 0, 0);
+    sound.playClick();
   }
 
 }
