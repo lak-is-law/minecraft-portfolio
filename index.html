@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lakshya's Minecraft Portfolio | 3D Voxel World</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%235ea832'/><rect y='10' width='16' height='6' fill='%23866043'/></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- 3D WebGL Canvas -->
+  <canvas id="canvas3d"></canvas>
+
+  <!-- Crosshair & Interaction Target Prompt -->
+  <div id="mc-crosshair"></div>
+
+  <!-- Top-Left Quick Access Navigation Bar -->
+  <div id="mc-quick-nav"></div>
+
+  <!-- Top-Right Minimap Radar -->
+  <div id="mc-minimap"></div>
+
+  <!-- F3 Debug Screen Overlay -->
+  <div id="mc-f3-screen"></div>
+
+  <!-- Bottom-Left Chat / Event Log -->
+  <div id="mc-chat-log"></div>
+
+  <!-- Bottom Hotbar & Status Bars (Hearts, Hunger, XP) -->
+  <div id="mc-hotbar"></div>
+
+  <!-- Fullscreen Modal Container (Book/Quill, Chest, Skills, Fast Travel) -->
+  <div id="modal-container"></div>
+
+  <!-- Welcome / Pause Overlay -->
+  <div id="pause-overlay">
+    <div class="pause-content">
+      <h1 class="pause-title">MINECRAFT PORTFOLIO</h1>
+      <p class="pause-subtitle">Welcome to Lakshya's 3D Voxel World.<br>Explore projects, experience, skills, and download the official resume.</p>
+
+      <div class="pause-controls-grid">
+        <div class="control-item">
+          <span class="key-tag">W A S D</span> Walk / Strafe
+        </div>
+        <div class="control-item">
+          <span class="key-tag">Mouse</span> Look Around
+        </div>
+        <div class="control-item">
+          <span class="key-tag">Space</span> Jump / <span class="key-tag">2x Space</span> Fly
+        </div>
+        <div class="control-item">
+          <span class="key-tag">Shift</span> Sneak / Descend
+        </div>
+        <div class="control-item">
+          <span class="key-tag">Left Click</span> Mine / Break Block
+        </div>
+        <div class="control-item">
+          <span class="key-tag">Right Click</span> Place / Interact
+        </div>
+        <div class="control-item">
+          <span class="key-tag">E</span> Open GUI / Inspect
+        </div>
+        <div class="control-item">
+          <span class="key-tag">1-9</span> Hotbar Slots
+        </div>
+        <div class="control-item">
+          <span class="key-tag">M</span> Fast Travel Map
+        </div>
+        <div class="control-item">
+          <span class="key-tag">F3</span> Debug Screen
+        </div>
+      </div>
+
+      <button class="pause-play-btn" id="play-button">CLICK TO PLAY</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

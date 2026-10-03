@@ -1,0 +1,880 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000;
+  font-family: 'Press Start 2P', monospace;
+  color: #fff;
+  image-rendering: pixelated;
+}
+
+#canvas3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ==========================================================
+   MINECRAFT CROSSHAIR & PROMPT
+   ========================================================== */
+#mc-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mc-crosshair-reticle {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.mc-interact-prompt {
+  margin-top: 14px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 2px solid #55ff55;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  display: none;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.mc-key-badge {
+  background: #facc15;
+  color: #000000;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.mc-key-hint {
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+/* ==========================================================
+   HOTBAR & PLAYER STATUS HUD
+   ========================================================== */
+#mc-hotbar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.mc-hotbar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mc-status-bars {
+  display: flex;
+  justify-content: space-between;
+  width: 440px;
+  padding: 0 4px;
+  font-size: 14px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-hearts-row, .mc-hunger-row {
+  display: flex;
+  gap: 2px;
+}
+
+.mc-xp-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 440px;
+  margin-bottom: 2px;
+}
+
+.mc-xp-number {
+  color: #55ff55;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  margin-bottom: 2px;
+}
+
+.mc-xp-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #1e293b;
+  border: 1px solid #0f172a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mc-xp-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #86efac);
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.mc-hotbar-slots {
+  display: flex;
+  gap: 4px;
+  background: rgba(30, 41, 59, 0.85);
+  padding: 5px;
+  border: 3px solid #64748b;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.mc-hotbar-slot {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  background-color: #475569;
+  border: 2px solid #334155;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.mc-hotbar-slot:hover {
+  background-color: #64748b;
+}
+
+.mc-hotbar-slot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px #38bdf8, inset 0 0 6px rgba(255, 255, 255, 0.5);
+  transform: scale(1.08);
+}
+
+.mc-hotbar-slot-num {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 8px;
+  color: #94a3b8;
+}
+
+.mc-hotbar-icon {
+  font-size: 20px;
+}
+
+/* ==========================================================
+   TOP QUICK NAVIGATION BAR
+   ========================================================== */
+#mc-quick-nav {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 40;
+}
+
+.mc-quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mc-chip-btn {
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid #475569;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #f8fafc;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.mc-chip-btn:hover {
+  background: #334155;
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   MINIMAP (TOP RIGHT)
+   ========================================================== */
+#mc-minimap {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 40;
+}
+
+.mc-minimap-box {
+  position: relative;
+  border: 3px solid #475569;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.mc-minimap-heading {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 11px;
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+/* ==========================================================
+   CHAT / NOTIFICATIONS LOG (BOTTOM LEFT)
+   ========================================================== */
+#mc-chat-log {
+  position: absolute;
+  bottom: 80px;
+  left: 12px;
+  width: 360px;
+  max-height: 180px;
+  overflow-y: hidden;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.mc-chat-msg {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 6px 10px;
+  border-left: 3px solid #38bdf8;
+  border-radius: 2px;
+  font-size: 9px;
+  line-height: 1.4;
+  text-shadow: 1px 1px 0 #000;
+  transition: opacity 1.5s;
+}
+
+.mc-chat-fade {
+  opacity: 0;
+}
+
+.mc-chat-sender {
+  color: #facc15;
+  font-weight: bold;
+}
+
+/* ==========================================================
+   F3 DEBUG SCREEN
+   ========================================================== */
+#mc-f3-screen {
+  position: absolute;
+  top: 50px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.mc-f3-left, .mc-f3-right {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.mc-f3-right {
+  text-align: right;
+}
+
+/* ==========================================================
+   PAUSE / WELCOME OVERLAY
+   ========================================================== */
+#pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.pause-content {
+  background: #2b2b2b;
+  border: 4px solid #4a4a4a;
+  box-shadow: inset -4px -4px #1b1b1b, inset 4px 4px #7a7a7a, 0 10px 30px rgba(0,0,0,0.8);
+  padding: 30px 40px;
+  max-width: 620px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.pause-title {
+  font-size: 20px;
+  color: #facc15;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.pause-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.pause-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: #1c1c1c;
+  border: 2px solid #333;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.control-item {
+  font-size: 9px;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key-tag {
+  background: #3b82f6;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.pause-play-btn {
+  background: #16a34a;
+  border: 3px solid #22c55e;
+  box-shadow: inset -2px -2px #14532d, inset 2px 2px #86efac;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  padding: 14px 28px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.pause-play-btn:hover {
+  background: #22c55e;
+}
+
+/* ==========================================================
+   MINECRAFT THEMED MODAL DIALOGS
+   ========================================================== */
+#modal-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(3px);
+  z-index: 90;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.mc-dialog {
+  background: #262626;
+  border: 4px solid #525252;
+  box-shadow: inset -4px -4px #171717, inset 4px 4px #737373, 0 12px 36px rgba(0,0,0,0.8);
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mc-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #404040;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.mc-dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mc-item-icon {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.mc-dialog-title {
+  font-size: 15px;
+  color: #facc15;
+  text-shadow: 2px 2px 0 #000;
+  margin-bottom: 4px;
+}
+
+.mc-dialog-subtitle {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.mc-close-btn {
+  background: #dc2626;
+  border: 2px solid #f87171;
+  color: #fff;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.mc-close-btn:hover {
+  background: #ef4444;
+}
+
+.mc-dialog-body {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mc-metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mc-metric-badge {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+  padding: 6px 10px;
+  font-size: 9px;
+  color: #93c5fd;
+  border-radius: 3px;
+}
+
+.mc-section-heading {
+  font-size: 11px;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.mc-text-p {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.mc-tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mc-tag {
+  background: #334155;
+  border: 1px solid #64748b;
+  padding: 4px 8px;
+  font-size: 8px;
+  color: #cbd5e1;
+  border-radius: 2px;
+}
+
+.mc-dialog-footer {
+  border-top: 3px solid #404040;
+  padding-top: 14px;
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Buttons */
+.mc-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-btn-green {
+  background: #16a34a;
+  border: 2px solid #22c55e;
+  color: #fff;
+  box-shadow: inset -2px -2px #14532d, inset 2px 2px #86efac;
+}
+
+.mc-btn-green:hover {
+  background: #22c55e;
+}
+
+.mc-btn-blue {
+  background: #2563eb;
+  border: 2px solid #3b82f6;
+  color: #fff;
+  box-shadow: inset -2px -2px #1e3a8a, inset 2px 2px #93c5fd;
+}
+
+.mc-btn-blue:hover {
+  background: #3b82f6;
+}
+
+.mc-btn-stone {
+  background: #525252;
+  border: 2px solid #737373;
+  color: #fff;
+  box-shadow: inset -2px -2px #262626, inset 2px 2px #a3a3a3;
+}
+
+.mc-btn-stone:hover {
+  background: #737373;
+}
+
+/* ==========================================================
+   CHEST GUI SPECIFICS
+   ========================================================== */
+.mc-chest-gui {
+  background: #c6c6c6;
+  border: 4px solid #fff;
+  box-shadow: inset -4px -4px #555, 0 12px 36px rgba(0,0,0,0.8);
+  width: 100%;
+  max-width: 580px;
+  padding: 18px;
+  border-radius: 4px;
+  color: #373737;
+}
+
+.mc-chest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 14px;
+  color: #373737;
+}
+
+.mc-chest-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+  background: #8b8b8b;
+  border: 3px solid #373737;
+  padding: 8px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+
+.mc-slot {
+  width: 48px;
+  height: 48px;
+  background: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow: inset 2px 2px #373737, inset -2px -2px #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.mc-slot:hover {
+  background: #a3a3a3;
+}
+
+.mc-slot-item {
+  font-size: 24px;
+}
+
+.mc-slot-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 7px;
+  color: #facc15;
+  font-weight: bold;
+}
+
+.mc-chest-loot-action {
+  background: #e5e5e5;
+  border: 2px solid #a3a3a3;
+  padding: 14px;
+  border-radius: 3px;
+}
+
+.mc-resume-preview-info h3 {
+  font-size: 12px;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.mc-resume-preview-info p {
+  font-size: 9px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.mc-chest-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ==========================================================
+   SKILLS & BREWING GUI
+   ========================================================== */
+.mc-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mc-brew-category {
+  background: #171717;
+  border: 2px solid #404040;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.mc-brew-title {
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.mc-brew-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-skill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mc-skill-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #e2e8f0;
+}
+
+.mc-skill-pct {
+  color: #facc15;
+}
+
+.mc-skill-bar {
+  width: 100%;
+  height: 6px;
+  background: #262626;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mc-skill-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ==========================================================
+   FAST TRAVEL MAP GUI
+   ========================================================== */
+.mc-map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mc-landmark-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #171717;
+  border: 2px solid #404040;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+.mc-landmark-icon {
+  font-size: 28px;
+}
+
+.mc-landmark-info {
+  flex: 1;
+}
+
+.mc-landmark-info h4 {
+  font-size: 11px;
+  color: #facc15;
+  margin-bottom: 4px;
+}
+
+.mc-landmark-info p {
+  font-size: 9px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.mc-landmark-coords {
+  font-size: 8px;
+  color: #38bdf8;
+  font-family: monospace;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .mc-hotbar-slot {
+    width: 36px;
+    height: 36px;
+  }
+  .mc-status-bars, .mc-xp-container {
+    width: 330px;
+  }
+  .mc-skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
+   LIVE REDIRECT TOAST NOTIFICATION
+   ========================================================== */
+.mc-redirect-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  border: 3px solid #22c55e;
+  border-radius: 6px;
+  padding: 10px 18px;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.mc-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.mc-toast-tag {
+  background: #22c55e;
+  color: #000;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+
+.mc-toast-title {
+  color: #f8fafc;
+  font-weight: bold;
+}
+
+.mc-toast-link {
+  background: #38bdf8;
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.mc-toast-link:hover {
+  background: #7dd3fc;
+}
+
+.mc-toast-close {
+  background: #334155;
+  border: 1px solid #64748b;
+  color: #fff;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 10px;
+}
+
