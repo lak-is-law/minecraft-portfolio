@@ -6,6 +6,7 @@ export class ModalManager {
   private modalContainer: HTMLElement;
   public isOpen: boolean = false;
   public onTeleportRequest?: (coords: [number, number, number]) => void;
+  public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[] };
 
   constructor() {
     this.modalContainer = document.getElementById('modal-container')!;
@@ -21,7 +22,8 @@ export class ModalManager {
         }
       }
       if (e.code === 'KeyM' && !this.isOpen) {
-        this.openFastTravelModal();
+        const info = this.getPlayerInfo?.();
+        this.openFastTravelModal(info?.position, info?.yaw, info?.dragons);
       }
     });
   }
@@ -269,58 +271,54 @@ export class ModalManager {
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
   }
 
-  // 5. Maximised World Map & Realm Atlas GUI
-  public openFastTravelModal() {
+  // 5. Maximised World Map & Realm Atlas GUI (Interactive Real-time Canvas)
+  public openFastTravelModal(
+    playerPos?: { x: number; y: number; z: number },
+    playerYaw?: number,
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+  ) {
     this.onModalOpen();
 
-    const landmarksHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
-      <div class="mc-landmark-card" data-index="${idx}">
-        <div class="mc-landmark-icon" style="font-family: monospace; font-weight: bold; color: #facc15;">${lm.tag}</div>
-        <div class="mc-landmark-info">
-          <h4>${lm.name}</h4>
-          <p>${lm.desc}</p>
-          <span class="mc-landmark-coords">[X: ${lm.coords[0]}, Y: ${lm.coords[1]}, Z: ${lm.coords[2]}]</span>
-        </div>
-        <button class="mc-btn mc-btn-green mc-warp-btn" data-index="${idx}">[WARP]</button>
-      </div>
+    const curX = Math.round(playerPos?.x || 0);
+    const curZ = Math.round(playerPos?.z || 0);
+
+    const landmarksChipsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
+      <button class="mc-btn mc-map-chip-btn" data-index="${idx}" title="${lm.desc}">
+        <span class="chip-tag">${lm.tag}</span>
+        <span class="chip-name">${lm.name}</span>
+      </button>
     `).join('');
 
     this.modalContainer.innerHTML = `
-      <div class="mc-dialog mc-map-dialog" style="max-width: 920px; width: 95%;">
+      <div class="mc-dialog mc-max-map-dialog">
         <div class="mc-dialog-header">
           <div>
-            <h2 class="mc-dialog-title">Maximised World Map & Realm Atlas</h2>
-            <span class="mc-dialog-subtitle">Select any landmark or biome to fast-travel teleport instantly</span>
+            <h2 class="mc-dialog-title">MINECRAFT REALM ATLAS [MAXIMISED MAP]</h2>
+            <span class="mc-dialog-subtitle">Live GPS & Real-time Radar • Click anywhere on the map to Fast-Travel Teleport</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
 
-        <!-- Biome Quadrant Atlas Summary -->
-        <div class="mc-biomes-atlas-grid">
-          <div class="mc-biome-atlas-card north">
-            <span class="mc-biome-tag">[NORTH] Frostpeak Glaciers</span>
-            <span class="mc-biome-monument">The Taj Mahal</span>
-            <span class="mc-biome-dragon">Frost Wyrm Dragon</span>
+        <div class="mc-map-top-status-bar">
+          <div class="mc-map-gps-pill">
+            <span class="gps-label">PLAYER GPS:</span>
+            <span class="gps-val" id="map-live-coords">X: ${curX}, Z: ${curZ}</span>
           </div>
-          <div class="mc-biome-atlas-card south">
-            <span class="mc-biome-tag">[SOUTH] Sunset Coast</span>
-            <span class="mc-biome-monument">Singapore Merlion & Beach</span>
-            <span class="mc-biome-dragon">Sea Leviathan Dragon</span>
-          </div>
-          <div class="mc-biome-atlas-card east">
-            <span class="mc-biome-tag">[EAST] Emerald River Valley</span>
-            <span class="mc-biome-monument">Lak Tower ("LK" Monument)</span>
-            <span class="mc-biome-dragon">Emerald Mountain Dragon</span>
-          </div>
-          <div class="mc-biome-atlas-card west">
-            <span class="mc-biome-tag">[WEST] The End & Caldera</span>
-            <span class="mc-biome-monument">Mount Obsidian Active Volcano</span>
-            <span class="mc-biome-dragon">Ender Dragon</span>
+          <div class="mc-map-cursor-pill">
+            <span class="cursor-label">TARGET:</span>
+            <span class="cursor-val" id="map-cursor-coords">Hover over map to Inspect • Click to Teleport</span>
           </div>
         </div>
 
-        <div class="mc-dialog-body mc-map-grid" style="max-height: 48vh; overflow-y: auto;">
-          ${landmarksHtml}
+        <div class="mc-max-map-canvas-container">
+          <canvas id="max-realm-canvas" width="860" height="460"></canvas>
+        </div>
+
+        <div class="mc-map-chips-container">
+          <span class="chips-heading">QUICK WARP:</span>
+          <div class="mc-map-chips-scroll">
+            ${landmarksChipsHtml}
+          </div>
         </div>
 
         <div class="mc-dialog-footer">
@@ -333,7 +331,8 @@ export class ModalManager {
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
 
-    document.querySelectorAll('.mc-warp-btn').forEach(btn => {
+    // Connect landmark chips buttons
+    document.querySelectorAll('.mc-map-chip-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const idx = parseInt(target.getAttribute('data-index') || '0', 10);
@@ -344,6 +343,412 @@ export class ModalManager {
           this.close();
         }
       });
+    });
+
+    // Render Canvas and attach hover/click interactions
+    this.initMaximizedMapCanvas(playerPos, playerYaw, dragons);
+  }
+
+  private initMaximizedMapCanvas(
+    playerPos?: { x: number; y: number; z: number },
+    playerYaw?: number,
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+  ) {
+    const canvas = document.getElementById('max-realm-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const cx = width / 2;
+    const cy = height / 2;
+    const scale = 1.55;
+    const worldLimit = 136;
+    const mapHalfW = worldLimit * scale;
+    const mapHalfH = worldLimit * scale;
+
+    let hoverWorldX: number | null = null;
+    let hoverWorldZ: number | null = null;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Canvas outer background
+      ctx.fillStyle = '#080c14';
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Side Information Panels
+      // Left Panel: Biome Legend
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(10, 10, 180, height - 20);
+      ctx.strokeStyle = '#334155';
+      ctx.strokeRect(10, 10, 180, height - 20);
+
+      ctx.font = 'bold 11px monospace';
+      ctx.fillStyle = '#facc15';
+      ctx.fillText('[REALM BIOMES]', 22, 34);
+
+      const biomes = [
+        { name: 'North: Frostpeaks', color: '#e0f2fe', desc: 'Taj Mahal & Glaciers' },
+        { name: 'Central: Corona Castle', color: '#4ade80', desc: 'Moat & Palace' },
+        { name: 'South: Sunset Coast', color: '#38bdf8', desc: 'Ocean & Merlion' },
+        { name: 'East: Emerald Valley', color: '#22c55e', desc: 'River & Lak Tower' },
+        { name: 'West: The End Caldera', color: '#c084fc', desc: 'Volcano & Spires' }
+      ];
+
+      biomes.forEach((b, i) => {
+        const by = 55 + i * 42;
+        ctx.fillStyle = b.color;
+        ctx.fillRect(22, by, 10, 10);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText(b.name, 38, by + 9);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '8px monospace';
+        ctx.fillText(b.desc, 38, by + 22);
+      });
+
+      // Compass Rose
+      const compY = height - 70;
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(100, compY, 32, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('N', 100, compY - 20);
+      ctx.fillText('S', 100, compY + 28);
+      ctx.fillText('W', 74, compY + 4);
+      ctx.fillText('E', 126, compY + 4);
+      ctx.textAlign = 'left';
+
+      // Right Panel: Active Radar & Distance Tracker
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(width - 190, 10, 180, height - 20);
+      ctx.strokeStyle = '#334155';
+      ctx.strokeRect(width - 190, 10, 180, height - 20);
+
+      ctx.font = 'bold 11px monospace';
+      ctx.fillStyle = '#facc15';
+      ctx.fillText('[LANDMARKS RADAR]', width - 178, 34);
+
+      const px = playerPos?.x || 0;
+      const pz = playerPos?.z || 0;
+
+      PORTFOLIO_DATA.landmarks.slice(0, 9).forEach((lm, i) => {
+        const ly = 55 + i * 40;
+        const dist = Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz));
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 9px monospace';
+        ctx.fillText(lm.tag, width - 178, ly);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '8px monospace';
+        ctx.fillText(`${lm.name} • ${dist}m`, width - 178, ly + 14);
+      });
+
+      // 3. Central Map Viewport (Clipped to World Bounds)
+      const mapX = cx - mapHalfW;
+      const mapY = cy - mapHalfH;
+      const mapW = mapHalfW * 2;
+      const mapH = mapHalfH * 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(mapX, mapY, mapW, mapH);
+      ctx.clip();
+
+      // Base Grass Floor (Central Realm)
+      ctx.fillStyle = '#3f7324';
+      ctx.fillRect(mapX, mapY, mapW, mapH);
+
+      // Biome 1: North Frostpeak Glaciers (Z < -75)
+      const northSplitY = cy - 75 * scale;
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillRect(mapX, mapY, mapW, northSplitY - mapY);
+      // North Mountain Peak Shading
+      ctx.fillStyle = '#f1f5f9';
+      ctx.beginPath();
+      ctx.moveTo(cx - 60 * scale, northSplitY);
+      ctx.lineTo(cx, cy - 130 * scale);
+      ctx.lineTo(cx + 60 * scale, northSplitY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Biome 2: South Sunset Coast & Ocean (Z > 75)
+      const southSandY = cy + 75 * scale;
+      const southOceanY = cy + 88 * scale;
+      // Sandy Beach
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(mapX, southSandY, mapW, southOceanY - southSandY);
+      // Ocean Waters
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(mapX, southOceanY, mapW, mapY + mapH - southOceanY);
+
+      // Biome 3: East Emerald Valley (X > 75)
+      const eastSplitX = cx + 75 * scale;
+      ctx.fillStyle = '#166534';
+      ctx.fillRect(eastSplitX, cy - 55 * scale, mapX + mapW - eastSplitX, 110 * scale);
+      // Winding River
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(cx + 70 * scale, cy);
+      ctx.bezierCurveTo(cx + 90 * scale, cy - 20 * scale, cx + 110 * scale, cy + 20 * scale, cx + 135 * scale, cy);
+      ctx.stroke();
+
+      // Biome 4: West The End & Volcano Caldera (X < -75)
+      const westSplitX = cx - 75 * scale;
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(mapX, cy - 65 * scale, westSplitX - mapX, 130 * scale);
+      // Volcano Cone & Lava
+      const volX = cx - 105 * scale;
+      const volY = cy - 25 * scale;
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(volX, volY, 22 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.arc(volX, volY, 7 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      // Lava spillways
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(volX, volY);
+      ctx.lineTo(volX + 18 * scale, volY);
+      ctx.stroke();
+
+      // Central Moat & Bridges
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 6 * scale;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 19 * scale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Moat Bridges
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(cx - 3 * scale, cy - 22 * scale, 6 * scale, 7 * scale);
+      ctx.fillRect(cx - 3 * scale, cy + 15 * scale, 6 * scale, 7 * scale);
+      ctx.fillRect(cx + 15 * scale, cy - 3 * scale, 7 * scale, 6 * scale);
+      ctx.fillRect(cx - 22 * scale, cy - 3 * scale, 7 * scale, 6 * scale);
+
+      // Central Castle Foundation
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(cx - 10 * scale, cy - 10 * scale, 20 * scale, 20 * scale);
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(cx - 3 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
+
+      // Coordinate Grid Lines (every 50 blocks)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let wCoord = -100; wCoord <= 100; wCoord += 50) {
+        const gx = cx + wCoord * scale;
+        const gz = cy + wCoord * scale;
+        ctx.beginPath();
+        ctx.moveTo(gx, mapY); ctx.lineTo(gx, mapY + mapH);
+        ctx.moveTo(mapX, gz); ctx.lineTo(mapX + mapW, gz);
+        ctx.stroke();
+      }
+
+      // 4. Landmarks Icons and Badges
+      for (const lm of PORTFOLIO_DATA.landmarks) {
+        const lx = cx + lm.coords[0] * scale;
+        const lz = cy + lm.coords[2] * scale;
+
+        let col = '#facc15';
+        if (lm.tag.includes('TAJ')) col = '#ffffff';
+        else if (lm.tag.includes('VOLCANO')) col = '#f97316';
+        else if (lm.tag.includes('MERLION')) col = '#06b6d4';
+        else if (lm.tag.includes('TOWER')) col = '#facc15';
+        else if (lm.tag.includes('PROJECTS')) col = '#a855f7';
+        else if (lm.tag.includes('EXPERIENCE')) col = '#3b82f6';
+        else if (lm.tag.includes('SKILLS')) col = '#22c55e';
+        else if (lm.tag.includes('RESUME')) col = '#eab308';
+
+        // Glowing outer halo
+        ctx.fillStyle = col + '44';
+        ctx.beginPath();
+        ctx.arc(lx, lz, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pin diamond
+        ctx.fillStyle = col;
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(lx, lz - 5);
+        ctx.lineTo(lx + 5, lz);
+        ctx.lineTo(lx, lz + 5);
+        ctx.lineTo(lx - 5, lz);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Tag label
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 8px monospace';
+        const txt = lm.tag.replace(/[\[\]]/g, '');
+        const tw = ctx.measureText(txt).width;
+        ctx.fillRect(lx - tw / 2 - 2, lz + 7, tw + 4, 11);
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(lx - tw / 2 - 2, lz + 7, tw + 4, 11);
+        ctx.fillStyle = col;
+        ctx.fillText(txt, lx - tw / 2, lz + 15);
+      }
+
+      // 5. Active Live Dragons
+      if (dragons) {
+        for (const d of dragons) {
+          const dx = cx + d.position.x * scale;
+          const dz = cy + d.position.z * scale;
+          ctx.fillStyle = '#' + d.config.eyeColor.toString(16).padStart(6, '0');
+          ctx.beginPath();
+          ctx.moveTo(dx, dz - 6);
+          ctx.lineTo(dx + 6, dz);
+          ctx.lineTo(dx, dz + 6);
+          ctx.lineTo(dx - 6, dz);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      // 6. Live Player Indicator
+      const pScreenX = cx + (playerPos?.x || 0) * scale;
+      const pScreenZ = cy + (playerPos?.z || 0) * scale;
+      const yaw = playerYaw || 0;
+
+      // Pulsing beacon ring
+      const time = performance.now() * 0.003;
+      const pulseR = 10 + Math.sin(time) * 3;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(pScreenX, pScreenZ, pulseR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Rotating Player Arrow
+      ctx.save();
+      ctx.translate(pScreenX, pScreenZ);
+      ctx.rotate(-yaw);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -11);
+      ctx.lineTo(7, 8);
+      ctx.lineTo(0, 4);
+      ctx.lineTo(-7, 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // Player Label
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(pScreenX - 35, pScreenZ - 24, 70, 13);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pScreenX - 35, pScreenZ - 24, 70, 13);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText('YOU [LAKSHYA]', pScreenX - 31, pScreenZ - 15);
+
+      // 7. Hover Cursor Crosshair
+      if (hoverWorldX !== null && hoverWorldZ !== null) {
+        const hx = cx + hoverWorldX * scale;
+        const hz = cy + hoverWorldZ * scale;
+
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(hx, mapY); ctx.lineTo(hx, mapY + mapH);
+        ctx.moveTo(mapX, hz); ctx.lineTo(mapX + mapW, hz);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Target reticle ring
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(hx, hz, 6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.restore(); // restore clipping
+
+      // World Border Perimeter Frame
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(mapX, mapY, mapW, mapH);
+
+      // World Limit Labels
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText('REALM BORDER (±136)', mapX + 6, mapY + 12);
+    };
+
+    draw();
+
+    // Mousemove for live hover coordinates
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      const wx = Math.round((mx - cx) / scale);
+      const wz = Math.round((my - cy) / scale);
+
+      if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
+        hoverWorldX = wx;
+        hoverWorldZ = wz;
+        canvas.style.cursor = 'crosshair';
+
+        const statusEl = document.getElementById('map-cursor-coords');
+        if (statusEl) {
+          statusEl.textContent = `[X: ${wx}, Z: ${wz}] - Click to Teleport Here!`;
+        }
+      } else {
+        hoverWorldX = null;
+        hoverWorldZ = null;
+        canvas.style.cursor = 'default';
+      }
+      draw();
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      hoverWorldX = null;
+      hoverWorldZ = null;
+      draw();
+    });
+
+    // Click to Teleport!
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      const wx = Math.round((mx - cx) / scale);
+      const wz = Math.round((my - cy) / scale);
+
+      if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
+        if (this.onTeleportRequest) {
+          sound.playLevelUp();
+          this.onTeleportRequest([wx, 2, wz]);
+          this.close();
+        }
+      }
     });
   }
 

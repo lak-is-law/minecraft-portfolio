@@ -60,17 +60,59 @@ export class WorldBuilder {
     this.buildSouthBeachAndOcean();
     this.buildEastEmeraldValley();
     this.buildWestTheEndDimension();
+
+    // World Boundary Barrier Walls
+    this.buildPerimeterBoundaries();
   }
 
-  // 1. Terrain: Vast 160x160 world foundation
+  // 1. Terrain: Vast, solid realm foundation with bedrock and biome surfaces
   private buildTerrain() {
-    const min = -82;
-    const max = 82;
+    const min = -136;
+    const max = 136;
 
     for (let x = min; x <= max; x++) {
       for (let z = min; z <= max; z++) {
-        this.setBlock(x, -1, z, 'dirt');
-        this.setBlock(x, 0, z, 'grass');
+        // Bedrock layer at Y = -2 (indestructible bottom floor)
+        this.setBlock(x, -2, z, 'bedrock');
+
+        // Foundation layer at Y = -1
+        if (z > 88 && Math.abs(x) <= 75) {
+          this.setBlock(x, -1, z, 'sand');
+        } else if (x < -74 && Math.abs(z) <= 65) {
+          this.setBlock(x, -1, z, 'end_stone');
+        } else if (z < -80 && Math.abs(x) <= 65) {
+          this.setBlock(x, -1, z, 'stone_bricks');
+        } else {
+          this.setBlock(x, -1, z, 'dirt');
+        }
+
+        // Surface layer at Y = 0
+        if (z > 88 && Math.abs(x) <= 75) {
+          this.setBlock(x, 0, z, 'water');
+        } else if (z > 74 && Math.abs(x) <= 65) {
+          this.setBlock(x, 0, z, 'sand');
+        } else if (x < -74 && Math.abs(z) <= 65) {
+          this.setBlock(x, 0, z, 'end_stone');
+        } else if (z < -80 && Math.abs(x) <= 65) {
+          this.setBlock(x, 0, z, 'snow_grass');
+        } else {
+          this.setBlock(x, 0, z, 'grass');
+        }
+      }
+    }
+  }
+
+  // Perimeter boundaries: Decorative, solid world border at ±136
+  private buildPerimeterBoundaries() {
+    const limit = 136;
+    for (let c = -limit; c <= limit; c++) {
+      for (const z of [-limit, limit]) {
+        this.setBlock(c, 1, z, 'stone_bricks');
+        this.setBlock(c, 2, z, (Math.abs(c) % 8 === 0) ? 'glowstone' : 'stone_bricks');
+      }
+      for (const x of [-limit, limit]) {
+        this.setBlock(x, 1, c, 'stone_bricks');
+        this.setBlock(x, 2, c, (Math.abs(c) % 8 === 0) ? 'glowstone' : 'stone_bricks');
       }
     }
   }
@@ -1012,15 +1054,12 @@ export class WorldBuilder {
 
         if (height > 0) {
           const blockType = height > 12 ? 'snow' : (height > 5 ? 'snow_grass' : 'stone_bricks');
-          this.setBlock(x, height, z, blockType);
-          this.setBlock(x + 1, height, z, blockType);
-          this.setBlock(x, height, z - 1, blockType);
-          this.setBlock(x + 1, height, z - 1, blockType);
-
-          if (height > 4 && (x % 4 === 0 || z % 4 === 0)) {
-            for (let y = 1; y < height; y += 2) {
-              this.setBlock(x, y, z, 'cobblestone');
-            }
+          for (let y = 1; y <= height; y++) {
+            const type = (y === height) ? blockType : (y > 8 ? 'stone_bricks' : 'cobblestone');
+            this.setBlock(x, y, z, type);
+            this.setBlock(x + 1, y, z, type);
+            this.setBlock(x, y, z - 1, type);
+            this.setBlock(x + 1, y, z - 1, type);
           }
         }
       }
@@ -1083,6 +1122,32 @@ export class WorldBuilder {
   // 15. The Taj Mahal (Wonder of the World in White Marble & Quartz)
   private buildTajMahal(cx: number, cz: number) {
     const baseY = 14;
+
+    // Grand Mountain Terrace & Solid Pedestal Foundation (Y = 1 to 13)
+    for (let y = 1; y < baseY; y++) {
+      const margin = Math.max(0, Math.floor((baseY - y) * 0.35));
+      for (let x = cx - 13 - margin; x <= cx + 13 + margin; x += 2) {
+        for (let z = cz - 13 - margin; z <= cz + 13 + margin; z += 2) {
+          const type = (y > 9) ? 'quartz_block' : 'stone_bricks';
+          this.setBlock(x, y, z, type);
+          this.setBlock(x + 1, y, z, type);
+          this.setBlock(x, y, z + 1, type);
+          this.setBlock(x + 1, y, z + 1, type);
+        }
+      }
+    }
+
+    // Solid foundation under Reflecting Pool
+    for (let z = cz + 14; z <= cz + 30; z += 2) {
+      for (let x = cx - 4; x <= cx + 4; x += 2) {
+        for (let y = 1; y < baseY; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+          this.setBlock(x + 1, y, z, 'stone_bricks');
+          this.setBlock(x, y, z + 1, 'stone_bricks');
+          this.setBlock(x + 1, y, z + 1, 'stone_bricks');
+        }
+      }
+    }
 
     // Grand Raised Quartz Podium (26x26)
     for (let x = cx - 13; x <= cx + 13; x++) {
@@ -1217,9 +1282,10 @@ export class WorldBuilder {
       for (let dx = -r; dx <= r; dx++) {
         for (let dz = -r; dz <= r; dz++) {
           const d = Math.sqrt(dx * dx + dz * dz);
-          if (d <= r && d >= r - 2) {
+          if (d <= r) {
             const isMagma = (dx + dz + y) % 3 === 0;
-            this.setBlock(cx + dx, y, cz + dz, isMagma ? 'magma_block' : 'obsidian');
+            const isSurface = d >= r - 2;
+            this.setBlock(cx + dx, y, cz + dz, (isMagma || !isSurface) ? 'magma_block' : 'obsidian');
           }
         }
       }

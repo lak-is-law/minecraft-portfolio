@@ -75,6 +75,7 @@ export class Player {
   public onInteract?: (target: TargetInfo) => void;
   public onHammerBanner?: (project: Project) => void;
   public onHotbarSelect?: (slotIndex: number) => void;
+  public onWorldNotice?: (msg: string) => void;
 
   constructor(camera: THREE.PerspectiveCamera, world: VoxelWorld, domElement: HTMLElement) {
     this.camera = camera;
@@ -156,8 +157,18 @@ export class Player {
           }
         } else if (this.currentTarget) {
           const { x, y, z } = this.currentTarget.blockPos;
-          this.world.breakBlock(x, y, z);
-          sound.playBlockBreak();
+          const target = this.world.getBlock(x, y, z);
+          if (target && (target.type === 'bedrock' || y <= -2)) {
+            sound.playClick();
+            if (this.onWorldNotice) {
+              this.onWorldNotice('Bedrock foundation cannot be broken!');
+            }
+            return;
+          }
+          const broke = this.world.breakBlock(x, y, z);
+          if (broke) {
+            sound.playBlockBreak();
+          }
         }
       } else if (isRight) {
         e.preventDefault();
@@ -489,6 +500,28 @@ export class Player {
       this.velocity.y = flyY;
 
       this.position.addScaledVector(this.velocity, dt);
+
+      // Hard boundary clamp in flying mode: cannot cross outside the realm
+      const WORLD_BORDER = 135;
+      if (Math.abs(this.position.x) > WORLD_BORDER) {
+        this.position.x = Math.sign(this.position.x) * WORLD_BORDER;
+        this.velocity.x = 0;
+      }
+      if (Math.abs(this.position.z) > WORLD_BORDER) {
+        this.position.z = Math.sign(this.position.z) * WORLD_BORDER;
+        this.velocity.z = 0;
+      }
+
+      // Big threshold safety: immediate rescue if falling below bedrock/floor
+      if (this.position.y < -1.5) {
+        this.position.set(0, 2.0, 4);
+        this.velocity.set(0, 0, 0);
+        sound.playLevelUp();
+        if (this.onWorldNotice) {
+          this.onWorldNotice('Void safety barrier saved you! Returned safely to Spawn Plaza.');
+        }
+      }
+
       this.updateCameraTransform();
       return;
     }
@@ -609,9 +642,14 @@ export class Player {
     }
 
     // 2. Horizontal resolution: X axis
+    const WORLD_BORDER = 135;
     const moveX = this.velocity.x * dt;
     if (Math.abs(moveX) > 0.0001) {
-      const nextX = this.position.x + moveX;
+      let nextX = this.position.x + moveX;
+      if (Math.abs(nextX) > WORLD_BORDER) {
+        nextX = Math.sign(nextX) * WORLD_BORDER;
+        this.velocity.x = 0;
+      }
       if (!this.checkHorizontalObstacle(nextX, this.position.y, this.position.z)) {
         this.position.x = nextX;
       } else {
@@ -628,7 +666,11 @@ export class Player {
     // 3. Horizontal resolution: Z axis
     const moveZ = this.velocity.z * dt;
     if (Math.abs(moveZ) > 0.0001) {
-      const nextZ = this.position.z + moveZ;
+      let nextZ = this.position.z + moveZ;
+      if (Math.abs(nextZ) > WORLD_BORDER) {
+        nextZ = Math.sign(nextZ) * WORLD_BORDER;
+        this.velocity.z = 0;
+      }
       if (!this.checkHorizontalObstacle(this.position.x, this.position.y, nextZ)) {
         this.position.z = nextZ;
       } else {
@@ -641,10 +683,23 @@ export class Player {
       }
     }
 
-    // Void safety: respawn at spawn if falling out of world
-    if (this.position.y < -20) {
+    // Hard boundary clamp on final position
+    if (Math.abs(this.position.x) > WORLD_BORDER) {
+      this.position.x = Math.sign(this.position.x) * WORLD_BORDER;
+    }
+    if (Math.abs(this.position.z) > WORLD_BORDER) {
+      this.position.z = Math.sign(this.position.z) * WORLD_BORDER;
+    }
+
+    // Big threshold safety: immediate rescue if falling below bedrock/floor
+    if (this.position.y < -1.5) {
       this.position.set(0, 2.0, 4);
       this.velocity.set(0, 0, 0);
+      this.isGrounded = true;
+      sound.playLevelUp();
+      if (this.onWorldNotice) {
+        this.onWorldNotice('Void safety barrier saved you! Returned safely to Spawn Plaza.');
+      }
     }
   }
 

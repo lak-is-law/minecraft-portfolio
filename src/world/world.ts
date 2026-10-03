@@ -73,7 +73,7 @@ export class VoxelWorld {
       const capacity = Math.max(count + 500, 200);
       const material = this.textureManager.getMaterial(type);
       const instMesh = new THREE.InstancedMesh(boxGeo, material, capacity);
-      instMesh.castShadow = true;
+      instMesh.castShadow = (type !== 'bedrock' && type !== 'dirt');
       instMesh.receiveShadow = true;
       instMesh.frustumCulled = false;
       instMesh.name = `voxel_${type}`;
@@ -313,6 +313,14 @@ export class VoxelWorld {
   // Break a block dynamically with debris particles
   public breakBlock(x: number, y: number, z: number): VoxelBlock | null {
     const key = `${x},${y},${z}`;
+    const target = this.getBlock(x, y, z);
+    if (!target) return null;
+
+    // Bedrock & bottom-most foundation layer protection: cannot be mined or broken!
+    if (target.type === 'bedrock' || y <= -2) {
+      return null;
+    }
+
     const block = this.builder.removeBlock(x, y, z);
     if (!block) return null;
 

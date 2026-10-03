@@ -780,6 +780,18 @@ export class TextureManager {
         ctx.fillRect(0, y, s, 1);
       }
     }));
+
+    // 45. Bedrock (Mottled Dark Grey/Black Indestructible Bottom Layer)
+    this.textures.set('bedrock', createPixelTexture((ctx, s) => {
+      const rng = createRng(9999);
+      const bedrockColors = ['#111111', '#181818', '#222222', '#2f2f2f', '#444444', '#555555'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = bedrockColors[Math.floor(rng() * bedrockColors.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
   }
 
   private createMaterials() {
@@ -927,5 +939,8 @@ export class TextureManager {
     }));
     const spruceLogSide = new THREE.MeshLambertMaterial({ map: this.getTexture('spruce_log_side') });
     this.materials.set('spruce_log', [spruceLogSide, spruceLogSide, logTop, logTop, spruceLogSide, spruceLogSide]);
+
+    // Bedrock
+    this.materials.set('bedrock', new THREE.MeshLambertMaterial({ map: this.getTexture('bedrock') }));
   }
 }

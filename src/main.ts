@@ -179,7 +179,17 @@ class Game {
     };
 
     this.hud.onOpenFastTravel = () => {
-      this.modals.openFastTravelModal();
+      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+    };
+
+    this.modals.getPlayerInfo = () => ({
+      position: this.player.position,
+      yaw: this.player.yaw,
+      dragons: this.world.dragonManager?.getDragons()
+    });
+
+    this.player.onWorldNotice = (msg: string) => {
+      this.hud.pushChatMessage('World', msg);
     };
 
     this.hud.onOpenResume = () => {
