@@ -186,6 +186,10 @@ class Game {
       this.modals.openResumeChestModal();
     };
 
+    this.hud.onTakeScreenshot = () => {
+      this.player.takeScreenshot();
+    };
+
     this.player.onHotbarSelect = (deltaOrSlot: number) => {
       if (deltaOrSlot >= 0 && deltaOrSlot <= 8) {
         this.hud.selectSlot(deltaOrSlot);

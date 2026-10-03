@@ -66,6 +66,7 @@ export class VoxelWorld {
       const instMesh = new THREE.InstancedMesh(boxGeo, material, capacity);
       instMesh.castShadow = true;
       instMesh.receiveShadow = true;
+      instMesh.frustumCulled = false;
       instMesh.name = `voxel_${type}`;
 
       this.scene.add(instMesh);
@@ -250,6 +251,7 @@ export class VoxelWorld {
       instMesh.count = 0;
       instMesh.castShadow = true;
       instMesh.receiveShadow = true;
+      instMesh.frustumCulled = false;
       this.scene.add(instMesh);
       this.instancedMeshes.set(type, instMesh);
       if (!this.blockTypes.includes(type)) {
@@ -269,6 +271,7 @@ export class VoxelWorld {
       const newInstMesh = new THREE.InstancedMesh(boxGeo, mat, newCapacity);
       newInstMesh.castShadow = true;
       newInstMesh.receiveShadow = true;
+      newInstMesh.frustumCulled = false;
 
       for (let i = 0; i < instMesh.count; i++) {
         const mat4 = new THREE.Matrix4();

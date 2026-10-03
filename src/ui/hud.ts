@@ -35,6 +35,7 @@ export class HUDManager {
   public onOpenFastTravel?: () => void;
   public onOpenResume?: () => void;
   public onBlockSelected?: (blockType: string) => void;
+  public onTakeScreenshot?: () => void;
 
   constructor() {
     this.renderHUD();
@@ -101,6 +102,8 @@ export class HUDManager {
         <button class="mc-chip-btn" id="btn-quick-skills">[SKILLS]</button>
         <button class="mc-chip-btn" id="btn-quick-resume">[RESUME]</button>
         <button class="mc-chip-btn" id="btn-quick-map">[MAP: M]</button>
+        <button class="mc-chip-btn" id="btn-quick-unlock" title="Free mouse cursor to switch windows or take screenshot (ESC)">[FREE CURSOR: ESC]</button>
+        <button class="mc-chip-btn" id="btn-quick-screenshot" title="Capture in-game screenshot PNG (F2)">[SCREENSHOT: F2]</button>
         <button class="mc-chip-btn" id="btn-quick-sound">[AUDIO: ON]</button>
         <button class="mc-chip-btn" id="btn-quick-fly">[FLY: OFF]</button>
       </div>
@@ -144,6 +147,14 @@ export class HUDManager {
     document.getElementById('btn-quick-skills')?.addEventListener('click', () => this.onOpenSkills?.());
     document.getElementById('btn-quick-resume')?.addEventListener('click', () => this.onOpenResume?.());
     document.getElementById('btn-quick-map')?.addEventListener('click', () => this.onOpenFastTravel?.());
+    document.getElementById('btn-quick-unlock')?.addEventListener('click', () => {
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+    });
+    document.getElementById('btn-quick-screenshot')?.addEventListener('click', () => {
+      this.onTakeScreenshot?.();
+    });
 
     const soundBtn = document.getElementById('btn-quick-sound');
     soundBtn?.addEventListener('click', () => {

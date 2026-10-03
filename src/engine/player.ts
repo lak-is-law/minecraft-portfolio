@@ -86,12 +86,10 @@ export class Player {
       }
     };
 
-    this.domElement.addEventListener('click', requestLock);
     playBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       requestLock();
     });
-    pauseOverlay?.addEventListener('click', requestLock);
 
     document.addEventListener('pointerlockchange', () => {
       this.isLocked = document.pointerLockElement === this.domElement;
@@ -114,12 +112,15 @@ export class Player {
       this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
     });
 
-    // Left click: Attack / Mine block or Hammer Project Banner
-    this.domElement.addEventListener('mousedown', (e) => {
+    // Window mousedown listener: works across all browsers & macOS trackpads
+    window.addEventListener('mousedown', (e) => {
       if (!this.isLocked) return;
-      this.triggerSwing();
 
-      if (e.button === 0) {
+      const isRight = e.button === 2 || (e.button === 0 && e.ctrlKey);
+      const isLeft = e.button === 0 && !e.ctrlKey;
+
+      if (isLeft) {
+        this.triggerSwing();
         if (this.currentTarget?.targetBanner) {
           // Hammer project banner to launch live site!
           const banner = this.currentTarget.targetBanner;
@@ -132,6 +133,10 @@ export class Player {
           if (banner.project.liveUrl) {
             try {
               window.open(banner.project.liveUrl, '_blank');
+              // Free cursor immediately so user can navigate to the newly opened tab!
+              if (document.pointerLockElement) {
+                document.exitPointerLock();
+              }
             } catch (err) {
               console.warn('Popup blocked:', err);
             }
@@ -141,15 +146,19 @@ export class Player {
           this.world.breakBlock(x, y, z);
           sound.playBlockBreak();
         }
-      } else if (e.button === 2) {
-        // Right click: Interact or Place block
+      } else if (isRight) {
         e.preventDefault();
+        this.triggerSwing();
         this.handleRightClick();
       }
     });
 
-    // Disable default context menu
-    this.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+    // Prevent context menu while pointer locked
+    window.addEventListener('contextmenu', (e) => {
+      if (this.isLocked) {
+        e.preventDefault();
+      }
+    });
 
     // Scroll wheel to cycle hotbar
     this.domElement.addEventListener('wheel', (e) => {
@@ -202,6 +211,31 @@ export class Player {
       if (e.code === 'KeyE') {
         if (this.currentTarget && this.onInteract) {
           this.onInteract(this.currentTarget);
+          if (document.pointerLockElement) {
+            document.exitPointerLock();
+          }
+        }
+      }
+
+      // 'KeyR' or 'KeyQ' for place block (keyboard alternative to right-click)
+      if (e.code === 'KeyR' || e.code === 'KeyQ') {
+        if (this.isLocked) {
+          e.preventDefault();
+          this.triggerSwing();
+          this.handleRightClick();
+        }
+      }
+
+      // 'F2' for instant screenshot capture & download
+      if (e.code === 'F2') {
+        e.preventDefault();
+        this.takeScreenshot();
+      }
+
+      // Escape to release pointer lock and free cursor
+      if (e.code === 'Escape') {
+        if (document.pointerLockElement) {
+          document.exitPointerLock();
         }
       }
     });
@@ -291,17 +325,46 @@ export class Player {
     // 3. Otherwise: place block against targeted face!
     const targetPos = this.currentTarget.blockPos.clone().add(this.currentTarget.faceNormal);
 
-    // Prevent placing block inside player's body (with slight inward skin tolerance)
-    const playerBox = this.getPlayerBoundingBox();
+    // Collision check against player core body: only prevent placement if target block overlaps player core
+    const playerFeet = this.position.y;
+    const playerHead = this.position.y + (this.isSneaking ? this.height * 0.8 : this.height);
+    const playerCoreBox = new THREE.Box3(
+      new THREE.Vector3(this.position.x - 0.15, playerFeet, this.position.z - 0.15),
+      new THREE.Vector3(this.position.x + 0.15, playerHead, this.position.z + 0.15)
+    );
     const newBlockBox = new THREE.Box3(
       targetPos,
       targetPos.clone().add(new THREE.Vector3(1, 1, 1))
     );
-    newBlockBox.expandByScalar(-0.04);
 
-    if (!playerBox.intersectsBox(newBlockBox)) {
-      this.world.placeBlock(targetPos.x, targetPos.y, targetPos.z, this.selectedBlockType);
+    if (!playerCoreBox.intersectsBox(newBlockBox)) {
+      const blockToPlace = this.selectedBlockType || 'cobblestone';
+      this.world.placeBlock(targetPos.x, targetPos.y, targetPos.z, blockToPlace);
       sound.playBlockPlace();
+      this.triggerSwing();
+    }
+  }
+
+  // Capture high-definition 3D screenshot and save as PNG file
+  public takeScreenshot() {
+    const canvas = this.domElement as HTMLCanvasElement;
+    if (!canvas) return;
+
+    try {
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.download = `minecraft-portfolio-${Date.now()}.png`;
+      a.href = dataUrl;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      sound.playLevelUp();
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+    } catch (err) {
+      console.error('Failed to take screenshot:', err);
     }
   }
 
@@ -589,20 +652,28 @@ export class Player {
 
       const block = this.world.getBlock(bx, by, bz);
       if (block) {
-        // Calculate hit normal by checking previous step point
-        const prev = origin.clone().addScaledVector(rayDir, d - stepSize);
-        const normal = new THREE.Vector3(
-          Math.floor(prev.x) - bx,
-          Math.floor(prev.y) - by,
-          Math.floor(prev.z) - bz
-        );
-        // Normalize to cardinal axis
-        if (Math.abs(normal.x) >= Math.abs(normal.y) && Math.abs(normal.x) >= Math.abs(normal.z)) {
-          normal.set(Math.sign(normal.x), 0, 0);
-        } else if (Math.abs(normal.y) >= Math.abs(normal.z)) {
-          normal.set(0, Math.sign(normal.y), 0);
+        // Calculate exact hit normal by finding which face of unit cube [bx, by, bz] was entered
+        const dx0 = Math.abs(p.x - bx);
+        const dx1 = Math.abs((bx + 1) - p.x);
+        const dy0 = Math.abs(p.y - by);
+        const dy1 = Math.abs((by + 1) - p.y);
+        const dz0 = Math.abs(p.z - bz);
+        const dz1 = Math.abs((bz + 1) - p.z);
+
+        const minD = Math.min(dx0, dx1, dy0, dy1, dz0, dz1);
+        const normal = new THREE.Vector3();
+        if (minD === dy1) {
+          normal.set(0, 1, 0); // Top face
+        } else if (minD === dy0) {
+          normal.set(0, -1, 0); // Bottom face
+        } else if (minD === dx0) {
+          normal.set(-1, 0, 0); // West face
+        } else if (minD === dx1) {
+          normal.set(1, 0, 0); // East face
+        } else if (minD === dz0) {
+          normal.set(0, 0, -1); // North face
         } else {
-          normal.set(0, 0, Math.sign(normal.z));
+          normal.set(0, 0, 1); // South face
         }
 
         foundTarget = {
