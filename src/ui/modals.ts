@@ -269,7 +269,7 @@ export class ModalManager {
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
   }
 
-  // 5. Fast Travel Map GUI
+  // 5. Maximised World Map & Realm Atlas GUI
   public openFastTravelModal() {
     this.onModalOpen();
 
@@ -286,21 +286,45 @@ export class ModalManager {
     `).join('');
 
     this.modalContainer.innerHTML = `
-      <div class="mc-dialog mc-map-dialog">
+      <div class="mc-dialog mc-map-dialog" style="max-width: 920px; width: 95%;">
         <div class="mc-dialog-header">
           <div>
-            <h2 class="mc-dialog-title">Portfolio Realm Fast Travel</h2>
-            <span class="mc-dialog-subtitle">Select a destination to warp instantly</span>
+            <h2 class="mc-dialog-title">Maximised World Map & Realm Atlas</h2>
+            <span class="mc-dialog-subtitle">Select any landmark or biome to fast-travel teleport instantly</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
 
-        <div class="mc-dialog-body mc-map-grid">
+        <!-- Biome Quadrant Atlas Summary -->
+        <div class="mc-biomes-atlas-grid">
+          <div class="mc-biome-atlas-card north">
+            <span class="mc-biome-tag">[NORTH] Frostpeak Glaciers</span>
+            <span class="mc-biome-monument">The Taj Mahal</span>
+            <span class="mc-biome-dragon">Frost Wyrm Dragon</span>
+          </div>
+          <div class="mc-biome-atlas-card south">
+            <span class="mc-biome-tag">[SOUTH] Sunset Coast</span>
+            <span class="mc-biome-monument">Singapore Merlion & Beach</span>
+            <span class="mc-biome-dragon">Sea Leviathan Dragon</span>
+          </div>
+          <div class="mc-biome-atlas-card east">
+            <span class="mc-biome-tag">[EAST] Emerald River Valley</span>
+            <span class="mc-biome-monument">Lak Tower ("LK" Monument)</span>
+            <span class="mc-biome-dragon">Emerald Mountain Dragon</span>
+          </div>
+          <div class="mc-biome-atlas-card west">
+            <span class="mc-biome-tag">[WEST] The End & Caldera</span>
+            <span class="mc-biome-monument">Mount Obsidian Active Volcano</span>
+            <span class="mc-biome-dragon">Ender Dragon</span>
+          </div>
+        </div>
+
+        <div class="mc-dialog-body mc-map-grid" style="max-height: 48vh; overflow-y: auto;">
           ${landmarksHtml}
         </div>
 
         <div class="mc-dialog-footer">
-          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Close (ESC)</button>
+          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Close Map (ESC / M)</button>
         </div>
       </div>
     `;

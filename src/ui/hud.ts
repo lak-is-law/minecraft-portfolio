@@ -36,6 +36,8 @@ export class HUDManager {
   public onOpenResume?: () => void;
   public onBlockSelected?: (blockType: string) => void;
   public onTakeScreenshot?: () => void;
+  public onTogglePerspective?: () => void;
+  public onToggleSit?: () => void;
 
   constructor() {
     this.renderHUD();
@@ -102,6 +104,8 @@ export class HUDManager {
         <button class="mc-chip-btn" id="btn-quick-skills">[SKILLS]</button>
         <button class="mc-chip-btn" id="btn-quick-resume">[RESUME]</button>
         <button class="mc-chip-btn" id="btn-quick-map">[MAP: M]</button>
+        <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1st / 3rd Person View (F5)">[VIEW: 1P/3P]</button>
+        <button class="mc-chip-btn" id="btn-quick-sit" title="Toggle Sit / Rest Emote (X)">[REST: X]</button>
         <button class="mc-chip-btn" id="btn-quick-unlock" title="Free mouse cursor to switch windows or take screenshot (ESC)">[FREE CURSOR: ESC]</button>
         <button class="mc-chip-btn" id="btn-quick-screenshot" title="Capture in-game screenshot PNG (F2)">[SCREENSHOT: F2]</button>
         <button class="mc-chip-btn" id="btn-quick-sound">[AUDIO: ON]</button>
@@ -109,12 +113,15 @@ export class HUDManager {
       </div>
     `;
 
-    // 5. Minimap container in top-right
+    // 5. Minimap container in top-left (Click/Tap to Maximise)
     const minimapEl = document.getElementById('mc-minimap')!;
     minimapEl.innerHTML = `
-      <div class="mc-minimap-box">
-        <canvas id="minimap-canvas" width="120" height="120"></canvas>
-        <div class="mc-minimap-heading" id="minimap-heading">N</div>
+      <div class="mc-minimap-box" id="mc-minimap-box" title="Click or Tap to Maximise World Map (Key: M)">
+        <div class="mc-minimap-top-bar">
+          <span class="mc-minimap-title">[MAP: MAXIMISE]</span>
+          <span class="mc-minimap-heading" id="minimap-heading">N</span>
+        </div>
+        <canvas id="minimap-canvas" width="130" height="130"></canvas>
       </div>
     `;
   }
@@ -154,6 +161,18 @@ export class HUDManager {
     });
     document.getElementById('btn-quick-screenshot')?.addEventListener('click', () => {
       this.onTakeScreenshot?.();
+    });
+    document.getElementById('btn-quick-perspective')?.addEventListener('click', () => {
+      this.onTogglePerspective?.();
+    });
+    document.getElementById('btn-quick-sit')?.addEventListener('click', () => {
+      this.onToggleSit?.();
+    });
+    document.getElementById('mc-minimap-box')?.addEventListener('click', () => {
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+      this.onOpenFastTravel?.();
     });
 
     const soundBtn = document.getElementById('btn-quick-sound');
@@ -275,50 +294,125 @@ export class HUDManager {
     `;
   }
 
-  // Update Minimap radar
-  public updateMinimap(playerPos: { x: number; y: number; z: number }, yaw: number) {
+  // Update Minimap radar (with Biomes, Landmarks, and Live Dragons)
+  public updateMinimap(
+    playerPos: { x: number; y: number; z: number },
+    yaw: number,
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+  ) {
     const canvas = document.getElementById('minimap-canvas') as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, 120, 120);
+    const w = 130;
+    const h = 130;
+    ctx.clearRect(0, 0, w, h);
 
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(0, 0, 120, 120);
+    // 1. Radar background
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, w, h);
 
-    const cx = 60;
-    const cz = 60;
-    const scale = 0.65;
+    const cx = 65;
+    const cz = 65;
+    const scale = 0.52;
 
+    // Biome boundary hints
+    // North (Snowy Peaks)
+    const northEdge = Math.max(0, cz - (80 + playerPos.z) * scale);
+    if (northEdge > 0) {
+      ctx.fillStyle = 'rgba(224, 242, 254, 0.2)';
+      ctx.fillRect(0, 0, w, northEdge);
+    }
+
+    // South (Beach & Sea)
+    const southEdge = Math.min(h, cz + (80 - playerPos.z) * scale);
+    if (southEdge < h) {
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx.fillRect(0, southEdge, w, h - southEdge);
+    }
+
+    // East (Emerald Valley)
+    const eastEdge = Math.min(w, cx + (75 - playerPos.x) * scale);
+    if (eastEdge < w) {
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.18)';
+      ctx.fillRect(eastEdge, 0, w - eastEdge, h);
+    }
+
+    // West (The End / Volcano)
+    const westEdge = Math.max(0, cx - (75 + playerPos.x) * scale);
+    if (westEdge > 0) {
+      ctx.fillStyle = 'rgba(192, 132, 252, 0.2)';
+      ctx.fillRect(0, 0, westEdge, h);
+    }
+
+    // Crosshair grid lines
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, h);
+    ctx.moveTo(0, cz); ctx.lineTo(w, cz);
+    ctx.stroke();
+
+    // 2. Landmarks
     for (const lm of PORTFOLIO_DATA.landmarks) {
       const lx = cx + (lm.coords[0] - playerPos.x) * scale;
       const lz = cz + (lm.coords[2] - playerPos.z) * scale;
 
-      if (lx >= 4 && lx <= 116 && lz >= 4 && lz <= 116) {
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(lx - 2.5, lz - 2.5, 5, 5);
+      if (lx >= 5 && lx <= w - 5 && lz >= 5 && lz <= h - 5) {
+        if (lm.tag === '[TAJ MAHAL]') ctx.fillStyle = '#ffffff';
+        else if (lm.tag === '[VOLCANO]') ctx.fillStyle = '#ea580c';
+        else if (lm.tag === '[MERLION]') ctx.fillStyle = '#06b6d4';
+        else if (lm.tag === '[LAK TOWER]') ctx.fillStyle = '#facc15';
+        else if (lm.tag === '[PROJECTS]') ctx.fillStyle = '#a855f7';
+        else ctx.fillStyle = '#94a3b8';
+
+        ctx.fillRect(lx - 2, lz - 2, 4, 4);
       }
     }
 
+    // 3. Active Soaring Dragons
+    if (dragons) {
+      for (const d of dragons) {
+        const dx = cx + (d.position.x - playerPos.x) * scale;
+        const dz = cz + (d.position.z - playerPos.z) * scale;
+
+        if (dx >= 4 && dx <= w - 4 && dz >= 4 && dz <= h - 4) {
+          ctx.fillStyle = '#' + d.config.eyeColor.toString(16).padStart(6, '0');
+          ctx.beginPath();
+          ctx.moveTo(dx, dz - 4);
+          ctx.lineTo(dx + 4, dz);
+          ctx.lineTo(dx, dz + 4);
+          ctx.lineTo(dx - 4, dz);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+    }
+
+    // 4. Center Player Arrow
     ctx.save();
     ctx.translate(cx, cz);
     ctx.rotate(-yaw);
 
     ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, -6);
-    ctx.lineTo(4, 5);
+    ctx.moveTo(0, -7);
+    ctx.lineTo(5, 5);
     ctx.lineTo(0, 3);
-    ctx.lineTo(-4, 5);
+    ctx.lineTo(-5, 5);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
 
     ctx.restore();
 
-    ctx.strokeStyle = '#64748b';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, 118, 118);
+    // Radar frame border
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
 
     const headingEl = document.getElementById('minimap-heading');
     if (headingEl) {

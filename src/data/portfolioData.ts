@@ -420,6 +420,14 @@ export const PORTFOLIO_DATA = {
     { name: "Snuggly Duckling Tavern", coords: [-50, 2, 50], tag: "[INTERESTS]", desc: "Tangled-inspired fairytale tavern with hearth, giant floor chessboard, and car showroom" },
     { name: "Royal Diplomatic Pavilion", coords: [-55, 2, 5], tag: "[LANG]", desc: "Fairytale lakeside pavilion celebrating 9 languages and Korean honors" },
     { name: "Rapunzel's Soaring Tower", coords: [-52, 2, -46], tag: "[BUILD]", desc: "Iconic 36-block-tall tower with climbing vines, flower balcony, and creative building studio" },
-    { name: "Sundrop Harbor & Beacon", coords: [0, 2, 25], tag: "[CONTACT]", desc: "Floating lanterns on water, sky beacon, and Ancient Resume Chest" }
+    { name: "Sundrop Harbor & Beacon", coords: [0, 2, 25], tag: "[CONTACT]", desc: "Floating lanterns on water, sky beacon, and Ancient Resume Chest" },
+    { name: "The Taj Mahal", coords: [0, 16, -100], tag: "[TAJ MAHAL]", desc: "Architectural wonder of the world in white marble with 4 minarets, dome, and reflecting pool" },
+    { name: "Frostpeak Overlook", coords: [0, 18, -90], tag: "[NORTH]", desc: "Dizzying snowy mountain lookout over the clouds under the Frost Wyrm dragon" },
+    { name: "Mount Obsidian Caldera", coords: [-86, 3, -25], tag: "[VOLCANO]", desc: "Active volcano with glowing magma fissures and cascading molten lava waterfalls" },
+    { name: "The End & Obsidian Spires", coords: [-100, 3, 2], tag: "[THE END]", desc: "Obsidian pillars and glowing End Crystals under the starry sky with the Ender Dragon" },
+    { name: "The Singapore Merlion", coords: [18, 4, 90], tag: "[MERLION]", desc: "Mythical lion-headed fish statue spouting water into the southern ocean" },
+    { name: "Sunset Beach Bluff", coords: [10, 4, 80], tag: "[BEACH]", desc: "Warm coastal bluffs with mossy rocks, red flowers, sailing ships, and cat companion" },
+    { name: "Lak Tower (LK Monument)", coords: [90, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel Tower inspired wonder with illuminated LK monogram and observation sky deck" },
+    { name: "Emerald Valley Viewpoint", coords: [84, 14, -14], tag: "[VALLEY]", desc: "Sunlit mountain ledge overlooking the river canyon under the Emerald Dragon" }
   ]
 };

@@ -60,6 +60,17 @@ export class Player {
   // Selected hotbar block
   public selectedBlockType: string = 'cobblestone';
 
+  // Camera perspective & Sit emotes (Photo-Inspired Lakshya)
+  public cameraMode: number = 0; // 0 = 1P, 1 = 3P Back, 2 = 3P Front
+  public isSitting: boolean = false;
+  public playerAvatar!: THREE.Group;
+  private avatarHead!: THREE.Group;
+  private avatarArmL!: THREE.Group;
+  private avatarArmR!: THREE.Group;
+  private avatarLegL!: THREE.Group;
+  private avatarLegR!: THREE.Group;
+  private firstPersonLegs!: THREE.Group;
+
   // Callback hooks for UI
   public onInteract?: (target: TargetInfo) => void;
   public onHammerBanner?: (project: Project) => void;
@@ -73,6 +84,8 @@ export class Player {
     this.setupPointerLock();
     this.setupKeyboard();
     this.setupFirstPersonHand();
+    this.setupFirstPersonLegs();
+    this.createLakshyaAvatar();
     this.setupBlockHighlight();
   }
 
@@ -226,6 +239,17 @@ export class Player {
         }
       }
 
+      // 'F5' for cycling camera perspective (1P -> 3P Back -> 3P Front)
+      if (e.code === 'F5') {
+        e.preventDefault();
+        this.cycleCameraMode();
+      }
+
+      // 'KeyX' for sit/rest pose (Photos 1, 2, 3, 4)
+      if (e.code === 'KeyX') {
+        this.toggleSit();
+      }
+
       // 'F2' for instant screenshot capture & download
       if (e.code === 'F2') {
         e.preventDefault();
@@ -252,6 +276,22 @@ export class Player {
   private setupFirstPersonHand() {
     this.handGroup = new THREE.Group();
     this.handGroup.position.set(0.38, -0.32, -0.6);
+
+    // Streetwear black t-shirt sleeve & skin forearm (Photos 1 & 4)
+    const armMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 });
+    const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+
+    const armGeo = new THREE.BoxGeometry(0.18, 0.5, 0.18);
+    const armMesh = new THREE.Mesh(armGeo, armMat);
+    armMesh.position.set(0.04, -0.05, 0.08);
+    armMesh.rotation.set(-0.3, 0.2, -0.15);
+    this.handGroup.add(armMesh);
+
+    const sleeveGeo = new THREE.BoxGeometry(0.2, 0.22, 0.2);
+    const sleeveMesh = new THREE.Mesh(sleeveGeo, sleeveMat);
+    sleeveMesh.position.set(0.04, 0.08, 0.08);
+    sleeveMesh.rotation.set(-0.3, 0.2, -0.15);
+    this.handGroup.add(sleeveMesh);
 
     // Default: Holding Diamond Pickaxe
     const pickaxeGroup = new THREE.Group();
@@ -375,6 +415,40 @@ export class Player {
     this.updateMovement(dt);
     this.updateRaycast();
     this.updateHandAnimation(dt);
+
+    // Sync 3D Lakshya Avatar Transform & Animations
+    if (this.playerAvatar) {
+      this.playerAvatar.position.set(
+        this.position.x,
+        this.position.y - (this.isSitting ? 0.35 : 0),
+        this.position.z
+      );
+      this.playerAvatar.rotation.y = this.yaw;
+
+      if (this.avatarHead) {
+        this.avatarHead.rotation.x = this.pitch;
+      }
+
+      const horizSpeed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.z * this.velocity.z);
+
+      if (this.isSitting) {
+        this.avatarLegL.rotation.x = -1.45;
+        this.avatarLegR.rotation.x = -1.45;
+        this.avatarArmL.rotation.x = 0.25;
+        this.avatarArmR.rotation.x = 0.25;
+      } else if (horizSpeed > 0.1) {
+        const swing = Math.sin(this.walkBobTime) * 0.65;
+        this.avatarLegL.rotation.x = swing;
+        this.avatarLegR.rotation.x = -swing;
+        this.avatarArmL.rotation.x = -swing * 0.7;
+        this.avatarArmR.rotation.x = swing * 0.7;
+      } else {
+        this.avatarLegL.rotation.x = 0;
+        this.avatarLegR.rotation.x = 0;
+        this.avatarArmL.rotation.x = 0;
+        this.avatarArmR.rotation.x = 0;
+      }
+    }
   }
 
   private updateMovement(dt: number) {
@@ -607,12 +681,38 @@ export class Player {
   }
 
   private updateCameraTransform() {
-    const curEye = this.isSneaking ? 1.35 : this.eyeHeight;
-    this.camera.position.set(this.position.x, this.position.y + curEye, this.position.z);
-
-    // Apply rotation: yaw around world Y, pitch around local X
+    const curEye = this.isSneaking ? 1.35 : (this.isSitting ? 1.05 : this.eyeHeight);
+    const targetPos = new THREE.Vector3(this.position.x, this.position.y + curEye, this.position.z);
     const euler = new THREE.Euler(this.pitch, this.yaw, 0, 'YXZ');
-    this.camera.quaternion.setFromEuler(euler);
+
+    if (this.cameraMode === 0) {
+      // First Person (1P)
+      this.camera.position.copy(targetPos);
+      this.camera.quaternion.setFromEuler(euler);
+      if (this.playerAvatar) this.playerAvatar.visible = false;
+      if (this.handGroup) this.handGroup.visible = !this.isSitting;
+      if (this.firstPersonLegs) this.firstPersonLegs.visible = this.isSitting;
+    } else {
+      // Third Person (3P)
+      if (this.playerAvatar) this.playerAvatar.visible = true;
+      if (this.handGroup) this.handGroup.visible = false;
+      if (this.firstPersonLegs) this.firstPersonLegs.visible = false;
+
+      const dist = 3.6;
+      const dir = new THREE.Vector3(0, 0, -1).applyEuler(euler);
+
+      if (this.cameraMode === 1) {
+        // Third Person Behind
+        this.camera.position.copy(targetPos).addScaledVector(dir, -dist);
+        this.camera.position.y += 0.45;
+        this.camera.quaternion.setFromEuler(euler);
+      } else {
+        // Third Person Front (looking at Lakshya)
+        this.camera.position.copy(targetPos).addScaledVector(dir, dist * 0.9);
+        this.camera.position.y += 0.2;
+        this.camera.lookAt(targetPos);
+      }
+    }
 
     // Sprint FOV effect
     const targetFOV = this.isSprinting ? 80 : 70;
@@ -742,4 +842,186 @@ export class Player {
     this.velocity.set(0, 0, 0);
     this.updateCameraTransform();
   }
+
+  // Toggle Sit / Rest Emote (Photos 1, 2, 3, 4)
+  public toggleSit() {
+    this.isSitting = !this.isSitting;
+    if (this.isSitting) {
+      this.velocity.set(0, 0, 0);
+    }
+  }
+
+  // Cycle Camera Mode (1P -> 3P Behind -> 3P Front)
+  public cycleCameraMode() {
+    this.cameraMode = (this.cameraMode + 1) % 3;
+    sound.playClick();
+  }
+
+  // Photo-Inspired 3D Lakshya Avatar
+  private createLakshyaAvatar() {
+    this.playerAvatar = new THREE.Group();
+
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 });
+    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const denimMat = new THREE.MeshLambertMaterial({ color: 0x2563eb });
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x1c1917 });
+    const shoeBlack = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const shoeWhite = new THREE.MeshLambertMaterial({ color: 0xffffff });
+
+    // Head
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 1.45, 0);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
+    headGroup.add(headMesh);
+
+    // Textured dark hair with modern side taper (Photos 2 & 4)
+    const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.22, 0.53), hairMat);
+    hairMesh.position.set(0, 0.18, 0);
+    headGroup.add(hairMesh);
+
+    const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.15), hairMat);
+    fringe.position.set(0.02, 0.18, 0.24);
+    headGroup.add(fringe);
+
+    // Eyes
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    for (const side of [-0.12, 0.12]) {
+      const eye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
+      eye.position.set(side, 0.02, 0.255);
+      headGroup.add(eye);
+      const pupil = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.03), pupilMat);
+      pupil.position.set(side, 0.02, 0.26);
+      headGroup.add(pupil);
+    }
+    this.avatarHead = headGroup;
+    this.playerAvatar.add(headGroup);
+
+    // Torso (Oversized Black Graphic Streetwear Tee)
+    const torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.28), shirtMat);
+    torsoMesh.position.set(0, 0.9, 0);
+    this.playerAvatar.add(torsoMesh);
+
+    // Pixel Graphic Print on Back & Front
+    const printFront = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.02), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
+    printFront.position.set(0, 0.94, 0.145);
+    this.playerAvatar.add(printFront);
+
+    const printBack = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.02), new THREE.MeshBasicMaterial({ color: 0xf1f5f9 }));
+    printBack.position.set(0, 0.92, -0.145);
+    this.playerAvatar.add(printBack);
+
+    // Arms
+    this.avatarArmL = new THREE.Group();
+    this.avatarArmL.position.set(-0.38, 1.15, 0);
+    const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
+    sleeveL.position.set(0, -0.16, 0);
+    this.avatarArmL.add(sleeveL);
+    const forearmL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
+    forearmL.position.set(0, -0.48, 0);
+    this.avatarArmL.add(forearmL);
+    this.playerAvatar.add(this.avatarArmL);
+
+    this.avatarArmR = new THREE.Group();
+    this.avatarArmR.position.set(0.38, 1.15, 0);
+    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
+    sleeveR.position.set(0, -0.16, 0);
+    this.avatarArmR.add(sleeveR);
+    const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
+    forearmR.position.set(0, -0.48, 0);
+    this.avatarArmR.add(forearmR);
+
+    // Diamond Pickaxe in Hand
+    const handPick = this.createMiniPickaxe();
+    handPick.position.set(0, -0.65, 0.15);
+    handPick.rotation.set(0.6, 0, 0);
+    this.avatarArmR.add(handPick);
+    this.playerAvatar.add(this.avatarArmR);
+
+    // Legs (Relaxed Denim Jeans + Two-Tone Skate Sneakers)
+    this.avatarLegL = this.createLegWithShoe(denimMat, shoeBlack, shoeWhite);
+    this.avatarLegL.position.set(-0.14, 0.55, 0);
+    this.playerAvatar.add(this.avatarLegL);
+
+    this.avatarLegR = this.createLegWithShoe(denimMat, shoeBlack, shoeWhite);
+    this.avatarLegR.position.set(0.14, 0.55, 0);
+    this.playerAvatar.add(this.avatarLegR);
+
+    this.playerAvatar.visible = false;
+    this.world.scene.add(this.playerAvatar);
+  }
+
+  private createLegWithShoe(denimMat: THREE.Material, shoeBlack: THREE.Material, shoeWhite: THREE.Material): THREE.Group {
+    const group = new THREE.Group();
+
+    // Jeans
+    const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.45, 0.23), denimMat);
+    pants.position.set(0, -0.22, 0);
+    group.add(pants);
+
+    // Two-Tone Skate Sneakers (Photos 1, 3)
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.34), shoeWhite);
+    sole.position.set(0, -0.5, 0.04);
+    group.add(sole);
+
+    const upper = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.32), shoeBlack);
+    upper.position.set(0, -0.41, 0.04);
+    group.add(upper);
+
+    const jazzStripe = new THREE.Mesh(new THREE.BoxGeometry(0.245, 0.04, 0.22), shoeWhite);
+    jazzStripe.position.set(0, -0.41, 0.04);
+    group.add(jazzStripe);
+
+    return group;
+  }
+
+  private createMiniPickaxe(): THREE.Group {
+    const group = new THREE.Group();
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.04), new THREE.MeshLambertMaterial({ color: 0x8b5a2b }));
+    handle.position.set(0, 0.15, 0);
+    group.add(handle);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.06), new THREE.MeshLambertMaterial({ color: 0x38bdf8 }));
+    head.position.set(0, 0.38, 0);
+    group.add(head);
+    return group;
+  }
+
+  // First-Person Legs visible when looking down in Sit Mode (Photos 1 & 3)
+  private setupFirstPersonLegs() {
+    this.firstPersonLegs = new THREE.Group();
+    this.firstPersonLegs.position.set(0, -0.45, -0.45);
+
+    const denimMat = new THREE.MeshLambertMaterial({ color: 0x2563eb });
+    const shoeBlack = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const shoeWhite = new THREE.MeshLambertMaterial({ color: 0xffffff });
+
+    for (const side of [-0.18, 0.18]) {
+      const leg = new THREE.Group();
+      leg.position.set(side, 0, 0);
+
+      const pants = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.7), denimMat);
+      pants.position.set(0, -0.05, -0.28);
+      pants.rotation.x = -0.18;
+      leg.add(pants);
+
+      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.08, 0.38), shoeWhite);
+      sole.position.set(0, -0.16, -0.62);
+      leg.add(sole);
+
+      const upper = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.36), shoeBlack);
+      upper.position.set(0, -0.06, -0.62);
+      leg.add(upper);
+
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.235, 0.04, 0.24), shoeWhite);
+      stripe.position.set(0, -0.06, -0.62);
+      leg.add(stripe);
+
+      this.firstPersonLegs.add(leg);
+    }
+
+    this.firstPersonLegs.visible = false;
+    this.camera.add(this.firstPersonLegs);
+  }
+
 }

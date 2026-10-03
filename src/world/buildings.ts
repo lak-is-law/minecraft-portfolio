@@ -50,6 +50,16 @@ export class WorldBuilder {
     this.buildRapunzelTower();
     this.buildSundropHarborAndBeacon();
     this.buildGrandBoulevardsAndFoliage();
+
+    // Cardinal Terrains & World Wonders
+    this.buildNorthSnowyMountains();
+    this.buildTajMahal(0, -118);
+    this.buildActiveVolcano(-105, -25);
+    this.buildMerlionStatue(18, 98);
+    this.buildLakTower(98, 0);
+    this.buildSouthBeachAndOcean();
+    this.buildEastEmeraldValley();
+    this.buildWestTheEndDimension();
   }
 
   // 1. Terrain: Vast 160x160 world foundation
@@ -990,5 +1000,637 @@ export class WorldBuilder {
       }
     }
     this.setBlock(x, groundY + 7, z, 'leaves');
+  }
+
+  // 14. North Snowy Mountains & Frostpeak Lookouts (Inspired by user photos 3 & 4)
+  private buildNorthSnowyMountains() {
+    for (let x = -55; x <= 55; x += 2) {
+      for (let z = -82; z >= -135; z -= 2) {
+        const distNorth = (-z - 80);
+        const wave = Math.sin(x * 0.1) * 5 + Math.cos(z * 0.08) * 6;
+        const height = Math.max(1, Math.min(26, Math.floor(distNorth * 0.45 + wave)));
+
+        if (height > 0) {
+          const blockType = height > 12 ? 'snow' : (height > 5 ? 'snow_grass' : 'stone_bricks');
+          this.setBlock(x, height, z, blockType);
+          this.setBlock(x + 1, height, z, blockType);
+          this.setBlock(x, height, z - 1, blockType);
+          this.setBlock(x + 1, height, z - 1, blockType);
+
+          if (height > 4 && (x % 4 === 0 || z % 4 === 0)) {
+            for (let y = 1; y < height; y += 2) {
+              this.setBlock(x, y, z, 'cobblestone');
+            }
+          }
+        }
+      }
+    }
+
+    // Alpine Spruce Trees in the mountain valleys
+    const spruceLocs = [
+      [-30, -90], [30, -90], [-40, -105], [40, -105],
+      [-20, -125], [20, -125], [-35, -128], [35, -128]
+    ];
+    for (const [sx, sz] of spruceLocs) {
+      this.buildSpruceTree(sx, 8, sz);
+    }
+
+    // Dizzying Cliff Overlook Ledge (Recreating Photo 3)
+    const ox = 0;
+    const oz = -92;
+    const oy = 16;
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(ox + dx, oy, oz + dz, 'oak_planks');
+        if (Math.abs(dx) === 4 || dz === -3) {
+          this.setBlock(ox + dx, oy + 1, oz + dz, 'cobblestone');
+        }
+      }
+    }
+    this.setBlock(ox, oy + 1, oz + 3, 'glowstone');
+    this.setBlock(ox, oy + 1, oz - 2, 'stone_bricks', {
+      type: 'sign',
+      title: 'Frostpeak Overlook',
+      text: 'Breathtaking mountain heights overlooking the clouds. Press [X] to sit and dangle your legs off the cliff into the gorge!'
+    });
+  }
+
+  private buildSpruceTree(x: number, groundY: number, z: number) {
+    const trunkH = 8;
+    for (let y = groundY; y <= groundY + trunkH; y++) {
+      this.setBlock(x, y, z, 'spruce_log');
+    }
+    const tiers = [
+      { dy: 4, r: 3 },
+      { dy: 5, r: 2 },
+      { dy: 6, r: 2 },
+      { dy: 7, r: 1 },
+      { dy: 8, r: 1 },
+      { dy: 9, r: 0 }
+    ];
+    for (const t of tiers) {
+      for (let dx = -t.r; dx <= t.r; dx++) {
+        for (let dz = -t.r; dz <= t.r; dz++) {
+          if (Math.abs(dx) === t.r && Math.abs(dz) === t.r && t.r > 1) continue;
+          if (dx !== 0 || dz !== 0 || t.dy > trunkH) {
+            this.setBlock(x + dx, groundY + t.dy, z + dz, 'spruce_leaves');
+          }
+        }
+      }
+    }
+  }
+
+  // 15. The Taj Mahal (Wonder of the World in White Marble & Quartz)
+  private buildTajMahal(cx: number, cz: number) {
+    const baseY = 14;
+
+    // Grand Raised Quartz Podium (26x26)
+    for (let x = cx - 13; x <= cx + 13; x++) {
+      for (let z = cz - 13; z <= cz + 13; z++) {
+        this.setBlock(x, baseY, z, 'quartz_block');
+        this.setBlock(x, baseY + 1, z, 'quartz_block');
+      }
+    }
+
+    // 4 Soaring Corner Minarets
+    const minarets = [
+      [cx - 11, cz - 11], [cx + 11, cz - 11],
+      [cx - 11, cz + 11], [cx + 11, cz + 11]
+    ];
+    for (const [mx, mz] of minarets) {
+      for (let y = baseY + 2; y <= baseY + 24; y++) {
+        this.setBlock(mx, y, mz, 'quartz_pillar');
+      }
+      for (const by of [baseY + 10, baseY + 18]) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            if (dx !== 0 || dz !== 0) {
+              this.setBlock(mx + dx, by, mz + dz, 'quartz_block');
+            }
+          }
+        }
+      }
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(mx + dx, baseY + 25, mz + dz, 'quartz_block');
+        }
+      }
+      this.setBlock(mx, baseY + 26, mz, 'gold_block');
+      this.setBlock(mx, baseY + 27, mz, 'glowstone');
+    }
+
+    // Main Mausoleum Sanctum (14x14)
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        for (let y = baseY + 2; y <= baseY + 12; y++) {
+          const isOuter = Math.abs(x - cx) === 7 || Math.abs(z - cz) === 7;
+          if (isOuter) {
+            const isPortal = (Math.abs(x - cx) <= 2 && (Math.abs(z - cz) === 7)) ||
+                             (Math.abs(z - cz) <= 2 && (Math.abs(x - cx) === 7));
+            if (isPortal && y <= baseY + 9) {
+              if (y === baseY + 9 || Math.abs(x - cx) === 2 || Math.abs(z - cz) === 2) {
+                this.setBlock(x, y, z, 'gold_block');
+              } else {
+                if (y === baseY + 2) this.setBlock(x, y, z, 'quartz_block');
+              }
+            } else {
+              this.setBlock(x, y, z, 'quartz_block');
+            }
+          }
+        }
+      }
+    }
+
+    // Roof & Parapet
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        this.setBlock(x, baseY + 12, z, 'quartz_block');
+        if (Math.abs(x - cx) === 7 || Math.abs(z - cz) === 7) {
+          this.setBlock(x, baseY + 13, z, (x + z) % 2 === 0 ? 'quartz_block' : 'gold_block');
+        }
+      }
+    }
+
+    // Central Bulbous Onion Dome (Radius 5)
+    for (let dy = 0; dy <= 7; dy++) {
+      const r = dy < 3 ? 4.5 : (dy < 6 ? 4.8 - (dy - 3) * 0.8 : 2.0 - (dy - 5) * 1.0);
+      for (let dx = -5; dx <= 5; dx++) {
+        for (let dz = -5; dz <= 5; dz++) {
+          const d = Math.sqrt(dx * dx + dz * dz);
+          if (d <= r && d >= r - 1.2) {
+            this.setBlock(cx + dx, baseY + 13 + dy, cz + dz, 'quartz_block');
+          }
+        }
+      }
+    }
+
+    // Golden Finial Spire
+    this.setBlock(cx, baseY + 21, cz, 'gold_block');
+    this.setBlock(cx, baseY + 22, cz, 'gold_block');
+    this.setBlock(cx, baseY + 23, cz, 'glowstone');
+
+    // 4 Corner Chattris (Roof Cupolas)
+    const chattris = [
+      [cx - 4, cz - 4], [cx + 4, cz - 4],
+      [cx - 4, cz + 4], [cx + 4, cz + 4]
+    ];
+    for (const [chx, chz] of chattris) {
+      for (let y = baseY + 13; y <= baseY + 15; y++) {
+        this.setBlock(chx, y, chz, 'quartz_pillar');
+      }
+      this.setBlock(chx, baseY + 16, chz, 'gold_block');
+      this.setBlock(chx, baseY + 17, chz, 'glowstone');
+    }
+
+    // Ceremonial Reflecting Pool stretching Southward
+    for (let z = cz + 14; z <= cz + 30; z++) {
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        const isBorder = Math.abs(x - cx) === 3;
+        if (isBorder) {
+          this.setBlock(x, baseY, z, 'sandstone');
+          this.setBlock(x, baseY + 1, z, 'sandstone');
+        } else {
+          this.setBlock(x, baseY, z, 'water');
+          if (z % 5 === 0 && x === cx) {
+            this.setBlock(x, baseY, z, 'glowstone');
+            this.setBlock(x, baseY + 1, z, 'quartz_pillar');
+          }
+        }
+      }
+    }
+
+    // Monument Plaque
+    this.setBlock(cx, baseY + 2, cz + 13, 'quartz_block', {
+      type: 'sign',
+      title: 'The Taj Mahal',
+      text: 'Architectural wonder of the world. Handcrafted in pure white marble and quartz, flanked by 4 towering minarets and reflecting pool.'
+    });
+  }
+
+  // 16. Active Volcanic Caldera & Molten Lava Falls
+  private buildActiveVolcano(cx: number, cz: number) {
+    const maxR = 20;
+    const topY = 22;
+
+    for (let y = 1; y <= topY; y++) {
+      const r = Math.max(4, Math.floor(maxR - y * 0.7));
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dz = -r; dz <= r; dz++) {
+          const d = Math.sqrt(dx * dx + dz * dz);
+          if (d <= r && d >= r - 2) {
+            const isMagma = (dx + dz + y) % 3 === 0;
+            this.setBlock(cx + dx, y, cz + dz, isMagma ? 'magma_block' : 'obsidian');
+          }
+        }
+      }
+    }
+
+    // Summit Caldera Filled with Glowing Molten Lava
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) {
+        const d = Math.sqrt(dx * dx + dz * dz);
+        if (d <= 4) {
+          this.setBlock(cx + dx, topY - 1, cz + dz, 'lava');
+          if (dx === 0 && dz === 0) {
+            this.setBlock(cx, topY, cz, 'magma_block');
+          }
+        }
+      }
+    }
+
+    // 3 Cascading Lava Falls down the mountain slopes
+    // 1. East spillway towards central realm
+    for (let i = 0; i <= 14; i++) {
+      const y = Math.max(1, topY - Math.floor(i * 1.4));
+      this.setBlock(cx + 4 + i, y, cz, 'lava');
+      this.setBlock(cx + 4 + i, y - 1, cz, 'magma_block');
+      this.setBlock(cx + 4 + i, y, cz - 1, 'obsidian');
+      this.setBlock(cx + 4 + i, y, cz + 1, 'obsidian');
+    }
+    for (let dx = 18; dx <= 23; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(cx + dx, 0, cz + dz, 'obsidian');
+        this.setBlock(cx + dx, 1, cz + dz, (dx + dz) % 2 === 0 ? 'lava' : 'magma_block');
+      }
+    }
+
+    // 2. North spillway
+    for (let i = 0; i <= 12; i++) {
+      const y = Math.max(1, topY - Math.floor(i * 1.5));
+      this.setBlock(cx, y, cz - 4 - i, 'lava');
+      this.setBlock(cx, y - 1, cz - 4 - i, 'magma_block');
+    }
+
+    // 3. South spillway
+    for (let i = 0; i <= 12; i++) {
+      const y = Math.max(1, topY - Math.floor(i * 1.5));
+      this.setBlock(cx, y, cz + 4 + i, 'lava');
+      this.setBlock(cx, y - 1, cz + 4 + i, 'magma_block');
+    }
+
+    // Volcano Plaque
+    this.setBlock(cx + 17, 2, cz + 4, 'obsidian', {
+      type: 'sign',
+      title: 'Mount Obsidian Caldera',
+      text: 'Active volcanic mountain bordering The End dimension. Glowing magma rock fissures and cascading molten lava waterfalls.'
+    });
+  }
+
+  // 17. The Singapore Merlion Statue & Water Spout
+  private buildMerlionStatue(cx: number, cz: number) {
+    for (let y = 1; y <= 3; y++) {
+      for (let dx = -3; dx <= 3; dx++) {
+        for (let dz = -3; dz <= 3; dz++) {
+          if (dx * dx + dz * dz <= 9) {
+            this.setBlock(cx + dx, y, cz + dz, 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    for (let y = 4; y <= 9; y++) {
+      const r = 2.2 - (y - 4) * 0.15;
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          if (dx * dx + dz * dz <= r * r) {
+            this.setBlock(cx + dx, y, cz + dz, (y % 2 === 0) ? 'prismarine_bricks' : 'purpur_block');
+          }
+        }
+      }
+    }
+
+    this.setBlock(cx, 4, cz + 3, 'prismarine_bricks');
+    this.setBlock(cx, 5, cz + 4, 'prismarine_bricks');
+    this.setBlock(cx - 1, 6, cz + 4, 'prismarine_bricks');
+    this.setBlock(cx + 1, 6, cz + 4, 'prismarine_bricks');
+
+    for (let y = 10; y <= 13; y++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 1; dz++) {
+          this.setBlock(cx + dx, y, cz + dz, 'sandstone');
+        }
+      }
+    }
+
+    for (let y = 10; y <= 14; y++) {
+      for (let dx = -3; dx <= 3; dx++) {
+        for (let dz = -1; dz <= 2; dz++) {
+          if (Math.abs(dx) === 3 || dz === 2 || y === 14) {
+            this.setBlock(cx + dx, y, cz + dz, 'gold_block');
+          }
+        }
+      }
+    }
+
+    this.setBlock(cx, 11, cz - 3, 'sandstone');
+    this.setBlock(cx - 1, 12, cz - 2, 'glowstone');
+    this.setBlock(cx + 1, 12, cz - 2, 'glowstone');
+
+    const spoutPoints = [
+      [cx, 11, cz - 3],
+      [cx, 10, cz - 4],
+      [cx, 9, cz - 5],
+      [cx, 7, cz - 6],
+      [cx, 5, cz - 7],
+      [cx, 3, cz - 8],
+      [cx, 1, cz - 9],
+      [cx, 0, cz - 9]
+    ];
+    for (const [sx, sy, sz] of spoutPoints) {
+      this.setBlock(sx, sy, sz, 'water');
+    }
+
+    this.setBlock(cx - 4, 3, cz - 2, 'sandstone', {
+      type: 'sign',
+      title: 'The Singapore Merlion',
+      text: 'Iconic national symbol of Singapore. Half lion and half fish, spouting a steady stream of water into the southern ocean.'
+    });
+  }
+
+  // 18. Lak Tower (LK Monument: 55-Block Tall Eiffel Tower Inspired Wonder)
+  private buildLakTower(cx: number, cz: number) {
+    const baseY = 0;
+
+    const legBases = [
+      { x: cx - 8, z: cz - 8, dirX: 1, dirZ: 1 },
+      { x: cx + 8, z: cz - 8, dirX: -1, dirZ: 1 },
+      { x: cx - 8, z: cz + 8, dirX: 1, dirZ: -1 },
+      { x: cx + 8, z: cz + 8, dirX: -1, dirZ: -1 },
+    ];
+
+    for (const leg of legBases) {
+      for (let dy = 0; dy <= 16; dy++) {
+        const t = dy / 16;
+        const curX = Math.round(leg.x + leg.dirX * t * 4);
+        const curZ = Math.round(leg.z + leg.dirZ * t * 4);
+
+        for (let ox = -1; ox <= 1; ox++) {
+          for (let oz = -1; oz <= 1; oz++) {
+            this.setBlock(curX + ox, baseY + 1 + dy, curZ + oz, 'iron_block');
+          }
+        }
+      }
+    }
+
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      const archH = Math.floor(10 - Math.abs(x - cx) * 1.2);
+      if (archH > 0) {
+        this.setBlock(x, baseY + archH, cz - 6, 'stone_bricks');
+        this.setBlock(x, baseY + archH, cz + 6, 'stone_bricks');
+      }
+    }
+    for (let z = cz - 5; z <= cz + 5; z++) {
+      const archH = Math.floor(10 - Math.abs(z - cz) * 1.2);
+      if (archH > 0) {
+        this.setBlock(cx - 6, baseY + archH, z, 'stone_bricks');
+        this.setBlock(cx + 6, baseY + archH, z, 'stone_bricks');
+      }
+    }
+
+    // First Sky Observation Deck (Y = 17, 14x14)
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        this.setBlock(x, baseY + 17, z, 'oak_planks');
+        if (Math.abs(x - cx) === 7 || Math.abs(z - cz) === 7) {
+          this.setBlock(x, baseY + 18, z, 'iron_block');
+          if ((x + z) % 3 === 0) {
+            this.setBlock(x, baseY + 19, z, 'glowstone');
+          }
+        }
+      }
+    }
+
+    // Middle Lattice Tower Section (Y = 18 to 33)
+    for (let y = baseY + 18; y <= baseY + 33; y++) {
+      const halfW = 4;
+      for (let x = cx - halfW; x <= cx + halfW; x++) {
+        for (let z = cz - halfW; z <= cz + halfW; z++) {
+          const isCorner = Math.abs(x - cx) === halfW && Math.abs(z - cz) === halfW;
+          if (isCorner) {
+            this.setBlock(x, y, z, 'iron_block');
+          }
+        }
+      }
+    }
+
+    // Monumental Illuminated LK Monogram on West Face
+    for (let y = baseY + 21; y <= baseY + 30; y++) {
+      this.setBlock(cx - 4, y, cz - 3, 'gold_block');
+    }
+    this.setBlock(cx - 4, baseY + 21, cz - 2, 'gold_block');
+    this.setBlock(cx - 4, baseY + 21, cz - 1, 'gold_block');
+
+    for (let y = baseY + 21; y <= baseY + 30; y++) {
+      this.setBlock(cx - 4, y, cz + 1, 'gold_block');
+    }
+    this.setBlock(cx - 4, baseY + 25, cz + 2, 'gold_block');
+    this.setBlock(cx - 4, baseY + 28, cz + 3, 'gold_block');
+    this.setBlock(cx - 4, baseY + 30, cz + 4, 'gold_block');
+    this.setBlock(cx - 4, baseY + 23, cz + 2, 'gold_block');
+    this.setBlock(cx - 4, baseY + 21, cz + 3, 'gold_block');
+
+    // Second Sky Observation Deck (Y = 34, 10x10)
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      for (let z = cz - 5; z <= cz + 5; z++) {
+        this.setBlock(x, baseY + 34, z, 'glass');
+        if (Math.abs(x - cx) === 5 || Math.abs(z - cz) === 5) {
+          this.setBlock(x, baseY + 35, z, 'iron_block');
+        }
+      }
+    }
+
+    // Upper Tapering Spire (Y = 35 to 54)
+    for (let y = baseY + 35; y <= baseY + 45; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(cx + dx, y, cz + dz, 'quartz_pillar');
+        }
+      }
+    }
+    for (let y = baseY + 46; y <= baseY + 53; y++) {
+      this.setBlock(cx, y, cz, 'iron_block');
+    }
+
+    // Pinnacle Beacon Crown (Y = 54 to 56)
+    this.setBlock(cx, baseY + 54, cz, 'gold_block');
+    this.setBlock(cx, baseY + 55, cz, 'glowstone');
+
+    // Plaque at Tower Base
+    this.setBlock(cx - 7, baseY + 2, cz, 'iron_block', {
+      type: 'sign',
+      title: 'Lak Tower (LK Monument)',
+      text: 'Soaring 55-block architectural wonder inspired by the Eiffel Tower. Features the illuminated LK monogram and high-altitude glass observation sky deck.'
+    });
+  }
+
+  // 19. South Beach & Azure Ocean Shoreline (Recreating Photo 2)
+  private buildSouthBeachAndOcean() {
+    for (let x = -65; x <= 65; x++) {
+      for (let z = 75; z <= 88; z++) {
+        const isDune = (x * 3 + z * 5) % 11 === 0;
+        this.setBlock(x, isDune ? 2 : 1, z, 'sand');
+        this.setBlock(x, 0, z, 'sandstone');
+      }
+    }
+
+    for (let x = -75; x <= 75; x++) {
+      for (let z = 89; z <= 135; z++) {
+        this.setBlock(x, 0, z, 'water');
+        if (z % 14 === 0 && x % 14 === 0) {
+          this.setBlock(x, -1, z, 'glowstone');
+        }
+      }
+    }
+
+    const bx = 10;
+    const bz = 82;
+    for (let dx = -3; dx <= 4; dx++) {
+      for (let dz = -2; dz <= 3; dz++) {
+        const h = 2 + (dx > 0 ? 1 : 0);
+        for (let y = 1; y <= h; y++) {
+          this.setBlock(bx + dx, y, bz + dz, (dx + dz) % 2 === 0 ? 'mossy_stone_bricks' : 'cobblestone');
+        }
+      }
+    }
+
+    this.setBlock(bx - 2, 3, bz, 'glowstone');
+    this.setBlock(bx + 3, 4, bz + 1, 'glowstone');
+    this.setBlock(bx - 1, 3, bz + 2, 'rose_vines');
+    this.setBlock(bx + 1, 4, bz - 1, 'rose_vines');
+
+    this.setBlock(bx, 4, bz, 'mossy_stone_bricks', {
+      type: 'sign',
+      title: 'Sunset Beach Bluff',
+      text: 'Warm seaside bluffs overlooking the ocean. Rest on the mossy rocks with your cat companion and watch the sea dragon soar!'
+    });
+
+    this.buildSailingShip(-25, 0, 112);
+    this.buildSailingShip(40, 0, 120);
+  }
+
+  private buildSailingShip(x: number, y: number, z: number) {
+    for (let dz = -4; dz <= 4; dz++) {
+      const w = Math.abs(dz) === 4 ? 1 : 2;
+      for (let dx = -w; dx <= w; dx++) {
+        this.setBlock(x + dx, y, z + dz, 'oak_planks');
+        if (Math.abs(dx) === w || Math.abs(dz) === 4) {
+          this.setBlock(x + dx, y + 1, z + dz, 'log');
+        }
+      }
+    }
+    for (let my = 1; my <= 9; my++) {
+      this.setBlock(x, y + my, z, 'log');
+    }
+    for (let sy = 4; sy <= 8; sy++) {
+      for (let sx = -2; sx <= 2; sx++) {
+        this.setBlock(x + sx, y + sy, z - 1, 'quartz_block');
+      }
+    }
+    this.setBlock(x, y + 10, z, 'glowstone');
+  }
+
+  // 20. East Emerald Valley & River Canyon (Recreating Photo 4)
+  private buildEastEmeraldValley() {
+    for (let x = 75; x <= 135; x += 2) {
+      for (let z = -45; z <= 45; z += 2) {
+        if (Math.abs(z) <= 4) {
+          this.setBlock(x, 0, z, 'water');
+          this.setBlock(x + 1, 0, z, 'water');
+          this.setBlock(x, 0, z + 1, 'water');
+          this.setBlock(x + 1, 0, z + 1, 'water');
+          continue;
+        }
+
+        const h = Math.max(1, Math.floor(Math.sin(x * 0.08) * 4 + Math.cos(z * 0.1) * 5 + (x - 75) * 0.15));
+        for (let y = 1; y <= h; y++) {
+          this.setBlock(x, y, z, y === h ? 'grass' : 'dirt');
+          this.setBlock(x + 1, y, z, y === h ? 'grass' : 'dirt');
+          this.setBlock(x, y, z + 1, y === h ? 'grass' : 'dirt');
+          this.setBlock(x + 1, y, z + 1, y === h ? 'grass' : 'dirt');
+        }
+      }
+    }
+
+    for (let z = -5; z <= 5; z++) {
+      this.setBlock(92, 4, z, 'stone_bricks');
+      this.setBlock(93, 4, z, 'stone_bricks');
+      if (Math.abs(z) === 5) {
+        this.setBlock(92, 5, z, 'glowstone');
+        this.setBlock(93, 5, z, 'glowstone');
+      }
+    }
+
+    const vx = 84;
+    const vy = 12;
+    const vz = -14;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(vx + dx, vy, vz + dz, 'stone_bricks');
+      }
+    }
+    this.setBlock(vx - 1, vy + 1, vz, 'diamond_block');
+    this.setBlock(vx + 1, vy + 1, vz, 'amethyst_block');
+    this.setBlock(vx, vy + 1, vz, 'oak_planks', {
+      type: 'sign',
+      title: 'Emerald Valley Viewpoint',
+      text: 'Sunlit mountain ledge overlooking the lush green valley and river canyon. Recreating Lakshya\'s iconic cliffside sit with diamond pickaxe.'
+    });
+  }
+
+  // 21. West The End Dimension & Obsidian Spires (Recreating Photo 1)
+  private buildWestTheEndDimension() {
+    for (let x = -75; x >= -135; x -= 2) {
+      for (let z = -55; z <= 55; z += 2) {
+        const dVolcano = Math.sqrt((x + 105) * (x + 105) + (z + 25) * (z + 25));
+        if (dVolcano < 22) continue;
+
+        this.setBlock(x, 0, z, 'end_stone');
+        this.setBlock(x - 1, 0, z, 'end_stone');
+        this.setBlock(x, 0, z + 1, 'end_stone');
+        this.setBlock(x - 1, 0, z + 1, 'end_stone');
+
+        if ((x * 7 + z * 13) % 29 === 0) {
+          this.setBlock(x, 1, z, 'purpur_block');
+          this.setBlock(x, 2, z, 'purpur_block');
+        }
+      }
+    }
+
+    const spires = [
+      { x: -92, z: 12, h: 26 },
+      { x: -118, z: 18, h: 32 },
+      { x: -128, z: -10, h: 28 },
+      { x: -98, z: 32, h: 24 },
+      { x: -84, z: -40, h: 30 }
+    ];
+
+    for (const sp of spires) {
+      for (let y = 1; y <= sp.h; y++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            this.setBlock(sp.x + dx, y, sp.z + dz, 'obsidian');
+          }
+        }
+      }
+      this.setBlock(sp.x, sp.h + 1, sp.z, 'glowstone');
+      this.setBlock(sp.x, sp.h + 2, sp.z, 'amethyst_block');
+      this.setBlock(sp.x - 1, sp.h + 1, sp.z, 'amethyst_block');
+      this.setBlock(sp.x + 1, sp.h + 1, sp.z, 'amethyst_block');
+      this.setBlock(sp.x, sp.h + 1, sp.z - 1, 'amethyst_block');
+      this.setBlock(sp.x, sp.h + 1, sp.z + 1, 'amethyst_block');
+    }
+
+    const rx = -100;
+    const rz = 2;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(rx + dx, 1, rz + dz, 'purpur_block');
+      }
+    }
+    this.setBlock(rx, 2, rz, 'amethyst_block', {
+      type: 'sign',
+      title: 'The End Stargazing Slabs',
+      text: 'Mystical obsidian spires and End Crystals under the starry sky. Press [X] to sit back, relax, and watch the Ender Dragon soar overhead!'
+    });
   }
 }

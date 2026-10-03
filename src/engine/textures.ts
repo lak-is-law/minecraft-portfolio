@@ -616,6 +616,170 @@ export class TextureManager {
         ctx.fillRect(fx + 1, fy + 1, 1, 1);
       }
     }));
+
+    // 34. Quartz Block (Taj Mahal White Marble)
+    this.textures.set('quartz_block', createPixelTexture((ctx, s) => {
+      const rng = createRng(1701);
+      const whites = ['#f8fafc', '#ffffff', '#f1f5f9', '#e2e8f0'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = whites[Math.floor(rng() * whites.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, s - 1, s - 1);
+    }));
+
+    // 35. Quartz Pillar (Taj Mahal Minarets)
+    this.textures.set('quartz_pillar', createPixelTexture((ctx, s) => {
+      const rng = createRng(1801);
+      const whites = ['#ffffff', '#f8fafc', '#f1f5f9'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = whites[Math.floor(rng() * whites.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      // Vertical fluting lines
+      ctx.fillStyle = '#cbd5e1';
+      for (let x = 0; x < s; x += 4) {
+        ctx.fillRect(x, 0, 1, s);
+      }
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(0, 0, s, 1);
+      ctx.fillRect(0, s - 1, s, 1);
+    }));
+
+    // 36. Magma Block (Active Volcano)
+    this.textures.set('magma_block', createPixelTexture((ctx, s) => {
+      const rng = createRng(1901);
+      const darks = ['#1c1917', '#292524', '#44403c'];
+      const fires = ['#ea580c', '#f97316', '#facc15', '#ef4444', '#b91c1c'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          const isFire = (x % 3 === 0 && y % 2 === 0) || rng() < 0.28;
+          ctx.fillStyle = isFire ? fires[Math.floor(rng() * fires.length)] : darks[Math.floor(rng() * darks.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 37. Lava (Molten Volcanic Lava)
+    this.textures.set('lava', createPixelTexture((ctx, s) => {
+      const rng = createRng(2001);
+      const lavaShades = ['#ea580c', '#f97316', '#facc15', '#ef4444', '#dc2626'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = lavaShades[Math.floor(rng() * lavaShades.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 38. Snow (Crisp White Mountain Snow)
+    this.textures.set('snow', createPixelTexture((ctx, s) => {
+      const rng = createRng(2101);
+      const whites = ['#ffffff', '#f8fafc', '#f1f5f9', '#e0f2fe'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = whites[Math.floor(rng() * whites.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 39. Snow Side (Snow-capped dirt/stone cliff side)
+    this.textures.set('snow_side', createPixelTexture((ctx, s) => {
+      const rng = createRng(2201);
+      const dirtPalette = ['#866043', '#725238', '#5c412b'];
+      const snowPalette = ['#ffffff', '#f8fafc', '#f1f5f9'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = dirtPalette[Math.floor(rng() * dirtPalette.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      const snowDrops = [5, 4, 6, 5, 4, 7, 5, 4, 6, 5, 4, 5, 6, 4, 5, 4];
+      for (let x = 0; x < s; x++) {
+        for (let y = 0; y < snowDrops[x]; y++) {
+          ctx.fillStyle = snowPalette[Math.floor(rng() * snowPalette.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 40. Ice (Glacial Translucent Ice)
+    this.textures.set('ice', createPixelTexture((ctx, s) => {
+      const rng = createRng(2301);
+      const blues = ['#bae6fd', '#7dd3fc', '#a5f3fc', '#e0f2fe', '#38bdf8'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = blues[Math.floor(rng() * blues.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 41. End Stone (The End Realm Ground)
+    this.textures.set('end_stone', createPixelTexture((ctx, s) => {
+      const rng = createRng(2401);
+      const endTones = ['#e6ebb2', '#dbe29d', '#ccd48b', '#bec778', '#f3f7c4'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = endTones[Math.floor(rng() * endTones.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 42. Sandstone (Smooth Stratified Desert/Beach Stone)
+    this.textures.set('sandstone', createPixelTexture((ctx, s) => {
+      const rng = createRng(2501);
+      const sandTones = ['#e2c285', '#d4b16f', '#f0d49e', '#c7a35e'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = sandTones[Math.floor(rng() * sandTones.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.fillStyle = '#b5934f';
+      ctx.fillRect(0, 0, s, 1);
+      ctx.fillRect(0, 7, s, 1);
+      ctx.fillRect(0, 15, s, 1);
+    }));
+
+    // 43. Spruce Leaves (Alpine Pine Foliage)
+    this.textures.set('spruce_leaves', createPixelTexture((ctx, s) => {
+      const rng = createRng(2601);
+      const pineGreens = ['#14532d', '#166534', '#0f3d21', '#1e3a1f'];
+      ctx.clearRect(0, 0, s, s);
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          if (rng() > 0.18) {
+            ctx.fillStyle = pineGreens[Math.floor(rng() * pineGreens.length)];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }));
+
+    // 44. Spruce Log Side (Alpine Dark Wood)
+    this.textures.set('spruce_log_side', createPixelTexture((ctx, s) => {
+      const rng = createRng(2701);
+      const darkWoods = ['#3b2716', '#2c1c0f', '#4a331f', '#24160a'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = darkWoods[Math.floor(rng() * darkWoods.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.fillStyle = '#1c1107';
+      for (let y = 0; y < s; y += 4) {
+        ctx.fillRect(0, y, s, 1);
+      }
+    }));
   }
 
   private createMaterials() {
@@ -722,5 +886,46 @@ export class TextureManager {
       alphaTest: 0.5,
       side: THREE.DoubleSide
     }));
+
+    // Taj Mahal Materials
+    this.materials.set('quartz_block', new THREE.MeshLambertMaterial({ map: this.getTexture('quartz_block') }));
+    const qSide = new THREE.MeshLambertMaterial({ map: this.getTexture('quartz_pillar') });
+    const qTop = new THREE.MeshLambertMaterial({ map: this.getTexture('quartz_block') });
+    this.materials.set('quartz_pillar', [qSide, qSide, qTop, qTop, qSide, qSide]);
+
+    // Volcano & Lava Materials
+    this.materials.set('magma_block', new THREE.MeshLambertMaterial({
+      map: this.getTexture('magma_block'),
+      emissive: new THREE.Color(0xf97316),
+      emissiveIntensity: 0.4
+    }));
+    this.materials.set('lava', new THREE.MeshBasicMaterial({ map: this.getTexture('lava') }));
+
+    // Snow & Ice Materials
+    const snowMat = new THREE.MeshLambertMaterial({ map: this.getTexture('snow') });
+    this.materials.set('snow', snowMat);
+
+    const snowSideMat = new THREE.MeshLambertMaterial({ map: this.getTexture('snow_side') });
+    this.materials.set('snow_grass', [snowSideMat, snowSideMat, snowMat, dirtMat, snowSideMat, snowSideMat]);
+
+    this.materials.set('ice', new THREE.MeshLambertMaterial({
+      map: this.getTexture('ice'),
+      transparent: true,
+      opacity: 0.82
+    }));
+
+    // The End & Desert/Beach Materials
+    this.materials.set('end_stone', new THREE.MeshLambertMaterial({ map: this.getTexture('end_stone') }));
+    this.materials.set('sandstone', new THREE.MeshLambertMaterial({ map: this.getTexture('sandstone') }));
+
+    // Alpine Spruce Materials
+    this.materials.set('spruce_leaves', new THREE.MeshLambertMaterial({
+      map: this.getTexture('spruce_leaves'),
+      transparent: true,
+      alphaTest: 0.5,
+      side: THREE.DoubleSide
+    }));
+    const spruceLogSide = new THREE.MeshLambertMaterial({ map: this.getTexture('spruce_log_side') });
+    this.materials.set('spruce_log', [spruceLogSide, spruceLogSide, logTop, logTop, spruceLogSide, spruceLogSide]);
   }
 }

@@ -210,6 +210,18 @@ class Game {
       this.hud.updateFlyStatus(this.player.isFlying);
       sound.playClick();
     });
+
+    // Perspective & Sit Callbacks
+    this.hud.onTogglePerspective = () => {
+      this.player.cycleCameraMode();
+      const modes = ['First-Person (1P)', 'Third-Person Back (3P)', 'Third-Person Front (3P)'];
+      this.hud.pushChatMessage('Camera', `Perspective: ${modes[this.player.cameraMode]}`);
+    };
+
+    this.hud.onToggleSit = () => {
+      this.player.toggleSit();
+      this.hud.pushChatMessage('Emote', this.player.isSitting ? 'Sitting down and resting.' : 'Standing up.');
+    };
   }
 
   // Handle interaction with objects in world
@@ -333,7 +345,7 @@ class Game {
     // 5. Update HUD elements
     this.hud.updatePrompt(this.player.currentTarget);
     this.hud.updateF3(this.player.position, this.player.yaw, this.player.pitch, this.fps);
-    this.hud.updateMinimap(this.player.position, this.player.yaw);
+    this.hud.updateMinimap(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
     this.hud.updateFlyStatus(this.player.isFlying);
 
     // 6. Render
