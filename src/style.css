@@ -428,6 +428,181 @@ body, html {
   transform: translateY(-1px);
 }
 
+/* Field guide atlas */
+.mc-dialog.mc-max-map-dialog {
+  width: min(95vw, 1120px);
+  max-width: 1120px;
+  max-height: 94vh;
+  padding: 22px 26px 16px;
+  background: #101714;
+  border: 1px solid #425448;
+  border-radius: 12px;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, .72), inset 0 1px rgba(255,255,255,.07);
+}
+.mc-max-map-dialog .mc-dialog-header {
+  align-items: center;
+  margin: 0;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #344239;
+}
+.atlas-eyebrow {
+  margin: 0 0 8px;
+  color: #8fc39a;
+  font: 700 9px/1.4 monospace;
+  letter-spacing: .16em;
+}
+.atlas-eyebrow span { color: #d1b676; padding: 0 5px; }
+.mc-max-map-dialog .mc-dialog-title {
+  margin: 0 0 6px;
+  color: #f0eadb;
+  font: 600 clamp(19px, 2vw, 27px)/1.2 system-ui, sans-serif;
+  letter-spacing: -.035em;
+  text-shadow: none;
+}
+.mc-max-map-dialog .mc-dialog-subtitle {
+  color: #aab7aa;
+  font: 12px/1.5 system-ui, sans-serif;
+}
+.mc-max-map-dialog .mc-close-btn {
+  width: 36px;
+  height: 36px;
+  background: #1d2821;
+  border: 1px solid #425448;
+  border-radius: 7px;
+  color: #d6e2d6;
+}
+.mc-max-map-dialog .mc-close-btn:hover { background: #2c3a30; }
+.atlas-section-nav {
+  display: flex;
+  gap: 7px;
+  padding: 12px 0;
+  border-bottom: 1px solid #344239;
+}
+.atlas-section-nav a {
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #99aa9d;
+  font: 700 9px/1 monospace;
+  letter-spacing: .08em;
+  text-decoration: none;
+  transition: background .16s, color .16s, border-color .16s;
+}
+.atlas-section-nav a span { margin-left: 5px; color: #e5e8dc; }
+.atlas-section-nav a:hover, .atlas-section-nav a:focus-visible {
+  background: #202d24;
+  border-color: #526b56;
+  color: #c0e2c2;
+  outline: none;
+}
+.atlas-scroll-area { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #526456 #172019; }
+.atlas-map-section { padding: 14px 0 4px; }
+.mc-max-map-dialog .mc-map-top-status-bar {
+  min-height: 42px;
+  margin-bottom: 9px;
+  padding: 8px 12px;
+  background: #19231c;
+  border: 1px solid #35463a;
+  border-radius: 7px;
+  font: 700 9px/1.4 monospace;
+}
+.mc-max-map-dialog .gps-label, .mc-max-map-dialog .cursor-label { color: #9aaa9c; }
+.mc-max-map-dialog .gps-val { color: #e8d69f; }
+.mc-max-map-dialog .cursor-val { color: #a9d5ad; }
+.mc-max-map-canvas-container {
+  border: 1px solid #485b4b;
+  border-radius: 9px;
+  background: #101a1b;
+  box-shadow: inset 0 0 32px rgba(0,0,0,.35);
+}
+.atlas-map-caption {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 11px 3px 0;
+  color: #a8b5a9;
+  font: 700 8px/1.4 monospace;
+  letter-spacing: .06em;
+}
+.atlas-map-caption > span { display: inline-flex; align-items: center; gap: 6px; }
+.atlas-key-dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; }
+.atlas-key-player { background: #f07560; box-shadow: 0 0 8px #f07560; }
+.atlas-key-place { background: #d8c38e; }
+.atlas-key-line { width: 15px; border-top: 2px dashed #d8c38e; }
+.atlas-caption-hint { margin-left: auto; color: #75867a; font-weight: 400; letter-spacing: 0; }
+.atlas-content-section { padding: 29px 0 8px; scroll-margin-top: 0; }
+.atlas-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 0 14px; }
+.atlas-section-heading .atlas-eyebrow { margin-bottom: 5px; }
+.atlas-section-heading h3 { margin: 0; color: #eff0e7; font: 600 20px/1.2 system-ui, sans-serif; letter-spacing: -.025em; }
+.atlas-section-heading > span { padding-bottom: 2px; color: #8b9a8d; font: 700 8px/1.4 monospace; letter-spacing: .12em; }
+.atlas-region-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.atlas-region-card {
+  --atlas-accent: #95c598;
+  position: relative;
+  min-height: 192px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 15px 12px;
+  overflow: hidden;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--atlas-accent) 11%, #19211b), #151c17 72%);
+  border: 1px solid color-mix(in srgb, var(--atlas-accent) 35%, #344238);
+  border-radius: 8px;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.atlas-region-card::after { content: ''; position: absolute; width: 90px; height: 90px; top: -48px; right: -35px; border: 1px solid color-mix(in srgb, var(--atlas-accent) 30%, transparent); border-radius: 50%; box-shadow: 0 0 0 12px color-mix(in srgb, var(--atlas-accent) 4%, transparent), 0 0 0 25px color-mix(in srgb, var(--atlas-accent) 3%, transparent); pointer-events: none; }
+.atlas-region-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--atlas-accent) 70%, #344238); }
+.atlas-citadel { --atlas-accent: #d4b976; }
+.atlas-frost { --atlas-accent: #9cc8d1; }
+.atlas-sakura { --atlas-accent: #dc9dbb; }
+.atlas-raj { --atlas-accent: #d4c187; }
+.atlas-neoyork { --atlas-accent: #7cb9bb; }
+.atlas-pueblo { --atlas-accent: #d3986b; }
+.atlas-coast { --atlas-accent: #d9ba73; }
+.atlas-card-topline, .atlas-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.atlas-card-topline { color: var(--atlas-accent); font: 700 8px/1.3 monospace; letter-spacing: .1em; }
+.atlas-region-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--atlas-accent); box-shadow: 0 0 10px var(--atlas-accent); }
+.atlas-region-card h3 { margin: 13px 0 3px; color: #f1efe5; font: 600 15px/1.25 system-ui, sans-serif; letter-spacing: -.015em; }
+.atlas-region-subtitle { margin: 0; color: var(--atlas-accent); font: 600 10px/1.4 system-ui, sans-serif; }
+.atlas-region-detail { flex: 1; margin: 8px 0 12px; color: #aeb8ad; font: 11px/1.55 system-ui, sans-serif; }
+.atlas-card-bottom { padding-top: 9px; border-top: 1px solid rgba(220,230,216,.1); }
+.atlas-card-bottom > span { color: #829184; font: 700 7px/1.4 monospace; letter-spacing: .07em; }
+.atlas-region-warp { position: relative; z-index: 1; padding: 6px 9px; background: #25352a; border: 1px solid color-mix(in srgb, var(--atlas-accent) 45%, #334238); border-radius: 5px; color: var(--atlas-accent); font: 700 8px/1 monospace; cursor: pointer; }
+.atlas-region-warp:hover { background: var(--atlas-accent); color: #152018; }
+.atlas-destinations-section { padding-bottom: 22px; }
+.atlas-destination-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.atlas-destination { min-width: 0; display: flex; align-items: center; gap: 11px; padding: 11px 12px; text-align: left; background: #18211b; border: 1px solid #334138; border-radius: 7px; color: #e6e9df; cursor: pointer; transition: background .16s, border-color .16s, transform .16s; }
+.atlas-destination:hover { transform: translateY(-1px); background: #202d24; border-color: #708c70; }
+.atlas-destination-tag { flex: 0 0 83px; color: #d4c18c; font: 700 8px/1.4 monospace; letter-spacing: .07em; }
+.atlas-destination-copy { min-width: 0; display: grid; gap: 4px; }
+.atlas-destination-copy strong { color: #edf0e7; font: 600 11px/1.35 system-ui, sans-serif; }
+.atlas-destination-copy small { overflow: hidden; color: #91a094; font: 10px/1.4 system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-destination-arrow { margin-left: auto; color: #8fc39a; font: 16px/1 monospace; }
+.atlas-footer-note { align-self: center; margin-right: auto; color: #829184; font: 700 8px/1 monospace; letter-spacing: .11em; }
+.mc-max-map-dialog .mc-dialog-footer { align-items: center; margin: 0; padding-top: 12px; border-color: #344239; }
+.mc-max-map-dialog .mc-dialog-footer .mc-btn { padding: 9px 12px; background: #243229; border-color: #526b56; border-radius: 6px; color: #e6eee3; font: 700 9px/1.2 monospace; }
+
+@media (max-width: 740px) {
+  .mc-dialog.mc-max-map-dialog { width: calc(100vw - 24px); padding: 16px 13px 12px; }
+  .mc-map-top-status-bar { flex-direction: column; align-items: flex-start; }
+  .atlas-caption-hint { margin-left: 0; }
+  .atlas-region-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .atlas-region-card { min-height: 205px; padding: 12px; }
+  .atlas-destination-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) {
+  .mc-max-map-dialog .mc-dialog-header { gap: 10px; }
+  .mc-max-map-dialog .mc-dialog-title { font-size: 18px; }
+  .mc-max-map-dialog .mc-dialog-subtitle { font-size: 10px; }
+  .atlas-section-nav { gap: 1px; }
+  .atlas-section-nav a { padding: 8px 6px; font-size: 8px; }
+  .atlas-region-grid { grid-template-columns: 1fr; }
+  .atlas-region-card { min-height: 170px; }
+  .atlas-destination-tag { flex-basis: 70px; font-size: 7px; }
+  .atlas-destination-copy small { white-space: normal; }
+  .atlas-footer-note { display: none; }
+}
+
 .chip-tag {
   color: #facc15;
   font-family: monospace;
@@ -1668,6 +1843,77 @@ button:focus-visible, a:focus-visible { outline: 3px solid #facc15; outline-offs
   .pause-subtitle { margin-bottom: 14px; }
   .mc-controls-section { padding-top: 10px; padding-bottom: 10px; }
   .mc-menu-footer { margin-top: 12px; }
+}
+
+/* Touch HUD: keep the look prompt compact and give the controls clear lanes. */
+.mc-interact-prompt {
+  width: min(92vw, 540px);
+  white-space: normal;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+body.touch-device .mc-interact-prompt {
+  margin-top: 38px;
+  padding: 8px 10px;
+  font-family: 'VT323', monospace;
+  font-size: clamp(17px, 2vw, 22px);
+  letter-spacing: 0;
+}
+body.touch-device #mc-chat-log {
+  width: min(42vw, 260px);
+  max-height: 58px;
+  bottom: 104px;
+  left: 10px;
+}
+body.touch-device .mc-chat-msg { padding: 4px 6px; font-size: 9px; }
+
+#install-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(5, 9, 8, .82);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+#install-prompt[hidden] { display: none !important; }
+.install-card {
+  width: min(100%, 440px);
+  padding: 26px 22px 20px;
+  border: 2px solid #6e806f;
+  border-radius: 8px;
+  background: #202923;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .65);
+  text-align: center;
+}
+.install-kicker { margin-bottom: 12px; color: #9be0ad; font: 12px 'VT323', monospace; letter-spacing: 2px; }
+.install-card h2 { font: 16px/1.7 'Press Start 2P', monospace; color: #fff; }
+.install-card > p:not(.install-kicker) { margin-top: 14px; color: #d4ddd4; font: 20px/1.45 'VT323', monospace; }
+.install-actions { display: grid; gap: 10px; margin-top: 22px; }
+.install-actions button { min-height: 48px; padding: 10px 12px; border: 2px solid #8edba2; border-radius: 4px; background: #247f48; color: #fff; font: 9px 'Press Start 2P', monospace; }
+.install-actions button + button { border-color: #748077; background: #353d37; }
+#install-help { min-height: 0; margin-top: 12px; color: #f5dc7a; font: 19px/1.4 'VT323', monospace; }
+#install-help:empty { display: none; }
+
+@media (max-height: 520px) and (orientation: landscape) {
+  body.touch-device #mc-minimap { display: none; }
+  body.touch-device #mc-quick-nav { top: 6px; left: 8px; right: 8px; max-width: none; }
+  body.touch-device .mc-quick-buttons { flex-wrap: nowrap; }
+  body.touch-device .mc-dpad { margin: 0 0 58px 0; gap: 2px; }
+  body.touch-device .mc-dpad-middle { gap: 2px; }
+  body.touch-device .mc-dpad-btn { width: 38px; height: 38px; font-size: 14px; }
+  body.touch-device .mc-touch-actions { flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 4px; max-width: 36vw; margin: 0 0 58px 0; }
+  body.touch-device .mc-touch-action-btn { min-width: 60px; height: 36px; font-size: 7px; }
+  body.touch-device #mc-chat-log { display: none; }
+  body.touch-device #mc-hotbar { bottom: max(2px, env(safe-area-inset-bottom)); }
+  body.touch-device .mc-hotbar-container { transform: scale(.58); transform-origin: bottom center; margin-bottom: -10px; }
+  .install-card { padding: 14px 18px 12px; }
+  .install-card h2 { font-size: 11px; line-height: 1.5; }
+  .install-card > p:not(.install-kicker) { margin-top: 8px; font-size: 18px; }
+  .install-actions { gap: 7px; margin-top: 12px; }
+  .install-actions button { min-height: 40px; font-size: 8px; }
 }
 
 /* Keep the rotating splash clear of the portfolio title. */

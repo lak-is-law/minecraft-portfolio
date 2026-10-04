@@ -419,6 +419,15 @@ export const PORTFOLIO_DATA = {
     { name: "Pueblo Royale & Cantina", coords: [-75, 2, 38], tag: "[PUEBLO]", desc: "Sunbaked Mexican adobe village with terracotta arches, central well, and Builder's Arena" },
     { name: "The Sunset Saloon & Beach Bar", coords: [6, 2, 58], tag: "[SALOON]", desc: "Beachfront timber tavern with glowing stone hearth, outdoor deck, and Lakshya's passions hub" },
     { name: "Palm Paradise Beach & Merlion", coords: [15, 2, 110], tag: "[BEACH]", desc: "Tropical coconut palm beach, ocean surf, boardwalk pier, and the iconic Singapore Merlion" },
-    { name: "Frostpeak Mountain Overlook", coords: [0, 18, -95], tag: "[FROSTPEAK]", desc: "Snowy alpine ridges and dizzying suspension bridge under the soaring Frost Wyrm dragon" }
+    { name: "Frostpeak Mountain Overlook", coords: [0, 18, -95], tag: "[FROSTPEAK]", desc: "Snowy alpine ridges and dizzying suspension bridge under the soaring Frost Wyrm dragon" },
+    { name: "Crossroads International Airport", coords: [61, 2, 62], tag: "[AIRPORT]", desc: "Island airport with a lit runway, glass terminal, and rooftop air-traffic control tower" },
+    { name: "Neo York Police Station", coords: [101, 2, 20], tag: "[POLICE]", desc: "A blue-striped public safety station in the East Borough" },
+    { name: "Neo York General Hospital", coords: [49, 2, 20], tag: "[HOSPITAL]", desc: "Quartz-and-glass community hospital with a red cross and ambulance bay" },
+    { name: "Neo York Public School", coords: [46, 2, -25], tag: "[SCHOOL]", desc: "Neighborhood school with a library, bright windows, and a bell tower" },
+    { name: "Crossroads Wildlife Park", coords: [-39, 2, -12], tag: "[ZOO]", desc: "A leafy city zoo with fenced habitats, a pond, and shaded garden paths" },
+    { name: "Rapunzel’s Castle", coords: [-46, 2, -50], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and a golden braid cascading into its gardens" },
+    { name: "Mexico City · Zócalo", coords: [-90, 2, 36], tag: "[MEXICO CITY]", desc: "A metropolitan plaza with cathedral towers, colorful market stalls, and a central fountain" },
+    { name: "Eiffel Tower", coords: [49, 2, -49], tag: "[EIFFEL]", desc: "A landmark iron tower with observation decks, beacon, and a garden avenue" },
+    { name: "Crossroads Central Station", coords: [60, 2, 34], tag: "[RAILWAY]", desc: "A covered rail station with live train service to the Citadel and airport" }
   ]
 };

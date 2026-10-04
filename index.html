@@ -41,6 +41,19 @@
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
+  <section id="install-prompt" role="dialog" aria-modal="true" aria-labelledby="install-title" hidden>
+    <div class="install-card">
+      <p class="install-kicker">PHONE APP</p>
+      <h2 id="install-title">Add this world to your Home Screen?</h2>
+      <p id="install-description">Open it like an app for a cleaner, full-screen experience.</p>
+      <div class="install-actions">
+        <button id="install-app-button" type="button">ADD TO HOME SCREEN</button>
+        <button id="continue-web-button" type="button">CONTINUE IN BROWSER</button>
+      </div>
+      <p id="install-help" aria-live="polite"></p>
+    </div>
+  </section>
+
   <!-- 3D WebGL Canvas -->
   <canvas id="canvas3d"></canvas>
 

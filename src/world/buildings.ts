@@ -48,6 +48,7 @@ export class WorldBuilder {
     this.buildPalmBeachAndOcean();
     this.buildFrostpeakMountains();
     this.buildNatureAndFlora();
+    this.buildCivicAndAdventureDistricts();
   }
 
   // 1. Organic Circular Island Coastline with Surrounding Ocean
@@ -1291,5 +1292,294 @@ export class WorldBuilder {
     heartlandFlowers.forEach(f => {
       this.setBlock(f.x, 1, f.z, 'redstone_block'); // Vibrant floral marker
     });
+  }
+
+  // New civic services and cultural destinations around the island.
+  private buildCivicAndAdventureDistricts() {
+    this.buildHospital(49, 20);
+    this.buildPoliceStation(101, 20);
+    this.buildSchool(46, -25);
+    this.buildCityZoo(-39, -12);
+    this.buildRapunzelCastle(-46, -50);
+    this.buildMexicoCity(-90, 36);
+    this.buildEiffelTower(49, -49);
+    this.buildAirport(61, 62);
+    this.buildRailwayStation(60, 34);
+  }
+
+  private buildHospital(cx: number, cz: number) {
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        this.setBlock(x, 1, z, 'quartz_block');
+        const wall = x === cx - 7 || x === cx + 7 || z === cz - 7 || z === cz + 7;
+        for (let y = 2; y <= 9; y++) {
+          if (wall) this.setBlock(x, y, z, y === 9 ? 'stone_bricks' : ((x + z + y) % 4 === 0 ? 'cyber_glass' : 'quartz_block'));
+        }
+        if (x === cx - 7 || x === cx + 7 || z === cz - 7 || z === cz + 7) this.setBlock(x, 10, z, 'quartz_block');
+      }
+    }
+    // Red cross on the east-facing facade
+    for (let y = 5; y <= 8; y++) this.setBlock(cx + 7, y, cz, 'redstone_block');
+    for (let z = cz - 2; z <= cz + 2; z++) this.setBlock(cx + 7, 6, z, 'redstone_block');
+    // Front doors and ambulance bay
+    this.setBlock(cx + 7, 2, cz - 3, 'glass');
+    this.setBlock(cx + 7, 2, cz - 2, 'glass');
+    this.setBlock(cx + 8, 1, cz - 5, 'smooth_stone');
+    this.setBlock(cx + 9, 1, cz - 5, 'smooth_stone');
+    this.setBlock(cx + 8, 2, cz - 5, 'redstone_block');
+    this.setBlock(cx + 9, 2, cz - 5, 'redstone_block');
+    this.setBlock(cx + 7, 2, cz + 4, 'glowstone', { type: 'sign', title: 'Neo York General Hospital', text: 'Community hospital and emergency care center.' });
+  }
+
+  private buildPoliceStation(cx: number, cz: number) {
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 6; z <= cz + 6; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+        const wall = x === cx - 7 || x === cx + 7 || z === cz - 6 || z === cz + 6;
+        for (let y = 2; y <= 7; y++) {
+          if (wall) this.setBlock(x, y, z, y === 7 ? 'stone_bricks' : ((x + z) % 3 === 0 ? 'cyber_glass' : 'stone_bricks'));
+        }
+        if (x === cx - 7 || x === cx + 7 || z === cz - 6 || z === cz + 6) this.setBlock(x, 8, z, 'iron_block');
+      }
+    }
+    // Blue beacon stripe and a marked entrance
+    for (let z = cz - 4; z <= cz + 4; z++) this.setBlock(cx - 7, 6, z, 'lapis_block');
+    for (let x = cx - 2; x <= cx + 2; x++) this.setBlock(x, 2, cz - 6, 'glass');
+    this.setBlock(cx - 7, 2, cz + 3, 'glowstone', { type: 'sign', title: 'Neo York Police Station', text: 'Public safety station serving the East Borough.' });
+    // Roof beacon
+    this.setBlock(cx, 9, cz, 'iron_block');
+    this.setBlock(cx, 10, cz, 'redstone_block');
+  }
+
+  private buildSchool(cx: number, cz: number) {
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = cz - 8; z <= cz + 8; z++) {
+        this.setBlock(x, 1, z, 'oak_planks');
+        const wall = x === cx - 7 || x === cx + 7 || z === cz - 8 || z === cz + 8;
+        for (let y = 2; y <= 7; y++) {
+          if (wall) this.setBlock(x, y, z, y === 7 ? 'red_sandstone' : ((x + z) % 4 === 0 ? 'glass' : 'terracotta_adobe'));
+        }
+        if (x === cx - 7 || x === cx + 7 || z === cz - 8 || z === cz + 8) this.setBlock(x, 8, z, 'red_sandstone');
+      }
+    }
+    // Classroom windows, library, entry steps, and school bell
+    for (let x = cx - 5; x <= cx - 3; x++) this.setBlock(x, 3, cz + 8, 'glass');
+    for (let x = cx + 3; x <= cx + 5; x++) this.setBlock(x, 3, cz + 8, 'glass');
+    for (let z = cz - 4; z <= cz + 4; z += 2) {
+      this.setBlock(cx - 5, 2, z, 'bookshelf');
+      this.setBlock(cx + 5, 2, z, 'bookshelf');
+    }
+    this.setBlock(cx, 9, cz, 'gold_block');
+    this.setBlock(cx, 2, cz + 8, 'glowstone', { type: 'sign', title: 'Neo York Public School', text: 'A neighborhood school with a bright library and open courtyard.' });
+  }
+
+  private buildCityZoo(cx: number, cz: number) {
+    // A green wildlife park with three open-air habitat yards.
+    for (let x = cx - 16; x <= cx + 16; x++) {
+      for (let z = cz - 13; z <= cz + 13; z++) {
+        this.setBlock(x, 1, z, ((x + z) % 5 === 0) ? 'grass' : 'oak_planks');
+        if (x === cx - 16 || x === cx + 16 || z === cz - 13 || z === cz + 13) {
+          this.setBlock(x, 2, z, 'oak_fence');
+          this.setBlock(x, 3, z, 'oak_fence');
+        }
+      }
+    }
+    // Paddock rails and gates
+    for (const x of [cx - 6, cx + 5]) {
+      for (let z = cz - 10; z <= cz + 10; z++) {
+        if (z < cz - 2 || z > cz + 2) this.setBlock(x, 2, z, 'oak_fence');
+      }
+    }
+    for (let x = cx - 13; x <= cx + 13; x++) {
+      if (x < cx - 2 || x > cx + 2) this.setBlock(x, 2, cz, 'oak_fence');
+    }
+    // Pond, rock garden, and shaded groves
+    for (let x = cx - 14; x <= cx - 10; x++) {
+      for (let z = cz - 3; z <= cz + 2; z++) this.setBlock(x, 2, z, 'water');
+    }
+    for (const [x, z] of [[cx - 11, cz - 9], [cx + 11, cz - 9], [cx - 11, cz + 8], [cx + 11, cz + 8]]) {
+      this.buildCypressTree(x, 1, z);
+    }
+    this.setBlock(cx, 2, cz + 12, 'glowstone', { type: 'sign', title: 'Crossroads Wildlife Park', text: 'A small city zoo with wooded habitats, a pond, and family trails.' });
+    this.setBlock(cx, 2, cz, 'gold_block');
+  }
+
+  private buildRapunzelCastle(cx: number, cz: number) {
+    // Walled keep with four corner turrets and an unusually tall central tower.
+    for (let x = cx - 12; x <= cx + 12; x++) {
+      for (let z = cz - 10; z <= cz + 10; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+        if (Math.abs(x - cx) === 12 || Math.abs(z - cz) === 10) {
+          for (let y = 2; y <= 8; y++) this.setBlock(x, y, z, 'stone_bricks');
+        }
+      }
+    }
+    // Entry arch
+    for (let y = 2; y <= 5; y++) {
+      this.setBlock(cx - 2, y, cz + 10, 'red_sandstone');
+      this.setBlock(cx + 2, y, cz + 10, 'red_sandstone');
+    }
+    for (let x = cx - 2; x <= cx + 2; x++) this.setBlock(x, 6, cz + 10, 'red_sandstone');
+    // Keep and tower
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      for (let z = cz - 5; z <= cz + 5; z++) {
+        for (let y = 2; y <= 13; y++) {
+          if (Math.abs(x - cx) >= 4 || Math.abs(z - cz) >= 4 || y === 2 || y === 13) this.setBlock(x, y, z, 'stone_bricks');
+        }
+      }
+    }
+    for (let y = 14; y <= 29; y++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          if (Math.abs(dx) === 2 || Math.abs(dz) === 2) this.setBlock(cx + dx, y, cz + dz, 'quartz_pillar');
+        }
+      }
+    }
+    // Golden braid falls from Rapunzel's tower to the castle garden.
+    for (let y = 8; y <= 27; y++) this.setBlock(cx + 3, y, cz + 2, 'gold_block');
+    this.setBlock(cx + 3, 7, cz + 2, 'glowstone');
+    for (const [x, z] of [[cx - 12, cz - 10], [cx + 12, cz - 10], [cx - 12, cz + 10], [cx + 12, cz + 10]]) {
+      for (let y = 2; y <= 11; y++) this.setBlock(x, y, z, 'red_sandstone');
+      this.setBlock(x, 12, z, 'gold_block');
+    }
+    this.setBlock(cx, 2, cz + 10, 'glowstone', { type: 'sign', title: 'Rapunzel’s Castle', text: 'A fairytale keep with a tall lantern tower and a golden braid cascading into its gardens.' });
+  }
+
+  private buildMexicoCity(cx: number, cz: number) {
+    // Zócalo plaza and colorful market district
+    for (let x = cx - 10; x <= cx + 10; x++) {
+      for (let z = cz - 10; z <= cz + 10; z++) this.setBlock(x, 1, z, ((x + z) % 4 === 0) ? 'red_sandstone' : 'smooth_stone');
+    }
+    // Metropolitan cathedral with twin bell towers
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      for (let z = cz - 9; z <= cz - 2; z++) {
+        for (let y = 2; y <= 10; y++) {
+          if (x === cx - 5 || x === cx + 5 || z === cz - 9 || z === cz - 2 || y === 2 || y === 10) this.setBlock(x, y, z, 'quartz_block');
+        }
+      }
+    }
+    for (const x of [cx - 4, cx + 4]) {
+      for (let y = 11; y <= 17; y++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) this.setBlock(x + dx, y, cz - 8 + dz, 'quartz_pillar');
+        }
+      }
+      this.setBlock(x, 18, cz - 8, 'gold_block');
+    }
+    // Palacio facade, market awnings, and a central fountain
+    for (let x = cx - 9; x <= cx - 6; x++) {
+      for (let z = cz + 3; z <= cz + 9; z++) {
+        this.setBlock(x, 2, z, 'terracotta_adobe');
+        this.setBlock(x, 3, z, 'red_terracotta');
+        this.setBlock(x, 4, z, 'terracotta_adobe');
+      }
+    }
+    for (let x = cx + 5; x <= cx + 9; x++) {
+      for (let z = cz + 4; z <= cz + 9; z++) {
+        this.setBlock(x, 2, z, 'emerald_block');
+        this.setBlock(x, 3, z, 'redstone_block');
+      }
+    }
+    for (let x = cx - 1; x <= cx + 1; x++) {
+      for (let z = cz - 1; z <= cz + 1; z++) this.setBlock(x, 2, z, (x === cx && z === cz) ? 'water' : 'quartz_block');
+    }
+    this.setBlock(cx, 3, cz, 'glowstone');
+    this.setBlock(cx, 2, cz + 10, 'glowstone', { type: 'sign', title: 'Mexico City · Zócalo', text: 'Explore the cathedral square, colorful market stalls, and the heart of Mexico City.' });
+  }
+
+  private buildEiffelTower(cx: number, cz: number) {
+    // Four open iron legs converge toward the first observation platform.
+    for (let y = 1; y <= 22; y++) {
+      const span = Math.max(2, Math.round(12 - (y - 1) * 0.42));
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+        this.setBlock(cx + sx * span, y, cz + sz * span, 'iron_block');
+        if (y % 4 === 0) this.setBlock(cx + sx * span, y, cz + sz * (span - 1), 'red_sandstone');
+      }
+    }
+    for (const [y, span] of [[8, 9], [16, 6], [23, 3]]) {
+      for (let x = cx - span; x <= cx + span; x++) {
+        for (let z = cz - span; z <= cz + span; z++) {
+          if (Math.abs(x - cx) === span || Math.abs(z - cz) === span) this.setBlock(x, y, z, 'iron_block');
+        }
+      }
+    }
+    for (let y = 24; y <= 43; y++) {
+      const span = Math.max(1, Math.round(3 - (y - 24) * 0.1));
+      for (let x = cx - span; x <= cx + span; x++) {
+        for (let z = cz - span; z <= cz + span; z++) {
+          if (Math.abs(x - cx) === span || Math.abs(z - cz) === span) this.setBlock(x, y, z, 'iron_block');
+        }
+      }
+    }
+    for (let y = 44; y <= 58; y++) this.setBlock(cx, y, cz, y % 3 === 0 ? 'glowstone' : 'iron_block');
+    this.setBlock(cx, 59, cz, 'beacon');
+    for (let x = cx - 14; x <= cx + 14; x++) {
+      this.setBlock(x, 1, cz + 15, 'smooth_stone');
+      if (x % 4 === 0) this.setBlock(x, 2, cz + 15, 'glowstone');
+    }
+    this.setBlock(cx, 2, cz + 15, 'glowstone', { type: 'sign', title: 'Eiffel Tower', text: 'A Paris landmark rising above the garden avenue.' });
+  }
+
+  private buildAirport(cx: number, cz: number) {
+    // Runway with threshold bars, centerline, and edge lighting
+    for (let x = cx - 23; x <= cx + 20; x++) {
+      for (let z = cz + 8; z <= cz + 14; z++) this.setBlock(x, 1, z, 'asphalt_road');
+      this.setBlock(x, 2, cz + 8, 'glowstone');
+      this.setBlock(x, 2, cz + 14, 'glowstone');
+      if (x % 4 === 0) this.setBlock(x, 2, cz + 11, 'smooth_stone');
+    }
+    for (let x = cx - 2; x <= cx + 2; x++) this.setBlock(x, 2, cz + 8, 'quartz_block');
+    // Terminal concourse with glass frontage
+    for (let x = cx + 8; x <= cx + 26; x++) {
+      for (let z = cz - 8; z <= cz + 4; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+        const wall = x === cx + 8 || x === cx + 26 || z === cz - 8 || z === cz + 4;
+        for (let y = 2; y <= 6; y++) if (wall) this.setBlock(x, y, z, y === 6 ? 'quartz_block' : 'cyber_glass');
+        if (x === cx + 8 || x === cx + 26 || z === cz - 8 || z === cz + 4) this.setBlock(x, 7, z, 'quartz_block');
+      }
+    }
+    // Control tower and rooftop radar
+    for (let y = 2; y <= 12; y++) this.setBlock(cx + 30, y, cz - 4, 'quartz_pillar');
+    for (let x = cx + 27; x <= cx + 33; x++) {
+      for (let z = cz - 7; z <= cz - 1; z++) {
+        if (x === cx + 27 || x === cx + 33 || z === cz - 7 || z === cz - 1) this.setBlock(x, 13, z, 'cyber_glass');
+      }
+    }
+    for (let x = cx + 26; x <= cx + 34; x++) this.setBlock(x, 14, cz - 4, 'quartz_block');
+    this.setBlock(cx + 30, 16, cz - 4, 'iron_block');
+    this.setBlock(cx + 30, 17, cz - 4, 'glowstone');
+    this.setBlock(cx, 2, cz - 8, 'glowstone', { type: 'sign', title: 'Crossroads International Airport', text: 'Runway, glass terminal, and a rooftop control tower connect every corner of the island.' });
+  }
+
+  private buildRailwayStation(cx: number, cz: number) {
+    // Raised platform flanks the track; the concourse opens onto the south side.
+    for (let x = cx - 12; x <= cx + 12; x++) {
+      for (let z = cz - 4; z <= cz + 4; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+        if (Math.abs(z - cz) === 4) this.setBlock(x, 2, z, 'stone_bricks');
+        if (z === cz - 3 || z === cz + 3) this.setBlock(x, 2, z, 'glowstone');
+      }
+    }
+    for (let x = cx - 11; x <= cx - 2; x++) {
+      for (let z = cz + 5; z <= cz + 11; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+        const wall = x === cx - 11 || x === cx - 2 || z === cz + 5 || z === cz + 11;
+        for (let y = 2; y <= 6; y++) if (wall) this.setBlock(x, y, z, y === 6 ? 'oak_planks' : ((x + z) % 3 === 0 ? 'glass' : 'oak_planks'));
+        if (wall) this.setBlock(x, 7, z, 'oak_planks');
+      }
+    }
+    // Canopy and clock tower
+    for (let x = cx - 12; x <= cx + 12; x++) {
+      for (let z = cz - 5; z <= cz + 5; z++) {
+        if (z === cz - 5 || z === cz + 5) this.setBlock(x, 8, z, 'oak_planks');
+      }
+    }
+    for (const x of [cx - 10, cx - 3, cx + 3, cx + 10]) {
+      for (let y = 2; y <= 7; y++) this.setBlock(x, y, cz, 'quartz_pillar');
+    }
+    this.setBlock(cx - 11, 2, cz + 11, 'glowstone', { type: 'sign', title: 'Crossroads Central Station', text: 'Live rail service connects the Citadel, this station, and the airport.' });
+    this.setBlock(cx - 2, 2, cz + 8, 'bookshelf');
+    this.setBlock(cx - 1, 2, cz + 8, 'bookshelf');
+    this.setBlock(cx, 2, cz + 8, 'gold_block');
   }
 }

@@ -283,10 +283,37 @@ export class ModalManager {
     const curX = Math.round(playerPos?.x || 0);
     const curZ = Math.round(playerPos?.z || 0);
 
-    const landmarksChipsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
-      <button class="mc-btn mc-map-chip-btn" data-index="${idx}" title="${lm.desc}">
-        <span class="chip-tag">${lm.tag}</span>
-        <span class="chip-name">${lm.name}</span>
+    const atlasRegions = [
+      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', index: 0, tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
+      { number: '02', name: 'Frostpeak Range', subtitle: 'Snow, ice & altitude', detail: 'Climb the alpine ridges to the overlook and suspension bridge above the clouds.', index: 8, tone: 'frost', direction: 'NORTH · Z −95' },
+      { number: '03', name: 'Sakura Sanctuary', subtitle: 'Pagoda & quiet gardens', detail: 'Walk beneath the cherry canopy, pass the torii gates, and visit the language embassy.', index: 4, tone: 'sakura', direction: 'NORTHWEST · X −68' },
+      { number: '04', name: 'Imperial Raj', subtitle: 'Marble & reflection', detail: 'Explore the Taj Mahal, its reflecting pool, and the SRMIST honors courtyard.', index: 3, tone: 'raj', direction: 'NORTHEAST · X 55' },
+      { number: '05', name: 'Neo York', subtitle: 'Glass towers & AI labs', detail: 'Find the Times Square avenue, research labs, and the Lak Tower skyline marker.', index: 1, tone: 'neoyork', direction: 'EAST · X 80' },
+      { number: '06', name: 'Pueblo Royale', subtitle: 'Adobe village & arena', detail: 'Visit the terracotta village square, central well, and builder’s arena.', index: 5, tone: 'pueblo', direction: 'WEST · X −75' },
+      { number: '07', name: 'Sunset Coast', subtitle: 'Saloon, palms & pier', detail: 'Follow the boardwalk south to the beach bar, palm grove, and Merlion.', index: 6, tone: 'coast', direction: 'SOUTH · Z 58' },
+      { number: '08', name: 'Civic Quarter', subtitle: 'Care & public service', detail: 'Find the hospital and police station serving the eastern neighborhoods.', index: 11, tone: 'citadel', direction: 'EAST · X 49' },
+      { number: '09', name: 'Learning Commons', subtitle: 'School & community', detail: 'Visit the neighborhood school, built around a warm timber courtyard.', index: 12, tone: 'pueblo', direction: 'NORTHWEST · X 46' },
+      { number: '10', name: 'Wildlife Park', subtitle: 'Habitats & nature trails', detail: 'Explore the zoo’s green paths, animal paddocks, and pond.', index: 13, tone: 'coast', direction: 'WEST · X −39' },
+      { number: '11', name: 'Rapunzel’s Keep', subtitle: 'A fairy-tale skyline', detail: 'Look for the high tower, golden braid, and clustered castle turrets.', index: 14, tone: 'raj', direction: 'SOUTHWEST · X −46' },
+      { number: '12', name: 'Mexico City', subtitle: 'Zócalo & cathedral', detail: 'Gather in the plaza, visit the twin-spired cathedral, and browse market stalls.', index: 15, tone: 'pueblo', direction: 'WEST · X −90' },
+      { number: '13', name: 'Eiffel Tower', subtitle: 'Paris by night', detail: 'See the illuminated iron landmark rising above the northern gardens.', index: 16, tone: 'frost', direction: 'NORTH · X 49' },
+      { number: '14', name: 'Central Station', subtitle: 'Platforms & live trains', detail: 'Watch the trains roll through the covered station and onward to the airport.', index: 17, tone: 'neoyork', direction: 'EAST · X 60' },
+      { number: '15', name: 'Skyport', subtitle: 'Terminal & runway', detail: 'Follow the runway to the terminal and control tower at the edge of town.', index: 9, tone: 'frost', direction: 'SOUTHEAST · Z 62' },
+    ];
+    const regionsHtml = atlasRegions.map((region) => `
+      <article class="atlas-region-card atlas-${region.tone}">
+        <div class="atlas-card-topline"><span>${region.number} / REALM</span><span class="atlas-region-dot"></span></div>
+        <h3>${region.name}</h3>
+        <p class="atlas-region-subtitle">${region.subtitle}</p>
+        <p class="atlas-region-detail">${region.detail}</p>
+        <div class="atlas-card-bottom"><span>${region.direction}</span><button class="atlas-region-warp mc-map-chip-btn" data-index="${region.index}" aria-label="Travel to ${region.name}">GO <span aria-hidden="true">↗</span></button></div>
+      </article>
+    `).join('');
+    const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
+      <button class="atlas-destination mc-map-chip-btn" data-index="${idx}">
+        <span class="atlas-destination-tag">${lm.tag.replace(/[\[\]]/g, '')}</span>
+        <span class="atlas-destination-copy"><strong>${lm.name}</strong><small>${lm.desc}</small></span>
+        <span class="atlas-destination-arrow" aria-hidden="true">↗</span>
       </button>
     `).join('');
 
@@ -294,20 +321,29 @@ export class ModalManager {
       <div class="mc-dialog mc-max-map-dialog">
         <div class="mc-dialog-header">
           <div>
-            <h2 class="mc-dialog-title">MINECRAFT REALM ATLAS [MAXIMISED MAP]</h2>
-            <span class="mc-dialog-subtitle">Live GPS & Real-time Radar • Click anywhere on the map to Fast-Travel Teleport</span>
+            <p class="atlas-eyebrow">LAKSHYA’S PORTFOLIO WORLD <span>·</span> FIELD GUIDE 01</p>
+            <h2 class="mc-dialog-title">A world worth exploring.</h2>
+            <span class="mc-dialog-subtitle">Fifteen neighborhoods and landmarks, connected by one central crossroads.</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
 
+        <nav class="atlas-section-nav" aria-label="Map sections">
+          <a href="#atlas-map-section">01 <span>MAP</span></a>
+          <a href="#atlas-regions-section">02 <span>REALMS</span></a>
+          <a href="#atlas-destinations-section">03 <span>DESTINATIONS</span></a>
+        </nav>
+
+        <div class="atlas-scroll-area">
+          <section class="atlas-map-section" id="atlas-map-section" aria-label="Interactive world map">
         <div class="mc-map-top-status-bar">
           <div class="mc-map-gps-pill">
-            <span class="gps-label">PLAYER GPS:</span>
+            <span class="gps-label">YOUR POSITION</span>
             <span class="gps-val" id="map-live-coords">X: ${curX}, Z: ${curZ}</span>
           </div>
           <div class="mc-map-cursor-pill">
-            <span class="cursor-label">TARGET:</span>
-            <span class="cursor-val" id="map-cursor-coords">Hover over map to Inspect • Click to Teleport</span>
+            <span class="cursor-label">MAP TARGET</span>
+            <span class="cursor-val" id="map-cursor-coords">Select a point · click to travel</span>
           </div>
         </div>
 
@@ -315,15 +351,23 @@ export class ModalManager {
           <canvas id="max-realm-canvas" width="960" height="600"></canvas>
         </div>
 
-        <div class="mc-map-chips-container">
-          <span class="chips-heading">QUICK WARP:</span>
-          <div class="mc-map-chips-scroll">
-            ${landmarksChipsHtml}
-          </div>
+        <div class="atlas-map-caption"><span><i class="atlas-key-dot atlas-key-player"></i> YOU ARE HERE</span><span><i class="atlas-key-dot atlas-key-place"></i> WAYPOINT</span><span><i class="atlas-key-line"></i> MAIN ROUTE</span><span class="atlas-caption-hint">Click the map to travel anywhere</span></div>
+          </section>
+
+          <section class="atlas-content-section" id="atlas-regions-section">
+            <div class="atlas-section-heading"><div><p class="atlas-eyebrow">PICK A DIRECTION</p><h3>Explore the world</h3></div><span>${atlasRegions.length.toString().padStart(2, '0')} AREAS</span></div>
+            <div class="atlas-region-grid">${regionsHtml}</div>
+          </section>
+
+          <section class="atlas-content-section atlas-destinations-section" id="atlas-destinations-section">
+            <div class="atlas-section-heading"><div><p class="atlas-eyebrow">MAKE IT A JOURNEY</p><h3>All destinations</h3></div><span>${PORTFOLIO_DATA.landmarks.length.toString().padStart(2, '0')} WAYPOINTS</span></div>
+            <div class="atlas-destination-list">${destinationsHtml}</div>
+          </section>
         </div>
 
         <div class="mc-dialog-footer">
-          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Close Map (ESC / M)</button>
+          <span class="atlas-footer-note">FAST TRAVEL IS READY</span>
+          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Close field guide</button>
         </div>
       </div>
     `;
@@ -360,8 +404,11 @@ export class ModalManager {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = canvas.width;
-    const height = canvas.height;
+    const compact = window.innerWidth < 740;
+    const width = compact ? 600 : canvas.width;
+    const height = 600;
+    canvas.width = width;
+    canvas.height = height;
     const cx = width / 2;
     const cy = height / 2;
     const scale = 1.84;
@@ -379,7 +426,8 @@ export class ModalManager {
       ctx.fillStyle = '#080c14';
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Side Information Panels
+      // 2. Side Information Panels (the small-screen map gets the full canvas)
+      if (!compact) {
       // Left Panel: Biome Legend
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(10, 10, 180, height - 20);
@@ -443,9 +491,12 @@ export class ModalManager {
       const px = playerPos?.x || 0;
       const pz = playerPos?.z || 0;
 
-      PORTFOLIO_DATA.landmarks.slice(0, 9).forEach((lm, i) => {
+      [...PORTFOLIO_DATA.landmarks]
+        .map(lm => ({ lm, dist: Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz)) }))
+        .sort((a, b) => a.dist - b.dist)
+        .slice(0, 9)
+        .forEach(({ lm, dist }, i) => {
         const ly = 55 + i * 40;
-        const dist = Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz));
         ctx.fillStyle = '#38bdf8';
         ctx.font = 'bold 9px monospace';
         ctx.fillText(lm.tag, width - 178, ly);
@@ -453,6 +504,7 @@ export class ModalManager {
         ctx.font = '8px monospace';
         ctx.fillText(`${lm.name} • ${dist}m`, width - 178, ly + 14);
       });
+      }
 
       // 3. Central Map Viewport (Clipped to World Bounds)
       const mapX = cx - mapHalfW;
@@ -501,105 +553,71 @@ export class ModalManager {
       ctx.closePath();
       ctx.fill();
 
-      // Biome 1: North Frostpeak Glaciers (Z <= -65, |X| <= 40)
-      ctx.fillStyle = '#e0f2fe';
-      ctx.beginPath();
-      ctx.moveTo(cx - 38 * scale, cy - 65 * scale);
-      ctx.lineTo(cx, cy - 128 * scale);
-      ctx.lineTo(cx + 38 * scale, cy - 65 * scale);
-      ctx.closePath();
-      ctx.fill();
-      // Snow peak triangles
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.moveTo(cx - 18 * scale, cy - 85 * scale);
-      ctx.lineTo(cx - 18 * scale, cy - 115 * scale);
-      ctx.lineTo(cx, cy - 95 * scale);
-      ctx.closePath();
-      ctx.fill();
+      // Biomes follow the same coordinate boundaries as the terrain builder.
+      const mapRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(cx + x1 * scale, cy + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
+      };
+      mapRect(-136, 55, 136, 136, '#c7ad72'); // Sunset Coast
+      mapRect(-136, 8, -35, 75, '#b56e48'); // Pueblo
+      mapRect(45, -35, 136, 45, '#4d7172'); // Neo York
+      mapRect(25, -136, 136, -55, '#c2ae78'); // Imperial Raj
+      mapRect(-136, -136, -25, -45, '#9d718a'); // Sakura
+      mapRect(-35, -136, 35, -65, '#b5c4c0'); // Frostpeaks, highest priority
 
-      // Biome 2: Northwest Sakura Sanctuary (X <= -25, Z <= -45)
-      ctx.fillStyle = '#fbcfe8';
+      // Ridge lines and a reflecting pool give the regions a little topography.
+      ctx.strokeStyle = 'rgba(255,255,255,.34)';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.ellipse(cx - 65 * scale, cy - 85 * scale, 35 * scale, 30 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Red Pagoda Icon
-      ctx.fillStyle = '#dc2626';
-      ctx.fillRect(cx - 72 * scale, cy - 92 * scale, 8 * scale, 8 * scale);
-
-      // Biome 3: Northeast Imperial Raj Complex (X >= 25, Z <= -55)
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.ellipse(cx + 60 * scale, cy - 90 * scale, 38 * scale, 32 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Reflecting pool
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(cx + 51 * scale, cy - 86 * scale, 8 * scale, 18 * scale);
-      // Taj Mahal white plinth
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx + 46 * scale, cy - 108 * scale, 18 * scale, 16 * scale);
-
-      // Biome 4: East Neo York Tech Metropolis (X >= 45, |Z| <= 45)
-      ctx.fillStyle = '#334155';
-      ctx.beginPath();
-      ctx.ellipse(cx + 80 * scale, cy, 32 * scale, 40 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Broadway asphalt avenue
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(cx + 78 * scale, cy - 32 * scale, 8 * scale, 64 * scale);
-      // Cyber glass towers
-      ctx.fillStyle = '#06b6d4';
-      ctx.fillRect(cx + 60 * scale, cy - 25 * scale, 12 * scale, 18 * scale);
-      ctx.fillRect(cx + 60 * scale, cy + 8 * scale, 12 * scale, 18 * scale);
-      // Lak Tower marker
-      ctx.fillStyle = '#facc15';
-      ctx.fillRect(cx + 96 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
-
-      // Biome 5: West Pueblo Royale (X <= -35, Z in [8, 75])
-      ctx.fillStyle = '#ea580c';
-      ctx.beginPath();
-      ctx.ellipse(cx - 75 * scale, cy + 40 * scale, 35 * scale, 32 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Adobe buildings
-      ctx.fillStyle = '#fed7aa';
-      ctx.fillRect(cx - 82 * scale, cy + 24 * scale, 14 * scale, 14 * scale);
-      // Builder's Arena outline
-      ctx.strokeStyle = '#c2410c';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(cx - 74 * scale, cy + 44 * scale, 24 * scale, 20 * scale);
-
-      // Biome 6: South Sunset Saloon & Beach (Z >= 50)
-      ctx.fillStyle = '#fde047';
-      ctx.fillRect(cx - 65 * scale, cy + 60 * scale, 130 * scale, 60 * scale);
-      // Saloon Timber Deck
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(cx - 4 * scale, cy + 52 * scale, 22 * scale, 14 * scale);
-      // Wooden Boardwalk Pier out into ocean
-      ctx.fillStyle = '#92400e';
-      ctx.fillRect(cx + 1 * scale, cy + 98 * scale, 5 * scale, 28 * scale);
-      // Merlion Cyan Marker
-      ctx.fillStyle = '#06b6d4';
-      ctx.beginPath();
-      ctx.arc(cx + 20 * scale, cy + 110 * scale, 5 * scale, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Connecting Arterial Roads from Citadel
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 4 * scale;
-      ctx.beginPath();
-      // North Road
-      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 65 * scale);
-      // South Boardwalk
-      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy + 98 * scale);
-      // East Broadway
-      ctx.moveTo(cx, cy); ctx.lineTo(cx + 78 * scale, cy);
-      // West Trail
-      ctx.moveTo(cx, cy); ctx.lineTo(cx - 66 * scale, cy + 30 * scale);
-      // NE Taj Causeway
-      ctx.moveTo(cx, cy - 50 * scale); ctx.lineTo(cx + 50 * scale, cy - 86 * scale);
-      // NW Sakura Path
-      ctx.moveTo(cx, cy - 45 * scale); ctx.lineTo(cx - 50 * scale, cy - 70 * scale);
+      ctx.moveTo(cx - 25 * scale, cy - 78 * scale);
+      ctx.lineTo(cx - 12 * scale, cy - 101 * scale);
+      ctx.lineTo(cx - 2 * scale, cy - 88 * scale);
+      ctx.lineTo(cx + 13 * scale, cy - 119 * scale);
+      ctx.lineTo(cx + 29 * scale, cy - 82 * scale);
       ctx.stroke();
+      ctx.fillStyle = 'rgba(83,165,182,.75)';
+      ctx.fillRect(cx + 50 * scale, cy - 86 * scale, 10 * scale, 19 * scale);
+
+      // Main routes are narrow, warm paths that remain legible at every scale.
+      const route = (points: [number, number][]) => {
+        ctx.beginPath();
+        points.forEach(([x, z], i) => {
+          const px = cx + x * scale;
+          const pz = cy + z * scale;
+          if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+        });
+        ctx.stroke();
+      };
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(27,37,31,.62)';
+      ctx.lineWidth = 5;
+      route([[0, -22], [0, -65], [0, -91]]);
+      route([[20, 0], [80, 0], [101, 0]]);
+      route([[-20, 0], [-31, 18], [-50, 35], [-70, 35]]);
+      route([[5, -51], [20, -64], [42, -85], [55, -95]]);
+      route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
+      route([[0, 22], [0, 58], [0, 92], [6, 110]]);
+      ctx.strokeStyle = '#e6d5a5';
+      ctx.lineWidth = 2.2;
+      route([[0, -22], [0, -65], [0, -91]]);
+      route([[20, 0], [80, 0], [101, 0]]);
+      route([[-20, 0], [-31, 18], [-50, 35], [-70, 35]]);
+      route([[5, -51], [20, -64], [42, -85], [55, -95]]);
+      route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
+      route([[0, 22], [0, 58], [0, 92], [6, 110]]);
+
+      // Small settlement marks help distinguish the built-up districts.
+      const block = (x: number, z: number, color: string, size = 5) => {
+        ctx.fillStyle = 'rgba(19,28,23,.55)';
+        ctx.fillRect(cx + x * scale - size / 2 + 1, cy + z * scale - size / 2 + 2, size, size);
+        ctx.fillStyle = color;
+        ctx.fillRect(cx + x * scale - size / 2, cy + z * scale - size / 2, size, size);
+      };
+      [[63,-2],[69,8],[73,-12],[87,12],[91,-12],[96,5]].forEach(([x,z]) => block(x,z,'#8ebfc0',6));
+      [[-82,-80],[-60,-95],[-72,-105]].forEach(([x,z]) => block(x,z,'#dfa9c3',6));
+      [[-85,29],[-68,16],[-79,49]].forEach(([x,z]) => block(x,z,'#e1ad7e',6));
+      [[39,-76],[70,-76]].forEach(([x,z]) => block(x,z,'#e9dfc6',5));
 
       // Central Crossroads Citadel Moat & Plaza
       ctx.strokeStyle = '#0284c7';
@@ -654,6 +672,15 @@ export class ModalManager {
         else if (lm.tag.includes('SALOON')) col = '#a16207';
         else if (lm.tag.includes('BEACH')) col = '#06b6d4';
         else if (lm.tag.includes('CITADEL')) col = '#4ade80';
+        else if (lm.tag.includes('AIRPORT')) col = '#38bdf8';
+        else if (lm.tag.includes('POLICE')) col = '#60a5fa';
+        else if (lm.tag.includes('HOSPITAL')) col = '#fb7185';
+        else if (lm.tag.includes('SCHOOL')) col = '#fbbf24';
+        else if (lm.tag.includes('ZOO')) col = '#4ade80';
+        else if (lm.tag.includes('CASTLE')) col = '#c084fc';
+        else if (lm.tag.includes('MEXICO')) col = '#34d399';
+        else if (lm.tag.includes('EIFFEL')) col = '#f9a8d4';
+        else if (lm.tag.includes('RAILWAY')) col = '#f97316';
 
         // Glowing outer halo
         ctx.fillStyle = col + '44';
@@ -780,7 +807,7 @@ export class ModalManager {
       // World Limit Labels
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 8px monospace';
-      ctx.fillText('FORTNITE ISLAND (±136)', mapX + 6, mapY + 12);
+      ctx.fillText('PORTFOLIO ISLAND  ·  NORTH ↑', mapX + 8, mapY + 15);
     };
 
     draw();

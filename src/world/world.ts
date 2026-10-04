@@ -30,6 +30,8 @@ export class VoxelWorld {
   private portalParticles: THREE.Points | null = null;
   private beaconBeam: THREE.Mesh | null = null;
   public npcMesh: THREE.Group | null = null;
+  private railCurve: THREE.CatmullRomCurve3 | null = null;
+  private liveTrains: THREE.Group[] = [];
 
   // Hammerable Project Banners
   public projectBanners: ProjectBanner[] = [];
@@ -46,6 +48,7 @@ export class VoxelWorld {
   public init() {
     this.builder.buildWorld();
     this.buildInstancedMeshes();
+    this.createRailway();
     this.createProjectPedestalVisuals();
     this.createBigProjectWallBanners();
     this.createBeaconBeam();
@@ -762,6 +765,8 @@ export class VoxelWorld {
   }
 
   public update(time: number, playerPos: THREE.Vector3) {
+    this.updateLiveTrains(time);
+
     for (let i = 0; i < this.spinningIcons.length; i++) {
       const g = this.spinningIcons[i];
       g.rotation.y = time * 1.5 + i;
@@ -809,6 +814,145 @@ export class VoxelWorld {
         this.npcMesh.rotation.y = Math.atan2(dx, dz);
       }
     }
+  }
+
+  private createRailway() {
+    const route = [
+      new THREE.Vector3(22, 2.15, 0),
+      new THREE.Vector3(22, 2.15, 24),
+      new THREE.Vector3(25, 2.15, 31),
+      new THREE.Vector3(60, 2.15, 34),
+      new THREE.Vector3(60, 2.15, 52)
+    ];
+    this.railCurve = new THREE.CatmullRomCurve3(route, false, 'centripetal');
+    const railMaterial = new THREE.MeshStandardMaterial({ color: 0x64736f, metalness: 0.72, roughness: 0.34 });
+    const tieMaterial = new THREE.MeshLambertMaterial({ color: 0x745d43 });
+    const supportMaterial = new THREE.MeshLambertMaterial({ color: 0x56635c });
+    const railRadius = 0.075;
+    const railLength = this.railCurve.getLength();
+
+    for (const side of [-0.48, 0.48]) {
+      const offsetPoints = route.map((point, index) => {
+        const tangent = this.railCurve!.getTangentAt(index / (route.length - 1));
+        const normal = new THREE.Vector3(tangent.z, 0, -tangent.x).normalize();
+        return point.clone().addScaledVector(normal, side);
+      });
+      const curve = new THREE.CatmullRomCurve3(offsetPoints, false, 'centripetal');
+      const rail = new THREE.Mesh(new THREE.TubeGeometry(curve, 220, railRadius, 8, false), railMaterial);
+      rail.castShadow = true;
+      rail.receiveShadow = true;
+      this.scene.add(rail);
+    }
+
+    // Timber sleepers and supports make the elevated line read as a real track.
+    for (let distance = 0; distance <= railLength; distance += 1.45) {
+      const t = this.railCurve.getUtoTmapping(0, distance);
+      const point = this.railCurve.getPointAt(t);
+      const tangent = this.railCurve.getTangentAt(t);
+      const sleeper = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.14, 0.26), tieMaterial);
+      sleeper.position.copy(point);
+      sleeper.position.y -= 0.12;
+      sleeper.rotation.y = Math.atan2(-tangent.z, tangent.x) + Math.PI / 2;
+      sleeper.castShadow = true;
+      this.scene.add(sleeper);
+
+      if (Math.round(distance) % 7 < 2) {
+        const support = new THREE.Mesh(new THREE.BoxGeometry(0.42, 1.65, 0.42), supportMaterial);
+        support.position.set(point.x, 1.28, point.z);
+        support.castShadow = true;
+        support.receiveShadow = true;
+        this.scene.add(support);
+      }
+    }
+
+    this.liveTrains = [
+      this.createTrain(0x426b62, 0xd7bd78),
+      this.createTrain(0x8b4b3d, 0xe2d9c3)
+    ];
+    this.liveTrains.forEach((train) => this.scene.add(train));
+  }
+
+  private createTrain(bodyColor: number, accentColor: number) {
+    const train = new THREE.Group();
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor, metalness: 0.26, roughness: 0.55 });
+    const accentMaterial = new THREE.MeshStandardMaterial({ color: accentColor, metalness: 0.48, roughness: 0.38 });
+    const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x9ed5d2, emissive: 0x173c3c, metalness: 0.32, roughness: 0.22 });
+    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x262b29, metalness: 0.68, roughness: 0.4 });
+    const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffedb0 });
+
+    for (let carIndex = 0; carIndex < 3; carIndex++) {
+      const car = new THREE.Group();
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.28, 1.55), darkMaterial);
+      chassis.position.y = 0.38;
+      car.add(chassis);
+
+      const shell = new THREE.Mesh(new THREE.BoxGeometry(carIndex === 0 ? 2.65 : 2.8, 1.12, 1.5), bodyMaterial);
+      shell.position.y = 1.0;
+      car.add(shell);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.16, 1.42), accentMaterial);
+      roof.position.set(-0.08, 1.65, 0);
+      car.add(roof);
+
+      for (const z of [-0.765, 0.765]) {
+        for (const x of [-0.8, 0, 0.8]) {
+          const window = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.4, 0.045), windowMaterial);
+          window.position.set(x, 1.12, z);
+          car.add(window);
+        }
+        for (const x of [-0.9, 0.9]) {
+          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.14, 10), darkMaterial);
+          wheel.rotation.x = Math.PI / 2;
+          wheel.position.set(x, 0.18, z * 0.72);
+          car.add(wheel);
+        }
+      }
+
+      if (carIndex === 0) {
+        const cab = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.58, 1.3), accentMaterial);
+        cab.position.set(-0.48, 1.82, 0);
+        car.add(cab);
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.48, 1.38), accentMaterial);
+        nose.position.set(1.42, 0.88, 0);
+        car.add(nose);
+        const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.42, 8), darkMaterial);
+        chimney.position.set(0.68, 1.72, 0);
+        car.add(chimney);
+        for (const z of [-0.43, 0.43]) {
+          const light = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.12), headlightMaterial);
+          light.position.set(1.66, 0.96, z);
+          car.add(light);
+        }
+      }
+
+      car.position.x = -carIndex * 3.2;
+      car.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.castShadow = true;
+          object.receiveShadow = true;
+        }
+      });
+      train.add(car);
+    }
+
+    return train;
+  }
+
+  private updateLiveTrains(time: number) {
+    if (!this.railCurve || this.liveTrains.length === 0) return;
+    const routeLength = this.railCurve.getLength();
+
+    this.liveTrains.forEach((train, index) => {
+      const phase = (time * 3.5 + index * routeLength) % (routeLength * 2);
+      const movingForward = phase <= routeLength;
+      const distance = movingForward ? phase : routeLength * 2 - phase;
+      const t = this.railCurve!.getUtoTmapping(0, distance);
+      const position = this.railCurve!.getPointAt(t);
+      const tangent = this.railCurve!.getTangentAt(t);
+      if (!movingForward) tangent.negate();
+      train.position.set(position.x, 2.14, position.z);
+      train.rotation.y = Math.atan2(-tangent.z, tangent.x);
+    });
   }
 
   public hasBlock(x: number, y: number, z: number): boolean {

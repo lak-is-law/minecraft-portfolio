@@ -44,7 +44,9 @@ export class HUDManager {
     this.setupListeners();
     this.pushChatMessage('System', 'Welcome to Lakshya\'s Minecraft Portfolio World!');
     this.pushChatMessage('Lakshya', 'Explore 9 structures to see my live projects, experience, skills, and resume.');
-    this.pushChatMessage('Tip', 'Press [E] to interact with pedestals, chests, and signs. Hammer banners to launch live sites.');
+    this.pushChatMessage('Tip', document.body.classList.contains('touch-device')
+      ? 'Use [USE] to inspect objects and [MINE] to launch banner links.'
+      : 'Press [E] to interact with objects. Hammer banners to launch live sites.');
   }
 
   public onCycleWeather?: () => void;
@@ -240,37 +242,41 @@ export class HUDManager {
     }
 
     promptEl.style.display = 'block';
+    const useBadge = document.body.classList.contains('touch-device') ? '[USE]' : '[E]';
 
     if (target.targetBanner) {
       const p = target.targetBanner.project;
-      promptEl.innerHTML = `<span class="mc-key-badge" style="background:#ef4444;color:#fff;">[HAMMER: LEFT CLICK]</span> Launch Live Site: <strong>${p.title}</strong> [OPEN]`;
+      const action = document.body.classList.contains('touch-device') ? '[MINE] HIT BANNER' : '[HAMMER: LEFT CLICK]';
+      promptEl.innerHTML = `<span class="mc-key-badge" style="background:#ef4444;color:#fff;">${action}</span> Launch Live Site: <strong>${p.title}</strong> [OPEN]`;
     } else if (target.interactable) {
       const inter = target.interactable;
       if (inter.type === 'project') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> View Project: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> View Project: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'chest') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Open: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'experience') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'leadership') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'research') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Inspect Research: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect Research: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'interests') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Explore: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Explore: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'languages') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'minigame') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Builder Arena: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Builder Arena: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'skills') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Open: <strong>Skills Matrix</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>Skills Matrix</strong>`;
       } else if (inter.type === 'sign') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Read Sign: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Read Sign: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'teleport') {
-        promptEl.innerHTML = `<span class="mc-key-badge">[E]</span> Enter: <strong>Nether Portal</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       }
     } else {
-      promptEl.innerHTML = `<span class="mc-key-hint">[Left Click] Mine</span> | <span class="mc-key-hint">[Right Click] Place Block</span>`;
+      promptEl.innerHTML = document.body.classList.contains('touch-device')
+        ? `<span class="mc-key-hint">[MINE] Mine</span> · <span class="mc-key-hint">[PLACE] Place block</span>`
+        : `<span class="mc-key-hint">[Left Click] Mine</span> | <span class="mc-key-hint">[Right Click] Place Block</span>`;
     }
   }
 
@@ -402,6 +408,15 @@ export class HUDManager {
         else if (lm.tag === '[SALOON]') ctx.fillStyle = '#a16207';
         else if (lm.tag === '[BEACH]') ctx.fillStyle = '#06b6d4';
         else if (lm.tag === '[CITADEL]') ctx.fillStyle = '#4ade80';
+        else if (lm.tag.includes('AIRPORT')) ctx.fillStyle = '#38bdf8';
+        else if (lm.tag.includes('POLICE')) ctx.fillStyle = '#60a5fa';
+        else if (lm.tag.includes('HOSPITAL')) ctx.fillStyle = '#fb7185';
+        else if (lm.tag.includes('SCHOOL')) ctx.fillStyle = '#fbbf24';
+        else if (lm.tag.includes('ZOO')) ctx.fillStyle = '#4ade80';
+        else if (lm.tag.includes('CASTLE')) ctx.fillStyle = '#c084fc';
+        else if (lm.tag.includes('MEXICO')) ctx.fillStyle = '#34d399';
+        else if (lm.tag.includes('EIFFEL')) ctx.fillStyle = '#f9a8d4';
+        else if (lm.tag.includes('RAILWAY')) ctx.fillStyle = '#f97316';
         else ctx.fillStyle = '#94a3b8';
 
         ctx.fillRect(lx - 2, lz - 2, 4, 4);
