@@ -157,6 +157,10 @@ class Game {
       this.handleInteraction(target);
     };
 
+    this.player.onFlyStateChange = (isFlying: boolean) => {
+      this.hud.updateFlyStatus(isFlying);
+    };
+
     // Hammer project banner callback
     this.player.onHammerBanner = (project: Project) => {
       this.hud.pushChatMessage('[HAMMER]', `Smashed ${project.title} banner! Launching ${project.liveUrl}...`);
@@ -224,9 +228,7 @@ class Game {
 
     // Quick fly toggle button
     document.getElementById('btn-quick-fly')?.addEventListener('click', () => {
-      this.player.isFlying = !this.player.isFlying;
-      this.hud.updateFlyStatus(this.player.isFlying);
-      sound.playClick();
+      this.player.toggleFlight();
     });
 
     // Perspective & Sit Callbacks

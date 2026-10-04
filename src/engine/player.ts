@@ -3,6 +3,8 @@ import { VoxelWorld, ProjectBanner } from '../world/world';
 import { sound } from './audio';
 import { Project } from '../data/portfolioData';
 
+const SPAWN_POSITION = new THREE.Vector3(0, 2, 8);
+
 export interface TargetInfo {
   blockPos: THREE.Vector3;
   faceNormal: THREE.Vector3;
@@ -22,8 +24,8 @@ export class Player {
   public world: VoxelWorld;
   public domElement: HTMLElement;
 
-  // Position & Movement: start firmly on Spawn Plaza surface (Y = 1.0)
-  public position: THREE.Vector3 = new THREE.Vector3(0, 1.0, 4);
+  // Feet rest on top of the plaza's Y=1 floor, away from the central fountain.
+  public position: THREE.Vector3 = SPAWN_POSITION.clone();
   public velocity: THREE.Vector3 = new THREE.Vector3();
   public pitch: number = 0;
   public yaw: number = 0;
@@ -84,6 +86,7 @@ export class Player {
   public onHammerBanner?: (project: Project) => void;
   public onHotbarSelect?: (slotIndex: number) => void;
   public onWorldNotice?: (msg: string) => void;
+  public onFlyStateChange?: (isFlying: boolean) => void;
 
   constructor(camera: THREE.PerspectiveCamera, world: VoxelWorld, domElement: HTMLElement) {
     this.camera = camera;
@@ -240,9 +243,7 @@ export class Player {
       // Fly toggle on 'KeyF'
       if (e.code === 'KeyF') {
         if (e.repeat) return;
-        this.isFlying = !this.isFlying;
-        this.velocity.set(0, 0, 0);
-        sound.playClick();
+        this.toggleFlight();
       }
 
       // Space double-tap for fly toggle (ignore continuous keydown repeats!)
@@ -250,9 +251,7 @@ export class Player {
         if (e.repeat) return;
         const now = performance.now();
         if (now - this.lastSpaceTime < 320) {
-          this.isFlying = !this.isFlying;
-          this.velocity.set(0, 0, 0);
-          sound.playClick();
+          this.toggleFlight();
           this.lastSpaceTime = 0;
         } else {
           this.lastSpaceTime = now;
@@ -600,9 +599,7 @@ export class Player {
       // Landing: if flying down towards ground and feet reach solid floor, land cleanly!
       if (targetFlyY < 0 && proposedY <= highestFloor + 0.15 && highestFloor > -900) {
         this.position.y = highestFloor;
-        this.isFlying = false;
-        this.isGrounded = true;
-        this.velocity.set(0, 0, 0);
+        this.setFlying(false, true);
         sound.playStep('grass');
         if (this.onWorldNotice) {
           this.onWorldNotice('Landed softly on the ground.');
@@ -651,10 +648,8 @@ export class Player {
 
       // Void rescue safety
       if (this.position.y < -8.0) {
-        this.position.set(0, 1.0, 4);
-        this.velocity.set(0, 0, 0);
-        this.isFlying = false;
-        this.isGrounded = true;
+        this.position.copy(SPAWN_POSITION);
+        this.setFlying(false, true);
         sound.playLevelUp();
         if (this.onWorldNotice) {
           this.onWorldNotice('Void safety barrier saved you! Returned safely to Spawn Plaza.');
@@ -863,7 +858,7 @@ export class Player {
 
     // Void safety barrier: only trigger below bedrock
     if (this.position.y < -8.0) {
-      this.position.set(0, 1.0, 4);
+      this.position.copy(SPAWN_POSITION);
       this.velocity.set(0, 0, 0);
       this.isGrounded = true;
       sound.playLevelUp();
@@ -1350,9 +1345,19 @@ export class Player {
   }
 
   public handleTouchFly() {
-    this.isFlying = !this.isFlying;
-    this.velocity.set(0, 0, 0);
+    this.toggleFlight();
+  }
+
+  public toggleFlight() {
+    this.setFlying(!this.isFlying, false);
     sound.playClick();
+  }
+
+  private setFlying(isFlying: boolean, isGrounded: boolean) {
+    this.isFlying = isFlying;
+    this.isGrounded = isGrounded;
+    this.velocity.set(0, 0, 0);
+    this.onFlyStateChange?.(isFlying);
   }
 
 }

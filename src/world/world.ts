@@ -496,7 +496,8 @@ export class VoxelWorld {
   // 3D NPC of Lakshya near spawn (Authentic Photo-Inspired Model)
   private createLakshyaNPC() {
     const npc = new THREE.Group();
-    npc.position.set(3.5, 1, 3.5);
+    // Keep the NPC on dry ground beside the spawn point, outside the fountain.
+    npc.position.set(3.5, 2, 7.5);
 
     const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 }); // Warm skin tone
     const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b }); // Black oversized graphic tee
