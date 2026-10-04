@@ -47,6 +47,7 @@ export class Player {
   // Input states
   private keys: { [key: string]: boolean } = {};
   private lastSpaceTime: number = 0;
+  private jumpBufferTimer: number = 0;
   private lastWTime: number = 0;
   private readonly flightTapWindowMs = 450;
   private flightTapBoost = 0;
@@ -195,7 +196,7 @@ export class Player {
     document.addEventListener('mousemove', (e) => {
       if (!this.isLocked) return;
 
-      const sensitivity = 0.0022;
+      const sensitivity = 0.0011;
       let dx = e.movementX;
       let dy = e.movementY;
       if (this.isPointerLockFallback) {
@@ -304,6 +305,7 @@ export class Player {
       // Space double-tap for fly toggle (ignore continuous keydown repeats!)
       if (e.code === 'Space') {
         if (e.repeat) return;
+        e.preventDefault();
         const now = performance.now();
         if (this.isFlying) {
           // A short tap still gains visible height; holding continues the climb.
@@ -314,6 +316,7 @@ export class Player {
           if (this.isFlying) this.flightTapBoost = 0.75;
           this.lastSpaceTime = 0;
         } else {
+          this.jumpBufferTimer = 0.14;
           this.lastSpaceTime = now;
         }
       }
@@ -581,6 +584,8 @@ export class Player {
   }
 
   private updateMovement(dt: number) {
+    this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
+
     // Determine movement direction relative to camera yaw
     const forward = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw)).normalize();
     const right = new THREE.Vector3(Math.cos(this.yaw), 0, -Math.sin(this.yaw)).normalize();
@@ -766,9 +771,10 @@ export class Player {
       if (this.velocity.y < -35.0) this.velocity.y = -35.0; // terminal velocity
 
       // Jump
-      if (this.isGrounded && (this.keys['Space'] || this.touchMove.jump)) {
+      if (this.isGrounded && (this.jumpBufferTimer > 0 || this.keys['Space'] || this.touchMove.jump)) {
         this.velocity.y = 8.5; // authentic Minecraft jump impulse
         this.isGrounded = false;
+        this.jumpBufferTimer = 0;
         sound.playStep('grass');
       }
     }
@@ -1310,8 +1316,8 @@ export class Player {
       const dx = e.clientX - this.lastTouchLookPos.x;
       const dy = e.clientY - this.lastTouchLookPos.y;
       this.lastTouchLookPos = { x: e.clientX, y: e.clientY };
-      this.yaw -= dx * 0.0038;
-      this.pitch -= dy * 0.0038;
+      this.yaw -= dx * 0.0024;
+      this.pitch -= dy * 0.0024;
       const maxPitch = Math.PI / 2 - 0.02;
       this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
     });
