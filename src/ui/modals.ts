@@ -299,6 +299,7 @@ export class ModalManager {
       { number: '13', name: 'Eiffel Tower', subtitle: 'Paris by night', detail: 'See the illuminated iron landmark rising above the northern gardens.', index: 16, tone: 'frost', direction: 'NORTH · X 49' },
       { number: '14', name: 'Central Station', subtitle: 'Platforms & live trains', detail: 'Watch the trains roll through the covered station and onward to the airport.', index: 17, tone: 'neoyork', direction: 'EAST · X 60' },
       { number: '15', name: 'Skyport', subtitle: 'Terminal & runway', detail: 'Follow the runway to the terminal and control tower at the edge of town.', index: 9, tone: 'frost', direction: 'SOUTHEAST · Z 62' },
+      { number: '16', name: 'Hollywood Hills', subtitle: 'The sign above the skyline', detail: 'Climb the ridge trail to a sunset overlook beneath the famous white hillside letters.', index: 18, tone: 'coast', direction: 'NORTHEAST · X 82' },
     ];
     const regionsHtml = atlasRegions.map((region) => `
       <article class="atlas-region-card atlas-${region.tone}">
@@ -323,7 +324,7 @@ export class ModalManager {
           <div>
             <p class="atlas-eyebrow">LAKSHYA’S PORTFOLIO WORLD <span>·</span> FIELD GUIDE 01</p>
             <h2 class="mc-dialog-title">A world worth exploring.</h2>
-            <span class="mc-dialog-subtitle">Fifteen neighborhoods and landmarks, connected by one central crossroads.</span>
+            <span class="mc-dialog-subtitle">Sixteen neighborhoods and landmarks, connected by one central crossroads.</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
@@ -348,7 +349,7 @@ export class ModalManager {
         </div>
 
         <div class="mc-max-map-canvas-container">
-          <canvas id="max-realm-canvas" width="960" height="600"></canvas>
+          <canvas id="max-realm-canvas" width="1600" height="860"></canvas>
         </div>
 
         <div class="atlas-map-caption"><span><i class="atlas-key-dot atlas-key-player"></i> YOU ARE HERE</span><span><i class="atlas-key-dot atlas-key-place"></i> WAYPOINT</span><span><i class="atlas-key-line"></i> MAIN ROUTE</span><span class="atlas-caption-hint">Click the map to travel anywhere</span></div>
@@ -405,13 +406,15 @@ export class ModalManager {
     if (!ctx) return;
 
     const compact = window.innerWidth < 740;
-    const width = compact ? 600 : canvas.width;
-    const height = 600;
-    canvas.width = width;
-    canvas.height = height;
+    const width = compact ? 960 : 1600;
+    const height = 860;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     const cx = width / 2;
     const cy = height / 2;
-    const scale = 1.84;
+    const scale = 2.8;
     const worldLimit = 136;
     const mapHalfW = worldLimit * scale;
     const mapHalfH = worldLimit * scale;
@@ -445,18 +448,19 @@ export class ModalManager {
         { name: 'Center: Citadel Hub', color: '#94a3b8', desc: 'Compass Rose & Moat' },
         { name: 'East: Neo York', color: '#38bdf8', desc: 'Times Sq & Lak Tower' },
         { name: 'West: Pueblo Royale', color: '#fb923c', desc: 'Adobe Village & Arena' },
-        { name: 'South: Sunset & Beach', color: '#fbbf24', desc: 'Saloon, Pier & Merlion' }
+        { name: 'South: Sunset & Beach', color: '#fbbf24', desc: 'Saloon, Pier & Merlion' },
+        { name: 'NE: Hollywood Hills', color: '#d7a879', desc: 'Ridge trail & hillside sign' }
       ];
 
       biomes.forEach((b, i) => {
-        const by = 48 + i * 38;
+        const by = 48 + i * 34;
         ctx.fillStyle = b.color;
         ctx.fillRect(22, by, 10, 10);
         ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 9px monospace';
+        ctx.font = 'bold 10px monospace';
         ctx.fillText(b.name, 38, by + 9);
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '8px monospace';
+        ctx.font = '9px monospace';
         ctx.fillText(b.desc, 38, by + 20);
       });
 
@@ -524,7 +528,7 @@ export class ModalManager {
       // Island Landmass Coastline (Organic Circle)
       ctx.save();
       ctx.beginPath();
-      const numPts = 64;
+      const numPts = 256;
       for (let i = 0; i <= numPts; i++) {
         const th = (i / numPts) * Math.PI * 2;
         const r = (112 + Math.sin(th * 5) * 5 + Math.cos(th * 3) * 4) * scale;
@@ -565,6 +569,29 @@ export class ModalManager {
       mapRect(-136, -136, -25, -45, '#9d718a'); // Sakura
       mapRect(-35, -136, 35, -65, '#b5c4c0'); // Frostpeaks, highest priority
 
+      // Hollywood Hills: layered ridge shading and the sign above the city.
+      const hollywoodX = cx + 82 * scale;
+      const hollywoodZ = cy - 58 * scale;
+      ctx.fillStyle = 'rgba(91,61,43,.48)';
+      ctx.beginPath();
+      ctx.ellipse(hollywoodX, hollywoodZ + 11 * scale, 34 * scale, 15 * scale, -.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(210,166,119,.8)';
+      ctx.beginPath();
+      ctx.moveTo(hollywoodX - 31 * scale, hollywoodZ + 8 * scale);
+      ctx.lineTo(hollywoodX - 15 * scale, hollywoodZ - 5 * scale);
+      ctx.lineTo(hollywoodX - 7 * scale, hollywoodZ - 1 * scale);
+      ctx.lineTo(hollywoodX + 8 * scale, hollywoodZ - 17 * scale);
+      ctx.lineTo(hollywoodX + 17 * scale, hollywoodZ - 7 * scale);
+      ctx.lineTo(hollywoodX + 30 * scale, hollywoodZ + 4 * scale);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,239,206,.7)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#fff8e8';
+      ctx.fillRect(hollywoodX - 18 * scale, hollywoodZ + 10 * scale, 36 * scale, 2 * scale);
+
       // Ridge lines and a reflecting pool give the regions a little topography.
       ctx.strokeStyle = 'rgba(255,255,255,.34)';
       ctx.lineWidth = 1.5;
@@ -598,6 +625,7 @@ export class ModalManager {
       route([[5, -51], [20, -64], [42, -85], [55, -95]]);
       route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
       route([[0, 22], [0, 58], [0, 92], [6, 110]]);
+      route([[20, 0], [46, -7], [66, -24], [82, -58]]);
       ctx.strokeStyle = '#e6d5a5';
       ctx.lineWidth = 2.2;
       route([[0, -22], [0, -65], [0, -91]]);
@@ -606,6 +634,7 @@ export class ModalManager {
       route([[5, -51], [20, -64], [42, -85], [55, -95]]);
       route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
       route([[0, 22], [0, 58], [0, 92], [6, 110]]);
+      route([[20, 0], [46, -7], [66, -24], [82, -58]]);
 
       // Small settlement marks help distinguish the built-up districts.
       const block = (x: number, z: number, color: string, size = 5) => {
@@ -681,6 +710,7 @@ export class ModalManager {
         else if (lm.tag.includes('MEXICO')) col = '#34d399';
         else if (lm.tag.includes('EIFFEL')) col = '#f9a8d4';
         else if (lm.tag.includes('RAILWAY')) col = '#f97316';
+        else if (lm.tag.includes('HOLLYWOOD')) col = '#f5c389';
 
         // Glowing outer halo
         ctx.fillStyle = col + '44';
@@ -703,15 +733,15 @@ export class ModalManager {
 
         // Tag label
         ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 8px monospace';
+        ctx.font = 'bold 10px monospace';
         const txt = lm.tag.replace(/[\[\]]/g, '');
         const tw = ctx.measureText(txt).width;
-        ctx.fillRect(lx - tw / 2 - 2, lz + 7, tw + 4, 11);
+        ctx.fillRect(lx - tw / 2 - 3, lz + 7, tw + 6, 14);
         ctx.strokeStyle = col;
         ctx.lineWidth = 1;
         ctx.strokeRect(lx - tw / 2 - 2, lz + 7, tw + 4, 11);
         ctx.fillStyle = col;
-        ctx.fillText(txt, lx - tw / 2, lz + 15);
+        ctx.fillText(txt, lx - tw / 2, lz + 17);
       }
 
       // 5. Active Live Dragons
@@ -815,8 +845,8 @@ export class ModalManager {
     // Mousemove for live hover coordinates
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+      const mx = (e.clientX - rect.left) * (width / rect.width);
+      const my = (e.clientY - rect.top) * (height / rect.height);
 
       const wx = Math.round((mx - cx) / scale);
       const wz = Math.round((my - cy) / scale);
@@ -847,8 +877,8 @@ export class ModalManager {
     // Click to Teleport!
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+      const mx = (e.clientX - rect.left) * (width / rect.width);
+      const my = (e.clientY - rect.top) * (height / rect.height);
 
       const wx = Math.round((mx - cx) / scale);
       const wz = Math.round((my - cy) / scale);
@@ -859,6 +889,10 @@ export class ModalManager {
           let targetY = 2;
           if (wz <= -75 && Math.abs(wx) <= 35) targetY = 18;
           else if (wz <= -80 && wx >= 35 && wx <= 75) targetY = 4;
+          else {
+            const hillDistance = Math.hypot((wx - 82) / 34, (wz + 58) / 24);
+            if (hillDistance < 1) targetY = Math.max(2, Math.round(28 * (1 - hillDistance)) + 2);
+          }
           this.onTeleportRequest([wx, targetY, wz]);
           this.close();
         }

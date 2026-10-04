@@ -125,7 +125,7 @@ export class HUDManager {
           <span class="mc-minimap-title">[MAP: M]</span>
           <span class="mc-minimap-heading" id="minimap-heading">N</span>
         </div>
-        <canvas id="minimap-canvas" width="130" height="130"></canvas>
+        <canvas id="minimap-canvas" width="320" height="320"></canvas>
       </div>
     `;
   }
@@ -322,17 +322,23 @@ export class HUDManager {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const w = 130;
-    const h = 130;
+    const w = 160;
+    const h = 160;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== w * pixelRatio || canvas.height !== h * pixelRatio) {
+      canvas.width = w * pixelRatio;
+      canvas.height = h * pixelRatio;
+    }
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
     // 1. Radar background
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, w, h);
 
-    const cx = 65;
-    const cz = 65;
-    const scale = 0.52;
+    const cx = 80;
+    const cz = 80;
+    const scale = 0.64;
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
@@ -360,6 +366,18 @@ export class HUDManager {
     worldRect(45, -45, 108, 45, '#47798b');
     worldRect(-108, 8, -35, 75, '#a95e36');
     worldRect(-108, 55, 108, 108, '#d0ad58');
+
+    // Hollywood ridge above Neo York, with a highlighted approach trail.
+    ctx.fillStyle = 'rgba(215,168,121,.9)';
+    ctx.beginPath();
+    ctx.ellipse(originX + 82 * scale, originZ - 58 * scale, 24 * scale, 12 * scale, -.25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,240,215,.75)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(originX + 84 * scale, originZ - 32 * scale);
+    ctx.lineTo(originX + 82 * scale, originZ - 58 * scale);
+    ctx.stroke();
 
     // Roads and the citadel read clearly at radar scale.
     ctx.strokeStyle = 'rgba(226,232,240,.8)';
@@ -417,6 +435,7 @@ export class HUDManager {
         else if (lm.tag.includes('MEXICO')) ctx.fillStyle = '#34d399';
         else if (lm.tag.includes('EIFFEL')) ctx.fillStyle = '#f9a8d4';
         else if (lm.tag.includes('RAILWAY')) ctx.fillStyle = '#f97316';
+        else if (lm.tag.includes('HOLLYWOOD')) ctx.fillStyle = '#f5c389';
         else ctx.fillStyle = '#94a3b8';
 
         ctx.fillRect(lx - 2, lz - 2, 4, 4);

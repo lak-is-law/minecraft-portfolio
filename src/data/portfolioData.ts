@@ -428,6 +428,7 @@ export const PORTFOLIO_DATA = {
     { name: "Rapunzel’s Castle", coords: [-46, 2, -50], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and a golden braid cascading into its gardens" },
     { name: "Mexico City · Zócalo", coords: [-90, 2, 36], tag: "[MEXICO CITY]", desc: "A metropolitan plaza with cathedral towers, colorful market stalls, and a central fountain" },
     { name: "Eiffel Tower", coords: [49, 2, -49], tag: "[EIFFEL]", desc: "A landmark iron tower with observation decks, beacon, and a garden avenue" },
-    { name: "Crossroads Central Station", coords: [60, 2, 34], tag: "[RAILWAY]", desc: "A covered rail station with live train service to the Citadel and airport" }
+    { name: "Crossroads Central Station", coords: [60, 2, 34], tag: "[RAILWAY]", desc: "A covered rail station with live train service to the Citadel and airport" },
+    { name: "Hollywood Hills & Sign", coords: [82, 30, -58], tag: "[HOLLYWOOD]", desc: "A terraced ridge with a block-built Hollywood sign, lit hiking trail, and skyline overlook" }
   ]
 };

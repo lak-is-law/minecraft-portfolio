@@ -305,6 +305,8 @@ body, html {
 
 #minimap-canvas {
   display: block;
+  width: 160px;
+  height: 160px;
 }
 
 /* Maximised World Map & Realm Atlas Dialog */
@@ -378,7 +380,7 @@ body, html {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 58vh;
+  max-height: 70vh;
   object-fit: contain;
   cursor: crosshair;
 }
@@ -430,8 +432,8 @@ body, html {
 
 /* Field guide atlas */
 .mc-dialog.mc-max-map-dialog {
-  width: min(95vw, 1120px);
-  max-width: 1120px;
+  width: min(97vw, 1380px);
+  max-width: 1380px;
   max-height: 94vh;
   padding: 22px 26px 16px;
   background: #101714;
@@ -591,6 +593,7 @@ body, html {
   .atlas-destination-list { grid-template-columns: 1fr; }
 }
 @media (max-width: 460px) {
+  #minimap-canvas { width: 132px; height: 132px; }
   .mc-max-map-dialog .mc-dialog-header { gap: 10px; }
   .mc-max-map-dialog .mc-dialog-title { font-size: 18px; }
   .mc-max-map-dialog .mc-dialog-subtitle { font-size: 10px; }

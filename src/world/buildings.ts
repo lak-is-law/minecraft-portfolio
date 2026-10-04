@@ -1305,6 +1305,94 @@ export class WorldBuilder {
     this.buildEiffelTower(49, -49);
     this.buildAirport(61, 62);
     this.buildRailwayStation(60, 34);
+    this.buildHollywoodMountain(82, -58);
+  }
+
+  private buildHollywoodMountain(cx: number, cz: number) {
+    const radiusX = 34;
+    const radiusZ = 24;
+    const peakHeight = 28;
+    const ridgeHeight = (dx: number, dz: number) => {
+      const distance = Math.hypot(dx / radiusX, dz / radiusZ);
+      return distance >= 1 ? 0 : Math.max(0, Math.round(peakHeight * (1 - distance)));
+    };
+
+    // Rounded, layered hills cut cleanly to the island shoreline.
+    for (let dx = -radiusX; dx <= radiusX; dx++) {
+      for (let dz = -radiusZ; dz <= radiusZ; dz++) {
+        const height = ridgeHeight(dx, dz);
+        const x = cx + dx;
+        const z = cz + dz;
+        const angle = Math.atan2(z, x);
+        const coastRadius = 112 + Math.sin(angle * 5) * 5 + Math.cos(angle * 3) * 4;
+        if (!height || Math.hypot(x, z) >= coastRadius - 1) continue;
+
+        for (let y = 1; y <= height; y++) {
+          const block = y === height
+            ? (height > 20 ? 'stone_bricks' : height > 9 ? 'terracotta_adobe' : 'red_sandstone')
+            : (y > 18 ? 'stone_bricks' : 'red_sandstone');
+          this.setBlock(x, y, z, block);
+        }
+      }
+    }
+
+    // A switchback-free stepped path climbs from Broadway to the summit.
+    let lastPathY = 2;
+    for (let z = cz + radiusZ; z >= cz; z--) {
+      const height = ridgeHeight(2, z - cz);
+      const pathY = Math.max(lastPathY, height + 1);
+      this.setBlock(cx + 2, pathY, z, 'smooth_stone');
+      if ((cz - z) % 4 === 0) {
+        this.setBlock(cx + 1, pathY + 1, z, 'oak_fence');
+        this.setBlock(cx + 3, pathY + 1, z, 'oak_fence');
+        if ((cz - z) % 8 === 0) this.setBlock(cx + 3, pathY + 2, z, 'glowstone');
+      }
+      lastPathY = pathY;
+    }
+
+    // Individually built block letters follow the slope of the south-facing ridge.
+    const letters: Record<string, string[]> = {
+      H: ['101', '101', '111', '101', '101'],
+      O: ['111', '101', '101', '101', '111'],
+      L: ['100', '100', '100', '100', '111'],
+      Y: ['101', '101', '010', '010', '010'],
+      W: ['101', '101', '101', '111', '101'],
+      D: ['110', '101', '101', '101', '110']
+    };
+    const signDepth = 14;
+    const signZ = cz + signDepth;
+    const word = 'HOLLYWOOD';
+    const signStartX = cx - 18;
+    for (let dx = -20; dx <= 20; dx++) {
+      const x = cx + dx;
+      const groundY = ridgeHeight(dx, signDepth);
+      const baseY = Math.max(1, groundY);
+      this.setBlock(x, baseY + 1, signZ, 'red_terracotta');
+      this.setBlock(x, baseY + 2, signZ, 'red_terracotta');
+      this.setBlock(x, baseY + 3, signZ, 'red_terracotta');
+      this.setBlock(x, baseY + 4, signZ, 'red_terracotta');
+      this.setBlock(x, baseY + 5, signZ, 'red_terracotta');
+    }
+    word.split('').forEach((letter, index) => {
+      const glyph = letters[letter];
+      for (let col = 0; col < 3; col++) {
+        const dx = signStartX + index * 4 + col - cx;
+        const groundY = ridgeHeight(dx, signDepth);
+        const baseY = Math.max(1, groundY);
+        for (let row = 0; row < 5; row++) {
+          if (glyph[row][col] === '1') {
+            this.setBlock(signStartX + index * 4 + col, baseY + 5 - row, signZ + 1, 'quartz_block');
+          }
+        }
+      }
+    });
+
+    this.setBlock(cx + 2, 2, cz + radiusZ, 'glowstone', {
+      type: 'sign',
+      title: 'Hollywood Hills Trail',
+      text: 'Follow the lit ridge path to the Hollywood sign and summit overlook.'
+    });
+    this.setBlock(cx, peakHeight + 1, cz, 'beacon');
   }
 
   private buildHospital(cx: number, cz: number) {
