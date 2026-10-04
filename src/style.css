@@ -16,7 +16,7 @@ body, html {
   font-family: 'Press Start 2P', monospace;
   color: #fff;
   image-rendering: pixelated;
-  touch-action: none;
+  touch-action: manipulation;
   -webkit-touch-callout: none;
 }
 
@@ -577,6 +577,32 @@ body, html {
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+/* Phone controls use safe-area spacing and remain hidden on narrow non-touch laptops. */
+body:not(.touch-device) #mc-touch-controls { display: none !important; }
+body.touch-device:not(.game-active) #mc-touch-controls { display: none !important; }
+#mc-touch-controls {
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+.mc-dpad-btn, .mc-touch-action-btn { touch-action: none; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible { outline: 3px solid #facc15; outline-offset: 2px; }
+@media (max-width: 480px) {
+  .mc-dpad { margin-bottom: 92px; margin-left: 0; }
+  .mc-touch-actions { margin-bottom: 92px; margin-right: 0; gap: 6px; }
+  .mc-dpad-btn { width: 48px; height: 48px; }
+  .mc-touch-action-btn { min-width: 56px; height: 44px; }
+  #mc-hotbar { bottom: max(4px, env(safe-area-inset-bottom)); }
+}
+@media (max-height: 480px) and (orientation: landscape) {
+  .mc-dpad, .mc-touch-actions { margin-bottom: 62px; }
+  .mc-dpad-btn { width: 42px; height: 42px; }
+  .mc-touch-actions { gap: 4px; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; max-width: 38vw; }
+  .mc-touch-action-btn { min-width: 52px; height: 38px; }
+  #mc-quick-nav { top: 8px; left: 115px; max-width: calc(100% - 125px); }
 }
 
 /* 3D Minecraft Title Header & Splash */
@@ -1520,4 +1546,125 @@ body, html {
     height: 38px;
     font-size: 7px;
   }
+}
+
+/* ==========================================================
+   WELCOME MENU REDESIGN
+   ========================================================== */
+#pause-overlay {
+  padding: clamp(12px, 3vw, 36px);
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(37, 68, 48, 0.36), transparent 52%),
+    linear-gradient(180deg, rgba(7, 12, 17, 0.64), rgba(5, 8, 12, 0.88));
+  backdrop-filter: blur(8px) saturate(0.75);
+}
+
+.pause-content.mc-menu-card {
+  width: min(100%, 790px);
+  max-width: 790px;
+  padding: clamp(24px, 4vw, 42px) clamp(20px, 5vw, 54px) 24px;
+  border: 1px solid #687266;
+  border-radius: 3px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.035), transparent 34%),
+    #202522;
+  box-shadow:
+    inset 0 0 0 5px #171b19,
+    inset 0 0 0 6px #424a43,
+    0 30px 90px rgba(0,0,0,.72),
+    0 0 0 1px rgba(0,0,0,.8);
+  max-height: min(92vh, 900px);
+  scrollbar-color: #596357 #202522;
+}
+
+.mc-menu-header { margin-bottom: 10px; }
+.mc-logo-title {
+  font-size: clamp(25px, 4vw, 36px);
+  letter-spacing: 1px;
+  color: #f3f2e9;
+  text-shadow: 0 2px #b4b7ae, 0 4px #747c72, 0 6px #485047, 0 9px #171b19, 0 12px 18px #000;
+}
+.mc-logo-subtitle {
+  color: #8bd9b2;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 14px rgba(87, 210, 147, .28);
+}
+.mc-splash-text {
+  color: #f4dc72;
+  text-shadow: 2px 2px #57491b, 0 0 12px rgba(244,220,114,.25);
+}
+.pause-subtitle {
+  max-width: 580px;
+  margin: 14px auto 24px;
+  color: #b2bbb1;
+  font-size: 9px;
+  line-height: 1.9;
+}
+
+.mc-btn-primary.mc-btn-large {
+  min-height: 64px;
+  border: 1px solid #78e6a5;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #35c96d, #168e4a);
+  box-shadow: inset 0 2px rgba(255,255,255,.32), inset 0 -5px rgba(0,0,0,.2), 0 5px 0 #0c542f, 0 10px 22px rgba(0,0,0,.3);
+  text-shadow: 2px 2px #14532d;
+  letter-spacing: .2px;
+}
+.mc-btn-primary.mc-btn-large:hover { background: linear-gradient(180deg, #4cdd83, #1da75a); }
+.mc-btn-primary.mc-btn-large:active { box-shadow: inset 0 3px rgba(0,0,0,.2), 0 2px 0 #0c542f; }
+.mc-btn-play-icon { color: #fff1a6; }
+
+.mc-menu-actions-grid { gap: 10px; margin: 18px 0 22px; }
+.mc-btn-secondary {
+  min-height: 56px;
+  padding: 10px 8px;
+  border: 1px solid #626b63;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #3a403b, #2a302c);
+  box-shadow: inset 0 1px rgba(255,255,255,.15), inset 0 -3px rgba(0,0,0,.2), 0 3px 0 #161a17;
+  color: #e6e9df;
+  font-size: 8px;
+  line-height: 1.6;
+}
+.mc-btn-secondary:hover {
+  border-color: #91d5aa;
+  background: linear-gradient(180deg, #47554a, #303c33);
+  color: #c8f5d7;
+}
+
+.mc-controls-section {
+  padding: 14px 16px 15px;
+  border: 1px solid #454d47;
+  border-radius: 2px;
+  background: rgba(14, 18, 16, .75);
+  box-shadow: inset 0 1px rgba(255,255,255,.035);
+}
+.mc-controls-header { border-bottom-color: #343b36; }
+.mc-controls-title { color: #e8cc68; }
+.mc-controls-toggle-btn { border-color: #49524b; color: #a9b4a9; }
+.mc-col-heading { color: #8bd9b2; }
+.mc-control-row { min-height: 21px; }
+.mc-key-kbd {
+  border-color: #515950;
+  background: #292f2b;
+  color: #e9d77f;
+}
+.mc-key-desc { color: #b9c1b8; }
+.mc-menu-footer { margin-top: 18px; color: #858e84; }
+.mc-footer-link { color: #8bd9b2; }
+
+@media (max-width: 620px) {
+  .pause-content.mc-menu-card { padding: 24px 18px 18px; }
+  .mc-controls-grid { gap: 14px; }
+  .mc-menu-actions-grid { gap: 8px; }
+  .mc-btn-secondary { min-height: 48px; }
+  .mc-splash-text { right: -18px; font-size: 8px; }
+}
+
+@media (max-height: 680px) and (min-width: 621px) {
+  .pause-content.mc-menu-card { padding-top: 20px; padding-bottom: 16px; }
+  .pause-subtitle { margin-bottom: 14px; }
+  .mc-controls-section { padding-top: 10px; padding-bottom: 10px; }
+  .mc-menu-footer { margin-top: 12px; }
 }
