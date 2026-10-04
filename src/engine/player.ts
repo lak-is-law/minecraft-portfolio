@@ -47,6 +47,7 @@ export class Player {
   private lastSpaceTime: number = 0;
   private lastWTime: number = 0;
   private readonly flightTapWindowMs = 450;
+  private flightTapBoost = 0;
 
   // Targeting & Raycasting
   public currentTarget: TargetInfo | null = null;
@@ -251,8 +252,13 @@ export class Player {
       if (e.code === 'Space') {
         if (e.repeat) return;
         const now = performance.now();
-        if (now - this.lastSpaceTime < this.flightTapWindowMs) {
+        if (this.isFlying) {
+          // A short tap still gains visible height; holding continues the climb.
+          this.flightTapBoost = Math.min(this.flightTapBoost + 0.75, 3);
+          this.lastSpaceTime = 0;
+        } else if (now - this.lastSpaceTime < this.flightTapWindowMs) {
           this.toggleFlight();
+          if (this.isFlying) this.flightTapBoost = 0.75;
           this.lastSpaceTime = 0;
         } else {
           this.lastSpaceTime = now;
@@ -322,6 +328,7 @@ export class Player {
     window.addEventListener('blur', () => {
       this.keys = {};
       this.isSprinting = false;
+      this.flightTapBoost = 0;
     });
   }
 
@@ -564,7 +571,8 @@ export class Player {
       this.velocity.y = targetFlyY;
 
       // Proposed vertical position
-      const proposedY = this.position.y + this.velocity.y * dt;
+      const proposedY = this.position.y + this.velocity.y * dt + this.flightTapBoost;
+      this.flightTapBoost = 0;
 
       // Ground detection beneath feet in flight mode
       let highestFloor = -999;
@@ -1277,10 +1285,14 @@ export class Player {
       this.isSitting = false;
       return;
     }
-    if (this.isFlying) return;
+    if (this.isFlying) {
+      this.flightTapBoost = Math.min(this.flightTapBoost + 0.75, 3);
+      return;
+    }
     const now = performance.now();
     if (now - this.lastSpaceTime < this.flightTapWindowMs) {
       this.setFlying(true, false);
+      this.flightTapBoost = 0.75;
       sound.playClick();
       this.lastSpaceTime = 0;
     } else {
@@ -1350,6 +1362,7 @@ export class Player {
     this.isFlying = isFlying;
     this.isGrounded = isGrounded;
     this.velocity.set(0, 0, 0);
+    this.flightTapBoost = 0;
     this.onFlyStateChange?.(isFlying);
   }
 
