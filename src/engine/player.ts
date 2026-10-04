@@ -196,7 +196,7 @@ export class Player {
     document.addEventListener('mousemove', (e) => {
       if (!this.isLocked) return;
 
-      const sensitivity = 0.0011;
+      const sensitivity = 0.0033;
       let dx = e.movementX;
       let dy = e.movementY;
       if (this.isPointerLockFallback) {
@@ -1316,8 +1316,8 @@ export class Player {
       const dx = e.clientX - this.lastTouchLookPos.x;
       const dy = e.clientY - this.lastTouchLookPos.y;
       this.lastTouchLookPos = { x: e.clientX, y: e.clientY };
-      this.yaw -= dx * 0.0024;
-      this.pitch -= dy * 0.0024;
+      this.yaw -= dx * 0.0042;
+      this.pitch -= dy * 0.0042;
       const maxPitch = Math.PI / 2 - 0.02;
       this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
     });
