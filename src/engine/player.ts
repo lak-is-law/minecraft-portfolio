@@ -113,7 +113,30 @@ export class Player {
 
     const requestLock = () => {
       if (!this.isLocked) {
-        this.domElement.requestPointerLock();
+        const startWithoutPointerLock = () => {
+          // Safari and some embedded browsers don't support Pointer Lock. Keep
+          // the world playable with keyboard/mouse input and a visible cursor.
+          this.isLocked = true;
+          if (pauseOverlay) pauseOverlay.style.display = 'none';
+          document.body.classList.add('game-active');
+        };
+        const requestPointerLock = (this.domElement as HTMLElement & {
+          requestPointerLock?: () => void | Promise<void>;
+        }).requestPointerLock;
+
+        if (!requestPointerLock) {
+          startWithoutPointerLock();
+          return;
+        }
+
+        try {
+          const result = requestPointerLock.call(this.domElement);
+          if (result && typeof result.catch === 'function') {
+            result.catch(startWithoutPointerLock);
+          }
+        } catch {
+          startWithoutPointerLock();
+        }
       }
     };
 
@@ -148,6 +171,14 @@ export class Player {
       const label = document.getElementById('play-btn-label');
       if (label) {
         label.textContent = this.isLocked ? 'RESUME GAME' : 'RESUME GAME';
+      }
+    });
+
+    document.addEventListener('pointerlockerror', () => {
+      if (!this.isLocked) {
+        this.isLocked = true;
+        if (pauseOverlay) pauseOverlay.style.display = 'none';
+        document.body.classList.add('game-active');
       }
     });
 
