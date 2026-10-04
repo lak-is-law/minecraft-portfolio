@@ -316,7 +316,14 @@ export class Player {
           if (this.isFlying) this.flightTapBoost = 0.75;
           this.lastSpaceTime = 0;
         } else {
-          this.jumpBufferTimer = 0.14;
+          if (this.isGrounded) {
+            this.velocity.y = this.checkInWater() ? 3.6 : 8.5;
+            this.isGrounded = false;
+            this.jumpBufferTimer = 0;
+            sound.playStep('grass');
+          } else {
+            this.jumpBufferTimer = 0.14;
+          }
           this.lastSpaceTime = now;
         }
       }
