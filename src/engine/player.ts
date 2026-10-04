@@ -36,6 +36,8 @@ export class Player {
   public isSneaking: boolean = false;
   public isSprinting: boolean = false;
   public isLocked: boolean = false;
+  private isPointerLockFallback: boolean = false;
+  private fallbackMousePosition: { x: number; y: number } | null = null;
 
   // Dimensions
   public height: number = 1.8;
@@ -116,6 +118,8 @@ export class Player {
         const startWithoutPointerLock = () => {
           // Safari and some embedded browsers don't support Pointer Lock. Keep
           // the world playable with keyboard/mouse input and a visible cursor.
+          this.isPointerLockFallback = true;
+          this.fallbackMousePosition = null;
           this.isLocked = true;
           if (pauseOverlay) pauseOverlay.style.display = 'none';
           document.body.classList.add('game-active');
@@ -163,6 +167,10 @@ export class Player {
 
     document.addEventListener('pointerlockchange', () => {
       this.isLocked = document.pointerLockElement === this.domElement;
+      if (this.isLocked) {
+        this.isPointerLockFallback = false;
+        this.fallbackMousePosition = null;
+      }
       if (pauseOverlay) {
         const modalContainer = document.getElementById('modal-container');
         const isModalOpen = modalContainer && modalContainer.style.display === 'flex';
@@ -176,6 +184,8 @@ export class Player {
 
     document.addEventListener('pointerlockerror', () => {
       if (!this.isLocked) {
+        this.isPointerLockFallback = true;
+        this.fallbackMousePosition = null;
         this.isLocked = true;
         if (pauseOverlay) pauseOverlay.style.display = 'none';
         document.body.classList.add('game-active');
@@ -186,8 +196,19 @@ export class Player {
       if (!this.isLocked) return;
 
       const sensitivity = 0.0022;
-      this.yaw -= e.movementX * sensitivity;
-      this.pitch -= e.movementY * sensitivity;
+      let dx = e.movementX;
+      let dy = e.movementY;
+      if (this.isPointerLockFallback) {
+        if (!this.fallbackMousePosition) {
+          this.fallbackMousePosition = { x: e.clientX, y: e.clientY };
+          return;
+        }
+        dx = e.clientX - this.fallbackMousePosition.x;
+        dy = e.clientY - this.fallbackMousePosition.y;
+        this.fallbackMousePosition = { x: e.clientX, y: e.clientY };
+      }
+      this.yaw -= dx * sensitivity;
+      this.pitch -= dy * sensitivity;
 
       // Clamp pitch to [-89deg, +89deg]
       const maxPitch = Math.PI / 2 - 0.02;
