@@ -53,3 +53,4 @@
 - 2026-09-29 19:32: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-10-04 11:02: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-10-04 16:55: refactor(terrain): Perlin noise octaves for procedural valleys
+- 2026-10-04 22:03: fix(camera): pitch clamp preventing gimbal lock at zenith
