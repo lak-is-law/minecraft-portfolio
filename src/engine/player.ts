@@ -383,6 +383,11 @@ export class Player {
 
     window.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
+      if (e.code === 'Space' && !this.isFlying && this.velocity.y > 0) {
+        // A quick tap gives a small hop, then immediately hands control back
+        // to gravity instead of carrying the full jump arc after release.
+        this.velocity.y *= 0.12;
+      }
       if (e.code === 'KeyW' && !this.keys['ControlLeft']) {
         this.isSprinting = false;
       }
