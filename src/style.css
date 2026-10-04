@@ -1668,3 +1668,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid #facc15; outline-offs
   .mc-controls-section { padding-top: 10px; padding-bottom: 10px; }
   .mc-menu-footer { margin-top: 12px; }
 }
+
+/* Keep the rotating splash clear of the portfolio title. */
+#mc-splash-text { display: none; }
