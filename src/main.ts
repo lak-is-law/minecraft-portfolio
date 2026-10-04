@@ -23,8 +23,22 @@ class Game {
   private sunMesh: THREE.Mesh;
   private moonMesh: THREE.Mesh;
   private skyGroup: THREE.Group;
-  private dayNightAngle: number = 0.8; // daytime start
+  private dayNightAngle: number = 0.8; // begin in the morning
   private isNightMode: boolean = false;
+  private timeTransitionTarget: number | null = null;
+  private readonly dayCycleKeys = [
+    { angle: 0, sky: new THREE.Color(0xf2a078), ambient: 0.48, sun: 0.72 }, // dawn
+    { angle: 0.5, sky: new THREE.Color(0xb5d4ff), ambient: 0.7, sun: 1.1 }, // early morning
+    { angle: 1.0, sky: new THREE.Color(0x83b3ff), ambient: 0.84, sun: 1.45 }, // morning
+    { angle: Math.PI / 2, sky: new THREE.Color(0x78b7ff), ambient: 0.95, sun: 1.6 }, // noon
+    { angle: 2.1, sky: new THREE.Color(0xa3a8d8), ambient: 0.82, sun: 1.25 }, // afternoon
+    { angle: 2.65, sky: new THREE.Color(0xf18457), ambient: 0.62, sun: 0.9 }, // evening
+    { angle: Math.PI, sky: new THREE.Color(0x634a70), ambient: 0.4, sun: 0.48 }, // dusk
+    { angle: 3.85, sky: new THREE.Color(0x222b47), ambient: 0.28, sun: 0.12 }, // night
+    { angle: Math.PI * 1.5, sky: new THREE.Color(0x090d16), ambient: 0.22, sun: 0.06 }, // midnight
+    { angle: 5.45, sky: new THREE.Color(0x171e32), ambient: 0.26, sun: 0.1 }, // late night
+  ];
+  private readonly currentSkyColor = new THREE.Color();
 
   // Blocky Clouds
   private cloudsMesh: THREE.InstancedMesh | null = null;
@@ -177,9 +191,8 @@ class Game {
     // Hotbar & HUD action callbacks
     this.hud.onDayNightToggle = () => {
       this.isNightMode = !this.isNightMode;
-      this.dayNightAngle = this.isNightMode ? Math.PI + 0.5 : 0.8;
-      this.updateDayNight(0);
-      this.hud.pushChatMessage('System', `Time set to ${this.isNightMode ? 'Night (Torches Lit)' : 'Day'}`);
+      this.timeTransitionTarget = this.isNightMode ? Math.PI * 1.5 : Math.PI / 2;
+      this.hud.pushChatMessage('System', `Transitioning to ${this.isNightMode ? 'midnight' : 'noon'}...`);
     };
 
     this.hud.onOpenProjects = () => {
@@ -468,8 +481,20 @@ class Game {
   }
 
   private updateDayNight(dt: number) {
-    if (!this.isNightMode) {
-      this.dayNightAngle += dt * 0.03; // slow natural cycle
+    if (this.timeTransitionTarget !== null) {
+      const delta = Math.atan2(
+        Math.sin(this.timeTransitionTarget - this.dayNightAngle),
+        Math.cos(this.timeTransitionTarget - this.dayNightAngle)
+      );
+      const step = dt * 0.75;
+      if (Math.abs(delta) <= step) {
+        this.dayNightAngle = this.timeTransitionTarget;
+        this.timeTransitionTarget = null;
+      } else {
+        this.dayNightAngle += Math.sign(delta) * step;
+      }
+    } else if (!this.isNightMode) {
+      this.dayNightAngle = (this.dayNightAngle + dt * 0.03) % (Math.PI * 2);
     }
 
     const dist = 55;
@@ -485,26 +510,30 @@ class Game {
     this.moonMesh.position.set(-sx, -sy, 0);
     this.moonMesh.lookAt(0, 0, 0);
 
-    const isDay = sy > 0;
-    const dayRatio = Math.max(0, Math.min(1, sy / dist));
+    const cycle = Math.PI * 2;
+    const angle = ((this.dayNightAngle % cycle) + cycle) % cycle;
+    let nextIndex = this.dayCycleKeys.findIndex((key) => key.angle > angle);
+    if (nextIndex < 0) nextIndex = 0;
+    const prevIndex = (nextIndex - 1 + this.dayCycleKeys.length) % this.dayCycleKeys.length;
+    const prev = this.dayCycleKeys[prevIndex];
+    const next = this.dayCycleKeys[nextIndex];
+    const prevAngle = prev.angle;
+    const nextAngle = nextIndex < prevIndex ? next.angle + cycle : next.angle;
+    const segment = Math.max(0.0001, nextAngle - prevAngle);
+    const t = THREE.MathUtils.clamp((angle < prevAngle ? angle + cycle : angle - prevAngle) / segment, 0, 1);
+    const eased = t * t * (3 - 2 * t);
 
-    if (isDay) {
-      const skyDay = new THREE.Color(0x78a7ff);
-      const skySunset = new THREE.Color(0xfb923c);
-      const curSky = skySunset.clone().lerp(skyDay, dayRatio);
-
-      this.scene.background = curSky;
-      if (this.scene.fog) this.scene.fog.color = curSky;
-      this.ambientLight.intensity = 0.5 + dayRatio * 0.4;
-      this.sunLight.intensity = 1.0 + dayRatio * 0.6;
+    this.currentSkyColor.copy(prev.sky).lerp(next.sky, eased);
+    if (this.scene.background instanceof THREE.Color) {
+      this.scene.background.copy(this.currentSkyColor);
     } else {
-      // Night
-      const skyNight = new THREE.Color(0x090d16);
-      this.scene.background = skyNight;
-      if (this.scene.fog) this.scene.fog.color = skyNight;
-      this.ambientLight.intensity = 0.25;
-      this.sunLight.intensity = 0.15;
+      this.scene.background = this.currentSkyColor.clone();
     }
+    if (this.scene.fog) this.scene.fog.color.copy(this.currentSkyColor);
+    this.ambientLight.intensity = THREE.MathUtils.lerp(prev.ambient, next.ambient, eased);
+    this.sunLight.intensity = THREE.MathUtils.lerp(prev.sun, next.sun, eased);
+    this.sunMesh.visible = sy > -4;
+    this.moonMesh.visible = sy < 4;
   }
 
   private animate = () => {
