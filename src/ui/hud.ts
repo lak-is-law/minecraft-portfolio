@@ -343,50 +343,36 @@ export class HUDManager {
     ctx.arc(originX, originZ, islandR, 0, Math.PI * 2);
     ctx.fill();
 
-    // North Frostpeaks tint
-    ctx.fillStyle = 'rgba(224, 242, 254, 0.45)';
-    ctx.beginPath();
-    ctx.arc(originX, originZ - 80 * scale, 38 * scale, 0, Math.PI * 2);
-    ctx.fill();
+    // Color the actual north-up regions as map areas instead of overlapping blobs.
+    const worldRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(originX + x1 * scale, originZ + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
+    };
+    worldRect(-35, -130, 35, -65, '#dbeafe');
+    worldRect(-108, -112, -25, -45, '#be789e');
+    worldRect(25, -112, 108, -55, '#c7a94e');
+    worldRect(45, -45, 108, 45, '#47798b');
+    worldRect(-108, 8, -35, 75, '#a95e36');
+    worldRect(-108, 55, 108, 108, '#d0ad58');
 
-    // Northwest Sakura tint
-    ctx.fillStyle = 'rgba(244, 114, 182, 0.4)';
+    // Roads and the citadel read clearly at radar scale.
+    ctx.strokeStyle = 'rgba(226,232,240,.8)';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(originX - 65 * scale, originZ - 85 * scale, 30 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Northeast Raj tint
-    ctx.fillStyle = 'rgba(254, 240, 138, 0.4)';
-    ctx.beginPath();
-    ctx.arc(originX + 60 * scale, originZ - 90 * scale, 32 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    // East Neo York tint
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
-    ctx.beginPath();
-    ctx.arc(originX + 80 * scale, originZ, 32 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    // West Pueblo Royale tint
-    ctx.fillStyle = 'rgba(251, 146, 60, 0.4)';
-    ctx.beginPath();
-    ctx.arc(originX - 75 * scale, originZ + 40 * scale, 32 * scale, 0, Math.PI * 2);
-    ctx.fill();
-
-    // South Beach & Sunset tint
-    ctx.fillStyle = 'rgba(253, 224, 71, 0.4)';
-    ctx.beginPath();
-    ctx.arc(originX, originZ + 80 * scale, 36 * scale, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(originX, originZ - 20 * scale); ctx.lineTo(originX, originZ - 65 * scale);
+    ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 108 * scale);
+    ctx.moveTo(originX + 20 * scale, originZ); ctx.lineTo(originX + 78 * scale, originZ);
+    ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 66 * scale, originZ + 30 * scale);
+    ctx.stroke();
 
     // Central Citadel Moat & Hub
-    ctx.strokeStyle = '#0284c7';
+    ctx.strokeStyle = '#38bdf8';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(originX, originZ, 20 * scale, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.fillStyle = '#475569';
+    ctx.fillStyle = '#64748b';
     ctx.beginPath();
     ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
     ctx.fill();

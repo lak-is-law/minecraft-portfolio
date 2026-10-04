@@ -727,7 +727,7 @@ export class WorldBuilder {
     for (let y = baseY + 2; y <= baseY + 7; y++) {
       for (let dx = -1; dx <= 1; dx++) {
         for (let dz = -1; dz <= 1; dz++) {
-          if (Math.abs(dx) + Math.abs(dz) <= 1) {
+          if ((dx !== 0 || dz !== 0) && Math.abs(dx) + Math.abs(dz) <= 1) {
             this.setBlock(x + dx, y, z + dz, 'spruce_leaves');
           }
         }
@@ -890,7 +890,7 @@ export class WorldBuilder {
       const radius = (y === baseY + 5) ? 3 : 2;
       for (let dx = -radius; dx <= radius; dx++) {
         for (let dz = -radius; dz <= radius; dz++) {
-          if (Math.hypot(dx, dz) <= radius + 0.3) {
+          if ((dx !== 0 || dz !== 0) && Math.hypot(dx, dz) <= radius + 0.3) {
             this.setBlock(cx + dx, y, cz + dz, 'sakura_leaves');
           }
         }

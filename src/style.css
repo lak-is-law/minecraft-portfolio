@@ -371,13 +371,14 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 0;
 }
 
 #max-realm-canvas {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 52vh;
+  max-height: 58vh;
   object-fit: contain;
   cursor: crosshair;
 }

@@ -312,7 +312,7 @@ export class ModalManager {
         </div>
 
         <div class="mc-max-map-canvas-container">
-          <canvas id="max-realm-canvas" width="860" height="460"></canvas>
+          <canvas id="max-realm-canvas" width="960" height="600"></canvas>
         </div>
 
         <div class="mc-map-chips-container">
@@ -364,7 +364,7 @@ export class ModalManager {
     const height = canvas.height;
     const cx = width / 2;
     const cy = height / 2;
-    const scale = 1.55;
+    const scale = 1.84;
     const worldLimit = 136;
     const mapHalfW = worldLimit * scale;
     const mapHalfH = worldLimit * scale;
