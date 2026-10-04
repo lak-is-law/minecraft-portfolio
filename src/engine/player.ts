@@ -66,6 +66,7 @@ export class Player {
   public touchMove = { forward: false, backward: false, left: false, right: false, sneak: false, jump: false };
   private touchLookId: number | null = null;
   private lastTouchLookPos = { x: 0, y: 0 };
+  private lastTouchTapTime = 0;
 
   // Camera perspective & Sit emotes (Photo-Inspired Lakshya)
   public cameraMode: number = 0; // 0 = 1P, 1 = 3P Back, 2 = 3P Front
@@ -90,6 +91,7 @@ export class Player {
     this.domElement = domElement;
 
     this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    document.body.classList.toggle('touch-device', this.isTouchDevice);
     this.setupPointerLock();
     this.setupTouchLook();
     this.setupKeyboard();
@@ -1229,70 +1231,51 @@ export class Player {
     if (pauseOverlay) {
       pauseOverlay.style.display = 'none';
     }
+    document.body.classList.add('game-active');
   }
 
   // Swipe-to-Look Camera on Right Half of Screen
   private setupTouchLook() {
-    let lastTapTime = 0;
+    this.domElement.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (e.pointerType !== 'touch' || !this.isMobileActive || this.touchLookId !== null) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('#mc-touch-controls, #mc-hotbar, #mc-quick-nav, #mc-minimap, #modal-container, #pause-overlay')) return;
 
-    this.domElement.addEventListener('touchstart', (e: TouchEvent) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        const target = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (target && (target.closest('#mc-touch-controls') || target.closest('#mc-hotbar') || target.closest('#mc-quick-nav') || target.closest('#mc-minimap') || target.closest('#modal-container') || target.closest('#pause-overlay'))) {
-          continue;
-        }
+      this.touchLookId = e.pointerId;
+      this.lastTouchLookPos = { x: e.clientX, y: e.clientY };
+      try { this.domElement.setPointerCapture(e.pointerId); } catch { /* capture can fail if the pointer already ended */ }
 
-        const isLeftDpad = touch.clientX < 220 && touch.clientY > window.innerHeight - 280;
-        const isRightActions = touch.clientX > window.innerWidth - 200 && touch.clientY > window.innerHeight - 340;
+      const now = performance.now();
+      if (now - this.lastTouchTapTime < 280) this.handleTouchMine();
+      this.lastTouchTapTime = now;
+    });
 
-        if (!isLeftDpad && !isRightActions && this.touchLookId === null) {
-          this.touchLookId = touch.identifier;
-          this.lastTouchLookPos = { x: touch.clientX, y: touch.clientY };
+    this.domElement.addEventListener('pointermove', (e: PointerEvent) => {
+      if (e.pointerId !== this.touchLookId) return;
+      e.preventDefault();
+      const dx = e.clientX - this.lastTouchLookPos.x;
+      const dy = e.clientY - this.lastTouchLookPos.y;
+      this.lastTouchLookPos = { x: e.clientX, y: e.clientY };
+      this.yaw -= dx * 0.0038;
+      this.pitch -= dy * 0.0038;
+      const maxPitch = Math.PI / 2 - 0.02;
+      this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
+    });
 
-          // Double tap on world to mine/hammer
-          const now = performance.now();
-          if (now - lastTapTime < 280) {
-            this.handleTouchMine();
-          }
-          lastTapTime = now;
-        }
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e: TouchEvent) => {
-      if (this.touchLookId === null) return;
-      if (e.cancelable) e.preventDefault();
-
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === this.touchLookId) {
-          const dx = touch.clientX - this.lastTouchLookPos.x;
-          const dy = touch.clientY - this.lastTouchLookPos.y;
-          this.lastTouchLookPos = { x: touch.clientX, y: touch.clientY };
-
-          const sensitivity = 0.0038;
-          this.yaw -= dx * sensitivity;
-          this.pitch -= dy * sensitivity;
-
-          const maxPitch = Math.PI / 2 - 0.02;
-          this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
-          break;
-        }
-      }
-    }, { passive: false });
-
-    const endLook = (e: TouchEvent) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        if (e.changedTouches[i].identifier === this.touchLookId) {
-          this.touchLookId = null;
-          break;
-        }
-      }
+    const endLook = (e: PointerEvent) => {
+      if (e.pointerId !== this.touchLookId) return;
+      this.touchLookId = null;
+      if (this.domElement.hasPointerCapture(e.pointerId)) this.domElement.releasePointerCapture(e.pointerId);
     };
-
-    window.addEventListener('touchend', endLook, { passive: true });
-    window.addEventListener('touchcancel', endLook, { passive: true });
+    this.domElement.addEventListener('pointerup', endLook);
+    this.domElement.addEventListener('pointercancel', endLook);
+    this.domElement.addEventListener('lostpointercapture', endLook);
+    window.addEventListener('blur', () => {
+      this.touchLookId = null;
+      this.touchMove.forward = this.touchMove.backward = false;
+      this.touchMove.left = this.touchMove.right = false;
+      this.touchMove.jump = false;
+    });
   }
 
   // Mobile Touch Action Triggers

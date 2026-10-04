@@ -46,8 +46,8 @@ class Game {
       powerPreference: 'high-performance',
       preserveDrawingBuffer: true
     });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setSize(window.visualViewport?.width ?? window.innerWidth, window.visualViewport?.height ?? window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.BasicShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -67,6 +67,7 @@ class Game {
     this.world.init();
 
     this.player = new Player(this.camera, this.world, canvas);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.player.isTouchDevice ? 1.5 : 2));
     this.scene.add(this.camera);
 
     this.hud = new HUDManager();
@@ -139,11 +140,17 @@ class Game {
   }
 
   private bindEvents() {
-    window.addEventListener('resize', () => {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
+    const resize = () => {
+      const width = window.visualViewport?.width ?? window.innerWidth;
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+      this.renderer.setSize(width, height);
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.player.isTouchDevice ? 1.5 : 2));
+    };
+    window.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', () => window.setTimeout(resize, 150));
 
     // Player interact callback
     this.player.onInteract = (target: TargetInfo) => {
@@ -289,24 +296,32 @@ class Game {
       splashEl.textContent = splashes[Math.floor(Math.random() * splashes.length)];
     }
 
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((error) => console.warn('Offline app support could not be enabled:', error));
+      });
+    }
+
     // Virtual Touch Controls for Mobile & Touchscreen Devices
     const setUpTouchBtn = (id: string, onDown: () => void, onUp: () => void) => {
       const el = document.getElementById(id);
       if (!el) return;
-      const handleDown = (e: Event) => {
+      const handleDown = (e: PointerEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        try { el.setPointerCapture(e.pointerId); } catch { /* pointer may already be released */ }
         onDown();
       };
-      const handleUp = (e: Event) => {
+      const handleUp = (e: PointerEvent) => {
         e.preventDefault();
         e.stopPropagation();
         onUp();
+        if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
       };
       el.addEventListener('pointerdown', handleDown);
       el.addEventListener('pointerup', handleUp);
       el.addEventListener('pointercancel', handleUp);
-      el.addEventListener('pointerleave', handleUp);
+      el.addEventListener('lostpointercapture', handleUp);
     };
 
     setUpTouchBtn('btn-touch-up',
@@ -350,9 +365,10 @@ class Game {
     // Mine Button (tap or hold to continuously mine)
     const mineBtn = document.getElementById('btn-touch-mine');
     let mineTimer: any = null;
-    const startMining = (e: Event) => {
+    const startMining = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      try { mineBtn?.setPointerCapture(e.pointerId); } catch { /* pointer may already be released */ }
       this.player.handleTouchMine();
       if (!mineTimer) {
         mineTimer = setInterval(() => {
@@ -360,18 +376,19 @@ class Game {
         }, 300);
       }
     };
-    const stopMining = (e: Event) => {
+    const stopMining = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
       if (mineTimer) {
         clearInterval(mineTimer);
         mineTimer = null;
       }
+      if (mineBtn?.hasPointerCapture(e.pointerId)) mineBtn.releasePointerCapture(e.pointerId);
     };
     mineBtn?.addEventListener('pointerdown', startMining);
     mineBtn?.addEventListener('pointerup', stopMining);
     mineBtn?.addEventListener('pointercancel', stopMining);
-    mineBtn?.addEventListener('pointerleave', stopMining);
+    mineBtn?.addEventListener('lostpointercapture', stopMining);
 
     // Place Button
     const placeBtn = document.getElementById('btn-touch-place');
