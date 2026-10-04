@@ -619,7 +619,7 @@ export class VoxelWorld {
     nameCtx.fillStyle = '#55ff55';
     nameCtx.font = 'bold 24px monospace';
     nameCtx.textAlign = 'center';
-    nameCtx.fillText('[LVL 22] Lakshya', 192, 36);
+    nameCtx.fillText('[LVL 19] Lakshya', 192, 36);
 
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
@@ -667,7 +667,7 @@ export class VoxelWorld {
     nameCtx.fillStyle = '#9be0ad';
     nameCtx.font = 'bold 24px monospace';
     nameCtx.textAlign = 'center';
-    nameCtx.fillText('[LVL 22] Lakshya', 192, 36);
+    nameCtx.fillText('[LVL 19] Lakshya', 192, 36);
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
     nameCtx.fillText('Software Engineer & Designer', 192, 68);

@@ -401,7 +401,7 @@ export class Player {
     this.handGroup.position.set(0.38, -0.32, -0.6);
 
     // Streetwear black t-shirt sleeve & skin forearm (Original Avatar)
-    const armMat = new THREE.MeshLambertMaterial({ color: 0x4d321f });
+    const armMat = new THREE.MeshLambertMaterial({ color: 0xf0c8a5 });
     const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
 
     const armGeo = new THREE.BoxGeometry(0.18, 0.5, 0.18);
@@ -1153,10 +1153,10 @@ export class Player {
   private createLakshyaAvatar() {
     this.playerAvatar = new THREE.Group();
 
-    const skinMat = new THREE.MeshLambertMaterial({ color: 0x4d321f });
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0xf0c8a5 });
     const shirtMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
     const denimMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x0a0a0a });
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x5b3825 });
     const shoeMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
 
     // Head
@@ -1166,7 +1166,7 @@ export class Player {
     const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
     headGroup.add(headMesh);
 
-    // Jet black flat hair block
+    // Chestnut brown hair block
     const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.2, 0.52), hairMat);
     hairMesh.position.set(0, 0.17, 0);
     headGroup.add(hairMesh);
