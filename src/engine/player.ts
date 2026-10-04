@@ -46,6 +46,7 @@ export class Player {
   private keys: { [key: string]: boolean } = {};
   private lastSpaceTime: number = 0;
   private lastWTime: number = 0;
+  private readonly flightTapWindowMs = 450;
 
   // Targeting & Raycasting
   public currentTarget: TargetInfo | null = null;
@@ -250,7 +251,7 @@ export class Player {
       if (e.code === 'Space') {
         if (e.repeat) return;
         const now = performance.now();
-        if (now - this.lastSpaceTime < 320) {
+        if (now - this.lastSpaceTime < this.flightTapWindowMs) {
           this.toggleFlight();
           this.lastSpaceTime = 0;
         } else {
@@ -316,6 +317,11 @@ export class Player {
       if (e.code === 'KeyW' && !this.keys['ControlLeft']) {
         this.isSprinting = false;
       }
+    });
+
+    window.addEventListener('blur', () => {
+      this.keys = {};
+      this.isSprinting = false;
     });
   }
 
@@ -544,26 +550,18 @@ export class Player {
     // 1. Creative Flight Physics (Glide, Collision, Landing)
     // ==========================================
     if (this.isFlying) {
-      const isFastFlight = !!this.keys['ControlLeft'] || this.isSprinting;
+      const isFastFlight = !!this.keys['ControlLeft'] || !!this.keys['ControlRight'] || this.isSprinting;
       const flySpeed = isFastFlight ? 20.0 : 10.5;
 
-      // Smooth horizontal inertia & glide
-      if (isMoving) {
-        this.velocity.x = THREE.MathUtils.lerp(this.velocity.x, moveDir.x * flySpeed, 0.35);
-        this.velocity.z = THREE.MathUtils.lerp(this.velocity.z, moveDir.z * flySpeed, 0.35);
-      } else {
-        this.velocity.x *= 0.82;
-        this.velocity.z *= 0.82;
-        if (Math.abs(this.velocity.x) < 0.05) this.velocity.x = 0;
-        if (Math.abs(this.velocity.z) < 0.05) this.velocity.z = 0;
-      }
+      // Immediate response avoids the input lag caused by per-frame inertia.
+      this.velocity.x = isMoving ? moveDir.x * flySpeed : 0;
+      this.velocity.z = isMoving ? moveDir.z * flySpeed : 0;
 
-      // Vertical flight speed
-      let targetFlyY = 0;
-      if (this.keys['Space'] || this.touchMove.jump) targetFlyY += flySpeed * 0.8;
-      if (this.keys['ShiftLeft'] || this.touchMove.sneak) targetFlyY -= flySpeed * 0.8;
-      this.velocity.y = THREE.MathUtils.lerp(this.velocity.y, targetFlyY, 0.35);
-      if (Math.abs(this.velocity.y) < 0.05 && targetFlyY === 0) this.velocity.y = 0;
+      // Holding Space climbs; releasing it stops vertical motion and hovers.
+      const ascending = this.keys['Space'] || this.touchMove.jump;
+      const descending = this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.touchMove.sneak;
+      const targetFlyY = ascending === descending ? 0 : (ascending ? flySpeed * 0.8 : -flySpeed * 0.8);
+      this.velocity.y = targetFlyY;
 
       // Proposed vertical position
       const proposedY = this.position.y + this.velocity.y * dt;
@@ -1279,15 +1277,10 @@ export class Player {
       this.isSitting = false;
       return;
     }
-    if (this.isFlying) {
-      // In flight mode, tapping jump ascends smoothly
-      this.velocity.y = 8.0;
-      return;
-    }
+    if (this.isFlying) return;
     const now = performance.now();
-    if (now - this.lastSpaceTime < 320) {
-      this.isFlying = true;
-      this.velocity.set(0, 0, 0);
+    if (now - this.lastSpaceTime < this.flightTapWindowMs) {
+      this.setFlying(true, false);
       sound.playClick();
       this.lastSpaceTime = 0;
     } else {
