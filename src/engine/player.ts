@@ -103,6 +103,7 @@ export class Player {
     this.setupFirstPersonHand();
     this.setupFirstPersonLegs();
     this.createLakshyaAvatar();
+    this.world.replaceLakshyaNPCWithAvatar(this.playerAvatar);
     this.setupBlockHighlight();
   }
 

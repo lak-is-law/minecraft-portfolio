@@ -50,7 +50,6 @@ export class VoxelWorld {
     this.createBigProjectWallBanners();
     this.createBeaconBeam();
     this.createNetherPortalParticles();
-    this.createLakshyaNPC();
     this.createBeachCat();
     this.createVolcanoSmoke();
     this.dragonManager = new DragonManager(this.scene);
@@ -622,6 +621,53 @@ export class VoxelWorld {
     nameCtx.textAlign = 'center';
     nameCtx.fillText('[LVL 22] Lakshya', 192, 36);
 
+    nameCtx.fillStyle = '#ffffff';
+    nameCtx.font = '18px monospace';
+    nameCtx.fillText('Software Engineer & Designer', 192, 68);
+
+    const nameTexture = new THREE.CanvasTexture(nameCanvas);
+    nameTexture.magFilter = THREE.NearestFilter;
+    const nameSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture }));
+    nameSprite.scale.set(2.4, 0.6, 1);
+    nameSprite.position.set(0, 2.2, 0);
+    npc.add(nameSprite);
+
+    this.scene.add(npc);
+    this.npcMesh = npc;
+  }
+
+  /** Replace the separately modeled guide with the same model used by the player. */
+  public replaceLakshyaNPCWithAvatar(playerAvatar: THREE.Group) {
+    if (this.npcMesh) {
+      this.scene.remove(this.npcMesh);
+      this.npcMesh.traverse((object) => {
+        if (object instanceof THREE.Mesh || object instanceof THREE.Sprite) {
+          object.geometry?.dispose();
+          const material = object.material;
+          if (Array.isArray(material)) material.forEach((item) => item.dispose());
+          else material?.dispose();
+        }
+      });
+    }
+
+    const npc = playerAvatar.clone(true);
+    npc.visible = true;
+    npc.position.set(3.5, 2, 7.5);
+    npc.rotation.y = Math.PI;
+
+    const nameCanvas = document.createElement('canvas');
+    nameCanvas.width = 384;
+    nameCanvas.height = 96;
+    const nameCtx = nameCanvas.getContext('2d')!;
+    nameCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    nameCtx.fillRect(0, 0, 384, 96);
+    nameCtx.strokeStyle = '#9be0ad';
+    nameCtx.lineWidth = 4;
+    nameCtx.strokeRect(2, 2, 380, 92);
+    nameCtx.fillStyle = '#9be0ad';
+    nameCtx.font = 'bold 24px monospace';
+    nameCtx.textAlign = 'center';
+    nameCtx.fillText('[LVL 22] Lakshya', 192, 36);
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
     nameCtx.fillText('Software Engineer & Designer', 192, 68);
