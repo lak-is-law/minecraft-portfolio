@@ -47,6 +47,9 @@ export class HUDManager {
     this.pushChatMessage('Tip', 'Press [E] to interact with pedestals, chests, and signs. Hammer banners to launch live sites.');
   }
 
+  public onCycleWeather?: () => void;
+  public onCycleSeason?: () => void;
+
   private renderHUD() {
     // 1. Crosshair & Prompt
     const crosshairEl = document.getElementById('mc-crosshair')!;
@@ -104,6 +107,8 @@ export class HUDManager {
         <button class="mc-chip-btn" id="btn-quick-skills" title="Skills Matrix">[SKILLS]</button>
         <button class="mc-chip-btn" id="btn-quick-resume" title="Official Resume">[RESUME]</button>
         <button class="mc-chip-btn" id="btn-quick-fly" title="Toggle Creative Flight">[FLY: OFF]</button>
+        <button class="mc-chip-btn" id="btn-quick-weather" title="Cycle clear, rain, thunder, rainbow, and snowfall">[WEATHER: CLEAR]</button>
+        <button class="mc-chip-btn" id="btn-quick-season" title="Cycle spring, summer, autumn, and winter">[SEASON: SPRING]</button>
         <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1P / 3P View (F5)">[VIEW: 1P]</button>
         <button class="mc-chip-btn" id="btn-quick-sound" title="Toggle Audio">[AUDIO: ON]</button>
         <button class="mc-chip-btn" id="btn-quick-unlock" title="Open Pause Menu (Key: ESC)">[PAUSE: ESC]</button>
@@ -153,6 +158,8 @@ export class HUDManager {
     document.getElementById('btn-quick-skills')?.addEventListener('click', () => this.onOpenSkills?.());
     document.getElementById('btn-quick-resume')?.addEventListener('click', () => this.onOpenResume?.());
     document.getElementById('btn-quick-map')?.addEventListener('click', () => this.onOpenFastTravel?.());
+    document.getElementById('btn-quick-weather')?.addEventListener('click', () => this.onCycleWeather?.());
+    document.getElementById('btn-quick-season')?.addEventListener('click', () => this.onCycleSeason?.());
     document.getElementById('btn-quick-unlock')?.addEventListener('click', () => {
       if (document.pointerLockElement) {
         document.exitPointerLock();
@@ -496,6 +503,13 @@ export class HUDManager {
       touchFlyBtn.textContent = isFlying ? '[FLYING]' : '[FLY]';
       touchFlyBtn.classList.toggle('active', isFlying);
     }
+  }
+
+  public updateClimateStatus(weather: string, season: string) {
+    const weatherBtn = document.getElementById('btn-quick-weather');
+    const seasonBtn = document.getElementById('btn-quick-season');
+    if (weatherBtn) weatherBtn.textContent = `[WEATHER: ${weather.toUpperCase()}]`;
+    if (seasonBtn) seasonBtn.textContent = `[SEASON: ${season.toUpperCase()}]`;
   }
 
   public showLiveRedirectToast(title: string, url: string) {

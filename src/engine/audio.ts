@@ -197,6 +197,39 @@ export class SoundEngine {
     osc.start(t);
     osc.stop(t + 0.04);
   }
+
+  // Low, distant thunder rumble for storm weather.
+  public playThunder() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const duration = 2.4;
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      const fade = Math.pow(1 - i / bufferSize, 2.2);
+      samples[i] = (Math.random() * 2 - 1) * fade;
+    }
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(170, t);
+    filter.frequency.exponentialRampToValueAtTime(55, t + duration);
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.linearRampToValueAtTime(0.22, t + 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    source.start(t);
+    source.stop(t + duration);
+  }
 }
 
 export const sound = new SoundEngine();

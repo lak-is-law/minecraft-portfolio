@@ -1,3 +1,4 @@
+import { ClimateEffects } from './world/climate';
 import * as THREE from 'three';
 import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
@@ -16,6 +17,7 @@ class Game {
   private player: Player;
   private hud: HUDManager;
   private modals: ModalManager;
+  private climate: ClimateEffects;
 
   // Lighting & Day/Night
   private ambientLight: THREE.AmbientLight;
@@ -118,6 +120,12 @@ class Game {
     this.scene.add(this.sunLight);
 
     this.createMinecraftClouds();
+    this.climate = new ClimateEffects(this.scene, this.sunLight, this.ambientLight);
+    this.climate.onChange = (weather, season) => {
+      this.hud.updateClimateStatus(weather, season);
+      this.hud.pushChatMessage('World', `${season[0].toUpperCase()}${season.slice(1)} · ${weather.replace('-', ' ')}`);
+    };
+    this.hud.updateClimateStatus(this.climate.weather, this.climate.season);
     this.bindEvents();
     this.updateDayNight(0);
 
@@ -189,6 +197,9 @@ class Game {
     };
 
     // Hotbar & HUD action callbacks
+    this.hud.onCycleWeather = () => this.climate.cycleWeather();
+    this.hud.onCycleSeason = () => this.climate.cycleSeason();
+
     this.hud.onDayNightToggle = () => {
       this.isNightMode = !this.isNightMode;
       this.timeTransitionTarget = this.isNightMode ? Math.PI * 1.5 : Math.PI / 2;
@@ -572,6 +583,7 @@ class Game {
 
     // 4. Update Day/Night
     this.updateDayNight(dt);
+    this.climate.update(dt, this.player.position, this.player.yaw);
 
     // 5. Update HUD elements
     this.hud.updatePrompt(this.player.currentTarget);
