@@ -54,3 +54,4 @@
 - 2026-10-04 11:02: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-10-04 16:55: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-10-04 22:03: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-10-06 15:54: perf(worker): offload terrain generation to web workers
