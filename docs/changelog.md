@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-09-09 15:59: refactor(terrain): Perlin noise octaves for procedural valleys
-- 2026-09-09 16:53: feat(voxel): chunk mesh generation and greedy meshing
-- 2026-09-09 17:02: feat(monument): LK brick monument voxel texture atlas
-- 2026-09-09 18:26: refactor(blocks): bit-packed voxel state representation
-- 2026-09-09 19:08: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-09-09 20:28: refactor(blocks): bit-packed voxel state representation
-- 2026-09-09 21:47: refactor(physics): AABB collision detection against voxel grid
-- 2026-09-09 22:05: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-09-10 13:42: fix(controls): pointer lock sensitivity on high-DPI displays
 - 2026-09-10 19:19: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-09-12 11:00: perf(memory): reuse Float32Array buffers across chunk re-meshes
 - 2026-09-12 12:04: refactor(blocks): bit-packed voxel state representation
@@ -58,3 +49,4 @@
 - 2026-10-08 11:44: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-08 12:38: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-10-08 17:09: perf(worker): offload terrain generation to web workers
+- 2026-10-08 22:20: fix(camera): pitch clamp preventing gimbal lock at zenith
