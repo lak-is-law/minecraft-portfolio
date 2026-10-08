@@ -57,3 +57,4 @@
 - 2026-10-06 15:54: perf(worker): offload terrain generation to web workers
 - 2026-10-08 11:44: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-08 12:38: feat(lighting): directional sunlight ray casting across voxel faces
+- 2026-10-08 17:09: perf(worker): offload terrain generation to web workers
