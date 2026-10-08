@@ -56,3 +56,4 @@
 - 2026-10-04 22:03: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-10-06 15:54: perf(worker): offload terrain generation to web workers
 - 2026-10-08 11:44: feat(audio): spatial distance attenuation for ambient loops
+- 2026-10-08 12:38: feat(lighting): directional sunlight ray casting across voxel faces
