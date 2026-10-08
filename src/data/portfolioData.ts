@@ -76,7 +76,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#22c55e",
       iconBlock: "emerald_block",
-      bannerCoords: { x: 85, y: 4, z: -20, rotY: -Math.PI / 2 }
+      bannerCoords: { x: 108.9, y: 4, z: -20, rotY: -Math.PI / 2 }
     },
     {
       id: "trackyourflight",
@@ -95,7 +95,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#0284c7",
       iconBlock: "diamond_block",
-      bannerCoords: { x: 85, y: 4, z: -10, rotY: -Math.PI / 2 }
+      bannerCoords: { x: 108.9, y: 4, z: -10, rotY: -Math.PI / 2 }
     },
     {
       id: "locateart",
@@ -114,7 +114,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#f59e0b",
       iconBlock: "gold_block",
-      bannerCoords: { x: 85, y: 4, z: 0, rotY: -Math.PI / 2 }
+      bannerCoords: { x: 108.9, y: 4, z: 0, rotY: -Math.PI / 2 }
     },
     {
       id: "redgambit",
@@ -133,7 +133,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#ef4444",
       iconBlock: "redstone_block",
-      bannerCoords: { x: 85, y: 4, z: 10, rotY: -Math.PI / 2 }
+      bannerCoords: { x: 108.9, y: 4, z: 10, rotY: -Math.PI / 2 }
     },
     {
       id: "spiderverse",
@@ -152,7 +152,7 @@ export const PORTFOLIO_DATA = {
       githubUrl: "https://github.com/lak-is-law",
       accentColor: "#a855f7",
       iconBlock: "amethyst_block",
-      bannerCoords: { x: 85, y: 4, z: 20, rotY: -Math.PI / 2 }
+      bannerCoords: { x: 108.9, y: 4, z: 20, rotY: -Math.PI / 2 }
     }
   ] as Project[],
 
@@ -412,23 +412,25 @@ export const PORTFOLIO_DATA = {
 
   landmarks: [
     { name: "Crossroads Citadel (Spawn)", coords: [0, 2, 0], tag: "[CITADEL]", desc: "Central drop-in nexus with marble compass rose, sky beacon, and Lakshya guide" },
-    { name: "Neo York Tech Metropolis", coords: [80, 2, 0], tag: "[NEO YORK]", desc: "Cyberpunk metropolis with glass skyscrapers, Times Square screens, and AI research labs" },
-    { name: "Lak Tower (\"LK\" Monument)", coords: [98, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel-inspired tower with illuminated LK monogram and observation skydeck" },
-    { name: "Imperial Raj Complex & Taj Mahal", coords: [55, 4, -95], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, reflecting pool, and SRMIST honors (4.37 CGPA)" },
-    { name: "Sakura Sanctuary & Pagoda", coords: [-68, 2, -88], tag: "[SAKURA]", desc: "Cherry blossom groves, 4-tier red pagoda, vermilion Torii gates, and Foreign Languages embassy" },
-    { name: "Pueblo Royale & Cantina", coords: [-75, 2, 38], tag: "[PUEBLO]", desc: "Sunbaked Mexican adobe village with terracotta arches, central well, and Builder's Arena" },
-    { name: "The Sunset Saloon & Beach Bar", coords: [6, 2, 58], tag: "[SALOON]", desc: "Beachfront timber tavern with glowing stone hearth, outdoor deck, and Lakshya's passions hub" },
-    { name: "Palm Paradise Beach & Merlion", coords: [15, 2, 110], tag: "[BEACH]", desc: "Tropical coconut palm beach, ocean surf, boardwalk pier, and the iconic Singapore Merlion" },
-    { name: "Frostpeak Mountain Overlook", coords: [0, 18, -95], tag: "[FROSTPEAK]", desc: "Snowy alpine ridges and dizzying suspension bridge under the soaring Frost Wyrm dragon" },
-    { name: "Crossroads International Airport", coords: [61, 2, 62], tag: "[AIRPORT]", desc: "Island airport with a lit runway, glass terminal, and rooftop air-traffic control tower" },
-    { name: "Neo York Police Station", coords: [101, 2, 20], tag: "[POLICE]", desc: "A blue-striped public safety station in the East Borough" },
-    { name: "Neo York General Hospital", coords: [49, 2, 20], tag: "[HOSPITAL]", desc: "Quartz-and-glass community hospital with a red cross and ambulance bay" },
-    { name: "Neo York Public School", coords: [46, 2, -25], tag: "[SCHOOL]", desc: "Neighborhood school with a library, bright windows, and a bell tower" },
-    { name: "Crossroads Wildlife Park", coords: [-39, 2, -12], tag: "[ZOO]", desc: "A leafy city zoo with fenced habitats, a pond, and shaded garden paths" },
-    { name: "Rapunzel’s Castle", coords: [-46, 2, -50], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and a golden braid cascading into its gardens" },
-    { name: "Mexico City · Zócalo", coords: [-90, 2, 36], tag: "[MEXICO CITY]", desc: "A metropolitan plaza with cathedral towers, colorful market stalls, and a central fountain" },
-    { name: "Eiffel Tower", coords: [49, 2, -49], tag: "[EIFFEL]", desc: "A landmark iron tower with observation decks, beacon, and a garden avenue" },
-    { name: "Crossroads Central Station", coords: [60, 2, 34], tag: "[RAILWAY]", desc: "A covered rail station with live train service to the Citadel and airport" },
-    { name: "Hollywood Hills & Sign", coords: [82, 30, -58], tag: "[HOLLYWOOD]", desc: "A terraced ridge with a block-built Hollywood sign, lit hiking trail, and skyline overlook" }
+    { name: "Neo York Tech Metropolis", coords: [100, 2, 0], tag: "[NEO YORK]", desc: "American cyberpunk metropolis with glass skyscrapers, Times Square screens, and AI research labs" },
+    { name: "Lak Tower (\"LK\" Monument)", coords: [150, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel-inspired tower with illuminated LK monogram and observation skydeck" },
+    { name: "Hollywood Hills & Sign", coords: [130, 24, -50], tag: "[HOLLYWOOD]", desc: "Scenic mountain ridge and illuminated block-built HOLLYWOOD sign overlooking the American tech hub" },
+    { name: "Imperial India · Taj Mahal", coords: [80, 4, -135], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, Yamuna reflecting canal, and SRMIST academic honors" },
+    { name: "Varanasi Ghats & Haveli", coords: [45, 2, -120], tag: "[VARANASI]", desc: "Historic riverfront stone steps, sacred banyan trees, and ornate Rajasthani Haveli chhatris" },
+    { name: "China · Great Wall & Pagoda", coords: [-110, 2, -110], tag: "[GREAT WALL]", desc: "Mighty stone ramparts, watchtowers, 5-tier dragon pagoda, bamboo groves, and Foreign Languages embassy" },
+    { name: "Temple of Heaven Pavilion", coords: [-80, 2, -90], tag: "[PAVILION]", desc: "Circular tiered imperial shrine with vermilion columns and gold roof accents" },
+    { name: "Mexico City · Zócalo", coords: [-105, 2, 60], tag: "[MEXICO CITY]", desc: "Metropolitan Cathedral square, Palacio Nacional, colourful Mercado stalls, and adobe village" },
+    { name: "Chichén Itzá Aztec Pyramid", coords: [-140, 2, 110], tag: "[PYRAMID]", desc: "Ancient 9-step Mesoamerican stone temple rising above the desert cacti plateau" },
+    { name: "Grand Carnival & Ferris Wheel", coords: [15, 2, 135], tag: "[CARNIVAL]", desc: "Oceanfront amusement park with a giant illuminated Ferris wheel, carousel, and coaster" },
+    { name: "The Sunset Saloon & Beach Bar", coords: [12, 2, 58], tag: "[SALOON]", desc: "Beachfront timber tavern with glowing stone hearth, outdoor deck, and Lakshya's passions hub" },
+    { name: "Palm Paradise Beach & Merlion", coords: [15, 2, 100], tag: "[BEACH]", desc: "Tropical coconut palm beach, ocean surf, boardwalk pier, and the iconic Singapore Merlion" },
+    { name: "Crossroads International Airport", coords: [130, 2, 80], tag: "[AIRPORT]", desc: "Dedicated coastal airport with a lit runway, glass terminal concourse, and air-traffic tower" },
+    { name: "Crossroads Central Station", coords: [58, 2, 33], tag: "[RAILWAY]", desc: "A covered rail station with live train service linking the civic quarter directly to the airport" },
+    { name: "Crossroads General Hospital", coords: [43, 2, 58], tag: "[HOSPITAL]", desc: "Quartz-and-glass community hospital with a red cross and emergency ambulance bay" },
+    { name: "Crossroads Police Station", coords: [51, 2, 60], tag: "[POLICE]", desc: "A blue-striped public safety station serving the southern districts" },
+    { name: "Crossroads Public School", coords: [43, 2, 36], tag: "[SCHOOL]", desc: "A neighborhood school with a library, bright windows, and bell tower" },
+    { name: "Crossroads Wildlife Park", coords: [-38, 2, -32], tag: "[ZOO]", desc: "A wooded city zoo with animal habitats, a pond, and shady family trails" },
+    { name: "Rapunzel’s Castle", coords: [-70, 2, -34], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and golden braid above secluded gardens" },
+    { name: "Eiffel Tower", coords: [26, 2, -38], tag: "[EIFFEL]", desc: "A Paris landmark rising above the northern garden avenue" }
   ]
 };

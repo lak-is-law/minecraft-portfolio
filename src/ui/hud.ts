@@ -272,6 +272,9 @@ export class HUDManager {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Read Sign: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'teleport') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
+      } else if (inter.type === 'npc') {
+        const actionVerb = inter.id === 'roger' ? 'Pet Dog' : 'Talk';
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {
       promptEl.innerHTML = document.body.classList.contains('touch-device')
@@ -338,11 +341,11 @@ export class HUDManager {
 
     const cx = 80;
     const cz = 80;
-    const scale = 0.64;
+    const scale = 0.42;
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
-    const islandR = 112 * scale;
+    const islandR = 180 * scale;
 
     ctx.save();
     ctx.beginPath();
@@ -355,38 +358,34 @@ export class HUDManager {
     ctx.arc(originX, originZ, islandR, 0, Math.PI * 2);
     ctx.fill();
 
-    // Color the actual north-up regions as map areas instead of overlapping blobs.
+    // Color the 4 cultural quadrants and carnival pier on radar
     const worldRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
       ctx.fillStyle = color;
       ctx.fillRect(originX + x1 * scale, originZ + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
     };
-    worldRect(-35, -130, 35, -65, '#dbeafe');
-    worldRect(-108, -112, -25, -45, '#be789e');
-    worldRect(25, -112, 108, -55, '#c7a94e');
-    worldRect(45, -45, 108, 45, '#47798b');
-    worldRect(-108, 8, -35, 75, '#a95e36');
-    worldRect(-108, 55, 108, 108, '#d0ad58');
+    worldRect(25, -195, 195, -40, '#c7a94e'); // NE: Imperial India
+    worldRect(-195, -195, -25, -40, '#2d7a5b'); // NW: China Realm
+    worldRect(-195, 25, -25, 195, '#a95e36'); // SW: Mexico Realm
+    worldRect(25, -40, 195, 75, '#47798b'); // SE: USA Neo York
+    worldRect(-40, 75, 40, 195, '#d0ad58'); // South: Beach & Boardwalk
+    worldRect(-25, 120, 35, 185, '#ec4899'); // South: Grand Carnival Pier
 
-    // Hollywood ridge above Neo York, with a highlighted approach trail.
+    // Hollywood ridge in USA
     ctx.fillStyle = 'rgba(215,168,121,.9)';
     ctx.beginPath();
-    ctx.ellipse(originX + 82 * scale, originZ - 58 * scale, 24 * scale, 12 * scale, -.25, 0, Math.PI * 2);
+    ctx.ellipse(originX + 130 * scale, originZ - 50 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,240,215,.75)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(originX + 84 * scale, originZ - 32 * scale);
-    ctx.lineTo(originX + 82 * scale, originZ - 58 * scale);
-    ctx.stroke();
 
-    // Roads and the citadel read clearly at radar scale.
+    // Main Roads
     ctx.strokeStyle = 'rgba(226,232,240,.8)';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.moveTo(originX, originZ - 20 * scale); ctx.lineTo(originX, originZ - 65 * scale);
-    ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 108 * scale);
-    ctx.moveTo(originX + 20 * scale, originZ); ctx.lineTo(originX + 78 * scale, originZ);
-    ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 66 * scale, originZ + 30 * scale);
+    ctx.moveTo(originX + 20 * scale, originZ); ctx.lineTo(originX + 150 * scale, originZ);
+    ctx.moveTo(originX + 2 * scale, originZ - 60 * scale); ctx.lineTo(originX + 74 * scale, originZ - 106 * scale);
+    ctx.moveTo(originX - 2 * scale, originZ - 55 * scale); ctx.lineTo(originX - 70 * scale, originZ - 85 * scale);
+    ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 79 * scale, originZ + 50 * scale);
+    ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 160 * scale);
     ctx.stroke();
 
     // Central Citadel Moat & Hub
@@ -436,6 +435,11 @@ export class HUDManager {
         else if (lm.tag.includes('EIFFEL')) ctx.fillStyle = '#f9a8d4';
         else if (lm.tag.includes('RAILWAY')) ctx.fillStyle = '#f97316';
         else if (lm.tag.includes('HOLLYWOOD')) ctx.fillStyle = '#f5c389';
+        else if (lm.tag.includes('GREAT WALL')) ctx.fillStyle = '#34d399';
+        else if (lm.tag.includes('PYRAMID')) ctx.fillStyle = '#f59e0b';
+        else if (lm.tag.includes('CARNIVAL')) ctx.fillStyle = '#f472b6';
+        else if (lm.tag.includes('VARANASI')) ctx.fillStyle = '#fb923c';
+        else if (lm.tag.includes('PAVILION')) ctx.fillStyle = '#f43f5e';
         else ctx.fillStyle = '#94a3b8';
 
         ctx.fillRect(lx - 2, lz - 2, 4, 4);

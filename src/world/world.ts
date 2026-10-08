@@ -23,6 +23,9 @@ export class VoxelWorld {
   // Dragons & Animals
   public dragonManager!: DragonManager;
   private catMesh: THREE.Group | null = null;
+  public dogMesh: THREE.Group | null = null;
+  private dogTailMesh: THREE.Mesh | null = null;
+  private dogHeadMesh: THREE.Group | null = null;
   private volcanoSmoke: THREE.Points | null = null;
 
   // Special animated objects
@@ -53,6 +56,7 @@ export class VoxelWorld {
     this.createBigProjectWallBanners();
     this.createBeaconBeam();
     this.createNetherPortalParticles();
+    this.createLakshyaNPC();
     this.createBeachCat();
     this.createVolcanoSmoke();
     this.dragonManager = new DragonManager(this.scene);
@@ -246,6 +250,45 @@ export class VoxelWorld {
     return closestBanner;
   }
 
+  // Check if player raycast hits Lakshya NPC or companion dog Roger
+  public checkNPCHit(rayOrigin: THREE.Vector3, rayDir: THREE.Vector3, reach: number): { type: 'npc' | 'dog'; position: THREE.Vector3; title: string } | null {
+    const ray = new THREE.Ray(rayOrigin, rayDir);
+    let closestDist = reach;
+    let hit: { type: 'npc' | 'dog'; position: THREE.Vector3; title: string } | null = null;
+
+    if (this.npcMesh) {
+      const npcBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z),
+        new THREE.Vector3(1.0, 2.2, 1.0)
+      );
+      const hitPoint = new THREE.Vector3();
+      if (ray.intersectBox(npcBox, hitPoint)) {
+        const dist = rayOrigin.distanceTo(hitPoint);
+        if (dist < closestDist) {
+          closestDist = dist;
+          hit = { type: 'npc', position: this.npcMesh.position.clone(), title: 'Lakshya' };
+        }
+      }
+    }
+
+    if (this.dogMesh) {
+      const dogBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z),
+        new THREE.Vector3(0.8, 0.9, 0.8)
+      );
+      const hitPoint = new THREE.Vector3();
+      if (ray.intersectBox(dogBox, hitPoint)) {
+        const dist = rayOrigin.distanceTo(hitPoint);
+        if (dist < closestDist) {
+          closestDist = dist;
+          hit = { type: 'dog', position: this.dogMesh.position.clone(), title: 'Roger' };
+        }
+      }
+    }
+
+    return hit;
+  }
+
   // Place a new block dynamically
   public placeBlock(x: number, y: number, z: number, type: string) {
     const key = `${x},${y},${z}`;
@@ -434,8 +477,8 @@ export class VoxelWorld {
 
     projects.forEach((proj) => {
       const group = new THREE.Group();
-      // Positioned on pedestal beside banner on Neo York Broadway sidewalk
-      group.position.set(proj.bannerCoords.x - 2.2, 2.8, proj.bannerCoords.z);
+      // Positioned directly above pedestal on Neo York Broadway East sidewalk (X = 87)
+      group.position.set(proj.bannerCoords.x - 1.9, 4.2, proj.bannerCoords.z);
 
       const geo = new THREE.OctahedronGeometry(0.45);
       const mat = new THREE.MeshLambertMaterial({
@@ -495,182 +538,239 @@ export class VoxelWorld {
     this.scene.add(this.portalParticles);
   }
 
-  // 3D NPC of Lakshya near spawn (Authentic Photo-Inspired Model)
+  // 3D NPC of Lakshya near spawn (Authentic Generated Avatar from og-image.jpg) & Companion Dog Roger
   private createLakshyaNPC() {
+    if (this.npcMesh) return;
+
     const npc = new THREE.Group();
     // Keep the NPC on dry ground beside the spawn point, outside the fountain.
     npc.position.set(3.5, 2, 7.5);
-
-    const skinMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 }); // Warm skin tone
-    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b }); // Black oversized graphic tee
-    const denimMat = new THREE.MeshLambertMaterial({ color: 0x2563eb }); // Relaxed blue denim jeans
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x1c1917 }); // Dark brown/black textured hair
-    const shoeBlack = new THREE.MeshLambertMaterial({ color: 0x18181b });
-    const shoeWhite = new THREE.MeshLambertMaterial({ color: 0xffffff });
-
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
-    head.position.set(0, 1.6, 0);
-
-    // Textured dark hair with modern side taper (Photos 2 & 4)
-    const hair = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.22, 0.53), hairMat);
-    hair.position.set(0, 0.18, 0);
-    head.add(hair);
-
-    const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.15), hairMat);
-    fringe.position.set(0.02, 0.18, 0.24);
-    head.add(fringe);
-
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
-    const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
-    eyeL.position.set(-0.12, 0.02, 0.255);
-    const pupilL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.03), pupilMat);
-    pupilL.position.set(-0.12, 0.02, 0.26);
-    head.add(eyeL);
-    head.add(pupilL);
-
-    const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
-    eyeR.position.set(0.12, 0.02, 0.255);
-    const pupilR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.03), pupilMat);
-    pupilR.position.set(0.12, 0.02, 0.26);
-    head.add(eyeR);
-    head.add(pupilR);
-    npc.add(head);
-
-    // Torso (Oversized Black Graphic Streetwear Tee)
-    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.28), shirtMat);
-    torso.position.set(0, 1.0, 0);
-    npc.add(torso);
-
-    // Graphic print on chest and back
-    const printFront = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.02), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
-    printFront.position.set(0, 1.04, 0.145);
-    npc.add(printFront);
-
-    const printBack = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.02), new THREE.MeshBasicMaterial({ color: 0xf1f5f9 }));
-    printBack.position.set(0, 1.02, -0.145);
-    npc.add(printBack);
-
-    // Arms
-    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
-    armL.position.set(-0.38, 1.15, 0);
-    const forearmL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
-    forearmL.position.set(0, -0.32, 0);
-    armL.add(forearmL);
-    npc.add(armL);
-
-    const armR = new THREE.Group();
-    armR.position.set(0.38, 1.15, 0);
-    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
-    armR.add(sleeveR);
-    const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
-    forearmR.position.set(0, -0.32, 0);
-    armR.add(forearmR);
-    armR.rotation.x = -0.4;
-
-    // Diamond Pickaxe in hand
-    const pickGroup = new THREE.Group();
-    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.04), new THREE.MeshLambertMaterial({ color: 0x8b5a2b }));
-    handle.position.set(0, 0.15, 0);
-    pickGroup.add(handle);
-    const headPick = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.06), new THREE.MeshLambertMaterial({ color: 0x38bdf8 }));
-    headPick.position.set(0, 0.38, 0);
-    pickGroup.add(headPick);
-    pickGroup.position.set(0, -0.5, 0.15);
-    pickGroup.rotation.set(0.6, 0, 0);
-    armR.add(pickGroup);
-    npc.add(armR);
-
-    // Legs with Skate Sneakers
-    const legL = new THREE.Group();
-    legL.position.set(-0.14, 0.6, 0);
-    const pantsL = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.45, 0.23), denimMat);
-    pantsL.position.set(0, -0.22, 0);
-    legL.add(pantsL);
-    const soleL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.34), shoeWhite);
-    soleL.position.set(0, -0.5, 0.04);
-    legL.add(soleL);
-    const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.32), shoeBlack);
-    shoeL.position.set(0, -0.41, 0.04);
-    legL.add(shoeL);
-    npc.add(legL);
-
-    const legR = new THREE.Group();
-    legR.position.set(0.14, 0.6, 0);
-    const pantsR = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.45, 0.23), denimMat);
-    pantsR.position.set(0, -0.22, 0);
-    legR.add(pantsR);
-    const soleR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.34), shoeWhite);
-    soleR.position.set(0, -0.5, 0.04);
-    legR.add(soleR);
-    const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.32), shoeBlack);
-    shoeR.position.set(0, -0.41, 0.04);
-    legR.add(shoeR);
-    npc.add(legR);
-
-    // Floating Nameplate
-    const nameCanvas = document.createElement('canvas');
-    nameCanvas.width = 384;
-    nameCanvas.height = 96;
-    const nameCtx = nameCanvas.getContext('2d')!;
-    nameCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    nameCtx.fillRect(0, 0, 384, 96);
-    nameCtx.strokeStyle = '#55ff55';
-    nameCtx.lineWidth = 4;
-    nameCtx.strokeRect(2, 2, 380, 92);
-
-    nameCtx.fillStyle = '#55ff55';
-    nameCtx.font = 'bold 24px monospace';
-    nameCtx.textAlign = 'center';
-    nameCtx.fillText('[LVL 19] Lakshya', 192, 36);
-
-    nameCtx.fillStyle = '#ffffff';
-    nameCtx.font = '18px monospace';
-    nameCtx.fillText('Software Engineer & Designer', 192, 68);
-
-    const nameTexture = new THREE.CanvasTexture(nameCanvas);
-    nameTexture.magFilter = THREE.NearestFilter;
-    const nameSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture }));
-    nameSprite.scale.set(2.4, 0.6, 1);
-    nameSprite.position.set(0, 2.2, 0);
-    npc.add(nameSprite);
-
-    this.scene.add(npc);
-    this.npcMesh = npc;
-  }
-
-  /** Replace the separately modeled guide with the same model used by the player. */
-  public replaceLakshyaNPCWithAvatar(playerAvatar: THREE.Group) {
-    if (this.npcMesh) {
-      this.scene.remove(this.npcMesh);
-      this.npcMesh.traverse((object) => {
-        if (object instanceof THREE.Mesh || object instanceof THREE.Sprite) {
-          object.geometry?.dispose();
-          const material = object.material;
-          if (Array.isArray(material)) material.forEach((item) => item.dispose());
-          else material?.dispose();
-        }
-      });
-    }
-
-    const npc = playerAvatar.clone(true);
-    npc.visible = true;
-    npc.position.set(3.5, 2, 7.5);
     npc.rotation.y = Math.PI;
 
+    // Palette authentic to og-image.jpg
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0xf0c8a5 }); // Warm healthy skin tone
+    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b }); // Crisp black button-down dress shirt
+    const placketMat = new THREE.MeshLambertMaterial({ color: 0x222227 }); // Front button placket
+    const buttonMat = new THREE.MeshBasicMaterial({ color: 0x64748b }); // Subtle silver/charcoal buttons
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x111113 }); // Jet black styled hair
+    const glassesFrameMat = new THREE.MeshLambertMaterial({ color: 0x0f0f11 }); // Black glasses frames
+    const lensMat = new THREE.MeshStandardMaterial({
+      color: 0xe0f2fe,
+      roughness: 0.1,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.38
+    }); // Translucent glasses lenses
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0xb45309 });
+    const beltMat = new THREE.MeshLambertMaterial({ color: 0x0f172a }); // Dark sleek belt
+    const buckleMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 }); // Metallic silver buckle
+    const watchBandMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 }); // Metallic silver watch strap
+    const watchDialMat = new THREE.MeshLambertMaterial({ color: 0x0f172a }); // Dark dial face
+    const pantsMat = new THREE.MeshLambertMaterial({ color: 0x18181b }); // Tailored black trousers
+    const shoeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff }); // Crisp white sneakers
+    const shoeSoleMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 }); // Subtle sneaker sole rim
+
+    // --- HEAD GROUP ---
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 1.55, 0);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
+    headGroup.add(headMesh);
+
+    // Jet black styled hair (Curtain / side part with modern volume)
+    const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.2, 0.53), hairMat);
+    hairTop.position.set(0, 0.17, 0);
+    headGroup.add(hairTop);
+
+    // Left & Right parted bangs framing forehead
+    const bangL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.14), hairMat);
+    bangL.position.set(-0.13, 0.12, 0.21);
+    headGroup.add(bangL);
+
+    const bangR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.14), hairMat);
+    bangR.position.set(0.13, 0.12, 0.21);
+    headGroup.add(bangR);
+
+    // Back & side hair taper
+    const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.3, 0.14), hairMat);
+    hairBack.position.set(0, 0.02, -0.2);
+    headGroup.add(hairBack);
+
+    const hairSideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.36), hairMat);
+    hairSideL.position.set(-0.24, 0.03, -0.02);
+    headGroup.add(hairSideL);
+
+    const hairSideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, 0.36), hairMat);
+    hairSideR.position.set(0.24, 0.03, -0.02);
+    headGroup.add(hairSideR);
+
+    // Eyes: White sclera + dark pupils
+    for (const side of [-0.12, 0.12]) {
+      const eye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
+      eye.position.set(side, 0.02, 0.255);
+      headGroup.add(eye);
+
+      const pupil = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.03), pupilMat);
+      pupil.position.set(side, 0.02, 0.26);
+      headGroup.add(pupil);
+    }
+
+    // Glasses: Signature black frames with clear lenses from og-image.jpg
+    const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.03), glassesFrameMat);
+    leftFrame.position.set(-0.12, 0.02, 0.268);
+    headGroup.add(leftFrame);
+
+    const leftLens = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.032), lensMat);
+    leftLens.position.set(-0.12, 0.02, 0.268);
+    headGroup.add(leftLens);
+
+    const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.03), glassesFrameMat);
+    rightFrame.position.set(0.12, 0.02, 0.268);
+    headGroup.add(rightFrame);
+
+    const rightLens = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.032), lensMat);
+    rightLens.position.set(0.12, 0.02, 0.268);
+    headGroup.add(rightLens);
+
+    // Nose Bridge
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.03), glassesFrameMat);
+    bridge.position.set(0, 0.03, 0.268);
+    headGroup.add(bridge);
+
+    // Glasses temple arms extending back
+    const templeL = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.26), glassesFrameMat);
+    templeL.position.set(-0.255, 0.03, 0.13);
+    headGroup.add(templeL);
+
+    const templeR = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.26), glassesFrameMat);
+    templeR.position.set(0.255, 0.03, 0.13);
+    headGroup.add(templeR);
+
+    // Friendly smile
+    const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.015), mouthMat);
+    mouth.position.set(0, -0.13, 0.256);
+    headGroup.add(mouth);
+
+    npc.add(headGroup);
+
+    // --- TORSO (Black Collared Dress Shirt with Open V-Neck & Placket) ---
+    const torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.28), shirtMat);
+    torsoMesh.position.set(0, 0.96, 0);
+    npc.add(torsoMesh);
+
+    // Open V-neck collar showing skin tone
+    const vNeck = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.12, 0.02), skinMat);
+    vNeck.position.set(0, 1.25, 0.142);
+    npc.add(vNeck);
+
+    // Folded collar wings
+    const collarL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.03), shirtMat);
+    collarL.position.set(-0.08, 1.25, 0.146);
+    collarL.rotation.z = -0.18;
+    npc.add(collarL);
+
+    const collarR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.03), shirtMat);
+    collarR.position.set(0.08, 1.25, 0.146);
+    collarR.rotation.z = 0.18;
+    npc.add(collarR);
+
+    // Central button placket
+    const placket = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.54, 0.015), placketMat);
+    placket.position.set(0, 0.94, 0.144);
+    npc.add(placket);
+
+    // Buttons
+    for (const yBtn of [1.14, 1.02, 0.90, 0.78]) {
+      const btn = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.02), buttonMat);
+      btn.position.set(0, yBtn, 0.152);
+      npc.add(btn);
+    }
+
+    // Belt & Buckle
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.08, 0.29), beltMat);
+    belt.position.set(0, 0.65, 0);
+    npc.add(belt);
+
+    const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.025), buckleMat);
+    buckle.position.set(0, 0.65, 0.148);
+    npc.add(buckle);
+
+    // --- ARMS (Black Shirt Sleeves & Left Wrist Watch) ---
+    // Left Arm with silver wrist watch
+    const armL = new THREE.Group();
+    armL.position.set(-0.38, 1.12, 0);
+
+    const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.38, 0.22), shirtMat);
+    sleeveL.position.set(0, -0.06, 0);
+    armL.add(sleeveL);
+
+    const forearmL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.34, 0.2), skinMat);
+    forearmL.position.set(0, -0.34, 0);
+    armL.add(forearmL);
+
+    // Silver Wrist Watch (Watch band + dial from og-image.jpg)
+    const watchBand = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.22), watchBandMat);
+    watchBand.position.set(0, -0.38, 0);
+    armL.add(watchBand);
+
+    const watchFace = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.07, 0.07), watchDialMat);
+    watchFace.position.set(-0.105, -0.38, 0);
+    armL.add(watchFace);
+
+    npc.add(armL);
+
+    // Right Arm (Relaxed)
+    const armR = new THREE.Group();
+    armR.position.set(0.38, 1.12, 0);
+
+    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.38, 0.22), shirtMat);
+    sleeveR.position.set(0, -0.06, 0);
+    armR.add(sleeveR);
+
+    const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.34, 0.2), skinMat);
+    forearmR.position.set(0, -0.34, 0);
+    armR.add(forearmR);
+
+    npc.add(armR);
+
+    // --- LEGS (Tailored Black Trousers & Crisp White Sneakers) ---
+    for (const side of [-0.14, 0.14]) {
+      const legGroup = new THREE.Group();
+      legGroup.position.set(side, 0.6, 0);
+
+      const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.46, 0.23), pantsMat);
+      pants.position.set(0, -0.22, 0);
+      legGroup.add(pants);
+
+      const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.13, 0.31), shoeWhiteMat);
+      shoe.position.set(0, -0.42, 0.04);
+      legGroup.add(shoe);
+
+      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, 0.33), shoeSoleMat);
+      sole.position.set(0, -0.50, 0.04);
+      legGroup.add(sole);
+
+      npc.add(legGroup);
+    }
+
+    // Floating Nameplate [LVL 22] Lakshya matching og-image.jpg
     const nameCanvas = document.createElement('canvas');
     nameCanvas.width = 384;
     nameCanvas.height = 96;
     const nameCtx = nameCanvas.getContext('2d')!;
-    nameCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    nameCtx.fillStyle = 'rgba(0, 0, 0, 0.82)';
     nameCtx.fillRect(0, 0, 384, 96);
-    nameCtx.strokeStyle = '#9be0ad';
+    nameCtx.strokeStyle = '#22c55e';
     nameCtx.lineWidth = 4;
     nameCtx.strokeRect(2, 2, 380, 92);
-    nameCtx.fillStyle = '#9be0ad';
+
+    nameCtx.fillStyle = '#4ade80';
     nameCtx.font = 'bold 24px monospace';
     nameCtx.textAlign = 'center';
-    nameCtx.fillText('[LVL 19] Lakshya', 192, 36);
+    nameCtx.fillText('[LVL 22] Lakshya', 192, 36);
+
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
     nameCtx.fillText('Software Engineer & Designer', 192, 68);
@@ -679,11 +779,140 @@ export class VoxelWorld {
     nameTexture.magFilter = THREE.NearestFilter;
     const nameSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture }));
     nameSprite.scale.set(2.4, 0.6, 1);
-    nameSprite.position.set(0, 2.2, 0);
+    nameSprite.position.set(0, 2.25, 0);
     npc.add(nameSprite);
 
     this.scene.add(npc);
     this.npcMesh = npc;
+
+    // --- COMPANION DOG: ROGER (Wolf with Red Collar from og-image.jpg) ---
+    this.createRogerDog();
+  }
+
+  // Faithful companion Minecraft Wolf "ROGER" sitting right beside Lakshya
+  private createRogerDog() {
+    if (this.dogMesh) return;
+
+    const dog = new THREE.Group();
+    // Sitting beside Lakshya at spawn
+    dog.position.set(4.5, 2, 7.3);
+    dog.rotation.y = Math.PI - 0.2;
+
+    const furMat = new THREE.MeshLambertMaterial({ color: 0xe4e4e7 }); // Light grey/white wolf fur
+    const saddleMat = new THREE.MeshLambertMaterial({ color: 0x9ca3af }); // Grey saddle/back markings
+    const collarMat = new THREE.MeshLambertMaterial({ color: 0xef4444 }); // Iconic red collar
+    const noseMat = new THREE.MeshBasicMaterial({ color: 0x18181b });
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+
+    // Body (Sitting angled back)
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.32, 0.46), furMat);
+    body.position.set(0, 0.28, 0);
+    body.rotation.x = 0.24;
+    dog.add(body);
+
+    const saddle = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.14, 0.32), saddleMat);
+    saddle.position.set(0, 0.36, -0.04);
+    saddle.rotation.x = 0.24;
+    dog.add(saddle);
+
+    // Red Collar around neck
+    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.08, 0.30), collarMat);
+    collar.position.set(0, 0.48, 0.16);
+    dog.add(collar);
+
+    // Head
+    const head = new THREE.Group();
+    head.position.set(0, 0.58, 0.22);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.28, 0.3), furMat);
+    head.add(headMesh);
+
+    // Snout / Muzzle
+    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.13, 0.16), furMat);
+    snout.position.set(0, -0.06, 0.18);
+    head.add(snout);
+
+    // Black Nose
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.03), noseMat);
+    nose.position.set(0, -0.03, 0.265);
+    head.add(nose);
+
+    // Eyes
+    for (const side of [-0.08, 0.08]) {
+      const eye = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.02), eyeMat);
+      eye.position.set(side, 0.04, 0.155);
+      head.add(eye);
+    }
+
+    // Pointed Ears
+    const earL = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.11, 0.06), furMat);
+    earL.position.set(-0.09, 0.18, -0.04);
+    head.add(earL);
+
+    const earR = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.11, 0.06), furMat);
+    earR.position.set(0.09, 0.18, -0.04);
+    head.add(earR);
+
+    dog.add(head);
+    this.dogHeadMesh = head;
+
+    // Front Legs (Standing upright)
+    const legFL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.32, 0.1), furMat);
+    legFL.position.set(-0.09, 0.16, 0.16);
+    dog.add(legFL);
+
+    const legFR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.32, 0.1), furMat);
+    legFR.position.set(0.09, 0.16, 0.16);
+    dog.add(legFR);
+
+    // Hind Legs (Sitting posture)
+    const legBL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.2, 0.28), furMat);
+    legBL.position.set(-0.13, 0.1, -0.12);
+    dog.add(legBL);
+
+    const legBR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.2, 0.28), furMat);
+    legBR.position.set(0.13, 0.1, -0.12);
+    dog.add(legBR);
+
+    // Wagging Tail
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.32), furMat);
+    tail.position.set(0, 0.12, -0.28);
+    tail.rotation.x = -0.35;
+    dog.add(tail);
+    this.dogTailMesh = tail;
+
+    // Floating Nametag: ROGER
+    const dogCanvas = document.createElement('canvas');
+    dogCanvas.width = 256;
+    dogCanvas.height = 64;
+    const dogCtx = dogCanvas.getContext('2d')!;
+    dogCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    dogCtx.fillRect(0, 0, 256, 64);
+    dogCtx.strokeStyle = '#ef4444';
+    dogCtx.lineWidth = 3;
+    dogCtx.strokeRect(2, 2, 252, 60);
+
+    dogCtx.fillStyle = '#ffffff';
+    dogCtx.font = 'bold 26px monospace';
+    dogCtx.textAlign = 'center';
+    dogCtx.fillText('ROGER', 128, 42);
+
+    const dogTexture = new THREE.CanvasTexture(dogCanvas);
+    dogTexture.magFilter = THREE.NearestFilter;
+    const dogSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: dogTexture }));
+    dogSprite.scale.set(1.2, 0.35, 1);
+    dogSprite.position.set(0, 1.05, 0.15);
+    dog.add(dogSprite);
+
+    this.scene.add(dog);
+    this.dogMesh = dog;
+  }
+
+  /** Maintain the authentic generated avatar guide and companion dog */
+  public replaceLakshyaNPCWithAvatar(_playerAvatar?: THREE.Group) {
+    if (!this.npcMesh) {
+      this.createLakshyaNPC();
+    }
   }
 
 
@@ -814,15 +1043,27 @@ export class VoxelWorld {
         this.npcMesh.rotation.y = Math.atan2(dx, dz);
       }
     }
+
+    if (this.dogMesh) {
+      const dist = this.dogMesh.position.distanceTo(playerPos);
+      if (dist < 14) {
+        const dx = playerPos.x - this.dogMesh.position.x;
+        const dz = playerPos.z - this.dogMesh.position.z;
+        this.dogMesh.rotation.y = Math.atan2(dx, dz);
+      }
+      if (this.dogTailMesh) {
+        this.dogTailMesh.rotation.y = Math.sin(time * 6) * 0.32;
+      }
+    }
   }
 
   private createRailway() {
     const route = [
-      new THREE.Vector3(22, 2.15, 0),
-      new THREE.Vector3(22, 2.15, 24),
-      new THREE.Vector3(25, 2.15, 31),
-      new THREE.Vector3(60, 2.15, 34),
-      new THREE.Vector3(60, 2.15, 52)
+      new THREE.Vector3(56, 2.15, 42),
+      new THREE.Vector3(72, 2.15, 42),
+      new THREE.Vector3(92, 2.15, 42),
+      new THREE.Vector3(112, 2.15, 54),
+      new THREE.Vector3(124, 2.15, 72)
     ];
     this.railCurve = new THREE.CatmullRomCurve3(route, false, 'centripetal');
     const railMaterial = new THREE.MeshStandardMaterial({ color: 0x64736f, metalness: 0.72, roughness: 0.34 });

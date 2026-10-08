@@ -400,9 +400,10 @@ export class Player {
     this.handGroup = new THREE.Group();
     this.handGroup.position.set(0.38, -0.32, -0.6);
 
-    // Streetwear black t-shirt sleeve & skin forearm (Original Avatar)
+    // Black collared shirt sleeve & skin forearm with silver wrist watch (og-image.jpg)
     const armMat = new THREE.MeshLambertMaterial({ color: 0xf0c8a5 });
-    const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+    const sleeveMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const watchBandMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
 
     const armGeo = new THREE.BoxGeometry(0.18, 0.5, 0.18);
     const armMesh = new THREE.Mesh(armGeo, armMat);
@@ -415,6 +416,13 @@ export class Player {
     sleeveMesh.position.set(0.04, 0.08, 0.08);
     sleeveMesh.rotation.set(-0.3, 0.2, -0.15);
     this.handGroup.add(sleeveMesh);
+
+    // Silver wrist watch band on arm
+    const watchGeo = new THREE.BoxGeometry(0.19, 0.04, 0.19);
+    const watchMesh = new THREE.Mesh(watchGeo, watchBandMat);
+    watchMesh.position.set(0.04, 0.04, 0.08);
+    watchMesh.rotation.set(-0.3, 0.2, -0.15);
+    this.handGroup.add(watchMesh);
 
     // Default: Holding Diamond Pickaxe
     const pickaxeGroup = new THREE.Group();
@@ -1032,6 +1040,23 @@ export class Player {
       return;
     }
 
+    // 2. Check if looking at Lakshya NPC or Roger the dog
+    const npcHit = this.world.checkNPCHit(origin, rayDir, maxReach);
+    if (npcHit) {
+      this.currentTarget = {
+        blockPos: new THREE.Vector3(Math.floor(npcHit.position.x), Math.floor(npcHit.position.y), Math.floor(npcHit.position.z)),
+        faceNormal: new THREE.Vector3(0, 1, 0),
+        distance: origin.distanceTo(npcHit.position),
+        interactable: {
+          type: 'npc',
+          id: npcHit.type === 'dog' ? 'roger' : 'lakshya_guide',
+          title: npcHit.title
+        }
+      };
+      if (this.blockHighlight) this.blockHighlight.visible = false;
+      return;
+    }
+
     // 2. Voxel DDA (Fast digital differential analysis) raycast
     let foundTarget: TargetInfo | null = null;
     let stepSize = 0.08;
@@ -1149,15 +1174,32 @@ export class Player {
     sound.playClick();
   }
 
-  // Original Signature 3D Lakshya Avatar
+  // Authentic 3D Lakshya Avatar from og-image.jpg
   private createLakshyaAvatar() {
     this.playerAvatar = new THREE.Group();
 
     const skinMat = new THREE.MeshLambertMaterial({ color: 0xf0c8a5 });
-    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
-    const denimMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
-    const hairMat = new THREE.MeshLambertMaterial({ color: 0x5b3825 });
-    const shoeMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const shirtMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const placketMat = new THREE.MeshLambertMaterial({ color: 0x222227 });
+    const buttonMat = new THREE.MeshBasicMaterial({ color: 0x64748b });
+    const hairMat = new THREE.MeshLambertMaterial({ color: 0x111113 });
+    const glassesFrameMat = new THREE.MeshLambertMaterial({ color: 0x0f0f11 });
+    const lensMat = new THREE.MeshStandardMaterial({
+      color: 0xe0f2fe,
+      roughness: 0.1,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.38
+    });
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    const beltMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+    const buckleMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+    const watchBandMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+    const watchFaceMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
+    const pantsMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const shoeWhiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const shoeSoleMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
 
     // Head
     const headGroup = new THREE.Group();
@@ -1166,14 +1208,20 @@ export class Player {
     const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
     headGroup.add(headMesh);
 
-    // Chestnut brown hair block
-    const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.2, 0.52), hairMat);
+    // Jet black styled parted hair
+    const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.2, 0.53), hairMat);
     hairMesh.position.set(0, 0.17, 0);
     headGroup.add(hairMesh);
 
-    // Eyes: white square sclera + black pupil
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const bangL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.14), hairMat);
+    bangL.position.set(-0.13, 0.12, 0.21);
+    headGroup.add(bangL);
+
+    const bangR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.14), hairMat);
+    bangR.position.set(0.13, 0.12, 0.21);
+    headGroup.add(bangR);
+
+    // Eyes: white square sclera + dark pupil
     for (const side of [-0.12, 0.12]) {
       const eye = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), eyeMat);
       eye.position.set(side, 0.02, 0.255);
@@ -1182,34 +1230,99 @@ export class Player {
       pupil.position.set(side, 0.02, 0.26);
       headGroup.add(pupil);
     }
+
+    // Glasses: Signature black frames with clear lenses from og-image.jpg
+    const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.03), glassesFrameMat);
+    leftFrame.position.set(-0.12, 0.02, 0.268);
+    headGroup.add(leftFrame);
+
+    const leftLens = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.032), lensMat);
+    leftLens.position.set(-0.12, 0.02, 0.268);
+    headGroup.add(leftLens);
+
+    const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.03), glassesFrameMat);
+    rightFrame.position.set(0.12, 0.02, 0.268);
+    headGroup.add(rightFrame);
+
+    const rightLens = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.032), lensMat);
+    rightLens.position.set(0.12, 0.02, 0.268);
+    headGroup.add(rightLens);
+
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.03), glassesFrameMat);
+    bridge.position.set(0, 0.03, 0.268);
+    headGroup.add(bridge);
+
     this.avatarHead = headGroup;
     this.playerAvatar.add(headGroup);
 
-    // Torso: Black T-shirt with signature pink chest rectangle
+    // Torso: Black button-down dress shirt with V-neck & buttons
     const torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.28), shirtMat);
     torsoMesh.position.set(0, 0.9, 0);
     this.playerAvatar.add(torsoMesh);
 
-    const printFront = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.28, 0.02), new THREE.MeshBasicMaterial({ color: 0xf43f5e }));
-    printFront.position.set(0, 0.94, 0.145);
-    this.playerAvatar.add(printFront);
+    const vNeck = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.12, 0.02), skinMat);
+    vNeck.position.set(0, 1.19, 0.142);
+    this.playerAvatar.add(vNeck);
+
+    const collarL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.03), shirtMat);
+    collarL.position.set(-0.08, 1.19, 0.146);
+    collarL.rotation.z = -0.18;
+    this.playerAvatar.add(collarL);
+
+    const collarR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.03), shirtMat);
+    collarR.position.set(0.08, 1.19, 0.146);
+    collarR.rotation.z = 0.18;
+    this.playerAvatar.add(collarR);
+
+    const placket = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.54, 0.015), placketMat);
+    placket.position.set(0, 0.88, 0.144);
+    this.playerAvatar.add(placket);
+
+    for (const yBtn of [1.08, 0.96, 0.84, 0.72]) {
+      const btn = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.02), buttonMat);
+      btn.position.set(0, yBtn, 0.152);
+      this.playerAvatar.add(btn);
+    }
+
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.53, 0.08, 0.29), beltMat);
+    belt.position.set(0, 0.59, 0);
+    this.playerAvatar.add(belt);
+
+    const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.025), buckleMat);
+    buckle.position.set(0, 0.59, 0.148);
+    this.playerAvatar.add(buckle);
 
     // Arms
+    // Left Arm with silver wrist watch
     this.avatarArmL = new THREE.Group();
     this.avatarArmL.position.set(-0.38, 1.15, 0);
-    const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
+
+    const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.38, 0.22), shirtMat);
     sleeveL.position.set(0, -0.16, 0);
     this.avatarArmL.add(sleeveL);
+
     const forearmL = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
     forearmL.position.set(0, -0.48, 0);
     this.avatarArmL.add(forearmL);
+
+    const watchBand = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.22), watchBandMat);
+    watchBand.position.set(0, -0.52, 0);
+    this.avatarArmL.add(watchBand);
+
+    const watchFace = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.07, 0.07), watchFaceMat);
+    watchFace.position.set(-0.105, -0.52, 0);
+    this.avatarArmL.add(watchFace);
+
     this.playerAvatar.add(this.avatarArmL);
 
+    // Right Arm with Diamond Pickaxe
     this.avatarArmR = new THREE.Group();
     this.avatarArmR.position.set(0.38, 1.15, 0);
-    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.22), shirtMat);
+
+    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.38, 0.22), shirtMat);
     sleeveR.position.set(0, -0.16, 0);
     this.avatarArmR.add(sleeveR);
+
     const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.38, 0.2), skinMat);
     forearmR.position.set(0, -0.48, 0);
     this.avatarArmR.add(forearmR);
@@ -1221,12 +1334,12 @@ export class Player {
     this.avatarArmR.add(handPick);
     this.playerAvatar.add(this.avatarArmR);
 
-    // Legs (Dark denim pants + dark shoes)
-    this.avatarLegL = this.createLegWithShoe(denimMat, shoeMat);
+    // Legs (Tailored black trousers + crisp white sneakers)
+    this.avatarLegL = this.createLegWithShoe(pantsMat, shoeWhiteMat, shoeSoleMat);
     this.avatarLegL.position.set(-0.14, 0.55, 0);
     this.playerAvatar.add(this.avatarLegL);
 
-    this.avatarLegR = this.createLegWithShoe(denimMat, shoeMat);
+    this.avatarLegR = this.createLegWithShoe(pantsMat, shoeWhiteMat, shoeSoleMat);
     this.avatarLegR.position.set(0.14, 0.55, 0);
     this.playerAvatar.add(this.avatarLegR);
 
@@ -1234,18 +1347,23 @@ export class Player {
     this.world.scene.add(this.playerAvatar);
   }
 
-  private createLegWithShoe(denimMat: THREE.Material, shoeMat: THREE.Material): THREE.Group {
+  private createLegWithShoe(pantsMat: THREE.Material, shoeMat: THREE.Material, soleMat: THREE.Material): THREE.Group {
     const group = new THREE.Group();
 
-    // Dark denim jeans
-    const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.48, 0.23), denimMat);
+    // Tailored black trousers
+    const pants = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.48, 0.23), pantsMat);
     pants.position.set(0, -0.22, 0);
     group.add(pants);
 
-    // Classic dark shoes
-    const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.14, 0.28), shoeMat);
-    shoe.position.set(0, -0.48, 0.02);
+    // Crisp white sneakers
+    const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.13, 0.31), shoeMat);
+    shoe.position.set(0, -0.45, 0.03);
     group.add(shoe);
+
+    // White sole rim
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.05, 0.33), soleMat);
+    sole.position.set(0, -0.52, 0.03);
+    group.add(sole);
 
     return group;
   }
@@ -1266,21 +1384,26 @@ export class Player {
     this.firstPersonLegs = new THREE.Group();
     this.firstPersonLegs.position.set(0, -0.45, -0.45);
 
-    const denimMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
-    const shoeMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const pantsMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const shoeMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const soleMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
 
     for (const side of [-0.18, 0.18]) {
       const leg = new THREE.Group();
       leg.position.set(side, 0, 0);
 
-      const pants = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.7), denimMat);
+      const pants = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.7), pantsMat);
       pants.position.set(0, -0.05, -0.28);
       pants.rotation.x = -0.18;
       leg.add(pants);
 
-      const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.15, 0.36), shoeMat);
-      shoe.position.set(0, -0.08, -0.62);
+      const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.14, 0.36), shoeMat);
+      shoe.position.set(0, -0.07, -0.62);
       leg.add(shoe);
+
+      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.04, 0.38), soleMat);
+      sole.position.set(0, -0.14, -0.62);
+      leg.add(sole);
 
       this.firstPersonLegs.add(leg);
     }

@@ -289,17 +289,13 @@ export class ModalManager {
       { number: '03', name: 'Sakura Sanctuary', subtitle: 'Pagoda & quiet gardens', detail: 'Walk beneath the cherry canopy, pass the torii gates, and visit the language embassy.', index: 4, tone: 'sakura', direction: 'NORTHWEST · X −68' },
       { number: '04', name: 'Imperial Raj', subtitle: 'Marble & reflection', detail: 'Explore the Taj Mahal, its reflecting pool, and the SRMIST honors courtyard.', index: 3, tone: 'raj', direction: 'NORTHEAST · X 55' },
       { number: '05', name: 'Neo York', subtitle: 'Glass towers & AI labs', detail: 'Find the Times Square avenue, research labs, and the Lak Tower skyline marker.', index: 1, tone: 'neoyork', direction: 'EAST · X 80' },
-      { number: '06', name: 'Pueblo Royale', subtitle: 'Adobe village & arena', detail: 'Visit the terracotta village square, central well, and builder’s arena.', index: 5, tone: 'pueblo', direction: 'WEST · X −75' },
-      { number: '07', name: 'Sunset Coast', subtitle: 'Saloon, palms & pier', detail: 'Follow the boardwalk south to the beach bar, palm grove, and Merlion.', index: 6, tone: 'coast', direction: 'SOUTH · Z 58' },
-      { number: '08', name: 'Civic Quarter', subtitle: 'Care & public service', detail: 'Find the hospital and police station serving the eastern neighborhoods.', index: 11, tone: 'citadel', direction: 'EAST · X 49' },
-      { number: '09', name: 'Learning Commons', subtitle: 'School & community', detail: 'Visit the neighborhood school, built around a warm timber courtyard.', index: 12, tone: 'pueblo', direction: 'NORTHWEST · X 46' },
-      { number: '10', name: 'Wildlife Park', subtitle: 'Habitats & nature trails', detail: 'Explore the zoo’s green paths, animal paddocks, and pond.', index: 13, tone: 'coast', direction: 'WEST · X −39' },
-      { number: '11', name: 'Rapunzel’s Keep', subtitle: 'A fairy-tale skyline', detail: 'Look for the high tower, golden braid, and clustered castle turrets.', index: 14, tone: 'raj', direction: 'SOUTHWEST · X −46' },
-      { number: '12', name: 'Mexico City', subtitle: 'Zócalo & cathedral', detail: 'Gather in the plaza, visit the twin-spired cathedral, and browse market stalls.', index: 15, tone: 'pueblo', direction: 'WEST · X −90' },
-      { number: '13', name: 'Eiffel Tower', subtitle: 'Paris by night', detail: 'See the illuminated iron landmark rising above the northern gardens.', index: 16, tone: 'frost', direction: 'NORTH · X 49' },
-      { number: '14', name: 'Central Station', subtitle: 'Platforms & live trains', detail: 'Watch the trains roll through the covered station and onward to the airport.', index: 17, tone: 'neoyork', direction: 'EAST · X 60' },
-      { number: '15', name: 'Skyport', subtitle: 'Terminal & runway', detail: 'Follow the runway to the terminal and control tower at the edge of town.', index: 9, tone: 'frost', direction: 'SOUTHEAST · Z 62' },
-      { number: '16', name: 'Hollywood Hills', subtitle: 'The sign above the skyline', detail: 'Climb the ridge trail to a sunset overlook beneath the famous white hillside letters.', index: 18, tone: 'coast', direction: 'NORTHEAST · X 82' },
+      { number: '06', name: 'Mexico City', subtitle: 'Zócalo & cathedral', detail: 'Gather in the city square, visit the cathedral, and browse the planned market streets.', index: 5, tone: 'pueblo', direction: 'WEST · X −70' },
+      { number: '07', name: 'South Coast', subtitle: 'Saloon, palms & pier', detail: 'Follow the boardwalk south to the beach bar, palm grove, and Merlion.', index: 6, tone: 'coast', direction: 'SOUTH · X 12 / Z 58' },
+      { number: '08', name: 'Civic Quarter', subtitle: 'School, care & public safety', detail: 'The school, hospital, and police station share a calm, connected southern district.', index: 11, tone: 'citadel', direction: 'SOUTHEAST · X 36 / Z 47' },
+      { number: '09', name: 'Travel Hub', subtitle: 'Station, trains & airport', detail: 'Live trains run between the central station and the compact coastal airport.', index: 10, tone: 'neoyork', direction: 'SOUTHEAST · X 58 / Z 42' },
+      { number: '10', name: 'Wildlife & Storybook Vale', subtitle: 'Zoo, gardens & castle', detail: 'Take the garden trail from the wildlife park to Rapunzel’s castle.', index: 14, tone: 'sakura', direction: 'WEST · X −44 / Z −32' },
+      { number: '11', name: 'Paris Gardens', subtitle: 'Eiffel Tower & avenue', detail: 'The Eiffel Tower anchors a quiet garden avenue on the northern approach.', index: 16, tone: 'frost', direction: 'NORTHEAST · X 30 / Z −42' },
+      { number: '12', name: 'Hollywood Hills', subtitle: 'A sign above the skyline', detail: 'Climb the contained ridge trail to the hillside sign and sunset overlook.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 78 / Z −50' },
     ];
     const regionsHtml = atlasRegions.map((region) => `
       <article class="atlas-region-card atlas-${region.tone}">
@@ -324,7 +320,7 @@ export class ModalManager {
           <div>
             <p class="atlas-eyebrow">LAKSHYA’S PORTFOLIO WORLD <span>·</span> FIELD GUIDE 01</p>
             <h2 class="mc-dialog-title">A world worth exploring.</h2>
-            <span class="mc-dialog-subtitle">Sixteen neighborhoods and landmarks, connected by one central crossroads.</span>
+            <span class="mc-dialog-subtitle">Twelve planned districts and eighteen waypoints, connected by clear routes.</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
@@ -414,8 +410,8 @@ export class ModalManager {
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     const cx = width / 2;
     const cy = height / 2;
-    const scale = 2.8;
-    const worldLimit = 136;
+    const scale = 1.9;
+    const worldLimit = 205;
     const mapHalfW = worldLimit * scale;
     const mapHalfH = worldLimit * scale;
 
@@ -439,21 +435,20 @@ export class ModalManager {
 
       ctx.font = 'bold 11px monospace';
       ctx.fillStyle = '#facc15';
-      ctx.fillText('[REALM BIOMES]', 22, 34);
+      ctx.fillText('[REALM QUADRANTS]', 22, 34);
 
       const biomes = [
-        { name: 'North: Frostpeaks', color: '#e0f2fe', desc: 'Snow Peaks & Overlook' },
-        { name: 'NW: Sakura Pagoda', color: '#f472b6', desc: 'Cherry Blossom & Zen' },
-        { name: 'NE: Imperial Raj', color: '#fef08a', desc: 'Taj Mahal & Honors' },
+        { name: 'NE: Imperial India', color: '#fef08a', desc: 'Taj Mahal & Yamuna' },
+        { name: 'NW: China Realm', color: '#34d399', desc: 'Great Wall & Pagoda' },
+        { name: 'SW: Mexico Realm', color: '#fb923c', desc: 'Zócalo & Aztec Pyramid' },
+        { name: 'SE: USA & Neo York', color: '#38bdf8', desc: 'Times Sq, Lak & Hollywood' },
+        { name: 'South: Grand Carnival', color: '#f472b6', desc: 'Ferris Wheel & Coaster' },
         { name: 'Center: Citadel Hub', color: '#94a3b8', desc: 'Compass Rose & Moat' },
-        { name: 'East: Neo York', color: '#38bdf8', desc: 'Times Sq & Lak Tower' },
-        { name: 'West: Pueblo Royale', color: '#fb923c', desc: 'Adobe Village & Arena' },
-        { name: 'South: Sunset & Beach', color: '#fbbf24', desc: 'Saloon, Pier & Merlion' },
-        { name: 'NE: Hollywood Hills', color: '#d7a879', desc: 'Ridge trail & hillside sign' }
+        { name: 'Beach: Palm Pier', color: '#06b6d4', desc: 'Merlion & Sailing Ships' }
       ];
 
       biomes.forEach((b, i) => {
-        const by = 48 + i * 34;
+        const by = 48 + i * 36;
         ctx.fillStyle = b.color;
         ctx.fillRect(22, by, 10, 10);
         ctx.fillStyle = '#f8fafc';
@@ -531,7 +526,7 @@ export class ModalManager {
       const numPts = 256;
       for (let i = 0; i <= numPts; i++) {
         const th = (i / numPts) * Math.PI * 2;
-        const r = (112 + Math.sin(th * 5) * 5 + Math.cos(th * 3) * 4) * scale;
+        const r = (180 + Math.sin(th * 6) * 6 + Math.cos(th * 4) * 5) * scale;
         const px = cx + Math.cos(th) * r;
         const py = cy + Math.sin(th) * r;
         if (i === 0) ctx.moveTo(px, py);
@@ -548,7 +543,7 @@ export class ModalManager {
       ctx.beginPath();
       for (let i = 0; i <= numPts; i++) {
         const th = (i / numPts) * Math.PI * 2;
-        const r = (104 + Math.sin(th * 5) * 4 + Math.cos(th * 3) * 3) * scale;
+        const r = (172 + Math.sin(th * 6) * 5 + Math.cos(th * 4) * 4) * scale;
         const px = cx + Math.cos(th) * r;
         const py = cy + Math.sin(th) * r;
         if (i === 0) ctx.moveTo(px, py);
@@ -557,55 +552,41 @@ export class ModalManager {
       ctx.closePath();
       ctx.fill();
 
-      // Biomes follow the same coordinate boundaries as the terrain builder.
+      // Biomes follow the cultural quadrant partition
       const mapRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
         ctx.fillStyle = color;
         ctx.fillRect(cx + x1 * scale, cy + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
       };
-      mapRect(-136, 55, 136, 136, '#c7ad72'); // Sunset Coast
-      mapRect(-136, 8, -35, 75, '#b56e48'); // Pueblo
-      mapRect(45, -35, 136, 45, '#4d7172'); // Neo York
-      mapRect(25, -136, 136, -55, '#c2ae78'); // Imperial Raj
-      mapRect(-136, -136, -25, -45, '#9d718a'); // Sakura
-      mapRect(-35, -136, 35, -65, '#b5c4c0'); // Frostpeaks, highest priority
+      mapRect(25, -195, 195, -40, '#c2ae78'); // NE: Imperial India
+      mapRect(-195, -195, -25, -40, '#2d7a5b'); // NW: China Realm
+      mapRect(-195, 25, -25, 195, '#b56e48'); // SW: Mexico Realm
+      mapRect(25, -40, 195, 75, '#4d7172'); // SE: USA Neo York
+      mapRect(-40, 75, 40, 195, '#d4ad64'); // South: Beach & Boardwalk
+      mapRect(-25, 120, 35, 185, '#ec4899'); // South: Grand Carnival Pier
 
-      // Hollywood Hills: layered ridge shading and the sign above the city.
-      const hollywoodX = cx + 82 * scale;
-      const hollywoodZ = cy - 58 * scale;
+      // Yamuna canal in India
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(cx + 76 * scale, cy - 122 * scale, 8 * scale, 47 * scale);
+
+      // Great Wall on China Ridge
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 4 * scale;
+      ctx.beginPath();
+      ctx.moveTo(cx - 150 * scale, cy - 140 * scale);
+      ctx.quadraticCurveTo(cx - 115 * scale, cy - 132 * scale, cx - 80 * scale, cy - 140 * scale);
+      ctx.stroke();
+
+      // Hollywood Hills Ridge in USA Realm
+      const hollywoodX = cx + 130 * scale;
+      const hollywoodZ = cy - 50 * scale;
       ctx.fillStyle = 'rgba(91,61,43,.48)';
       ctx.beginPath();
-      ctx.ellipse(hollywoodX, hollywoodZ + 11 * scale, 34 * scale, 15 * scale, -.22, 0, Math.PI * 2);
+      ctx.ellipse(hollywoodX, hollywoodZ + 6 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = 'rgba(210,166,119,.8)';
-      ctx.beginPath();
-      ctx.moveTo(hollywoodX - 31 * scale, hollywoodZ + 8 * scale);
-      ctx.lineTo(hollywoodX - 15 * scale, hollywoodZ - 5 * scale);
-      ctx.lineTo(hollywoodX - 7 * scale, hollywoodZ - 1 * scale);
-      ctx.lineTo(hollywoodX + 8 * scale, hollywoodZ - 17 * scale);
-      ctx.lineTo(hollywoodX + 17 * scale, hollywoodZ - 7 * scale);
-      ctx.lineTo(hollywoodX + 30 * scale, hollywoodZ + 4 * scale);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,239,206,.7)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
       ctx.fillStyle = '#fff8e8';
-      ctx.fillRect(hollywoodX - 18 * scale, hollywoodZ + 10 * scale, 36 * scale, 2 * scale);
+      ctx.fillRect(hollywoodX - 18 * scale, hollywoodZ + 5 * scale, 36 * scale, 2 * scale);
 
-      // Ridge lines and a reflecting pool give the regions a little topography.
-      ctx.strokeStyle = 'rgba(255,255,255,.34)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(cx - 25 * scale, cy - 78 * scale);
-      ctx.lineTo(cx - 12 * scale, cy - 101 * scale);
-      ctx.lineTo(cx - 2 * scale, cy - 88 * scale);
-      ctx.lineTo(cx + 13 * scale, cy - 119 * scale);
-      ctx.lineTo(cx + 29 * scale, cy - 82 * scale);
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(83,165,182,.75)';
-      ctx.fillRect(cx + 50 * scale, cy - 86 * scale, 10 * scale, 19 * scale);
-
-      // Main routes are narrow, warm paths that remain legible at every scale.
+      // Main Arterial Routes
       const route = (points: [number, number][]) => {
         ctx.beginPath();
         points.forEach(([x, z], i) => {
@@ -619,22 +600,22 @@ export class ModalManager {
       ctx.lineJoin = 'round';
       ctx.strokeStyle = 'rgba(27,37,31,.62)';
       ctx.lineWidth = 5;
-      route([[0, -22], [0, -65], [0, -91]]);
-      route([[20, 0], [80, 0], [101, 0]]);
-      route([[-20, 0], [-31, 18], [-50, 35], [-70, 35]]);
-      route([[5, -51], [20, -64], [42, -85], [55, -95]]);
-      route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
-      route([[0, 22], [0, 58], [0, 92], [6, 110]]);
-      route([[20, 0], [46, -7], [66, -24], [82, -58]]);
+      route([[0, -22], [0, -65]]);
+      route([[20, 0], [77, 0], [100, 0], [150, 0]]);
+      route([[2, -60], [40, -84], [74, -106]]);
+      route([[-2, -55], [-38, -70], [-70, -85]]);
+      route([[-20, 0], [-50, 25], [-79, 50]]);
+      route([[0, 22], [0, 58], [0, 119], [0, 160]]);
+      route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
       ctx.strokeStyle = '#e6d5a5';
       ctx.lineWidth = 2.2;
-      route([[0, -22], [0, -65], [0, -91]]);
-      route([[20, 0], [80, 0], [101, 0]]);
-      route([[-20, 0], [-31, 18], [-50, 35], [-70, 35]]);
-      route([[5, -51], [20, -64], [42, -85], [55, -95]]);
-      route([[-5, -51], [-22, -58], [-47, -75], [-68, -88]]);
-      route([[0, 22], [0, 58], [0, 92], [6, 110]]);
-      route([[20, 0], [46, -7], [66, -24], [82, -58]]);
+      route([[0, -22], [0, -65]]);
+      route([[20, 0], [77, 0], [100, 0], [150, 0]]);
+      route([[2, -60], [40, -84], [74, -106]]);
+      route([[-2, -55], [-38, -70], [-70, -85]]);
+      route([[-20, 0], [-50, 25], [-79, 50]]);
+      route([[0, 22], [0, 58], [0, 119], [0, 160]]);
+      route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
 
       // Small settlement marks help distinguish the built-up districts.
       const block = (x: number, z: number, color: string, size = 5) => {
@@ -711,6 +692,11 @@ export class ModalManager {
         else if (lm.tag.includes('EIFFEL')) col = '#f9a8d4';
         else if (lm.tag.includes('RAILWAY')) col = '#f97316';
         else if (lm.tag.includes('HOLLYWOOD')) col = '#f5c389';
+        else if (lm.tag.includes('GREAT WALL')) col = '#34d399';
+        else if (lm.tag.includes('PAVILION')) col = '#f43f5e';
+        else if (lm.tag.includes('PYRAMID')) col = '#f59e0b';
+        else if (lm.tag.includes('CARNIVAL')) col = '#f472b6';
+        else if (lm.tag.includes('VARANASI')) col = '#fb923c';
 
         // Glowing outer halo
         ctx.fillStyle = col + '44';
@@ -731,17 +717,21 @@ export class ModalManager {
         ctx.fill();
         ctx.stroke();
 
-        // Tag label
+        // Smart non-overlapping badge placement
+        const topTags = ['SCHOOL', 'HOSPITAL', 'CASTLE', 'EIFFEL', 'HOLLYWOOD', 'FROSTPEAK', 'NEO YORK'];
+        const isTop = topTags.some(t => lm.tag.includes(t));
+        const badgeY = isTop ? lz - 21 : lz + 7;
+
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 10px monospace';
         const txt = lm.tag.replace(/[\[\]]/g, '');
         const tw = ctx.measureText(txt).width;
-        ctx.fillRect(lx - tw / 2 - 3, lz + 7, tw + 6, 14);
+        ctx.fillRect(lx - tw / 2 - 3, badgeY, tw + 6, 14);
         ctx.strokeStyle = col;
         ctx.lineWidth = 1;
-        ctx.strokeRect(lx - tw / 2 - 2, lz + 7, tw + 4, 11);
+        ctx.strokeRect(lx - tw / 2 - 2, badgeY, tw + 4, 11);
         ctx.fillStyle = col;
-        ctx.fillText(txt, lx - tw / 2, lz + 17);
+        ctx.fillText(txt, lx - tw / 2, badgeY + 10);
       }
 
       // 5. Active Live Dragons

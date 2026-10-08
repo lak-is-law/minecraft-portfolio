@@ -294,65 +294,65 @@ export class DragonManager {
 
   constructor(scene: THREE.Scene) {
     const dragonConfigs: DragonConfig[] = [
-      // 1. WEST: The Iconic Ender Dragon (Over The End spires & Volcano)
+      // 1. WEST / SOUTH-WEST: The Obsidian & Amethyst Dragon (Over Mexico & Aztec Step Pyramid)
       {
         id: 'ender_dragon',
-        name: 'Ender Dragon',
+        name: 'Quetzalcoatl Dragon',
         region: 'West',
         bodyColor: 0x18181b,
-        wingColor: 0x27272a,
-        eyeColor: 0xd946ef,
-        centerPos: new THREE.Vector3(-105, 0, -25),
-        patrolRadius: 36,
-        baseAltitude: 36,
+        wingColor: 0x059669,
+        eyeColor: 0xf59e0b,
+        centerPos: new THREE.Vector3(-120, 0, 80),
+        patrolRadius: 42,
+        baseAltitude: 38,
         altitudeWave: 6,
         speed: 0.22,
-        particleColor: 0xc084fc
+        particleColor: 0x34d399
       },
-      // 2. NORTH: Frost Wyrm (Glacial Dragon over Taj Mahal & Snowy Peaks)
+      // 2. NORTH-EAST: Indian Golden Garuda Wyrm (Over Taj Mahal & Imperial India)
       {
         id: 'frost_wyrm',
-        name: 'Frost Wyrm',
+        name: 'Golden Garuda Wyrm',
         region: 'North',
-        bodyColor: 0xf0fdf4,
-        wingColor: 0x38bdf8,
+        bodyColor: 0xfef08a,
+        wingColor: 0xf59e0b,
         eyeColor: 0x06b6d4,
-        centerPos: new THREE.Vector3(0, 0, -110),
-        patrolRadius: 36,
-        baseAltitude: 38,
-        altitudeWave: 5,
-        speed: 0.20,
-        particleColor: 0xe0f2fe
-      },
-      // 3. SOUTH: Sea Leviathan Dragon (Over Merlion, Beach & Ocean)
-      {
-        id: 'sea_leviathan',
-        name: 'Sea Leviathan',
-        region: 'South',
-        bodyColor: 0x0f766e,
-        wingColor: 0x2dd4bf,
-        eyeColor: 0x67e8f9,
-        centerPos: new THREE.Vector3(15, 0, 100),
-        patrolRadius: 36,
-        baseAltitude: 30,
-        altitudeWave: 4,
+        centerPos: new THREE.Vector3(80, 0, -140),
+        patrolRadius: 44,
+        baseAltitude: 40,
+        altitudeWave: 6,
         speed: 0.21,
-        particleColor: 0x5eead4
+        particleColor: 0xfde047
       },
-      // 4. EAST: Emerald Mountain Dragon (Over Lak Tower & River Canyon)
+      // 3. NORTH-WEST: Imperial Jade Dragon (Over China Great Wall & Pagoda)
       {
         id: 'emerald_dragon',
-        name: 'Emerald Dragon',
+        name: 'Imperial Jade Dragon',
         region: 'East',
-        bodyColor: 0x15803d,
-        wingColor: 0xfacc15,
-        eyeColor: 0xf59e0b,
-        centerPos: new THREE.Vector3(100, 0, 5),
-        patrolRadius: 34,
+        bodyColor: 0x047857,
+        wingColor: 0xd97706,
+        eyeColor: 0xef4444,
+        centerPos: new THREE.Vector3(-110, 0, -110),
+        patrolRadius: 45,
         baseAltitude: 42,
-        altitudeWave: 6,
+        altitudeWave: 7,
         speed: 0.23,
-        particleColor: 0x86efac
+        particleColor: 0x10b981
+      },
+      // 4. SOUTH / CARNIVAL: Sea Leviathan Dragon (Over Carnival Pier, Merlion & Ocean)
+      {
+        id: 'sea_leviathan',
+        name: 'Carnival Sea Leviathan',
+        region: 'South',
+        bodyColor: 0x0284c7,
+        wingColor: 0xec4899,
+        eyeColor: 0x38bdf8,
+        centerPos: new THREE.Vector3(20, 0, 140),
+        patrolRadius: 42,
+        baseAltitude: 34,
+        altitudeWave: 5,
+        speed: 0.22,
+        particleColor: 0xf472b6
       }
     ];
 

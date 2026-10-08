@@ -74,13 +74,13 @@ class Game {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // 2. Scene & Fog
+    // 2. Scene & Fog (tuned for expansive 5x realm)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x78a7ff); // Minecraft blue sky
-    this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.016);
+    this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.006);
 
-    // 3. Camera (near 0.05 prevents face clipping, far 200 renders distant landmarks)
-    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 200);
+    // 3. Camera (near 0.05 prevents face clipping, far 450 renders distant landmarks across 5x realm)
+    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 450);
 
     // 4. Managers
     this.textureManager = new TextureManager();
@@ -138,23 +138,23 @@ class Game {
     this.animate();
   }
 
-  // Create iconic blocky floating Minecraft clouds at Y = 28
+  // Create iconic blocky floating Minecraft clouds at Y = 28 across expanded realm
   private createMinecraftClouds() {
-    const cloudCount = 140;
-    const cloudGeo = new THREE.BoxGeometry(10, 2, 8);
+    const cloudCount = 350;
+    const cloudGeo = new THREE.BoxGeometry(12, 2, 10);
     const cloudMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.72
     });
 
     this.cloudsMesh = new THREE.InstancedMesh(cloudGeo, cloudMat, cloudCount);
 
     let idx = 0;
-    for (let x = -80; x <= 80; x += 14) {
-      for (let z = -80; z <= 80; z += 14) {
-        if (Math.sin(x * 0.3) * Math.cos(z * 0.3) > -0.2 && idx < cloudCount) {
-          this.cloudDummy.position.set(x + (Math.random() - 0.5) * 4, 28, z + (Math.random() - 0.5) * 4);
+    for (let x = -200; x <= 200; x += 22) {
+      for (let z = -200; z <= 200; z += 22) {
+        if (Math.sin(x * 0.15) * Math.cos(z * 0.15) > -0.25 && idx < cloudCount) {
+          this.cloudDummy.position.set(x + (Math.random() - 0.5) * 6, 32, z + (Math.random() - 0.5) * 6);
           this.cloudDummy.updateMatrix();
           this.cloudsMesh.setMatrixAt(idx, this.cloudDummy.matrix);
           idx++;
@@ -547,6 +547,24 @@ class Game {
       this.modals.openSignModal(inter.title || 'Notice', inter.text || '');
     } else if (inter.type === 'teleport') {
       this.modals.openFastTravelModal();
+    } else if (inter.type === 'npc') {
+      if (inter.id === 'roger') {
+        sound.playLevelUp();
+        if (this.world.dogMesh) {
+          this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
+        }
+        this.hud.pushChatMessage('Roger', '*Woof woof!* (Wags tail happily and leans into your hand)');
+      } else {
+        sound.playLevelUp();
+        if (this.world.npcMesh) {
+          this.world.spawnHammerSparkles(this.world.npcMesh.position.x, this.world.npcMesh.position.y + 1.2, this.world.npcMesh.position.z);
+        }
+        this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to my Minecraft Portfolio world! Press M anytime for Fast Travel.');
+        this.modals.openSignModal(
+          'Lakshya [LVL 22] · Welcome Guide',
+          'Hey! I\'m Lakshya, Software Engineer & Designer.\n\nWelcome to my interactive 3D voxel portfolio island! Explore all 9 landmarks to inspect my live full-stack projects, experience history, skills matrix, and career resume chest.\n\nBeside me is my loyal dog Roger! Press [M] anytime to open the Fast Travel Map, or [C] to customize perspective.'
+        );
+      }
     }
   }
 
