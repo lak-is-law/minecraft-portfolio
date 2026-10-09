@@ -4053,139 +4053,418 @@ export class WorldBuilder {
   }
 
   private buildLakTower(cx: number, cz: number) {
-    // Solid concrete/stone plinth under tower footings (Y = 1)
-    for (let x = cx - 6; x <= cx + 6; x++) {
-      for (let z = cz - 6; z <= cz + 6; z++) {
-        if (Math.abs(x - cx) >= 2 && Math.abs(z - cz) >= 2) {
-          this.setBlock(x, 1, z, 'stone_bricks');
+    // 1. Grand Polished Plinth & Crystal Plaza Base (Y = 1..2, X in [cx-8, cx+8], Z in [cz-8, cz+8])
+    for (let x = cx - 8; x <= cx + 8; x++) {
+      for (let z = cz - 8; z <= cz + 8; z++) {
+        const d = Math.max(Math.abs(x - cx), Math.abs(z - cz));
+        this.setBlock(x, 1, z, d === 8 ? 'smooth_stone' : 'quartz_block');
+        if (d === 8 && (x + z) % 4 === 0) {
+          this.setBlock(x, 2, z, 'sea_lantern');
         }
       }
     }
 
-    const legOffsets = [
-      { dx: -4, dz: -4 }, { dx: 4, dz: -4 },
-      { dx: -4, dz: 4 }, { dx: 4, dz: 4 }
+    // Grand Entrance Portal Steps & Welcome Plaque
+    for (let x = cx - 3; x <= cx + 3; x++) {
+      this.setBlock(x, 1, cz + 9, 'smooth_stone');
+      this.setBlock(x, 1, cz + 10, 'stone_bricks');
+    }
+    this.setBlock(cx, 2, cz + 8, 'sea_lantern', {
+      type: 'sign',
+      title: 'LK Mega Spire · World Wonder',
+      text: 'Architectural masterpiece soaring 62 blocks high. Featuring quad parabolic arches, Sky Observation Deck, and the L K Monogram Beacon.'
+    });
+
+    // 2. Quad Monumental Corner Pylons & Grand Lattice Arches (Y = 2..22)
+    // Corner footings at (cx ± 6, cz ± 6) tapering inwards towards (cx ± 3, cz ± 3) at Y = 22
+    const cornerOffsets = [
+      { sx: -6, sz: -6 }, { sx: 6, sz: -6 },
+      { sx: -6, sz: 6 },  { sx: 6, sz: 6 }
     ];
-    for (let y = 1; y <= 16; y++) {
-      const taper = (y / 16) * 2.2;
-      for (const leg of legOffsets) {
-        const lx = Math.round(cx + (leg.dx > 0 ? leg.dx - taper : leg.dx + taper));
-        const lz = Math.round(cz + (leg.dz > 0 ? leg.dz - taper : leg.dz + taper));
-        this.setBlock(lx, y, lz, 'iron_block');
-        this.setBlock(lx, y, lz + (leg.dz > 0 ? -1 : 1), 'stone_bricks');
-        // Ensure vertical continuity during taper shifts
-        if (y > 1) {
-          this.setBlock(lx, y - 1, lz, 'iron_block');
-        }
-      }
-    }
-    for (let x = cx - 4; x <= cx + 4; x++) {
-      for (let z = cz - 4; z <= cz + 4; z++) {
-        this.setBlock(x, 16, z, 'iron_block');
-        if (Math.abs(x - cx) === 4 || Math.abs(z - cz) === 4) {
-          this.setBlock(x, 17, z, 'stone_bricks');
-        }
-      }
-    }
-    for (let y = 18; y <= 23; y++) this.setBlock(cx - 4, y, cz - 2, 'glowstone');
-    this.setBlock(cx - 4, 18, cz - 1, 'glowstone');
-    for (let y = 18; y <= 23; y++) this.setBlock(cx - 4, y, cz + 1, 'glowstone');
-    this.setBlock(cx - 4, 21, cz + 2, 'glowstone');
-    this.setBlock(cx - 4, 23, cz + 3, 'glowstone');
-    this.setBlock(cx - 4, 19, cz + 3, 'glowstone');
 
-    for (let y = 17; y <= 36; y++) {
-      const taper = Math.round(((y - 17) / 20) * 1.5);
-      const span = Math.max(1, 2 - taper);
-      for (let x = cx - span; x <= cx + span; x++) {
-        for (let z = cz - span; z <= cz + span; z++) {
-          if (Math.abs(x - cx) === span || Math.abs(z - cz) === span) {
-            this.setBlock(x, y, z, (y % 3 === 0) ? 'glowstone' : 'iron_block');
+    for (let y = 2; y <= 22; y++) {
+      const t = (y - 2) / 20; // 0 to 1
+      const offset = 6 - t * 3; // 6 down to 3
+      const thickness = Math.max(1, Math.round(2 - t * 0.8));
+
+      for (const c of cornerOffsets) {
+        const signX = Math.sign(c.sx);
+        const signZ = Math.sign(c.sz);
+        const targetX = cx + Math.round(signX * offset);
+        const targetZ = cz + Math.round(signZ * offset);
+
+        for (let dx = 0; dx < thickness; dx++) {
+          for (let dz = 0; dz < thickness; dz++) {
+            const px = targetX - signX * dx;
+            const pz = targetZ - signZ * dz;
+            const isRibbon = (y % 4 === 0);
+            this.setBlock(px, y, pz, isRibbon ? 'sea_lantern' : (y % 2 === 0 ? 'quartz_pillar' : 'quartz_block'));
+          }
+        }
+      }
+
+      // Parabolic cross-bracing arches at Y = 8, 14, 20
+      if (y === 8 || y === 14 || y === 20) {
+        const curSpan = Math.round(offset);
+        for (let s = -curSpan; s <= curSpan; s++) {
+          this.setBlock(cx + s, y, cz - curSpan, 'iron_block');
+          this.setBlock(cx + s, y, cz + curSpan, 'iron_block');
+          this.setBlock(cx - curSpan, y, cz + s, 'iron_block');
+          this.setBlock(cx + curSpan, y, cz + s, 'iron_block');
+          if (Math.abs(s) % 2 === 0) {
+            this.setBlock(cx + s, y + 1, cz - curSpan, 'sea_lantern');
+            this.setBlock(cx + s, y + 1, cz + curSpan, 'sea_lantern');
           }
         }
       }
     }
-    for (let x = cx - 2; x <= cx + 2; x++) {
-      for (let z = cz - 2; z <= cz + 2; z++) {
-        this.setBlock(x, 36, z, 'gold_block');
+
+    // 3. Central Glass Atrium & High-Speed Glass Elevator Core (Y = 2..42)
+    for (let y = 2; y <= 42; y++) {
+      for (let x = cx - 1; x <= cx + 1; x++) {
+        for (let z = cz - 1; z <= cz + 1; z++) {
+          const isCorner = Math.abs(x - cx) === 1 && Math.abs(z - cz) === 1;
+          if (isCorner) {
+            this.setBlock(x, y, z, 'iron_block');
+          } else if (x === cx && z === cz) {
+            // High-speed illuminated shaft
+            this.setBlock(x, y, z, y % 3 === 0 ? 'sea_lantern' : 'quartz_pillar');
+          } else {
+            // Glass enclosure
+            this.setBlock(x, y, z, 'cyber_glass');
+          }
+        }
       }
     }
-    for (let y = 37; y <= 55; y++) {
-      this.setBlock(cx, y, cz, (y % 4 === 0) ? 'glowstone' : 'iron_block');
+
+    // 4. Grand Observation Skydeck & Rotunda (Y = 22..25, Footprint 9x9)
+    for (let y = 22; y <= 25; y++) {
+      for (let x = cx - 4; x <= cx + 4; x++) {
+        for (let z = cz - 4; z <= cz + 4; z++) {
+          const maxD = Math.max(Math.abs(x - cx), Math.abs(z - cz));
+          if (maxD > 4) continue;
+          if (y === 22) {
+            // Floor with gold perimeter
+            this.setBlock(x, y, z, maxD === 4 ? 'gold_block' : 'quartz_block');
+          } else if (y === 23 || y === 24) {
+            // Panorama 360-degree glass windows
+            if (maxD === 4) {
+              const isCol = (Math.abs(x - cx) === 4 && Math.abs(z - cz) === 4);
+              this.setBlock(x, y, z, isCol ? 'quartz_pillar' : 'cyber_glass');
+            }
+          } else if (y === 25) {
+            // Skydeck ceiling
+            this.setBlock(x, y, z, maxD === 4 ? 'sea_lantern' : 'quartz_block');
+          }
+        }
+      }
     }
-    this.setBlock(cx, 56, cz, 'beacon');
+
+    // Skydeck interior amenities
+    this.setBlock(cx + 2, 23, cz, 'gold_block');
+    this.setBlock(cx - 2, 23, cz, 'gold_block');
+    this.setBlock(cx, 23, cz - 3, 'sea_lantern', {
+      type: 'sign',
+      title: 'LK Skydeck · 100m Level',
+      text: 'Panoramic 360-degree observation deck overlooking the world capitals, mountains, and runway.'
+    });
+
+    // 5. Mid-Tower Shaft & Illuminated Monogram "L K" (Y = 26..38)
+    for (let y = 26; y <= 38; y++) {
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        for (let z = cz - 3; z <= cz + 3; z++) {
+          const isPerim = Math.abs(x - cx) === 3 || Math.abs(z - cz) === 3;
+          if (isPerim) {
+            this.setBlock(x, y, z, (y % 2 === 0) ? 'quartz_block' : 'quartz_pillar');
+          }
+        }
+      }
+    }
+
+    // Iconic 3D Glowing Monogram "L" and "K" on the South and North facades (Y = 29..35)
+    // Letter "L": 5 high, 3 wide (X from cx-3 to cx-1)
+    // Letter "K": 5 high, 3 wide (X from cx+1 to cx+3)
+    for (const facadeZ of [cz + 4, cz - 4]) {
+      // Glow background halo
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        for (let y = 29; y <= 35; y++) {
+          this.setBlock(x, y, facadeZ, 'obsidian');
+        }
+      }
+
+      // "L" in Gold & Diamond
+      for (let y = 30; y <= 34; y++) {
+        this.setBlock(cx - 3, y, facadeZ, 'gold_block');
+      }
+      this.setBlock(cx - 2, 30, facadeZ, 'gold_block');
+      this.setBlock(cx - 1, 30, facadeZ, 'gold_block');
+
+      // "K" in Diamond & Sea Lanterns
+      for (let y = 30; y <= 34; y++) {
+        this.setBlock(cx + 1, y, facadeZ, 'diamond_block');
+      }
+      this.setBlock(cx + 3, 34, facadeZ, 'diamond_block');
+      this.setBlock(cx + 2, 33, facadeZ, 'diamond_block');
+      this.setBlock(cx + 2, 32, facadeZ, 'sea_lantern');
+      this.setBlock(cx + 2, 31, facadeZ, 'diamond_block');
+      this.setBlock(cx + 3, 30, facadeZ, 'diamond_block');
+    }
+
+    // 6. Upper Cloud Lounge & Executive Terrace (Y = 39..42)
+    for (let y = 39; y <= 42; y++) {
+      for (let x = cx - 2; x <= cx + 2; x++) {
+        for (let z = cz - 2; z <= cz + 2; z++) {
+          const isPerim = Math.abs(x - cx) === 2 || Math.abs(z - cz) === 2;
+          if (y === 39) {
+            this.setBlock(x, y, z, 'gold_block');
+          } else if (y === 42) {
+            this.setBlock(x, y, z, 'sea_lantern');
+          } else {
+            this.setBlock(x, y, z, isPerim ? 'cyber_glass' : 'air');
+          }
+        }
+      }
+    }
+
+    // 7. Celestial Needle Spire & Beacon Laser (Y = 43..62)
+    for (let y = 43; y <= 48; y++) {
+      for (let x = cx - 1; x <= cx + 1; x++) {
+        for (let z = cz - 1; z <= cz + 1; z++) {
+          const isEdge = Math.abs(x - cx) === 1 || Math.abs(z - cz) === 1;
+          this.setBlock(x, y, z, isEdge ? 'iron_block' : 'gold_block');
+        }
+      }
+    }
+
+    // Needle tapering to single apex
+    for (let y = 49; y <= 60; y++) {
+      this.setBlock(cx, y, cz, y % 3 === 0 ? 'sea_lantern' : 'iron_block');
+      if (y % 4 === 0) {
+        // Cross vanes
+        this.setBlock(cx + 1, y, cz, 'iron_block');
+        this.setBlock(cx - 1, y, cz, 'iron_block');
+        this.setBlock(cx, y, cz + 1, 'iron_block');
+        this.setBlock(cx, y, cz - 1, 'iron_block');
+      }
+    }
+
+    // Apex Crown & Golden Finial
+    this.setBlock(cx, 61, cz, 'gold_block');
+    this.setBlock(cx, 62, cz, 'beacon');
   }
 
   private buildHollywoodMountain(cx: number, cz: number) {
+    // 1. Natural Geological Mount Lee Ridge (bounds X in [cx-22, cx+22], Z in [cz-16, cz+16])
+    // Realistic multi-tier terrain with stepped contours, chaparral, and exposed bedrock
     const radiusX = 22;
-    const radiusZ = 14;
-    const peakHeight = 24;
-    const ridgeHeight = (dx: number, dz: number) => {
-      const distance = Math.hypot(dx / radiusX, dz / radiusZ);
-      return distance >= 1 ? 0 : Math.max(0, Math.round(peakHeight * (1 - distance)));
+    const radiusZ = 16;
+    const peakHeight = 26;
+
+    const ridgeElevation = (dx: number, dz: number) => {
+      const nx = dx / radiusX;
+      const nz = dz / radiusZ;
+      const dist = Math.sqrt(nx * nx + nz * nz);
+      if (dist >= 1.0) return 0;
+      // Ridge spine runs roughly along East-West with summit at dx = 8, dz = -4
+      const spineDist = Math.abs(dz + 3);
+      const spineFalloff = Math.max(0, 1 - spineDist / 12);
+      const baseH = (1 - dist) * peakHeight;
+      const sculptedH = Math.round(baseH * 0.75 + spineFalloff * 8);
+      return Math.max(0, Math.min(peakHeight, sculptedH));
     };
 
     for (let dx = -radiusX; dx <= radiusX; dx++) {
       for (let dz = -radiusZ; dz <= radiusZ; dz++) {
-        const height = ridgeHeight(dx, dz);
+        const height = ridgeElevation(dx, dz);
+        if (height <= 0) continue;
         const x = cx + dx;
         const z = cz + dz;
-        if (!height) continue;
 
         for (let y = 1; y <= height; y++) {
-          const block = y === height
-            ? (height > 20 ? 'stone_bricks' : height > 9 ? 'terracotta_adobe' : 'red_sandstone')
-            : (y > 18 ? 'stone_bricks' : 'red_sandstone');
+          let block: string = 'red_sandstone';
+          if (y === height) {
+            // Surface terrain: granite/stone near crest, grass and arid shrubs lower down
+            if (height >= 20) {
+              block = 'smooth_stone';
+            } else if (height >= 12) {
+              block = (dx + dz) % 3 === 0 ? 'terracotta_adobe' : 'stone_bricks';
+            } else {
+              block = (dx + dz) % 2 === 0 ? 'grass' : 'terracotta_adobe';
+            }
+          } else if (y >= height - 2) {
+            block = y >= 16 ? 'stone_bricks' : 'red_sandstone';
+          }
           this.setBlock(x, y, z, block);
+        }
+
+        // Chaparral scrub & desert shrubs on lower slopes
+        if (height >= 2 && height <= 14 && (dx * 13 + dz * 7) % 11 === 0) {
+          this.setBlock(x, height + 1, z, 'oak_leaves');
         }
       }
     }
 
-    let lastPathY = 2;
-    for (let z = cz + radiusZ; z >= cz; z--) {
-      const height = ridgeHeight(2, z - cz);
-      const pathY = Math.max(lastPathY, height + 1);
-      this.setBlock(cx + 2, pathY, z, 'smooth_stone');
-      if ((cz - z) % 4 === 0) {
-        this.setBlock(cx + 1, pathY + 1, z, 'oak_fence');
-        this.setBlock(cx + 3, pathY + 1, z, 'oak_fence');
-        if ((cz - z) % 8 === 0) this.setBlock(cx + 3, pathY + 2, z, 'glowstone');
+    // 2. Mulholland Scenic Drive Highway winding up the southern face
+    for (let x = cx - 20; x <= cx + 18; x++) {
+      const zCurve = Math.round(cz + 10 - Math.sin((x - cx) * 0.12) * 4);
+      const groundH = ridgeElevation(x - cx, zCurve - cz);
+      const roadY = Math.max(2, groundH);
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(x, roadY, zCurve + dz, 'asphalt_road');
       }
-      lastPathY = pathY;
+      // Highway center yellow divider
+      if (x % 2 === 0) {
+        this.setBlock(x, roadY, zCurve, 'gold_block');
+      }
+      // Safety guardrails & highway lights
+      this.setBlock(x, roadY + 1, zCurve + 2, 'oak_fence');
+      if (x % 6 === 0) {
+        this.setBlock(x, roadY + 2, zCurve + 2, 'sea_lantern');
+      }
     }
 
-    const letters: Record<string, string[]> = {
-      H: ['101', '101', '111', '101', '101'],
-      O: ['111', '101', '101', '101', '111'],
-      L: ['100', '100', '100', '100', '111'],
-      Y: ['101', '101', '010', '010', '010'],
-      W: ['101', '101', '101', '111', '101'],
-      D: ['110', '101', '101', '101', '110']
+    // 3. Iconic 3D HOLLYWOOD Sign (South-facing slope at Z = cz + 6)
+    // 7 blocks high, 4 blocks wide, with rear support timber scaffolding & front ground spotlights
+    const letters7x4: Record<string, string[]> = {
+      H: ['1001', '1001', '1001', '1111', '1001', '1001', '1001'],
+      O: ['0110', '1001', '1001', '1001', '1001', '1001', '0110'],
+      L: ['1000', '1000', '1000', '1000', '1000', '1000', '1111'],
+      Y: ['1001', '1001', '1001', '0110', '0010', '0010', '0010'],
+      W: ['1001', '1001', '1001', '1001', '1011', '1101', '1001'],
+      D: ['1110', '1001', '1001', '1001', '1001', '1001', '1110']
     };
-    const signDepth = 6;
-    const signZ = cz + signDepth;
-    const word = 'HOLLYWOOD';
-    const signStartX = cx - 18;
-    word.split('').forEach((letter, index) => {
-      const glyph = letters[letter];
-      for (let col = 0; col < 3; col++) {
-        const dx = signStartX + index * 4 + col - cx;
-        const groundY = ridgeHeight(dx, signDepth);
-        const baseY = Math.max(1, groundY);
-        for (let row = 0; row < 5; row++) {
+
+    const word = ['H', 'O', 'L', 'L', 'Y', 'W', 'O', 'O', 'D'];
+    const signZ = cz + 6;
+    const signBaseY = 14; // Elevated prominently on the mountain ridge slope
+    let signCursorX = cx - 18;
+
+    for (const char of word) {
+      const glyph = letters7x4[char] || letters7x4['H'];
+      for (let row = 0; row < 7; row++) {
+        const y = signBaseY + (6 - row);
+        for (let col = 0; col < 4; col++) {
+          const x = signCursorX + col;
           if (glyph[row][col] === '1') {
-            this.setBlock(signStartX + index * 4 + col, baseY + 6 - row, signZ, 'quartz_block');
+            // White Quartz letter face
+            this.setBlock(x, y, signZ, 'quartz_block');
+            // Heavy timber & iron structural scaffolding behind each block
+            this.setBlock(x, y, signZ - 1, 'oak_fence');
+            if (row === 6 || row === 3 || row === 0) {
+              this.setBlock(x, y, signZ - 2, 'iron_block');
+            }
           }
         }
       }
+
+      // Ground spotlights in front of each letter
+      this.setBlock(signCursorX + 1, signBaseY - 1, signZ + 2, 'sea_lantern');
+      this.setBlock(signCursorX + 2, signBaseY - 1, signZ + 2, 'sea_lantern');
+      signCursorX += 4; // next letter
+    }
+
+    // Hollywood Sign scenic viewing turn-out & historical marker
+    this.setBlock(cx, 2, cz + 14, 'smooth_stone');
+    this.setBlock(cx, 3, cz + 14, 'sea_lantern', {
+      type: 'sign',
+      title: 'The HOLLYWOOD Sign & Mount Lee',
+      text: 'Original 1923 landmark rebuilt with monumental 7-block quartz lettering, scaffolding, and spotlights overlooking Los Angeles.'
     });
 
-    this.setBlock(cx + 2, 1, cz + radiusZ, 'smooth_stone');
-    this.setBlock(cx + 2, 2, cz + radiusZ, 'glowstone', {
+    // 4. Griffith Observatory on the Summit Ridge (cx + 8, cz - 5, Y = 22..28)
+    const obsX = cx + 8;
+    const obsZ = cz - 5;
+    const obsY = 22;
+
+    // Observatory Main Hall & Promenade (Footprint 11 x 7)
+    for (let x = obsX - 5; x <= obsX + 5; x++) {
+      for (let z = obsZ - 3; z <= obsZ + 3; z++) {
+        this.setBlock(x, obsY, z, 'quartz_block');
+        const isWall = (x === obsX - 5 || x === obsX + 5 || z === obsZ - 3 || z === obsZ + 3);
+        if (isWall) {
+          for (let y = obsY + 1; y <= obsY + 4; y++) {
+            this.setBlock(x, y, z, (y === obsY + 2 || y === obsY + 3) ? 'cyber_glass' : 'quartz_pillar');
+          }
+        }
+        this.setBlock(x, obsY + 5, z, 'quartz_block'); // Roof deck
+      }
+    }
+
+    // Central Grand Planetarium Dome (copper-green prismarine)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(obsX + dx, obsY + 6, obsZ + dz, 'prismarine_bricks');
+        if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) {
+          this.setBlock(obsX + dx, obsY + 7, obsZ + dz, 'prismarine_bricks');
+        }
+      }
+    }
+    this.setBlock(obsX, obsY + 8, obsZ, 'gold_block');
+
+    // East & West Astronomical Telescope Domes
+    for (const domeX of [obsX - 4, obsX + 4]) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(domeX + dx, obsY + 6, obsZ + dz, 'prismarine_bricks');
+        }
+      }
+      this.setBlock(domeX, obsY + 7, obsZ, 'gold_block');
+      // Giant Refractor Telescope pointing skyward
+      this.setBlock(domeX, obsY + 8, obsZ - 1, 'iron_block');
+    }
+
+    this.setBlock(obsX, obsY + 1, obsZ + 4, 'sea_lantern', {
       type: 'sign',
-      title: 'Hollywood Hills Trail',
-      text: 'Follow the lit ridge path to the Hollywood sign and summit overlook.'
+      title: 'Griffith Observatory',
+      text: 'Art Deco celestial observatory featuring triple planetarium domes and giant refractor telescopes peering into deep space.'
     });
+
+    // 5. Cantilevered Modernist Celebrity Villa with Infinity Pool (cx - 12, cz - 6, Y = 16..20)
+    const villaX = cx - 12;
+    const villaZ = cz - 6;
+    const villaY = 16;
+
+    // Structural steel cantilever pillars hanging over the mountain edge
+    for (let y = 6; y <= villaY; y++) {
+      this.setBlock(villaX - 4, y, villaZ - 3, 'iron_block');
+      this.setBlock(villaX + 4, y, villaZ - 3, 'iron_block');
+    }
+
+    // Concrete & Wood Villa Floor
+    for (let x = villaX - 5; x <= villaX + 5; x++) {
+      for (let z = villaZ - 4; z <= villaZ + 4; z++) {
+        this.setBlock(x, villaY, z, (Math.abs(x - villaX) > 2) ? 'quartz_block' : 'oak_planks');
+      }
+    }
+
+    // Floor-to-ceiling glass panoramic living room
+    for (let x = villaX - 5; x <= villaX + 1; x++) {
+      for (let z = villaZ - 4; z <= villaZ + 4; z++) {
+        const isVillaEdge = (x === villaX - 5 || x === villaX + 1 || z === villaZ - 4 || z === villaZ + 4);
+        if (isVillaEdge) {
+          this.setBlock(x, villaY + 1, z, 'cyber_glass');
+          this.setBlock(x, villaY + 2, z, 'cyber_glass');
+          this.setBlock(x, villaY + 3, z, 'quartz_block');
+        }
+        this.setBlock(x, villaY + 4, z, 'smooth_stone'); // Flat modern roof
+      }
+    }
+
+    // Cantilevered Infinity Pool hanging over the canyon (X in [villaX + 2, villaX + 5], Z in [villaZ - 3, villaZ + 3])
+    for (let x = villaX + 2; x <= villaX + 5; x++) {
+      for (let z = villaZ - 3; z <= villaZ + 3; z++) {
+        const isPoolEdge = (x === villaX + 5 || z === villaZ - 3 || z === villaZ + 3);
+        if (isPoolEdge) {
+          this.setBlock(x, villaY, z, 'cyber_glass');
+          this.setBlock(x, villaY + 1, z, 'cyber_glass'); // Glass infinity edge
+        } else {
+          this.setBlock(x, villaY - 1, z, 'sea_lantern'); // Underwater pool lights
+          this.setBlock(x, villaY, z, 'water');
+        }
+      }
+    }
+
+    // Summit Beacon on top of Mount Lee peak
     this.setBlock(cx, peakHeight + 1, cz, 'beacon');
   }
 
@@ -4293,43 +4572,195 @@ export class WorldBuilder {
   }
 
   private buildRapunzelCastle(cx: number, cz: number) {
-    for (let x = cx - 10; x <= cx + 10; x++) {
-      for (let z = cz - 10; z <= cz + 10; z++) {
-        this.setBlock(x, 1, z, 'stone_bricks');
-        if (Math.abs(x - cx) === 10 || Math.abs(z - cz) === 10) {
-          for (let y = 2; y <= 8; y++) this.setBlock(x, y, z, 'stone_bricks');
+    // High-Fantasy Neuschwanstein Royal Fortress & Rapunzel Tower
+    // Bounds: X in [cx - 14, cx + 14], Z in [cz - 14, cz + 14]
+
+    // 1. Water Moat surrounding the entire fortress perimeter
+    for (let x = cx - 14; x <= cx + 14; x++) {
+      for (let z = cz - 14; z <= cz + 14; z++) {
+        const d = Math.max(Math.abs(x - cx), Math.abs(z - cz));
+        if (d >= 12 && d <= 14) {
+          // Leave opening for southern drawbridge entrance
+          const isBridgeSpan = (Math.abs(x - cx) <= 2 && z >= cz + 11);
+          if (!isBridgeSpan) {
+            this.setBlock(x, 1, z, 'water');
+          }
         }
       }
     }
-    for (let y = 2; y <= 5; y++) {
-      this.setBlock(cx - 2, y, cz + 10, 'red_sandstone');
-      this.setBlock(cx + 2, y, cz + 10, 'red_sandstone');
-    }
-    for (let x = cx - 2; x <= cx + 2; x++) this.setBlock(x, 6, cz + 10, 'red_sandstone');
-    for (let x = cx - 4; x <= cx + 4; x++) {
-      for (let z = cz - 4; z <= cz + 4; z++) {
-        for (let y = 2; y <= 13; y++) {
-          if (Math.abs(x - cx) >= 3 || Math.abs(z - cz) >= 3 || y === 2 || y === 13) this.setBlock(x, y, z, 'stone_bricks');
+
+    // 2. Heavy Timber Drawbridge & Moat Piers (Z in [cz + 11, cz + 14])
+    for (let z = cz + 11; z <= cz + 14; z++) {
+      for (let x = cx - 2; x <= cx + 2; x++) {
+        this.setBlock(x, 1, z, 'oak_planks');
+        if (Math.abs(x - cx) === 2) {
+          this.setBlock(x, 2, z, 'oak_fence');
         }
       }
     }
-    for (let y = 14; y <= 29; y++) {
+    // Drawbridge iron winches and chains
+    this.setBlock(cx - 2, 3, cz + 11, 'iron_block');
+    this.setBlock(cx + 2, 3, cz + 11, 'iron_block');
+
+    // 3. Fortress Foundation Plinth & Outer Courtyard (Y = 1, X in [cx - 11, cx + 11], Z in [cz - 11, cz + 11])
+    for (let x = cx - 11; x <= cx + 11; x++) {
+      for (let z = cz - 11; z <= cz + 11; z++) {
+        const isYard = Math.abs(x - cx) < 11 && Math.abs(z - cz) < 11;
+        this.setBlock(x, 1, z, isYard ? 'stone_bricks' : 'mossy_cobblestone');
+      }
+    }
+
+    // 4. Outer Curtain Wall & Battlements with Crenelations (Y = 2..8)
+    for (let x = cx - 11; x <= cx + 11; x++) {
+      for (let z = cz - 11; z <= cz + 11; z++) {
+        const isWall = Math.abs(x - cx) === 11 || Math.abs(z - cz) === 11;
+        const isGateOpening = (z === cz + 11 && Math.abs(x - cx) <= 2);
+        if (isWall && !isGateOpening) {
+          for (let y = 2; y <= 7; y++) {
+            this.setBlock(x, y, z, (y === 4 && (x + z) % 4 === 0) ? 'cyber_glass' : 'stone_bricks');
+          }
+          // Crenelated parapet battlements
+          if ((x + z) % 2 === 0) {
+            this.setBlock(x, 8, z, 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    // 5. Fortified Gatehouse with Iron Portcullis & Guard Towers (Z = cz + 11)
+    for (let y = 2; y <= 10; y++) {
+      this.setBlock(cx - 3, y, cz + 11, 'stone_bricks');
+      this.setBlock(cx - 2, y, cz + 11, 'stone_bricks');
+      this.setBlock(cx + 2, y, cz + 11, 'stone_bricks');
+      this.setBlock(cx + 3, y, cz + 11, 'stone_bricks');
+      // Iron Portcullis bars
+      if (y >= 2 && y <= 5) {
+        this.setBlock(cx - 1, y, cz + 11, 'iron_block');
+        this.setBlock(cx, y, cz + 11, 'iron_block');
+        this.setBlock(cx + 1, y, cz + 11, 'iron_block');
+      }
+    }
+    // Gatehouse arch canopy
+    for (let x = cx - 3; x <= cx + 3; x++) {
+      this.setBlock(x, 9, cz + 11, 'quartz_block');
+      this.setBlock(x, 10, cz + 11, 'gold_block');
+    }
+    this.setBlock(cx, 11, cz + 11, 'sea_lantern');
+
+    // 6. Four Corner Drum Bastion Towers (3x3 at each corner, Y = 2..15)
+    const corners = [
+      { bx: cx - 10, bz: cz - 10 },
+      { bx: cx + 10, bz: cz - 10 },
+      { bx: cx - 10, bz: cz + 10 },
+      { bx: cx + 10, bz: cz + 10 }
+    ];
+    for (const c of corners) {
+      for (let y = 2; y <= 13; y++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            if (Math.abs(dx) === 1 && Math.abs(dz) === 1) continue; // Round cylinder shape
+            this.setBlock(c.bx + dx, y, c.bz + dz, (y % 4 === 0) ? 'smooth_stone' : 'stone_bricks');
+          }
+        }
+      }
+      // Conical fairy-tale spire roofs in Prussian Blue / Lapis & Gold
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(c.bx + dx, 14, c.bz + dz, 'lapis_block');
+        }
+      }
+      this.setBlock(c.bx, 15, c.bz, 'gold_block');
+      this.setBlock(c.bx, 16, c.bz, 'sea_lantern');
+    }
+
+    // 7. Central Royal Keep & Grand Great Hall (Footprint 11x9, Y = 2..20)
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      for (let z = cz - 7; z <= cz + 1; z++) {
+        const isWall = (x === cx - 5 || x === cx + 5 || z === cz - 7 || z === cz + 1);
+        if (isWall) {
+          for (let y = 2; y <= 16; y++) {
+            const isWindow = (y === 6 || y === 12) && (x % 2 === 0 || z % 2 === 0);
+            this.setBlock(x, y, z, isWindow ? 'cyber_glass' : 'stone_bricks');
+          }
+        }
+        // Great Hall wooden banquet floor (Y = 2)
+        this.setBlock(x, 2, z, 'oak_planks');
+        // Keep roof terrace (Y = 17)
+        this.setBlock(x, 17, z, 'smooth_stone');
+      }
+    }
+
+    // Great Hall Interior: Long oak banquet table, chandelier, and thrones
+    for (let z = cz - 5; z <= cz - 1; z++) {
+      this.setBlock(cx, 3, z, 'oak_planks'); // Long feast table
+      this.setBlock(cx - 1, 3, z, 'bookshelf');
+      this.setBlock(cx + 1, 3, z, 'bookshelf');
+    }
+    // Twin Gilded Royal Thrones at northern dais (cx - 1, cx + 1, cz - 6)
+    this.setBlock(cx - 1, 3, cz - 6, 'gold_block');
+    this.setBlock(cx - 1, 4, cz - 6, 'gold_block');
+    this.setBlock(cx + 1, 3, cz - 6, 'diamond_block');
+    this.setBlock(cx + 1, 4, cz - 6, 'diamond_block');
+    this.setBlock(cx, 8, cz - 3, 'sea_lantern'); // Hanging grand chandelier
+
+    // High keep peaked gabled roof (Y = 18..22)
+    for (let step = 0; step <= 4; step++) {
+      const y = 18 + step;
+      for (let z = cz - 7; z <= cz + 1; z++) {
+        this.setBlock(cx - (5 - step), y, z, 'prismarine_bricks');
+        this.setBlock(cx + (5 - step), y, z, 'prismarine_bricks');
+      }
+    }
+
+    // 8. Rapunzel's Fairytale Sky Tower & Cascading Golden Braid (Y = 2..38)
+    // Tower centered at (cx + 5, cz + 5)
+    const rapX = cx + 5;
+    const rapZ = cz + 5;
+
+    for (let y = 2; y <= 34; y++) {
       for (let dx = -2; dx <= 2; dx++) {
         for (let dz = -2; dz <= 2; dz++) {
-          if (Math.abs(dx) === 2 || Math.abs(dz) === 2) this.setBlock(cx + dx, y, cz + dz, 'quartz_pillar');
+          const dist = Math.abs(dx) + Math.abs(dz);
+          if (dist === 2 || (Math.abs(dx) === 2 && Math.abs(dz) === 1) || (Math.abs(dx) === 1 && Math.abs(dz) === 2)) {
+            // Cylindrical tower shell
+            this.setBlock(rapX + dx, y, rapZ + dz, (y % 6 === 0) ? 'sea_lantern' : 'quartz_pillar');
+          }
         }
       }
     }
-    for (let y = 8; y <= 27; y++) this.setBlock(cx + 3, y, cz + 2, 'gold_block');
-    this.setBlock(cx + 3, 7, cz + 2, 'glowstone');
-    for (const [x, z] of [[cx - 10, cz - 10], [cx + 10, cz - 10], [cx - 10, cz + 10], [cx + 10, cz + 10]]) {
-      for (let y = 2; y <= 11; y++) this.setBlock(x, y, z, 'red_sandstone');
-      this.setBlock(x, 12, z, 'gold_block');
+
+    // Rapunzel's High Chamber Balcony & Room (Y = 32..35)
+    this.setBlock(rapX, 32, rapZ, 'gold_block');
+    this.setBlock(rapX, 33, rapZ, 'bookshelf'); // Rapunzel's library
+    // Fairytale Conical Spire Crown (Y = 35..38)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) {
+          this.setBlock(rapX + dx, 35, rapZ + dz, 'gold_block');
+        }
+      }
     }
-    this.setBlock(cx, 2, cz + 10, 'glowstone', {
+    this.setBlock(rapX, 36, rapZ, 'lapis_block');
+    this.setBlock(rapX, 37, rapZ, 'gold_block');
+    this.setBlock(rapX, 38, rapZ, 'beacon'); // Glowing tower apex
+
+    // 28-Block Cascading Golden Braid falling from balcony (Y = 32 down to Y = 4)
+    // Braid weaves realistically down the south-east tower wall with sinusoidal waves
+    for (let y = 4; y <= 32; y++) {
+      const braidOffset = Math.sin(y * 0.45) * 0.8;
+      const bx = rapX + 2 + Math.round(braidOffset);
+      const bz = rapZ + 1;
+      this.setBlock(bx, y, bz, (y % 3 === 0) ? 'glowstone' : 'gold_block');
+      if (y % 4 === 0) {
+        this.setBlock(bx + 1, y, bz, 'gold_block'); // Thick hair strand
+      }
+    }
+
+    // Historical Plaque & Royal Sign at the drawbridge entrance
+    this.setBlock(cx, 2, cz + 15, 'sea_lantern', {
       type: 'sign',
-      title: 'Rapunzel’s Castle',
-      text: 'A fairytale keep with a high lantern tower and a golden braid cascading into its gardens.'
+      title: 'Neuschwanstein & Rapunzel’s Keep',
+      text: 'High-fantasy fortress featuring moat, drawbridge, Great Hall thrones, and Rapunzel’s soaring tower with cascading golden hair.'
     });
   }
 

@@ -36,6 +36,9 @@ export class VoxelWorld {
   private railCurve: THREE.CatmullRomCurve3 | null = null;
   private liveTrains: THREE.Group[] = [];
   public autoRickshawMesh: THREE.Group | null = null;
+  public animatedAirplanes: THREE.Group[] = [];
+  private airplaneStrobes: THREE.Mesh[] = [];
+  private airplaneWheels: THREE.Group[] = [];
 
   // Hammerable Project Banners
   public projectBanners: ProjectBanner[] = [];
@@ -61,6 +64,7 @@ export class VoxelWorld {
     this.createLakshyaNPC();
     this.createBeachCat();
     this.createVolcanoSmoke();
+    this.createAnimatedAirplanes();
     this.dragonManager = new DragonManager(this.scene);
   }
 
@@ -997,6 +1001,7 @@ export class VoxelWorld {
 
   public update(time: number, playerPos: THREE.Vector3) {
     this.updateLiveTrains(time);
+    this.updateAnimatedAirplanes(time);
 
     for (let i = 0; i < this.spinningIcons.length; i++) {
       const g = this.spinningIcons[i];
@@ -1120,126 +1125,178 @@ export class VoxelWorld {
 
   private createTrain(bodyColor: number, accentColor: number) {
     const train = new THREE.Group();
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor, metalness: 0.35, roughness: 0.45 });
-    const accentMaterial = new THREE.MeshStandardMaterial({ color: accentColor, metalness: 0.55, roughness: 0.35 });
-    const windowMaterial = new THREE.MeshStandardMaterial({ color: 0xbae6fd, emissive: 0x0284c7, emissiveIntensity: 0.25, transparent: true, opacity: 0.75 });
-    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.75, roughness: 0.35 });
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor, metalness: 0.55, roughness: 0.35 });
+    const accentMaterial = new THREE.MeshStandardMaterial({ color: accentColor, metalness: 0.65, roughness: 0.25 });
+    const chromeMaterial = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.88, roughness: 0.15 });
+    const glassMaterial = new THREE.MeshStandardMaterial({ color: 0x93c5fd, emissive: 0x1d4ed8, emissiveIntensity: 0.35, transparent: true, opacity: 0.72 });
+    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
     const woodFloorMaterial = new THREE.MeshLambertMaterial({ color: 0x78350f });
-    const seatMaterial = new THREE.MeshLambertMaterial({ color: 0xb91c1c });
+    const seatMaterial = new THREE.MeshLambertMaterial({ color: 0xd97706 });
+    const diningTableMaterial = new THREE.MeshLambertMaterial({ color: 0xfef3c7 });
     const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xfef08a });
 
-    // Car 0: Aerodynamic Streamlined Locomotive Engine
+    // Car 0: High-Speed Bullet Streamliner Locomotive Engine
     const loco = new THREE.Group();
-    const chassis = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.32, 1.6), darkMaterial);
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.35, 1.6), darkMaterial);
     chassis.position.y = 0.38;
     loco.add(chassis);
 
-    // Aerodynamic wedge nose & cowcatcher
-    const cowcatcher = new THREE.Mesh(new THREE.ConeGeometry(0.85, 0.9, 4), darkMaterial);
+    // Bullet-nosed Aerodynamic Cowcatcher & Wedge Front
+    const cowcatcher = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.2, 4), darkMaterial);
     cowcatcher.rotation.z = -Math.PI / 2;
     cowcatcher.rotation.y = Math.PI / 4;
-    cowcatcher.position.set(1.9, 0.45, 0);
+    cowcatcher.position.set(2.2, 0.45, 0);
     loco.add(cowcatcher);
 
-    const body = new THREE.Mesh(new THREE.BoxGeometry(3.0, 1.3, 1.55), bodyMaterial);
-    body.position.set(0.1, 1.15, 0);
+    // Streamlined Bullet Hood
+    const bulletNose = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.78, 1.3, 16), accentMaterial);
+    bulletNose.rotation.z = Math.PI / 2;
+    bulletNose.position.set(1.6, 1.05, 0);
+    loco.add(bulletNose);
+
+    // Main Engine Body with chrome speed stripes
+    const body = new THREE.Mesh(new THREE.BoxGeometry(3.0, 1.35, 1.55), bodyMaterial);
+    body.position.set(0.1, 1.2, 0);
     loco.add(body);
 
-    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.95, 1.45), accentMaterial);
-    nose.position.set(1.65, 0.95, 0);
-    loco.add(nose);
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 1.58), chromeMaterial);
+    stripe.position.set(0.1, 1.25, 0);
+    loco.add(stripe);
 
-    // Engineer Cab with glass windows
-    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.75, 1.48), accentMaterial);
-    cab.position.set(-0.4, 1.95, 0);
+    // Elevated Engineer Cab with wraparound panoramic glass
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.78, 1.48), accentMaterial);
+    cab.position.set(-0.35, 2.0, 0);
     loco.add(cab);
-    const cabWindshield = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.55, 1.25), windowMaterial);
-    cabWindshield.position.set(0.22, 1.95, 0);
-    loco.add(cabWindshield);
 
-    // High-beam dual headlights
+    const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.55, 1.3), glassMaterial);
+    windshield.position.set(0.32, 2.0, 0);
+    loco.add(windshield);
+
+    // Triple High-Intensity Halogen Headlights (1 central apex + 2 bumper markers)
+    const topHL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.22), headlightMaterial);
+    topHL.position.set(2.15, 1.2, 0);
+    loco.add(topHL);
+
     for (const z of [-0.48, 0.48]) {
-      const hl = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 0.22), headlightMaterial);
-      hl.position.set(2.0, 0.85, z);
+      const hl = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.2, 0.2), headlightMaterial);
+      hl.position.set(2.25, 0.75, z);
       loco.add(hl);
     }
 
-    const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.55, 8), darkMaterial);
-    exhaust.position.set(0.85, 1.95, 0);
+    // Chrome Exhaust Stacks
+    const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.6, 12), chromeMaterial);
+    exhaust.position.set(0.8, 2.05, 0);
     loco.add(exhaust);
 
+    // Heavy Locomotive Wheel Bogies
     for (const z of [-0.82, 0.82]) {
-      for (const x of [-1.2, -0.4, 0.4, 1.2]) {
-        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.14, 12), darkMaterial);
+      for (const x of [-1.3, -0.5, 0.5, 1.3]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.14, 16), chromeMaterial);
         wheel.rotation.x = Math.PI / 2;
-        wheel.position.set(x, 0.26, z);
+        wheel.position.set(x, 0.28, z);
         loco.add(wheel);
       }
     }
     train.add(loco);
 
-    // Car 1 & Car 2: Rideable Passenger Coaches with Walk-In Interior
-    for (let coachIdx = 1; coachIdx <= 2; coachIdx++) {
-      const coach = new THREE.Group();
-      coach.position.x = -coachIdx * 3.8;
+    // Car 1: Vista-Dome Panoramic Glass Observation Lounge (Rideable Car!)
+    const vistaCar = new THREE.Group();
+    vistaCar.position.x = -4.0;
 
-      const cChassis = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.28, 1.6), darkMaterial);
-      cChassis.position.y = 0.38;
-      coach.add(cChassis);
+    const vChassis = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.28, 1.6), darkMaterial);
+    vChassis.position.y = 0.38;
+    vistaCar.add(vChassis);
 
-      const cFloor = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.08, 1.5), woodFloorMaterial);
-      cFloor.position.y = 0.54;
-      coach.add(cFloor);
+    const vFloor = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.08, 1.5), woodFloorMaterial);
+    vFloor.position.y = 0.54;
+    vistaCar.add(vFloor);
 
-      const cRoof = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.22, 1.55), accentMaterial);
-      cRoof.position.set(0, 2.05, 0);
-      coach.add(cRoof);
+    // Streamlined lower hull
+    const vLowerWall = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.65, 1.55), bodyMaterial);
+    vLowerWall.position.set(0, 0.85, 0);
+    vistaCar.add(vLowerWall);
 
-      // End walls
-      const endF = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.45, 1.55), bodyMaterial);
-      endF.position.set(1.65, 1.25, 0);
-      coach.add(endF);
-      const endB = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.45, 1.55), bodyMaterial);
-      endB.position.set(-1.65, 1.25, 0);
-      coach.add(endB);
+    // Full Upper Vista-Dome Glass Roof
+    const domeRoof = new THREE.Mesh(new THREE.CylinderGeometry(0.76, 0.76, 3.4, 16, 1, false, 0, Math.PI), glassMaterial);
+    domeRoof.rotation.z = Math.PI / 2;
+    domeRoof.position.set(0, 1.55, 0);
+    vistaCar.add(domeRoof);
 
-      // Side walls with windows and open boarding door
-      for (const z of [-0.78, 0.78]) {
-        const lowerWall = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.55, 0.08), bodyMaterial);
-        lowerWall.position.set(0, 0.82, z);
-        coach.add(lowerWall);
-
-        for (const wx of [-1.0, 1.0]) {
-          const win = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.65, 0.06), windowMaterial);
-          win.position.set(wx, 1.42, z);
-          coach.add(win);
-        }
-      }
-
-      // Interior passenger seats
-      for (const sx of [-1.0, 1.0]) {
-        for (const sz of [-0.45, 0.45]) {
-          const seat = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.38, 0.45), seatMaterial);
-          seat.position.set(sx, 0.74, sz);
-          coach.add(seat);
-        }
-      }
-
-      const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.08, 0.3), headlightMaterial);
-      lamp.position.set(0, 1.92, 0);
-      coach.add(lamp);
-
-      for (const z of [-0.82, 0.82]) {
-        for (const x of [-1.1, 1.1]) {
-          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.12, 12), darkMaterial);
-          wheel.rotation.x = Math.PI / 2;
-          wheel.position.set(x, 0.24, z);
-          coach.add(wheel);
-        }
-      }
-
-      train.add(coach);
+    // Chrome Vista Ribs
+    for (const rx of [-1.2, 0, 1.2]) {
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(0.77, 0.04, 8, 16, Math.PI), chromeMaterial);
+      rib.rotation.y = Math.PI / 2;
+      rib.position.set(rx, 1.55, 0);
+      vistaCar.add(rib);
     }
+
+    // Luxury plush leather swivel seats
+    for (const sx of [-1.1, 0, 1.1]) {
+      for (const sz of [-0.45, 0.45]) {
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.38, 0.45), seatMaterial);
+        seat.position.set(sx, 0.74, sz);
+        vistaCar.add(seat);
+      }
+    }
+
+    // Dome overhead chandelier lights
+    const vLamp = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.08, 0.4), headlightMaterial);
+    vLamp.position.set(0, 2.1, 0);
+    vistaCar.add(vLamp);
+
+    // Bogie wheels
+    for (const z of [-0.82, 0.82]) {
+      for (const x of [-1.2, 1.2]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.12, 12), darkMaterial);
+        wheel.rotation.x = Math.PI / 2;
+        wheel.position.set(x, 0.24, z);
+        vistaCar.add(wheel);
+      }
+    }
+    train.add(vistaCar);
+
+    // Car 2: Luxury Dining & Club Lounge Car
+    const dinerCar = new THREE.Group();
+    dinerCar.position.x = -7.8;
+
+    const dChassis = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.28, 1.6), darkMaterial);
+    dChassis.position.y = 0.38;
+    dinerCar.add(dChassis);
+
+    const dRoof = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.24, 1.55), accentMaterial);
+    dRoof.position.set(0, 2.05, 0);
+    dinerCar.add(dRoof);
+
+    // Side walls with large panoramic windows
+    for (const z of [-0.78, 0.78]) {
+      const wall = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.55, 0.08), bodyMaterial);
+      wall.position.set(0, 0.82, z);
+      dinerCar.add(wall);
+
+      for (const wx of [-1.0, 1.0]) {
+        const win = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.68, 0.06), glassMaterial);
+        win.position.set(wx, 1.45, z);
+        dinerCar.add(win);
+      }
+    }
+
+    // Dining tables and linen tablecloths
+    for (const tx of [-1.0, 1.0]) {
+      const table = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.42, 0.9), diningTableMaterial);
+      table.position.set(tx, 0.75, 0);
+      dinerCar.add(table);
+    }
+
+    // Wheels
+    for (const z of [-0.82, 0.82]) {
+      for (const x of [-1.2, 1.2]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.12, 12), darkMaterial);
+        wheel.rotation.x = Math.PI / 2;
+        wheel.position.set(x, 0.24, z);
+        dinerCar.add(wheel);
+      }
+    }
+    train.add(dinerCar);
 
     train.traverse((object) => {
       if (object instanceof THREE.Mesh) {
@@ -1276,11 +1333,295 @@ export class VoxelWorld {
   public getTrainRideTransform(index = 0): { position: THREE.Vector3, rotationY: number } | null {
     const train = this.liveTrains[index];
     if (!train) return null;
-    // Seated in Passenger Coach 1
-    const coachOffset = new THREE.Vector3(-3.8, 1.25, 0);
+    // Seated comfortably in the Vista-Dome Observation Car 1
+    const coachOffset = new THREE.Vector3(-4.0, 1.35, 0);
     coachOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
     const seatPos = train.position.clone().add(coachOffset);
     return { position: seatPos, rotationY: train.rotation.y };
+  }
+
+  // -------------------------------------------------------------
+  // ANIMATED COMMERCIAL AIRPLANES: REALISTIC TAKEOFF & LANDING SYSTEM
+  // -------------------------------------------------------------
+  private createAnimatedAirplanes() {
+    // Build high-detail commercial twinjet airliner (Airbus / Boeing style)
+    const plane = new THREE.Group();
+
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.2 });
+    const blueMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.35, metalness: 0.5 });
+    const silverMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.85 });
+    const cockpitGlass = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.9, transparent: true, opacity: 0.85 });
+    const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
+    const redStrobe = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+    const greenStrobe = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+    const whiteBeacon = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+    // 1. Aerodynamic Main Fuselage Tube (Length ~10, Radius ~0.9)
+    const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.88, 0.88, 8.5, 18), whiteMat);
+    fuselage.rotation.z = Math.PI / 2;
+    plane.add(fuselage);
+
+    // Streamlined Nose Cone
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.88, 2.2, 18), whiteMat);
+    nose.rotation.z = -Math.PI / 2;
+    nose.position.x = 5.35;
+    plane.add(nose);
+
+    // Tail Taper Cone
+    const tailCone = new THREE.Mesh(new THREE.ConeGeometry(0.88, 2.8, 18), blueMat);
+    tailCone.rotation.z = Math.PI / 2;
+    tailCone.position.x = -5.65;
+    plane.add(tailCone);
+
+    // Cockpit Windshield (angled wrap-around windows)
+    const cockpit = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.45, 1.1), cockpitGlass);
+    cockpit.position.set(4.6, 0.45, 0);
+    cockpit.rotation.z = -0.32;
+    plane.add(cockpit);
+
+    // Cabin Windows rows along port & starboard sides
+    for (let x = -2.8; x <= 3.2; x += 0.8) {
+      for (const z of [-0.89, 0.89]) {
+        const win = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.22, 0.05), cockpitGlass);
+        win.position.set(x, 0.15, z);
+        plane.add(win);
+      }
+    }
+
+    // 2. Swept-Back Main Wings with Upright Winglets (Wingspan ~12)
+    const wingGeo = new THREE.BoxGeometry(2.4, 0.14, 6.2);
+    const starWing = new THREE.Mesh(wingGeo, silverMat);
+    starWing.position.set(-0.3, -0.15, -3.4);
+    starWing.rotation.y = 0.28; // Sweep back
+    starWing.rotation.x = -0.05; // Dihedral angle
+    plane.add(starWing);
+
+    const portWing = new THREE.Mesh(wingGeo, silverMat);
+    portWing.position.set(-0.3, -0.15, 3.4);
+    portWing.rotation.y = -0.28;
+    portWing.rotation.x = 0.05;
+    plane.add(portWing);
+
+    // Upright Winglets
+    const starWinglet = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.65, 0.08), blueMat);
+    starWinglet.position.set(-0.9, 0.22, -6.4);
+    plane.add(starWinglet);
+
+    const portWinglet = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.65, 0.08), blueMat);
+    portWinglet.position.set(-0.9, 0.22, 6.4);
+    plane.add(portWinglet);
+
+    // 3. High-Bypass Turbofan Jet Engines under Wings
+    for (const z of [-2.6, 2.6]) {
+      const engine = new THREE.Group();
+      engine.position.set(0.6, -0.65, z);
+
+      // Pylon
+      const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.4, 0.12), silverMat);
+      pylon.position.y = 0.25;
+      engine.add(pylon);
+
+      // Nacelle
+      const nacelle = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.44, 2.1, 16), silverMat);
+      nacelle.rotation.z = Math.PI / 2;
+      engine.add(nacelle);
+
+      // Intake cone spinner
+      const spinner = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 12), tireMat);
+      spinner.rotation.z = -Math.PI / 2;
+      spinner.position.x = 1.05;
+      engine.add(spinner);
+
+      // Jet exhaust flare
+      const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.38, 0.4, 12), tireMat);
+      exhaust.rotation.z = Math.PI / 2;
+      exhaust.position.x = -1.1;
+      engine.add(exhaust);
+
+      plane.add(engine);
+    }
+
+    // 4. Vertical Stabilizer (Fin) & Horizontal Stabilizers
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 2.5, 0.16), blueMat);
+    fin.position.set(-5.1, 1.85, 0);
+    fin.rotation.z = -0.45; // Swept back
+    plane.add(fin);
+
+    const hStabGeo = new THREE.BoxGeometry(1.2, 0.1, 2.2);
+    for (const z of [-1.3, 1.3]) {
+      const hStab = new THREE.Mesh(hStabGeo, silverMat);
+      hStab.position.set(-5.6, 0.55, z);
+      hStab.rotation.y = (z < 0 ? 0.25 : -0.25);
+      plane.add(hStab);
+    }
+
+    // 5. Navigation Strobes & Beacons
+    const pStrobe = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), redStrobe);
+    pStrobe.position.set(-0.9, 0.55, 6.4);
+    plane.add(pStrobe);
+    this.airplaneStrobes.push(pStrobe);
+
+    const sStrobe = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), greenStrobe);
+    sStrobe.position.set(-0.9, 0.55, -6.4);
+    plane.add(sStrobe);
+    this.airplaneStrobes.push(sStrobe);
+
+    const topBeacon = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), whiteBeacon);
+    topBeacon.position.set(0.2, 0.95, 0);
+    plane.add(topBeacon);
+    this.airplaneStrobes.push(topBeacon);
+
+    // 6. Retractable Tricycle Landing Gear (Hinged Group for Takeoff & Landing)
+    const gearGroup = new THREE.Group();
+
+    // Nose Gear (forward)
+    const nStrut = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.9, 8), silverMat);
+    nStrut.position.set(4.4, -0.65, 0);
+    gearGroup.add(nStrut);
+
+    const nWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.16, 12), tireMat);
+    nWheel.rotation.x = Math.PI / 2;
+    nWheel.position.set(4.4, -1.05, 0);
+    gearGroup.add(nWheel);
+
+    // Main Gear (Twin bogies under wings)
+    for (const z of [-1.8, 1.8]) {
+      const mStrut = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.95, 8), silverMat);
+      mStrut.position.set(-0.2, -0.68, z);
+      gearGroup.add(mStrut);
+
+      for (const wx of [-0.2, 0.2]) {
+        const mWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.16, 12), tireMat);
+        mWheel.rotation.x = Math.PI / 2;
+        mWheel.position.set(-0.2 + wx, -1.1, z);
+        gearGroup.add(mWheel);
+      }
+    }
+
+    plane.add(gearGroup);
+    this.airplaneWheels.push(gearGroup);
+
+    plane.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+    });
+
+    plane.position.set(88, 2.6, 85);
+    this.scene.add(plane);
+    this.animatedAirplanes.push(plane);
+  }
+
+  private updateAnimatedAirplanes(time: number) {
+    if (this.animatedAirplanes.length === 0) return;
+
+    // Strobe light flashing (flash every 1 second)
+    const flash = (time % 1.0) < 0.25;
+    for (const strobe of this.airplaneStrobes) {
+      strobe.visible = flash;
+    }
+
+    // 44-second complete realistic flight loop:
+    // 0..8s: Takeoff Roll on Runway 09 (accelerating from X = 88 to 142 at Y = 2.6, pitch 0)
+    // 8..14s: Rotation & Climbout (+14 deg pitch, gear retracts, climbs Y: 2.6 -> 26, X: 142 -> 200)
+    // 14..22s: Deep Blue Sky Coastal Turn (banking 28 deg left, climbing Y: 26 -> 48, sweeping towards North)
+    // 22..30s: Scenic High Altitude Cruise over Mountains & World Capitals (Y = 48, heading West)
+    // 30..36s: Descent & Base-to-Final Turn (gear extends, descending Y: 48 -> 18, lining up Runway 09)
+    // 36..40s: 3-degree Glideslope Final Approach & Flare (Y: 18 -> 2.6, X: 45 -> 88)
+    // 40..44s: Touchdown & Reverse Thrust Deceleration Rollout (X: 88 -> 138 -> resets to 88)
+
+    const cycle = 44.0;
+    const t = time % cycle;
+    const plane = this.animatedAirplanes[0];
+    const gear = this.airplaneWheels[0];
+
+    const runwayZ = 85.0;
+    const groundY = 2.6; // Wheels touching the asphalt surface
+
+    if (t < 8.0) {
+      // 1. Takeoff Roll on Runway 09
+      const progress = t / 8.0;
+      // Acceleration: x(t) = x0 + a * t^2
+      const x = 88.0 + progress * progress * 56.0;
+      plane.position.set(x, groundY, runwayZ);
+      plane.rotation.set(0, 0, 0); // Facing East (+X)
+      if (gear) gear.scale.set(1, 1, 1); // Gear locked down
+    } else if (t < 14.0) {
+      // 2. Rotation, Lift-off & Initial Climbout
+      const p = (t - 8.0) / 6.0;
+      const x = 144.0 + p * 58.0;
+      const y = groundY + Math.pow(p, 1.4) * 24.0;
+      plane.position.set(x, y, runwayZ);
+      // Pitch nose up +14 degrees
+      plane.rotation.set(0, 0, THREE.MathUtils.degToRad(14 * Math.min(1, p * 2.5)));
+      // Retract landing gear seamlessly
+      if (gear) {
+        const gearScale = Math.max(0.001, 1 - p * 2.0);
+        gear.scale.set(gearScale, gearScale, gearScale);
+      }
+    } else if (t < 22.0) {
+      // 3. Coastal Ocean Climb & Banking Left Turn towards North
+      const p = (t - 14.0) / 8.0;
+      const angle = p * Math.PI; // 0 to PI (turning from +X to -X)
+      // Turn radius ~65
+      const cx = 202.0;
+      const cz = runwayZ - 65.0;
+      const x = cx + Math.sin(angle) * 35.0;
+      const z = cz + Math.cos(angle) * 65.0;
+      const y = 26.6 + p * 20.0; // Climb to 46.6m
+      plane.position.set(x, y, z);
+      // Tangent heading + Left bank roll
+      const heading = Math.PI / 2 + angle;
+      const bank = THREE.MathUtils.degToRad(-26);
+      plane.rotation.set(bank, heading, THREE.MathUtils.degToRad(4));
+      if (gear) gear.scale.set(0.001, 0.001, 0.001); // Fully retracted
+    } else if (t < 30.0) {
+      // 4. High-Altitude Scenic Mountain & Metropolis Cruise
+      const p = (t - 22.0) / 8.0;
+      const x = 202.0 - p * 210.0; // Flying West from X=202 down to X=-8
+      const z = runwayZ - 130.0 + Math.sin(p * Math.PI) * 15.0;
+      const y = 46.6 + Math.sin(p * Math.PI) * 4.0;
+      plane.position.set(x, y, z);
+      plane.rotation.set(0, Math.PI, 0); // Heading West
+      if (gear) gear.scale.set(0.001, 0.001, 0.001);
+    } else if (t < 36.0) {
+      // 5. Base Leg, Gear Extension & Intercepting Runway 09 Final Approach
+      const p = (t - 30.0) / 6.0;
+      const angle = Math.PI + p * Math.PI; // PI to 2PI (turning back to face East)
+      const cx = 35.0;
+      const cz = runwayZ - 65.0;
+      const x = cx + Math.sin(angle) * 42.0;
+      const z = cz + Math.cos(angle) * 65.0;
+      const y = 46.6 - p * 30.0; // Descend to 16.6m
+      plane.position.set(x, y, z);
+      const heading = Math.PI / 2 + angle;
+      const bank = THREE.MathUtils.degToRad(22 * (1 - p));
+      plane.rotation.set(-bank, heading, THREE.MathUtils.degToRad(-3));
+      // Extend landing gear smoothly
+      if (gear) {
+        const gearScale = Math.min(1.0, Math.max(0.001, (p - 0.4) * 2.5));
+        gear.scale.set(gearScale, gearScale, gearScale);
+      }
+    } else if (t < 40.0) {
+      // 6. Final Approach on 3-degree Glideslope & Runway Threshold Flare
+      const p = (t - 36.0) / 4.0;
+      const x = 35.0 + p * 54.0; // from X=35 to X=89 (Runway 09 threshold)
+      const y = 16.6 - p * 14.0; // Touchdown at Y = 2.6
+      plane.position.set(x, Math.max(groundY, y), runwayZ);
+      // Aerodynamic flare: nose pitched up +5 degrees just before touchdown
+      const flare = THREE.MathUtils.degToRad(5 * (1 - p * 0.4));
+      plane.rotation.set(0, 0, flare);
+      if (gear) gear.scale.set(1, 1, 1);
+    } else {
+      // 7. Touchdown Rollout & Thrust Reverser Deceleration on Runway 09
+      const p = (t - 40.0) / 4.0;
+      // Decelerating rollout: v(t) decreasing
+      const x = 89.0 + (p - 0.5 * p * p) * 75.0;
+      plane.position.set(x, groundY, runwayZ);
+      plane.rotation.set(0, 0, 0); // Flat on landing gear
+      if (gear) gear.scale.set(1, 1, 1);
+    }
   }
 
   // Driveable Bajaj Auto-Rickshaw
