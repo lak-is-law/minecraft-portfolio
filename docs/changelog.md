@@ -50,3 +50,4 @@
 - 2026-10-08 12:38: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-10-08 17:09: perf(worker): offload terrain generation to web workers
 - 2026-10-08 22:20: fix(camera): pitch clamp preventing gimbal lock at zenith
+- 2026-10-09 11:56: perf(shaders): optimize ambient occlusion fragment pass
