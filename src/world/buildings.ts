@@ -614,138 +614,401 @@ export class WorldBuilder {
     }
   }
 
-  // 3. Crossroads Citadel (Central Hub & Guide)
+  // 3. Crossroads Citadel (Revamped Central Hub, Country Flags Parade & Majestic Botanical Gardens)
   private buildCrossroadsCitadel() {
+    // 1. Polished Citadel Island Base & Curbs (Radius <= 17)
     for (let x = -17; x <= 17; x++) {
       for (let z = -17; z <= 17; z++) {
         const r = Math.hypot(x, z);
         if (r <= 17) {
-          this.setBlock(x, 1, z, 'stone_bricks');
-          if (r > 15) {
-            this.setBlock(x, 2, z, 'stone_bricks');
+          // Polished concentric rings
+          const ring = Math.floor(r);
+          const mat = (ring <= 4) ? 'quartz_block' :
+                      (ring === 5 || ring === 9 || ring === 13) ? 'gold_block' :
+                      (ring % 2 === 0) ? 'smooth_stone' : 'quartz_block';
+          this.setBlock(x, 1, z, mat);
+          if (r > 15.5) {
+            this.setBlock(x, 2, z, 'stone_bricks'); // Moat perimeter parapet
+            if ((Math.abs(x) + Math.abs(z)) % 5 === 0) {
+              this.setBlock(x, 3, z, 'lantern');
+            }
           }
         }
       }
     }
 
-    // Four Monumental Archway Gatehouses over Moat Bridges
+    // 2. Cardinal Processional Boulevards (North, South, East, West)
+    for (let d = 5; d <= 17; d++) {
+      for (const offset of [-1, 0, 1]) {
+        this.setBlock(offset, 1, -d, (offset === 0 && d % 3 === 0) ? 'gold_block' : 'quartz_block');
+        this.setBlock(offset, 1, d, (offset === 0 && d % 3 === 0) ? 'gold_block' : 'quartz_block');
+        this.setBlock(-d, 1, offset, (offset === 0 && d % 3 === 0) ? 'gold_block' : 'quartz_block');
+        this.setBlock(d, 1, offset, (offset === 0 && d % 3 === 0) ? 'gold_block' : 'quartz_block');
+      }
+      if (d % 4 === 0) {
+        this.setBlock(-2, 1, -d, 'sea_lantern');
+        this.setBlock(2, 1, -d, 'sea_lantern');
+        this.setBlock(-2, 1, d, 'sea_lantern');
+        this.setBlock(2, 1, d, 'sea_lantern');
+        this.setBlock(-d, 1, -2, 'sea_lantern');
+        this.setBlock(-d, 1, 2, 'sea_lantern');
+        this.setBlock(d, 1, -2, 'sea_lantern');
+        this.setBlock(d, 1, 2, 'sea_lantern');
+      }
+    }
+
+    // 3. Central Grand Fountain & World Beacon Memorial at (0, 0)
+    // Octagonal Outer Marble Basin (Radius <= 4)
+    for (let x = -4; x <= 4; x++) {
+      for (let z = -4; z <= 4; z++) {
+        const d = Math.hypot(x, z);
+        if (d <= 4.2 && d >= 3.2) {
+          this.setBlock(x, 2, z, 'quartz_block');
+        } else if (d < 3.2 && (x !== 0 || z !== 0)) {
+          this.setBlock(x, 1, z, 'sea_lantern'); // Submerged illumination
+          this.setBlock(x, 2, z, 'water');
+        }
+      }
+    }
+    // Raised Center Spire & World Beacon
+    this.setBlock(0, 1, 0, 'diamond_block', { type: 'teleport' });
+    this.setBlock(0, 2, 0, 'beacon', { type: 'teleport' });
+    this.setBlock(0, 3, 0, 'quartz_pillar');
+    this.setBlock(0, 4, 0, 'gold_block');
+    this.setBlock(0, 5, 0, 'sea_lantern');
+    this.setBlock(0, 6, 0, 'beacon'); // High skyward beam
+    // Weeping fountain jets
+    for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+      this.setBlock(dx, 3, dz, 'water');
+    }
+
+    // 4. Directional World Portal Directory Monument at (0, 2, 5)
+    for (let y = 1; y <= 4; y++) {
+      this.setBlock(0, y, 5, 'quartz_pillar');
+      this.setBlock(-1, y, 5, 'quartz_block');
+      this.setBlock(1, y, 5, 'quartz_block');
+    }
+    this.setBlock(0, 5, 5, 'gold_block');
+    this.setBlock(-1, 5, 5, 'gold_block');
+    this.setBlock(1, 5, 5, 'gold_block');
+    this.setBlock(0, 6, 5, 'sea_lantern');
+    this.setBlock(0, 2, 6, 'gold_block', {
+      type: 'sign',
+      title: 'Crossroads Global Nexus · World Directory',
+      text: 'Welcome to Lakshya\'s Portfolio World!\nNorth: London, Paris, Tokyo, Seoul & China\nEast: USA Metropolis, Hollywood & Dubai\nSouth: Carnival Pier, Airport & Marina\nWest: Mexico City, Giza Pyramids & Sphinx'
+    });
+    this.setBlock(-1, 2, 6, 'quartz_block', {
+      type: 'sign',
+      title: 'West & North-West Realms',
+      text: '• London & Big Ben (-32, -65)\n• Paris & Eiffel Tower (26, -38)\n• Tokyo Shibuya Scramble (-155, -80)\n• Seoul & Gwanghwamun (-65, -95)\n• China Great Wall & Pagoda (-110, -110)'
+    });
+    this.setBlock(1, 2, 6, 'quartz_block', {
+      type: 'sign',
+      title: 'East & South-East Realms',
+      text: '• Imperial India & Taj Mahal (80, -135)\n• USA & Times Square (100, 0)\n• Hollywood Sign & Hills (130, -50)\n• Dubai Burj Khalifa (170, 42)\n• International Airport (130, 80)'
+    });
+
+    // 5. Four Monumental Archway Gatehouses over Moat Bridges
     this.buildCitadelGatehouse(0, -18, true);
     this.buildCitadelGatehouse(0, 18, true);
     this.buildCitadelGatehouse(18, 0, false);
     this.buildCitadelGatehouse(-18, 0, false);
 
-    // Central Compass Rose & 3-Tier Fountain
+    // 6. --- Grand Parade of Nations (Country Flags) ---
+    this.buildAllCountryFlags();
+
+    // 7. --- Majestic Botanical Gardens in Four Quadrant Courtyards ---
+    this.buildMajesticBotanicalGardens();
+
+    // 8. Skills & Knowledge Pavilion (Citadel South at (0, 1, 12))
     for (let x = -4; x <= 4; x++) {
-      for (let z = -4; z <= 4; z++) {
-        const dist = Math.max(Math.abs(x), Math.abs(z));
-        if (dist === 4) {
-          this.setBlock(x, 2, z, 'quartz_block');
-        } else if (dist === 0) {
-          this.setBlock(0, 1, 0, 'diamond_block', { type: 'teleport' });
-          this.setBlock(0, 2, 0, 'beacon', { type: 'teleport' });
-          this.setBlock(0, 3, 0, 'water');
-          this.setBlock(0, 4, 0, 'glowstone');
-        } else {
-          this.setBlock(x, 2, z, 'water');
-        }
-      }
-    }
-
-    for (let d = 5; d <= 12; d++) {
-      this.setBlock(0, 1, -d, 'quartz_block');
-      this.setBlock(0, 1, d, 'quartz_block');
-      this.setBlock(d, 1, 0, 'quartz_block');
-      this.setBlock(-d, 1, 0, 'quartz_block');
-    }
-
-    // Directional Welcome Obelisk right in front of spawn
-    for (let y = 1; y <= 4; y++) {
-      this.setBlock(0, y, 4, 'quartz_pillar');
-    }
-    this.setBlock(0, 5, 4, 'gold_block');
-    this.setBlock(0, 6, 4, 'sea_lantern');
-
-    this.setBlock(2, 2, 2, 'oak_log');
-    this.setBlock(2, 3, 2, 'oak_planks', {
-      type: 'sign',
-      title: 'Crossroads Citadel Nexus',
-      text: 'NE: Imperial India Realm (Taj Mahal & Ghats)\nNW: China Realm (Great Wall & Pagoda)\nSW: Mexico Realm (Zócalo & Aztec Pyramid)\nSE: USA Realm (Neo York & Hollywood)\nSouth: Carnival Pier & Beach'
-    });
-    this.setBlock(2, 4, 2, 'lantern');
-
-    // NW Courtyard: Classical Rose Garden & Lantern
-    for (let x = -12; x <= -8; x++) {
-      for (let z = -12; z <= -8; z++) {
-        const isBorder = (x === -12 || x === -8 || z === -12 || z === -8);
-        this.setBlock(x, 2, z, isBorder ? 'stone_bricks' : 'rose_vines');
-      }
-    }
-    this.setBlock(-10, 2, -10, 'glowstone');
-    this.setBlock(-10, 3, -10, 'lantern');
-
-    // NE Courtyard: Ornamental Turquoise Fountain
-    for (let x = 8; x <= 12; x++) {
-      for (let z = -12; z <= -8; z++) {
-        const isBorder = (x === 8 || x === 12 || z === -12 || z === -8);
-        this.setBlock(x, 2, z, isBorder ? 'quartz_block' : 'water');
-      }
-    }
-    this.setBlock(10, 2, -10, 'sea_lantern');
-
-    // SW Courtyard: Cherry Blossom Alcove & Benches
-    this.buildSakuraTree(-10, 1, 6);
-    this.setBlock(-8, 2, 6, 'oak_stairs');
-    this.setBlock(-12, 2, 6, 'oak_stairs');
-
-    // Skills Matrix Pavilion (Citadel South: X in [-8, 8], Z in [9, 15])
-    for (let x = -8; x <= 8; x++) {
-      for (let z = 9; z <= 15; z++) {
+      for (let z = 11; z <= 15; z++) {
         this.setBlock(x, 1, z, 'quartz_block');
-        if ((Math.abs(x) === 8 || Math.abs(x) === 0) && (z === 9 || z === 15)) {
-          for (let y = 2; y <= 5; y++) {
-            this.setBlock(x, y, z, 'quartz_pillar');
-          }
+        if ((Math.abs(x) === 4) && (z === 11 || z === 15)) {
+          for (let y = 2; y <= 5; y++) this.setBlock(x, y, z, 'quartz_pillar');
         }
         this.setBlock(x, 6, z, 'quartz_block');
       }
     }
-    for (let z = 10; z <= 14; z++) {
-      this.setBlock(-7, 2, z, 'bookshelf');
-      this.setBlock(-7, 3, z, 'bookshelf');
-      this.setBlock(7, 2, z, 'bookshelf');
-      this.setBlock(7, 3, z, 'bookshelf');
+    this.setBlock(0, 2, 13, 'crafting_table', { type: 'skills' });
+    this.setBlock(0, 3, 13, 'glowstone', { type: 'skills' });
+    this.setBlock(-3, 2, 13, 'bookshelf');
+    this.setBlock(-3, 3, 13, 'bookshelf');
+    this.setBlock(3, 2, 13, 'bookshelf');
+    this.setBlock(3, 3, 13, 'bookshelf');
+    this.setBlock(-1, 2, 13, 'cauldron');
+    this.setBlock(1, 2, 13, 'cauldron');
+  }
+
+  // Parade of Nations: Authentic 3D Country Flags on Majestic Flagpoles
+  private buildAllCountryFlags() {
+    // 1. India 🇮🇳 (Saffron, White with Ashoka Chakra, Green)
+    this.buildFlagpole(6, -14, 'Republic of India 🇮🇳', 'Tiranga · Saffron, White with Navy Ashoka Chakra, and India Green.', [
+      ['red_terracotta', 'red_terracotta', 'red_terracotta', 'red_terracotta'],
+      ['quartz_block', 'lapis_block', 'lapis_block', 'quartz_block'],
+      ['emerald_block', 'emerald_block', 'emerald_block', 'emerald_block']
+    ], 'east');
+
+    // 2. South Korea 🇰🇷 (White field, Red/Blue Taegeuk, Black Trigrams)
+    this.buildFlagpole(-6, -14, 'Republic of Korea 🇰🇷', 'Taegeukgi · White purity, Red & Blue cosmic harmony, and four Kwae trigrams.', [
+      ['coal_block', 'quartz_block', 'quartz_block', 'coal_block'],
+      ['quartz_block', 'redstone_block', 'lapis_block', 'quartz_block'],
+      ['coal_block', 'quartz_block', 'quartz_block', 'coal_block']
+    ], 'west');
+
+    // 3. Japan 🇯🇵 (White field with Crimson Sun)
+    this.buildFlagpole(-12, -10, 'Japan 🇯🇵', 'Nisshōki / Hinomaru · Land of the Rising Sun with crimson central disk.', [
+      ['quartz_block', 'quartz_block', 'quartz_block', 'quartz_block'],
+      ['quartz_block', 'redstone_block', 'redstone_block', 'quartz_block'],
+      ['quartz_block', 'quartz_block', 'quartz_block', 'quartz_block']
+    ], 'west');
+
+    // 4. China 🇨🇳 (Red field with Golden Stars)
+    this.buildFlagpole(-14, -6, 'People\'s Republic of China 🇨🇳', 'Five-Star Red Flag · Vermilion red field with five golden stars.', [
+      ['red_terracotta', 'gold_block', 'red_terracotta', 'red_terracotta'],
+      ['red_terracotta', 'gold_block', 'gold_block', 'red_terracotta'],
+      ['red_terracotta', 'red_terracotta', 'red_terracotta', 'red_terracotta']
+    ], 'west');
+
+    // 5. United Kingdom 🇬🇧 (Union Jack)
+    this.buildFlagpole(-14, 6, 'United Kingdom 🇬🇧', 'Union Flag · Crosses of St. George, St. Andrew, and St. Patrick combined.', [
+      ['lapis_block', 'quartz_block', 'redstone_block', 'lapis_block'],
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'redstone_block', 'lapis_block']
+    ], 'west');
+
+    // 6. France 🇫🇷 (Bleu, Blanc, Rouge Tricolore)
+    this.buildFlagpole(-12, 10, 'French Republic 🇫🇷', 'Le Drapeau Tricolore · Liberty, Equality, Fraternity (Blue, White, Red).', [
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block']
+    ], 'west');
+
+    // 7. Mexico 🇲🇽 (Green, White with Eagle, Red)
+    this.buildFlagpole(-6, 14, 'United Mexican States 🇲🇽', 'Bandera de México · Hope, Unity, and Blood of Heroes with Golden Emblem.', [
+      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['emerald_block', 'gold_block', 'quartz_block', 'redstone_block'],
+      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block']
+    ], 'west');
+
+    // 8. United States 🇺🇸 (Stars and Stripes)
+    this.buildFlagpole(6, 14, 'United States of America 🇺🇸', 'Stars and Stripes · 50 stars in blue canton and thirteen red and white stripes.', [
+      ['lapis_block', 'gold_block', 'redstone_block', 'quartz_block'],
+      ['lapis_block', 'lapis_block', 'quartz_block', 'redstone_block'],
+      ['redstone_block', 'quartz_block', 'redstone_block', 'quartz_block']
+    ], 'east');
+
+    // 9. Egypt 🇪🇬 (Red, White with Golden Eagle, Black)
+    this.buildFlagpole(12, 10, 'Arab Republic of Egypt 🇪🇬', 'Egyptian Tricolour · Red sacrifice, White purity with Golden Eagle, and Black end of oppression.', [
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block'],
+      ['quartz_block', 'gold_block', 'gold_block', 'quartz_block'],
+      ['coal_block', 'coal_block', 'coal_block', 'coal_block']
+    ], 'east');
+
+    // 10. United Arab Emirates 🇦🇪 (Pan-Arab Red, Green, White, Black)
+    this.buildFlagpole(12, -10, 'United Arab Emirates 🇦🇪', 'Flag of the UAE · Unity, prosperity, peace, and strength of the seven emirates.', [
+      ['redstone_block', 'emerald_block', 'emerald_block', 'emerald_block'],
+      ['redstone_block', 'quartz_block', 'quartz_block', 'quartz_block'],
+      ['redstone_block', 'coal_block', 'coal_block', 'coal_block']
+    ], 'east');
+  }
+
+  private buildFlagpole(px: number, pz: number, title: string, desc: string, pattern: string[][], dir: 'east' | 'west') {
+    // Flagpole plinth and shaft (Y = 1 to 8)
+    this.setBlock(px, 1, pz, 'smooth_stone');
+    for (let y = 2; y <= 8; y++) {
+      this.setBlock(px, y, pz, 'iron_block');
     }
-    this.setBlock(0, 2, 12, 'crafting_table', { type: 'skills' });
-    this.setBlock(0, 3, 12, 'glowstone', { type: 'skills' });
-    this.setBlock(-2, 2, 12, 'cauldron');
-    this.setBlock(2, 2, 12, 'cauldron');
+    this.setBlock(px, 9, pz, 'gold_block'); // Eagle/finial
+
+    // Flag banner (4x3 blocks at Y = 6 to 8)
+    for (let row = 0; row < 3; row++) {
+      const y = 8 - row;
+      for (let col = 0; col < 4; col++) {
+        const mat = pattern[row][col];
+        const bx = (dir === 'east') ? px + 1 + col : px - 1 - col;
+        this.setBlock(bx, y, pz, mat);
+      }
+    }
+
+    // Interactive Flag Plaque Sign
+    const signX = px;
+    const signZ = (pz <= 0) ? pz + 1 : pz - 1;
+    this.setBlock(signX, 2, signZ, 'quartz_block', {
+      type: 'sign',
+      title: title,
+      text: desc
+    });
+  }
+
+  // Majestic Botanical Gardens: 4 Thematic World Pleasure Gardens
+  private buildMajesticBotanicalGardens() {
+    // 1. North-West: Imperial Sakura & Zen Water Garden (X in [-15, -6], Z in [-15, -6])
+    // Flagstone garden floor & mossy paths
+    for (let x = -15; x <= -6; x++) {
+      for (let z = -15; z <= -6; z++) {
+        if ((x + z) % 2 === 0) {
+          this.setBlock(x, 1, z, 'mossy_stone_bricks');
+        }
+      }
+    }
+    // Twin Full-Canopy Japanese Sakura Cherry Blossom Trees
+    this.buildSakuraTree(-12, 1, -12);
+    this.buildSakuraTree(-8, 1, -14);
+    // Zen Reflection Lotus Pool with submerged lanterns
+    for (let x = -11; x <= -8; x++) {
+      for (let z = -11; z <= -8; z++) {
+        const isBorder = (x === -11 || x === -8 || z === -11 || z === -8);
+        if (isBorder) {
+          this.setBlock(x, 1, z, 'stone_bricks');
+        } else {
+          this.setBlock(x, 0, z, 'sea_lantern');
+          this.setBlock(x, 1, z, 'water');
+        }
+      }
+    }
+    // Floating Lotus Blossom Pads
+    this.setBlock(-10, 1, -10, 'emerald_block');
+    this.setBlock(-9, 1, -10, 'purpur_block');
+    this.setBlock(-9, 2, -10, 'lantern');
+    // Traditional Carved Stone Toro Pagoda Lanterns
+    this.setBlock(-14, 2, -8, 'stone_bricks');
+    this.setBlock(-14, 3, -8, 'quartz_pillar');
+    this.setBlock(-14, 4, -8, 'lantern');
+    this.setBlock(-14, 5, -8, 'stone_bricks');
+    // Bamboo Clump & Stone Meditation Bench
+    this.buildBambooStalk(-6, 1, -8, 5);
+    this.buildBambooStalk(-6, 1, -7, 6);
+    this.setBlock(-8, 2, -7, 'smooth_stone'); // Bench
+
+    // 2. North-East: Mughal Charbagh Paradise Botanical Garden (X in [6, 15], Z in [-15, -6])
+    // 4 Symmetrical Quadrants divided by White Marble Water Rills
+    const ncx = 11;
+    const ncz = -11;
+    // Central Octagonal Raised Marble Fountain
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 2.2 && d >= 1.5) {
+          this.setBlock(ncx + dx, 2, ncz + dz, 'quartz_block');
+        } else if (d < 1.5) {
+          this.setBlock(ncx + dx, 1, ncz + dz, 'sea_lantern');
+          this.setBlock(ncx + dx, 2, ncz + dz, 'water');
+        }
+      }
+    }
+    this.setBlock(ncx, 3, ncz, 'quartz_pillar');
+    this.setBlock(ncx, 4, ncz, 'gold_block');
+    this.setBlock(ncx, 4, ncz, 'water');
+    // Four Marble Water Channels radiating outward
+    for (let step = 3; step <= 5; step++) {
+      this.setBlock(ncx + step, 1, ncz, 'water');
+      this.setBlock(ncx - step, 1, ncz, 'water');
+      this.setBlock(ncx, 1, ncz + step, 'water');
+      this.setBlock(ncx, 1, ncz - step, 'water');
+    }
+    // Symmetrical Aromatic Flowerbeds & Topiary Cypress Pines
+    this.buildCypressTree(7, 1, -7);
+    this.buildCypressTree(15, 1, -7);
+    this.buildCypressTree(7, 1, -15);
+    this.buildCypressTree(15, 1, -15);
+    // Rose bushes and amethyst borders
+    for (const [fx, fz] of [[8, -9], [9, -8], [13, -9], [14, -8], [8, -13], [9, -14], [13, -13], [14, -14]]) {
+      this.setBlock(fx, 2, fz, 'rose_vines');
+    }
+    this.setBlock(ncx, 2, -6, 'quartz_block'); // Marble bench
+
+    // 3. South-West: Mediterranean Rose Pergola & Fountains (X in [-15, -6], Z in [6, 15])
+    // Grand Colonnade Pergola with Climbing Roses
+    for (let z = 7; z <= 13; z += 3) {
+      this.setBlock(-12, 2, z, 'quartz_pillar');
+      this.setBlock(-12, 3, z, 'quartz_pillar');
+      this.setBlock(-12, 4, z, 'quartz_pillar');
+      this.setBlock(-8, 2, z, 'quartz_pillar');
+      this.setBlock(-8, 3, z, 'quartz_pillar');
+      this.setBlock(-8, 4, z, 'quartz_pillar');
+      // Crossbeams with flowering vines
+      for (let x = -12; x <= -8; x++) {
+        this.setBlock(x, 5, z, 'oak_planks');
+        this.setBlock(x, 6, z, 'rose_vines');
+      }
+    }
+    // Pergola longitudinal beams
+    for (let z = 7; z <= 13; z++) {
+      this.setBlock(-12, 5, z, 'oak_planks');
+      this.setBlock(-8, 5, z, 'oak_planks');
+      if (z % 2 === 0) {
+        this.setBlock(-10, 5, z, 'lantern');
+      }
+    }
+    // Bubbling Lion-Head Wall Fountain in SW Garden at (-14, 10)
+    for (let y = 1; y <= 4; y++) {
+      this.setBlock(-14, y, 9, 'prismarine_bricks');
+      this.setBlock(-14, y, 11, 'prismarine_bricks');
+      this.setBlock(-15, y, 10, 'prismarine_bricks');
+    }
+    this.setBlock(-14, 3, 10, 'gold_block'); // Spout
+    this.setBlock(-14, 2, 10, 'water');
+    this.setBlock(-14, 1, 10, 'sea_lantern');
+
+    // 4. South-East: Royal French Versailles Topiary Court (X in [6, 15], Z in [6, 15])
+    const secX = 11;
+    const secZ = 11;
+    // Clipped Spiral Topiary Hedges
+    for (const [tx, tz] of [[8, 8], [14, 8], [8, 14], [14, 14]]) {
+      this.setBlock(tx, 2, tz, 'mossy_stone_bricks');
+      this.setBlock(tx, 3, tz, 'leaves');
+      this.setBlock(tx, 4, tz, 'leaves');
+      this.setBlock(tx, 5, tz, 'leaves');
+    }
+    // Center Marble Sundial & Sculpture Pedestal
+    this.setBlock(secX, 2, secZ, 'quartz_block');
+    this.setBlock(secX, 3, secZ, 'quartz_pillar');
+    this.setBlock(secX, 4, secZ, 'gold_block');
+    this.setBlock(secX, 5, secZ, 'sea_lantern');
+    // Concentric Lavender Flower Borders
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        if (Math.abs(dx) === 3 || Math.abs(dz) === 3) {
+          if ((dx + dz) % 2 === 0) {
+            this.setBlock(secX + dx, 2, secZ + dz, 'amethyst_block');
+          } else {
+            this.setBlock(secX + dx, 2, secZ + dz, 'purpur_block');
+          }
+        }
+      }
+    }
   }
 
   private buildCitadelGatehouse(cx: number, cz: number, isNorthSouth: boolean) {
     if (isNorthSouth) {
-      for (let x = -3; x <= 3; x++) {
-        for (let y = 2; y <= 6; y++) {
+      for (let x = -4; x <= 4; x++) {
+        for (let y = 2; y <= 7; y++) {
           const isArchOpening = (Math.abs(x) <= 1 && y <= 4);
           if (!isArchOpening) {
-            this.setBlock(x, y, cz, (Math.abs(x) === 3 || y === 6) ? 'stone_bricks' : 'mossy_stone_bricks');
+            const isCorner = Math.abs(x) === 4;
+            this.setBlock(x, y, cz, isCorner ? 'quartz_pillar' : (y === 7) ? 'gold_block' : 'stone_bricks');
           }
         }
       }
-      this.setBlock(-3, 7, cz, 'lantern');
-      this.setBlock(3, 7, cz, 'lantern');
-      this.setBlock(0, 5, cz, 'gold_block');
+      this.setBlock(-4, 8, cz, 'beacon');
+      this.setBlock(4, 8, cz, 'beacon');
+      this.setBlock(0, 8, cz, 'gold_block');
+      this.setBlock(0, 9, cz, 'sea_lantern');
     } else {
-      for (let z = -3; z <= 3; z++) {
-        for (let y = 2; y <= 6; y++) {
+      for (let z = -4; z <= 4; z++) {
+        for (let y = 2; y <= 7; y++) {
           const isArchOpening = (Math.abs(z) <= 1 && y <= 4);
           if (!isArchOpening) {
-            this.setBlock(cx, y, z, (Math.abs(z) === 3 || y === 6) ? 'stone_bricks' : 'mossy_stone_bricks');
+            const isCorner = Math.abs(z) === 4;
+            this.setBlock(cx, y, z, isCorner ? 'quartz_pillar' : (y === 7) ? 'gold_block' : 'stone_bricks');
           }
         }
       }
-      this.setBlock(cx, 7, -3, 'lantern');
-      this.setBlock(cx, 7, 3, 'lantern');
-      this.setBlock(cx, 5, 0, 'gold_block');
+      this.setBlock(cx, 8, -4, 'beacon');
+      this.setBlock(cx, 8, 4, 'beacon');
+      this.setBlock(cx, 8, 0, 'gold_block');
+      this.setBlock(cx, 9, 0, 'sea_lantern');
     }
   }
 
