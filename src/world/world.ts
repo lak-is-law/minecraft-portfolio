@@ -35,6 +35,7 @@ export class VoxelWorld {
   public npcMesh: THREE.Group | null = null;
   private railCurve: THREE.CatmullRomCurve3 | null = null;
   private liveTrains: THREE.Group[] = [];
+  public autoRickshawMesh: THREE.Group | null = null;
 
   // Hammerable Project Banners
   public projectBanners: ProjectBanner[] = [];
@@ -52,6 +53,7 @@ export class VoxelWorld {
     this.builder.buildWorld();
     this.buildInstancedMeshes();
     this.createRailway();
+    this.createAutoRickshaw();
     this.createProjectPedestalVisuals();
     this.createBigProjectWallBanners();
     this.createBeaconBeam();
@@ -1058,14 +1060,15 @@ export class VoxelWorld {
   }
 
   private createRailway() {
+    // Dedicated collision-free scenic viaduct corridor between Central Station and Airport
     const route = [
-      new THREE.Vector3(50, 2.15, 33),  // Inside Central Station West
-      new THREE.Vector3(62, 2.15, 33),  // Central Station Platform East
-      new THREE.Vector3(76, 2.15, 34),  // Viaduct Trestle 1
-      new THREE.Vector3(92, 2.15, 42),  // Viaduct Trestle 2
-      new THREE.Vector3(108, 2.15, 52), // Viaduct Trestle 3
-      new THREE.Vector3(122, 2.15, 64), // Airport Station Approach
-      new THREE.Vector3(130, 2.15, 72)  // Airport Station Platform
+      new THREE.Vector3(52, 2.15, 33),  // Inside Central Station West Platform
+      new THREE.Vector3(66, 2.20, 33),  // Station East Portal
+      new THREE.Vector3(80, 2.70, 33),  // Scenic Viaduct Trestle 1 (above open waterway)
+      new THREE.Vector3(96, 3.00, 34),  // Viaduct Trestle 2 (crossing over highway)
+      new THREE.Vector3(110, 2.80, 42), // Curve across open meadow
+      new THREE.Vector3(122, 2.40, 56), // Airport approach
+      new THREE.Vector3(130, 2.15, 70)  // Airport Terminal Station Platform
     ];
     this.railCurve = new THREE.CatmullRomCurve3(route, false, 'centripetal');
     const railMaterial = new THREE.MeshStandardMaterial({ color: 0x64736f, metalness: 0.72, roughness: 0.34 });
@@ -1087,7 +1090,7 @@ export class VoxelWorld {
       this.scene.add(rail);
     }
 
-    // Timber sleepers and supports make the elevated line read as a real track.
+    // Timber sleepers and viaduct piers
     for (let distance = 0; distance <= railLength; distance += 1.45) {
       const t = this.railCurve.getUtoTmapping(0, distance);
       const point = this.railCurve.getPointAt(t);
@@ -1100,8 +1103,8 @@ export class VoxelWorld {
       this.scene.add(sleeper);
 
       if (Math.round(distance) % 7 < 2) {
-        const support = new THREE.Mesh(new THREE.BoxGeometry(0.42, 1.65, 0.42), supportMaterial);
-        support.position.set(point.x, 1.28, point.z);
+        const support = new THREE.Mesh(new THREE.BoxGeometry(0.55, point.y + 0.5, 0.55), supportMaterial);
+        support.position.set(point.x, (point.y) / 2, point.z);
         support.castShadow = true;
         support.receiveShadow = true;
         this.scene.add(support);
@@ -1109,74 +1112,141 @@ export class VoxelWorld {
     }
 
     this.liveTrains = [
-      this.createTrain(0x426b62, 0xd7bd78),
-      this.createTrain(0x8b4b3d, 0xe2d9c3)
+      this.createTrain(0x1e3a8a, 0xf59e0b), // Crossroads Express (Royal Navy & Gold)
+      this.createTrain(0x047857, 0xfbbf24)  // Airport Shuttle (Emerald & Amber)
     ];
     this.liveTrains.forEach((train) => this.scene.add(train));
   }
 
   private createTrain(bodyColor: number, accentColor: number) {
     const train = new THREE.Group();
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor, metalness: 0.26, roughness: 0.55 });
-    const accentMaterial = new THREE.MeshStandardMaterial({ color: accentColor, metalness: 0.48, roughness: 0.38 });
-    const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x9ed5d2, emissive: 0x173c3c, metalness: 0.32, roughness: 0.22 });
-    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x262b29, metalness: 0.68, roughness: 0.4 });
-    const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffedb0 });
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor, metalness: 0.35, roughness: 0.45 });
+    const accentMaterial = new THREE.MeshStandardMaterial({ color: accentColor, metalness: 0.55, roughness: 0.35 });
+    const windowMaterial = new THREE.MeshStandardMaterial({ color: 0xbae6fd, emissive: 0x0284c7, emissiveIntensity: 0.25, transparent: true, opacity: 0.75 });
+    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.75, roughness: 0.35 });
+    const woodFloorMaterial = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    const seatMaterial = new THREE.MeshLambertMaterial({ color: 0xb91c1c });
+    const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xfef08a });
 
-    for (let carIndex = 0; carIndex < 3; carIndex++) {
-      const car = new THREE.Group();
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.28, 1.55), darkMaterial);
-      chassis.position.y = 0.38;
-      car.add(chassis);
+    // Car 0: Aerodynamic Streamlined Locomotive Engine
+    const loco = new THREE.Group();
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.32, 1.6), darkMaterial);
+    chassis.position.y = 0.38;
+    loco.add(chassis);
 
-      const shell = new THREE.Mesh(new THREE.BoxGeometry(carIndex === 0 ? 2.65 : 2.8, 1.12, 1.5), bodyMaterial);
-      shell.position.y = 1.0;
-      car.add(shell);
+    // Aerodynamic wedge nose & cowcatcher
+    const cowcatcher = new THREE.Mesh(new THREE.ConeGeometry(0.85, 0.9, 4), darkMaterial);
+    cowcatcher.rotation.z = -Math.PI / 2;
+    cowcatcher.rotation.y = Math.PI / 4;
+    cowcatcher.position.set(1.9, 0.45, 0);
+    loco.add(cowcatcher);
 
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.16, 1.42), accentMaterial);
-      roof.position.set(-0.08, 1.65, 0);
-      car.add(roof);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(3.0, 1.3, 1.55), bodyMaterial);
+    body.position.set(0.1, 1.15, 0);
+    loco.add(body);
 
-      for (const z of [-0.765, 0.765]) {
-        for (const x of [-0.8, 0, 0.8]) {
-          const window = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.4, 0.045), windowMaterial);
-          window.position.set(x, 1.12, z);
-          car.add(window);
-        }
-        for (const x of [-0.9, 0.9]) {
-          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.14, 10), darkMaterial);
-          wheel.rotation.x = Math.PI / 2;
-          wheel.position.set(x, 0.18, z * 0.72);
-          car.add(wheel);
-        }
-      }
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.95, 1.45), accentMaterial);
+    nose.position.set(1.65, 0.95, 0);
+    loco.add(nose);
 
-      if (carIndex === 0) {
-        const cab = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.58, 1.3), accentMaterial);
-        cab.position.set(-0.48, 1.82, 0);
-        car.add(cab);
-        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.48, 1.38), accentMaterial);
-        nose.position.set(1.42, 0.88, 0);
-        car.add(nose);
-        const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.42, 8), darkMaterial);
-        chimney.position.set(0.68, 1.72, 0);
-        car.add(chimney);
-        for (const z of [-0.43, 0.43]) {
-          const light = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.12), headlightMaterial);
-          light.position.set(1.66, 0.96, z);
-          car.add(light);
-        }
-      }
+    // Engineer Cab with glass windows
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.75, 1.48), accentMaterial);
+    cab.position.set(-0.4, 1.95, 0);
+    loco.add(cab);
+    const cabWindshield = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.55, 1.25), windowMaterial);
+    cabWindshield.position.set(0.22, 1.95, 0);
+    loco.add(cabWindshield);
 
-      car.position.x = -carIndex * 3.2;
-      car.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-          object.castShadow = true;
-          object.receiveShadow = true;
-        }
-      });
-      train.add(car);
+    // High-beam dual headlights
+    for (const z of [-0.48, 0.48]) {
+      const hl = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.22, 0.22), headlightMaterial);
+      hl.position.set(2.0, 0.85, z);
+      loco.add(hl);
     }
+
+    const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.55, 8), darkMaterial);
+    exhaust.position.set(0.85, 1.95, 0);
+    loco.add(exhaust);
+
+    for (const z of [-0.82, 0.82]) {
+      for (const x of [-1.2, -0.4, 0.4, 1.2]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.14, 12), darkMaterial);
+        wheel.rotation.x = Math.PI / 2;
+        wheel.position.set(x, 0.26, z);
+        loco.add(wheel);
+      }
+    }
+    train.add(loco);
+
+    // Car 1 & Car 2: Rideable Passenger Coaches with Walk-In Interior
+    for (let coachIdx = 1; coachIdx <= 2; coachIdx++) {
+      const coach = new THREE.Group();
+      coach.position.x = -coachIdx * 3.8;
+
+      const cChassis = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.28, 1.6), darkMaterial);
+      cChassis.position.y = 0.38;
+      coach.add(cChassis);
+
+      const cFloor = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.08, 1.5), woodFloorMaterial);
+      cFloor.position.y = 0.54;
+      coach.add(cFloor);
+
+      const cRoof = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.22, 1.55), accentMaterial);
+      cRoof.position.set(0, 2.05, 0);
+      coach.add(cRoof);
+
+      // End walls
+      const endF = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.45, 1.55), bodyMaterial);
+      endF.position.set(1.65, 1.25, 0);
+      coach.add(endF);
+      const endB = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.45, 1.55), bodyMaterial);
+      endB.position.set(-1.65, 1.25, 0);
+      coach.add(endB);
+
+      // Side walls with windows and open boarding door
+      for (const z of [-0.78, 0.78]) {
+        const lowerWall = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.55, 0.08), bodyMaterial);
+        lowerWall.position.set(0, 0.82, z);
+        coach.add(lowerWall);
+
+        for (const wx of [-1.0, 1.0]) {
+          const win = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.65, 0.06), windowMaterial);
+          win.position.set(wx, 1.42, z);
+          coach.add(win);
+        }
+      }
+
+      // Interior passenger seats
+      for (const sx of [-1.0, 1.0]) {
+        for (const sz of [-0.45, 0.45]) {
+          const seat = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.38, 0.45), seatMaterial);
+          seat.position.set(sx, 0.74, sz);
+          coach.add(seat);
+        }
+      }
+
+      const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.08, 0.3), headlightMaterial);
+      lamp.position.set(0, 1.92, 0);
+      coach.add(lamp);
+
+      for (const z of [-0.82, 0.82]) {
+        for (const x of [-1.1, 1.1]) {
+          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.12, 12), darkMaterial);
+          wheel.rotation.x = Math.PI / 2;
+          wheel.position.set(x, 0.24, z);
+          coach.add(wheel);
+        }
+      }
+
+      train.add(coach);
+    }
+
+    train.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+      }
+    });
 
     return train;
   }
@@ -1193,9 +1263,113 @@ export class VoxelWorld {
       const position = this.railCurve!.getPointAt(t);
       const tangent = this.railCurve!.getTangentAt(t);
       if (!movingForward) tangent.negate();
-      train.position.set(position.x, 2.14, position.z);
+      train.position.set(position.x, position.y + 0.14, position.z);
       train.rotation.y = Math.atan2(-tangent.z, tangent.x);
     });
+  }
+
+  public getTrainPosition(index = 0): THREE.Vector3 | null {
+    if (!this.liveTrains[index]) return null;
+    return this.liveTrains[index].position;
+  }
+
+  public getTrainRideTransform(index = 0): { position: THREE.Vector3, rotationY: number } | null {
+    const train = this.liveTrains[index];
+    if (!train) return null;
+    // Seated in Passenger Coach 1
+    const coachOffset = new THREE.Vector3(-3.8, 1.25, 0);
+    coachOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
+    const seatPos = train.position.clone().add(coachOffset);
+    return { position: seatPos, rotationY: train.rotation.y };
+  }
+
+  // Driveable Bajaj Auto-Rickshaw
+  private createAutoRickshaw() {
+    const rickshaw = new THREE.Group();
+    const greenMat = new THREE.MeshStandardMaterial({ color: 0x15803d, metalness: 0.4, roughness: 0.4 });
+    const yellowMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.5 });
+    const blackMat = new THREE.MeshStandardMaterial({ color: 0x18181b, metalness: 0.6, roughness: 0.4 });
+    const lightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.18, 2.2), greenMat);
+    floor.position.y = 0.32;
+    rickshaw.add(floor);
+
+    const frontFender = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.35, 0.65), greenMat);
+    frontFender.position.set(0, 0.55, 1.05);
+    rickshaw.add(frontFender);
+
+    const frontWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.16, 12), blackMat);
+    frontWheel.rotation.z = Math.PI / 2;
+    frontWheel.position.set(0, 0.26, 1.05);
+    rickshaw.add(frontWheel);
+
+    for (const side of [-0.68, 0.68]) {
+      const rearWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.16, 12), blackMat);
+      rearWheel.rotation.z = Math.PI / 2;
+      rearWheel.position.set(side, 0.26, -0.65);
+      rickshaw.add(rearWheel);
+    }
+
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.16, 1.85), yellowMat);
+    roof.position.set(0, 1.82, -0.15);
+    rickshaw.add(roof);
+
+    for (const x of [-0.64, 0.64]) {
+      for (const z of [-0.98, 0.68]) {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.35, 0.06), blackMat);
+        pillar.position.set(x, 1.08, z);
+        rickshaw.add(pillar);
+      }
+    }
+
+    const driverSeat = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.32, 0.45), blackMat);
+    driverSeat.position.set(0, 0.58, 0.35);
+    rickshaw.add(driverSeat);
+
+    const passengerSeat = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.38, 0.55), blackMat);
+    passengerSeat.position.set(0, 0.62, -0.65);
+    rickshaw.add(passengerSeat);
+
+    const headlight = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 12), lightMat);
+    headlight.rotation.x = Math.PI / 2;
+    headlight.position.set(0, 0.65, 1.38);
+    rickshaw.add(headlight);
+
+    const handlebar = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.06, 0.06), blackMat);
+    handlebar.position.set(0, 0.88, 0.75);
+    rickshaw.add(handlebar);
+
+    rickshaw.position.set(14, 1.0, 8); // Parked near Crossroads Citadel East Gate
+    rickshaw.rotation.y = -Math.PI / 2;
+    rickshaw.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+    });
+
+    this.scene.add(rickshaw);
+    this.autoRickshawMesh = rickshaw;
+  }
+
+  public getAutoRickshawPosition(): THREE.Vector3 | null {
+    if (!this.autoRickshawMesh) return null;
+    return this.autoRickshawMesh.position;
+  }
+
+  public updateAutoRickshaw(pos: THREE.Vector3, rotY: number) {
+    if (!this.autoRickshawMesh) return;
+    this.autoRickshawMesh.position.set(pos.x, pos.y - 0.2, pos.z);
+    this.autoRickshawMesh.rotation.y = rotY;
+  }
+
+  public getAutoRickshawRideTransform(): { position: THREE.Vector3, rotationY: number } | null {
+    if (!this.autoRickshawMesh) return null;
+    const seatOffset = new THREE.Vector3(0, 0.9, 0.35);
+    seatOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.autoRickshawMesh.rotation.y);
+    const seatPos = this.autoRickshawMesh.position.clone().add(seatOffset);
+    return { position: seatPos, rotationY: this.autoRickshawMesh.rotation.y };
   }
 
   public hasBlock(x: number, y: number, z: number): boolean {

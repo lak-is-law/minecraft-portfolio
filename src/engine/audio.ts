@@ -230,6 +230,101 @@ export class SoundEngine {
     source.start(t);
     source.stop(t + duration);
   }
+
+  // Iconic high-pitched double-beep Auto-Rickshaw horn ("Pee-Pee!")
+  public playHorn() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    for (const offset of [0, 0.12]) {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(460, t + offset);
+      osc2.frequency.setValueAtTime(580, t + offset);
+
+      gain.gain.setValueAtTime(0.18, t + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + offset + 0.09);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc1.start(t + offset);
+      osc2.start(t + offset);
+      osc1.stop(t + offset + 0.09);
+      osc2.stop(t + offset + 0.09);
+    }
+  }
+
+  // Deep resonant passenger train whistle
+  public playTrainWhistle() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const freqs = [330, 440, 550];
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(0.16, t + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+
+    for (const f of freqs) {
+      const osc = this.ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, t);
+      osc.frequency.exponentialRampToValueAtTime(f * 0.96, t + 1.2);
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + 1.2);
+    }
+    gain.connect(this.ctx.destination);
+  }
+
+  // Resonant bell chime for Big Ben & temple bells
+  public playBell() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, t); // C5
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + 1.8);
+  }
+
+  // Street food eating / cutting chai slurp sound
+  public playSlurp() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(400, t);
+    osc.frequency.exponentialRampToValueAtTime(750, t + 0.12);
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.14);
+  }
 }
 
 export const sound = new SoundEngine();

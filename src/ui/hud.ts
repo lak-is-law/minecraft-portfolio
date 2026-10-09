@@ -488,6 +488,15 @@ export class HUDManager {
         else if (lm.tag.includes('CARNIVAL')) ctx.fillStyle = '#f472b6';
         else if (lm.tag.includes('VARANASI')) ctx.fillStyle = '#fb923c';
         else if (lm.tag.includes('PAVILION')) ctx.fillStyle = '#f43f5e';
+        else if (lm.tag.includes('LONDON')) ctx.fillStyle = '#ef4444';
+        else if (lm.tag.includes('TOKYO')) ctx.fillStyle = '#ec4899';
+        else if (lm.tag.includes('SEOUL')) ctx.fillStyle = '#8b5cf6';
+        else if (lm.tag.includes('GIZA')) ctx.fillStyle = '#eab308';
+        else if (lm.tag.includes('DUBAI')) ctx.fillStyle = '#06b6d4';
+        else if (lm.tag.includes('MUMBAI')) ctx.fillStyle = '#f97316';
+        else if (lm.tag.includes('TEMPLE')) ctx.fillStyle = '#a855f7';
+        else if (lm.tag.includes('MARINA')) ctx.fillStyle = '#38bdf8';
+        else if (lm.tag.includes('DHABA')) ctx.fillStyle = '#fb923c';
         else ctx.fillStyle = '#94a3b8';
 
         ctx.fillRect(lx - 2, lz - 2, 4, 4);

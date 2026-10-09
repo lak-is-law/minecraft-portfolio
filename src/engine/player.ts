@@ -39,6 +39,11 @@ export class Player {
   private isPointerLockFallback: boolean = false;
   private fallbackMousePosition: { x: number; y: number } | null = null;
 
+  // Vehicle Riding State
+  public ridingVehicle: 'train' | 'auto_rickshaw' | null = null;
+  private rickshawSpeed: number = 0;
+  private rickshawHeading: number = 0;
+
   // Dimensions
   public height: number = 1.8;
   public radius: number = 0.3;
@@ -302,6 +307,12 @@ export class Player {
         this.toggleFlight();
       }
 
+      // Space / Shift vehicle dismount
+      if (this.ridingVehicle && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) {
+        this.dismountVehicle();
+        return;
+      }
+
       // Space double-tap for fly toggle (ignore continuous keydown repeats!)
       if (e.code === 'Space') {
         if (e.repeat) return;
@@ -337,12 +348,38 @@ export class Player {
         this.lastWTime = now;
       }
 
-      // 'KeyE' for interact
+      // 'KeyE' for interact / vehicle board
       if (e.code === 'KeyE') {
+        if (this.ridingVehicle) {
+          this.dismountVehicle();
+          return;
+        }
+        // Check train boarding within 6 blocks
+        const trainPos = this.world.getTrainPosition();
+        if (trainPos && this.position.distanceTo(trainPos) < 6.5) {
+          this.startRidingTrain();
+          return;
+        }
+        // Check auto-rickshaw boarding within 5 blocks
+        const rickshawPos = this.world.getAutoRickshawPosition();
+        if (rickshawPos && this.position.distanceTo(rickshawPos) < 5.0) {
+          this.startDrivingRickshaw();
+          return;
+        }
         if (this.currentTarget && this.onInteract) {
           this.onInteract(this.currentTarget);
           if (document.pointerLockElement) {
             document.exitPointerLock();
+          }
+        }
+      }
+
+      // 'KeyH' for Auto-Rickshaw horn ("Pee-Pee!")
+      if (e.code === 'KeyH') {
+        if (this.ridingVehicle === 'auto_rickshaw') {
+          sound.playHorn();
+          if (this.onWorldNotice) {
+            this.onWorldNotice('📢 *PEE-PEE!* (Horn OK Please)');
           }
         }
       }
@@ -599,6 +636,24 @@ export class Player {
   }
 
   private updateMovement(dt: number) {
+    // If riding train, follow train coach seat position
+    if (this.ridingVehicle === 'train') {
+      const transform = this.world.getTrainRideTransform();
+      if (transform) {
+        this.position.copy(transform.position);
+        this.velocity.set(0, 0, 0);
+      }
+      this.updateCameraTransform();
+      return;
+    }
+
+    // If driving auto-rickshaw, handle WASD vehicle driving
+    if (this.ridingVehicle === 'auto_rickshaw') {
+      this.updateRickshawDriving(dt);
+      this.updateCameraTransform();
+      return;
+    }
+
     this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
 
     // Determine movement direction relative to camera yaw
@@ -946,6 +1001,85 @@ export class Player {
         this.onWorldNotice('Void safety barrier saved you! Returned safely to Spawn Plaza.');
       }
     }
+  }
+
+  public dismountVehicle() {
+    if (!this.ridingVehicle) return;
+    this.ridingVehicle = null;
+    this.position.x += Math.cos(this.yaw) * 1.5;
+    this.position.z -= Math.sin(this.yaw) * 1.5;
+    sound.playStep('stone');
+    if (this.onWorldNotice) {
+      this.onWorldNotice('Dismounted vehicle.');
+    }
+  }
+
+  public startRidingTrain() {
+    this.ridingVehicle = 'train';
+    this.isFlying = false;
+    sound.playTrainWhistle();
+    if (this.onWorldNotice) {
+      this.onWorldNotice('🚆 Riding Crossroads Express! Press SPACE or SHIFT to dismount.');
+    }
+  }
+
+  public startDrivingRickshaw() {
+    this.ridingVehicle = 'auto_rickshaw';
+    this.isFlying = false;
+    this.rickshawHeading = this.yaw;
+    sound.playHorn();
+    if (this.onWorldNotice) {
+      this.onWorldNotice('🛺 Driving Bajaj Auto-Rickshaw! WASD to drive, H to honk, SPACE to exit.');
+    }
+  }
+
+  private updateRickshawDriving(dt: number) {
+    if (!this.world.autoRickshawMesh) return;
+
+    const maxSpeed = 11.5; // blocks/sec
+    const accel = 18.0;
+    const brake = 22.0;
+    const steerSpeed = 2.4;
+
+    const isW = !!this.keys['KeyW'] || this.touchMove.forward;
+    const isS = !!this.keys['KeyS'] || this.touchMove.backward;
+    const isA = !!this.keys['KeyA'] || this.touchMove.left;
+    const isD = !!this.keys['KeyD'] || this.touchMove.right;
+
+    if (isW) {
+      this.rickshawSpeed = Math.min(maxSpeed, this.rickshawSpeed + accel * dt);
+    } else if (isS) {
+      this.rickshawSpeed = Math.max(-4.5, this.rickshawSpeed - brake * dt);
+    } else {
+      if (this.rickshawSpeed > 0) {
+        this.rickshawSpeed = Math.max(0, this.rickshawSpeed - 7.5 * dt);
+      } else if (this.rickshawSpeed < 0) {
+        this.rickshawSpeed = Math.min(0, this.rickshawSpeed + 7.5 * dt);
+      }
+    }
+
+    if (Math.abs(this.rickshawSpeed) > 0.1) {
+      const dir = this.rickshawSpeed > 0 ? 1 : -1;
+      if (isA) this.rickshawHeading += steerSpeed * dt * dir;
+      if (isD) this.rickshawHeading -= steerSpeed * dt * dir;
+    }
+
+    const forwardX = Math.sin(this.rickshawHeading);
+    const forwardZ = Math.cos(this.rickshawHeading);
+    const proposedX = this.position.x + forwardX * this.rickshawSpeed * dt;
+    const proposedZ = this.position.z + forwardZ * this.rickshawSpeed * dt;
+
+    if (!this.checkHorizontalObstacle(proposedX, this.position.y, proposedZ)) {
+      this.position.x = proposedX;
+      this.position.z = proposedZ;
+    } else {
+      this.rickshawSpeed = 0;
+    }
+
+    const gy = this.world.builder.getTerrainHeight(this.position.x, this.position.z);
+    this.position.y = Math.max(1.2, gy + 1.1);
+
+    this.world.updateAutoRickshaw(this.position, this.rickshawHeading);
   }
 
   // Check if there is an obstacle block at the player's body level (feet + 0.1 to head - 0.1)

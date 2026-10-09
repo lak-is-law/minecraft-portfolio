@@ -431,6 +431,16 @@ export const PORTFOLIO_DATA = {
     { name: "Crossroads Public School", coords: [43, 2, 36], tag: "[SCHOOL]", desc: "A neighborhood school with a library, bright windows, and bell tower" },
     { name: "Crossroads Wildlife Park", coords: [-38, 2, -32], tag: "[ZOO]", desc: "A wooded city zoo with animal habitats, a pond, and shady family trails" },
     { name: "Rapunzel’s Castle", coords: [-70, 2, -34], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and golden braid above secluded gardens" },
-    { name: "Eiffel Tower", coords: [26, 2, -38], tag: "[EIFFEL]", desc: "A Paris landmark rising above the northern garden avenue" }
+    { name: "Eiffel Tower · Paris", coords: [26, 2, -38], tag: "[EIFFEL]", desc: "Gustave Eiffel's lattice landmark with walkable archways, Champ de Mars gardens, and Café de Paris" },
+    { name: "London · Big Ben & Tower Bridge", coords: [-32, 2, -65], tag: "[LONDON]", desc: "Gothic Elizabeth Tower clock, Great Bell, Tower Bridge walkways, and red Routemaster double-decker bus" },
+    { name: "Tokyo · Shibuya Scramble Crossing", coords: [-155, 2, -80], tag: "[TOKYO]", desc: "Vibrant neon-lit scramble crossing, giant LED billboard towers, Hachiko plaza, and Shinkansen bullet train" },
+    { name: "Seoul · Gwanghwamun Palace Gate", coords: [-65, 2, -95], tag: "[SEOUL]", desc: "Historic Joseon royal pavilion with Dancheong eaves, stone portals, and Hongdae K-Pop street food" },
+    { name: "Seoul · N Seoul Tower (Namsan)", coords: [-52, 16, -115], tag: "[SEOUL]", desc: "Mount Namsan observation spire with 360-degree glass skydeck and illuminated communication antenna" },
+    { name: "Egypt · Giza Pyramids & Great Sphinx", coords: [-155, 2, 36], tag: "[GIZA]", desc: "Pyramid of Khufu with hollow torch-lit burial chamber, Great Sphinx of Giza, and desert camels" },
+    { name: "Dubai · Burj Khalifa & Palm Jumeirah", coords: [170, 2, 42], tag: "[DUBAI]", desc: "828m spider-lily skyscraper with glass observation skydeck at Y=46 and Palm Jumeirah lagoon villas" },
+    { name: "Mumbai · Gateway of India & Local Train", coords: [40, 2, -95], tag: "[MUMBAI]", desc: "Indo-Saracenic basalt triumphal arch, Apollo Bunder harbor, and Western Railway Mumbai Local coach" },
+    { name: "Dravidian Temple Gopuram & Mandapam", coords: [115, 2, -135], tag: "[TEMPLE]", desc: "Vibrant 24-block sculptural tiers, 16-pillared stone mandapam hall, brass bells, and sacred kulam tank" },
+    { name: "Chennai · Marina Beach Lighthouse", coords: [145, 2, -125], tag: "[MARINA]", desc: "Striped maritime lighthouse, fishing catamarans on the sand, sundal cart, and beach kites" },
+    { name: "Sher-e-Punjab Highway Dhaba & Tata Truck", coords: [55, 2, -75], tag: "[DHABA]", desc: "Grand Trunk Road dhaba with woven charpai cots, smoking tandoor oven, and decorated 'Horn OK Please' Tata truck" }
   ]
 };
