@@ -335,46 +335,94 @@ export class HUDManager {
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Radar background
-    ctx.fillStyle = '#0f172a';
+    // 1. Radar background: Ocean Water
+    ctx.fillStyle = '#0284c7';
     ctx.fillRect(0, 0, w, h);
 
     const cx = 80;
     const cz = 80;
-    const scale = 0.42;
+    const scale = 0.38;
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
-    const islandR = 180 * scale;
 
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, w, h);
     ctx.clip();
 
-    // 1. Island landmass disk
-    ctx.fillStyle = '#15803d'; // Green base island
-    ctx.beginPath();
-    ctx.arc(originX, originZ, islandR, 0, Math.PI * 2);
+    // Rounded square island outline matching 3D world (R = 200, cornerR = 55)
+    const drawIslandShape = (margin = 0) => {
+      ctx.beginPath();
+      const r = (200 - margin) * scale;
+      const cornerR = Math.max(8, (55 - margin) * scale);
+      const minX = originX - r;
+      const maxX = originX + r;
+      const minZ = originZ - r;
+      const maxZ = originZ + r;
+
+      ctx.moveTo(minX + cornerR, minZ);
+      ctx.lineTo(maxX - cornerR, minZ);
+      ctx.quadraticCurveTo(maxX, minZ, maxX, minZ + cornerR);
+      ctx.lineTo(maxX, maxZ - cornerR);
+      ctx.quadraticCurveTo(maxX, maxZ, maxX - cornerR, maxZ);
+      ctx.lineTo(minX + cornerR, maxZ);
+      ctx.quadraticCurveTo(minX, maxZ, minX, maxZ - cornerR);
+      ctx.lineTo(minX, minZ + cornerR);
+      ctx.quadraticCurveTo(minX, minZ, minX + cornerR, minZ);
+      ctx.closePath();
+    };
+
+    // Golden beach shoreline fringe
+    drawIslandShape(0);
+    ctx.fillStyle = '#fde047';
     ctx.fill();
+
+    // Clip all terrain and biomes strictly inside the island landmass
+    ctx.save();
+    drawIslandShape(6);
+    ctx.clip();
+
+    // Base interior plains
+    ctx.fillStyle = '#15803d';
+    ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
 
     // Color the 4 cultural quadrants and carnival pier on radar
     const worldRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
       ctx.fillStyle = color;
       ctx.fillRect(originX + x1 * scale, originZ + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
     };
-    worldRect(25, -195, 195, -40, '#c7a94e'); // NE: Imperial India
-    worldRect(-195, -195, -25, -40, '#2d7a5b'); // NW: China Realm
-    worldRect(-195, 25, -25, 195, '#a95e36'); // SW: Mexico Realm
-    worldRect(25, -40, 195, 75, '#47798b'); // SE: USA Neo York
-    worldRect(-40, 75, 40, 195, '#d0ad58'); // South: Beach & Boardwalk
+    worldRect(20, -210, 210, -35, '#c7a94e'); // NE: Imperial India
+    worldRect(-210, -210, -20, -35, '#2d7a5b'); // NW: China Realm
+    worldRect(-210, 20, -20, 210, '#a95e36'); // SW: Mexico Realm
+    worldRect(25, -35, 210, 95, '#47798b'); // SE: USA Neo York & Airport
+    worldRect(-40, 75, 40, 210, '#d0ad58'); // South: Beach & Boardwalk
     worldRect(-25, 120, 35, 185, '#ec4899'); // South: Grand Carnival Pier
+
+    // Yamuna river in India
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.lineWidth = 6 * scale;
+    ctx.strokeStyle = '#0284c7';
+    ctx.moveTo(originX + 75 * scale, originZ - 60 * scale);
+    ctx.quadraticCurveTo(originX + 85 * scale, originZ - 100 * scale, originX + 75 * scale, originZ - 160 * scale);
+    ctx.stroke();
+
+    // Great Wall in China
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 3.5 * scale;
+    ctx.beginPath();
+    ctx.moveTo(originX - 150 * scale, originZ - 140 * scale);
+    ctx.quadraticCurveTo(originX - 115 * scale, originZ - 132 * scale, originX - 80 * scale, originZ - 140 * scale);
+    ctx.stroke();
 
     // Hollywood ridge in USA
     ctx.fillStyle = 'rgba(215,168,121,.9)';
     ctx.beginPath();
-    ctx.ellipse(originX + 130 * scale, originZ - 50 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);
+    ctx.ellipse(originX + 132 * scale, originZ - 52 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.restore(); // restore island clip
 
     // Main Roads
     ctx.strokeStyle = 'rgba(226,232,240,.8)';

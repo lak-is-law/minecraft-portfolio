@@ -1059,11 +1059,13 @@ export class VoxelWorld {
 
   private createRailway() {
     const route = [
-      new THREE.Vector3(56, 2.15, 42),
-      new THREE.Vector3(72, 2.15, 42),
-      new THREE.Vector3(92, 2.15, 42),
-      new THREE.Vector3(112, 2.15, 54),
-      new THREE.Vector3(124, 2.15, 72)
+      new THREE.Vector3(50, 2.15, 33),  // Inside Central Station West
+      new THREE.Vector3(62, 2.15, 33),  // Central Station Platform East
+      new THREE.Vector3(76, 2.15, 34),  // Viaduct Trestle 1
+      new THREE.Vector3(92, 2.15, 42),  // Viaduct Trestle 2
+      new THREE.Vector3(108, 2.15, 52), // Viaduct Trestle 3
+      new THREE.Vector3(122, 2.15, 64), // Airport Station Approach
+      new THREE.Vector3(130, 2.15, 72)  // Airport Station Platform
     ];
     this.railCurve = new THREE.CatmullRomCurve3(route, false, 'centripetal');
     const railMaterial = new THREE.MeshStandardMaterial({ color: 0x64736f, metalness: 0.72, roughness: 0.34 });

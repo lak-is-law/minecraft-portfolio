@@ -694,7 +694,7 @@ export class Player {
       }
 
       // Horizontal movement with obstacle collision in flight mode
-      const WORLD_BORDER = 135;
+      const WORLD_BORDER = 225;
       const moveX = this.velocity.x * dt;
       if (Math.abs(moveX) > 0.0001) {
         const nextX = this.position.x + moveX;
@@ -887,7 +887,7 @@ export class Player {
     }
 
     // 2. Horizontal resolution: X axis
-    const WORLD_BORDER = 135;
+    const WORLD_BORDER = 225;
     const moveX = this.velocity.x * dt;
     if (Math.abs(moveX) > 0.0001) {
       let nextX = this.position.x + moveX;
@@ -920,7 +920,7 @@ export class Player {
         this.position.z = nextZ;
       } else {
         if (this.isGrounded && this.velocity.y <= 0.1 && !this.checkHorizontalObstacle(this.position.x, this.position.y + 1.1, nextZ)) {
-          this.velocity.z = 7.8;
+          this.velocity.y = 7.8;
           this.isGrounded = false;
         } else {
           this.velocity.z = 0;
@@ -1155,7 +1155,18 @@ export class Player {
 
   // Teleport player instantly to coordinates (e.g. from Fast-Travel Map)
   public teleport(x: number, y: number, z: number) {
-    this.position.set(x, y, z);
+    let safeY = Math.max(2, y);
+    const ix = Math.floor(x);
+    const iz = Math.floor(z);
+    // Find the highest solid block at (ix, iz)
+    for (let checkY = 45; checkY >= 0; checkY--) {
+      const b = this.world.getBlock(ix, checkY, iz);
+      if (b && b.type !== 'water') {
+        safeY = checkY + 1.2;
+        break;
+      }
+    }
+    this.position.set(x, safeY, z);
     this.velocity.set(0, 0, 0);
     this.updateCameraTransform();
   }

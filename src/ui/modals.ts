@@ -520,37 +520,41 @@ export class ModalManager {
       ctx.fillStyle = '#0284c7';
       ctx.fillRect(mapX, mapY, mapW, mapH);
 
-      // Island Landmass Coastline (Organic Circle)
+      // Island Landmass Coastline (Rounded Square matching 3D world)
       ctx.save();
-      ctx.beginPath();
-      const numPts = 256;
-      for (let i = 0; i <= numPts; i++) {
-        const th = (i / numPts) * Math.PI * 2;
-        const r = (180 + Math.sin(th * 6) * 6 + Math.cos(th * 4) * 5) * scale;
-        const px = cx + Math.cos(th) * r;
-        const py = cy + Math.sin(th) * r;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
+      const drawIslandShape = (margin = 0) => {
+        ctx.beginPath();
+        const r = (200 - margin) * scale;
+        const cornerR = Math.max(10, (55 - margin) * scale);
+        const minX = cx - r;
+        const maxX = cx + r;
+        const minZ = cy - r;
+        const maxZ = cy + r;
+
+        ctx.moveTo(minX + cornerR, minZ);
+        ctx.lineTo(maxX - cornerR, minZ);
+        ctx.quadraticCurveTo(maxX, minZ, maxX, minZ + cornerR);
+        ctx.lineTo(maxX, maxZ - cornerR);
+        ctx.quadraticCurveTo(maxX, maxZ, maxX - cornerR, maxZ);
+        ctx.lineTo(minX + cornerR, maxZ);
+        ctx.quadraticCurveTo(minX, maxZ, minX, maxZ - cornerR);
+        ctx.lineTo(minX, minZ + cornerR);
+        ctx.quadraticCurveTo(minX, minZ, minX + cornerR, minZ);
+        ctx.closePath();
+      };
+
       // Outer golden beach ring
+      drawIslandShape(0);
       ctx.fillStyle = '#fde047';
       ctx.fill();
-      ctx.clip(); // clip subsequent biome drawing inside island
+
+      // Clip subsequent biome drawing inside island
+      drawIslandShape(6);
+      ctx.clip();
 
       // Inner Island Plains
       ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      for (let i = 0; i <= numPts; i++) {
-        const th = (i / numPts) * Math.PI * 2;
-        const r = (172 + Math.sin(th * 6) * 5 + Math.cos(th * 4) * 4) * scale;
-        const px = cx + Math.cos(th) * r;
-        const py = cy + Math.sin(th) * r;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fill();
+      ctx.fillRect(cx - 210 * scale, cy - 210 * scale, 420 * scale, 420 * scale);
 
       // Biomes follow the cultural quadrant partition
       const mapRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {

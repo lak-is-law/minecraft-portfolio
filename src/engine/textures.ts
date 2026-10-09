@@ -908,6 +908,96 @@ export class TextureManager {
         }
       }
     }));
+
+    // 54. Smooth Stone (Clean Minecraft Voxel Slab with outer seam)
+    this.textures.set('smooth_stone', createPixelTexture((ctx, s) => {
+      const rng = createRng(3901);
+      const stone = ['#9e9e9e', '#a4a4a4', '#969696', '#aaaaaa', '#8e8e8e'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = stone[Math.floor(rng() * stone.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.strokeStyle = '#616161';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, s - 1, s - 1);
+      ctx.fillStyle = '#b5b5b5';
+      ctx.fillRect(1, 1, s - 2, 1);
+      ctx.fillRect(1, 1, 1, s - 2);
+    }));
+
+    // 55. Beacon (Obsidian Base, Glass Encasing, Glowing Cyan Core)
+    this.textures.set('beacon', createPixelTexture((ctx, s) => {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, s - 3, s, 3);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(3, 3, 10, 10);
+      ctx.fillStyle = '#bae6fd';
+      ctx.fillRect(5, 5, 6, 6);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(7, 7, 2, 2);
+      ctx.strokeStyle = '#67e8f9';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, s - 1, s - 4);
+    }));
+
+    // 56. Lantern (Wrought-Iron Lantern with Golden Amber Glow)
+    this.textures.set('lantern', createPixelTexture((ctx, s) => {
+      ctx.fillStyle = '#27272a';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(3, 4, 10, 8);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(5, 5, 6, 6);
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(7, 7, 2, 2);
+      ctx.fillStyle = '#18181b';
+      ctx.fillRect(0, 0, s, 3);
+      ctx.fillRect(0, s - 3, s, 3);
+      ctx.fillRect(2, 2, 2, 12);
+      ctx.fillRect(s - 4, 2, 2, 12);
+    }));
+
+    // 57. Sea Lantern (Aquatic Cyan Grid Lantern)
+    this.textures.set('sea_lantern', createPixelTexture((ctx, s) => {
+      const rng = createRng(4001);
+      const sea = ['#bae6fd', '#7dd3fc', '#38bdf8', '#e0f2fe', '#f0f9ff'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = sea[Math.floor(rng() * sea.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(2.5, 2.5, s - 5, s - 5);
+    }));
+
+    // 58. Coal Block (Charcoal Mineral Block)
+    this.textures.set('coal_block', createPixelTexture((ctx, s) => {
+      const rng = createRng(4101);
+      const coal = ['#18181b', '#27272a', '#09090b', '#3f3f46', '#141416'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = coal[Math.floor(rng() * coal.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 59. Cauldron (Iron Pot with Blue Water)
+    this.textures.set('cauldron', createPixelTexture((ctx, s) => {
+      ctx.fillStyle = '#3f3f46';
+      ctx.fillRect(0, 0, s, s);
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, s - 1, s - 1);
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(3, 3, 10, 10);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(5, 5, 6, 6);
+    }));
   }
 
   private createMaterials() {
@@ -1089,5 +1179,28 @@ export class TextureManager {
       alphaTest: 0.5,
       side: THREE.DoubleSide
     }));
+
+    // Smooth Stone
+    this.materials.set('smooth_stone', new THREE.MeshLambertMaterial({ map: this.getTexture('smooth_stone') }));
+
+    // Beacon (glowing)
+    this.materials.set('beacon', new THREE.MeshBasicMaterial({ map: this.getTexture('beacon') }));
+
+    // Lantern (glowing)
+    this.materials.set('lantern', new THREE.MeshBasicMaterial({ map: this.getTexture('lantern') }));
+
+    // Sea Lantern (glowing)
+    this.materials.set('sea_lantern', new THREE.MeshBasicMaterial({ map: this.getTexture('sea_lantern') }));
+
+    // Coal Block
+    this.materials.set('coal_block', new THREE.MeshLambertMaterial({ map: this.getTexture('coal_block') }));
+
+    // Cauldron
+    this.materials.set('cauldron', new THREE.MeshLambertMaterial({ map: this.getTexture('cauldron') }));
+
+    // Oak Wood Aliases (ensure oak_log, oak_fence, oak_stairs render with proper wood textures instead of fallback)
+    this.materials.set('oak_log', this.materials.get('log')!);
+    this.materials.set('oak_fence', this.materials.get('oak_planks')!);
+    this.materials.set('oak_stairs', this.materials.get('oak_planks')!);
   }
 }
