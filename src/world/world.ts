@@ -81,7 +81,7 @@ export class VoxelWorld {
     this.createWorldCitizens();
     this.dragonManager = new DragonManager(this.scene);
     this.flagManager = new FlagManager(this.scene);
-    this.animalManager = new AnimalManager(this.scene);
+    this.animalManager = new AnimalManager(this.scene, this);
     this.createAllWorldFlags();
   }
 
@@ -610,7 +610,8 @@ export class VoxelWorld {
 
     const npc = new THREE.Group();
     // Keep the NPC on dry ground beside the spawn point, outside the fountain.
-    npc.position.set(3.5, 2, 7.5);
+    const groundY = this.getGroundHeight(3.5, 7.5, 2);
+    npc.position.set(3.5, groundY, 7.5);
     npc.rotation.y = Math.PI;
 
     // Palette authentic to og-image.jpg
@@ -861,7 +862,8 @@ export class VoxelWorld {
 
     const dog = new THREE.Group();
     // Sitting beside Lakshya at spawn
-    dog.position.set(4.5, 2, 7.3);
+    const groundY = this.getGroundHeight(4.5, 7.3, 2);
+    dog.position.set(4.5, groundY, 7.3);
     dog.rotation.y = Math.PI - 0.2;
 
     const furMat = new THREE.MeshLambertMaterial({ color: 0xe4e4e7 }); // Light grey/white wolf fur
@@ -985,7 +987,8 @@ export class VoxelWorld {
   // Companion Black & White Tuxedo Cat resting on coastal rocks (Photo 2)
   private createBeachCat() {
     const cat = new THREE.Group();
-    cat.position.set(10.5, 3.8, 82.5);
+    const groundY = this.getGroundHeight(10.5, 82.5, 2);
+    cat.position.set(10.5, groundY, 82.5);
 
     const blackMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
     const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -1844,7 +1847,8 @@ export class VoxelWorld {
     handlebar.position.set(0, 0.88, 0.75);
     rickshaw.add(handlebar);
 
-    rickshaw.position.set(14, 1.0, 8); // Parked near Crossroads Citadel East Gate
+    const groundY = this.getGroundHeight(14, 8, 1);
+    rickshaw.position.set(14, groundY, 8); // Parked near Crossroads Citadel East Gate
     rickshaw.rotation.y = -Math.PI / 2;
     rickshaw.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
@@ -1901,7 +1905,7 @@ export class VoxelWorld {
       { name: 'Aarav Sharma', role: 'Varanasi Ghat Pundit', x: 74, y: 2, z: -112, heading: Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xe0e7ff, pantsColor: 0xf59e0b, hairColor: 0x111111, tagColor: '#f97316', hatType: 'turban', hatColor: 0xf97316 },
       { name: 'Priya Patel', role: 'Classical Sitar Maestro', x: 86, y: 2, z: -116, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xd97706, pantsColor: 0xb45309, hairColor: 0x09090b, tagColor: '#f59e0b', hatType: 'none' },
       { name: 'Rajesh Kumar', role: 'Dhaba Chai Master', x: 44, y: 2, z: -76, heading: 0, skinColor: 0xa0522d, shirtColor: 0xef4444, pantsColor: 0x1e293b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0xd97706 },
-      { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 80, y: 2, z: -140, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
+      { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 78, y: 2, z: -116, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
       { name: 'Dr. Vikram Nair', role: 'ISRO Aerospace Director', x: 112, y: 2, z: -88, heading: Math.PI * 0.75, skinColor: 0x935116, shirtColor: 0x3b82f6, pantsColor: 0x1e293b, hairColor: 0x27272a, tagColor: '#38bdf8', hatType: 'none' },
       { name: 'Murugan Pillai', role: 'Mumbai Auto Captain', x: 45, y: 2, z: -83, heading: 0, skinColor: 0x8d5524, shirtColor: 0xca8a04, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#eab308', hatType: 'cap', hatColor: 0x854d0e },
 
@@ -1911,12 +1915,12 @@ export class VoxelWorld {
       { name: 'Daiki Takahashi', role: 'Shinkansen Conductor', x: -155, y: 2, z: -94, heading: 0, skinColor: 0xf1c27d, shirtColor: 0x1e3a8a, pantsColor: 0x1e3a8a, hairColor: 0x18181b, tagColor: '#2563eb', hatType: 'cap', hatColor: 0x1e3a8a },
 
       // 3. Seoul Gwanghwamun Realm: Modern K-pop & palace heritage
-      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 2, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
-      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 2, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 13, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 15, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
 
       // 4. Hollywood & Times Square USA Realm: Directors, film stars, reporters
-      { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 130, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },
-      { name: 'Jack Sullivan', role: 'Broadway Choreographer', x: 124, y: 2, z: -32, heading: 0, skinColor: 0xffdbac, shirtColor: 0xe11d48, pantsColor: 0x0f172a, hairColor: 0x475569, tagColor: '#f43f5e', hatType: 'none' },
+      { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 133, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },
+      { name: 'Jack Sullivan', role: 'Broadway Choreographer', x: 106, y: 2, z: -15, heading: 0, skinColor: 0xffdbac, shirtColor: 0xe11d48, pantsColor: 0x0f172a, hairColor: 0x475569, tagColor: '#f43f5e', hatType: 'none' },
       { name: 'Chloe Davis', role: 'Sunset Boulevard Vlogger', x: 136, y: 2, z: -34, heading: -Math.PI / 2, skinColor: 0xf2c49b, shirtColor: 0x06b6d4, pantsColor: 0xffffff, hairColor: 0xfacc15, tagColor: '#22d3ee', hatType: 'cap', hatColor: 0xfacc15 },
       { name: 'Leonardo Vance', role: 'A-List Hollywood Actor', x: 151, y: 2, z: -63, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0x18181b, pantsColor: 0x09090b, hairColor: 0x27272a, tagColor: '#fbbf24', hatType: 'none' },
       { name: 'Seraphina Gold', role: 'Academy Award Actress', x: 165, y: 2, z: -70, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0xf59e0b, pantsColor: 0xd97706, hairColor: 0x451a03, tagColor: '#f59e0b', hatType: 'none' },
@@ -1925,15 +1929,15 @@ export class VoxelWorld {
       { name: 'DJ Sterling', role: 'Capitol Audio Engineer', x: 171, y: 2, z: -58, heading: -Math.PI / 3, skinColor: 0x8d5524, shirtColor: 0x06b6d4, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0284c7 },
 
       // 5. London Westminster & Big Ben Realm
-      { name: 'Oliver Wright', role: 'Royal Guard Guide', x: -30, y: 2, z: -68, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xdc2626, pantsColor: 0x111827, hairColor: 0x78350f, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x111827 },
+      { name: 'Oliver Wright', role: 'Royal Guard Guide', x: -28, y: 2, z: -60, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xdc2626, pantsColor: 0x111827, hairColor: 0x78350f, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x111827 },
       { name: 'Emma Watson', role: 'London Historian', x: -36, y: 2, z: -72, heading: -Math.PI / 3, skinColor: 0xf5d0b5, shirtColor: 0x047857, pantsColor: 0x374151, hairColor: 0xb45309, tagColor: '#10b981', hatType: 'beret', hatColor: 0x047857 },
 
       // 6. Paris Eiffel Tower Realm
-      { name: 'Jean-Luc Moreau', role: 'Montmartre Painter', x: 28, y: 2, z: -42, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x475569, pantsColor: 0x0f172a, hairColor: 0x94a3b8, tagColor: '#94a3b8', hatType: 'beret', hatColor: 0x18181b },
+      { name: 'Jean-Luc Moreau', role: 'Montmartre Painter', x: 24, y: 2, z: -36, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x475569, pantsColor: 0x0f172a, hairColor: 0x94a3b8, tagColor: '#94a3b8', hatType: 'beret', hatColor: 0x18181b },
       { name: 'Camille Dubois', role: 'Parisian Patissier', x: 22, y: 2, z: -46, heading: Math.PI / 4, skinColor: 0xffe0bd, shirtColor: 0xffffff, pantsColor: 0x1e293b, hairColor: 0x451a03, tagColor: '#f8fafc', hatType: 'cap', hatColor: 0xffffff },
 
       // 7. Egypt Giza & Sphinx Realm
-      { name: 'Tarek Mansour', role: 'Giza Desert Guide', x: -145, y: 2, z: 46, heading: 0, skinColor: 0xa0522d, shirtColor: 0xfef08a, pantsColor: 0x78350f, hairColor: 0x111111, tagColor: '#eab308', hatType: 'turban', hatColor: 0xfef08a },
+      { name: 'Tarek Mansour', role: 'Giza Desert Guide', x: -145, y: 5, z: 46, heading: 0, skinColor: 0xa0522d, shirtColor: 0xfef08a, pantsColor: 0x78350f, hairColor: 0x111111, tagColor: '#eab308', hatType: 'turban', hatColor: 0xfef08a },
       { name: 'Dr. Amira Hassan', role: 'Chief Egyptologist', x: -152, y: 2, z: 20, heading: Math.PI / 4, skinColor: 0xbf8558, shirtColor: 0x0284c7, pantsColor: 0x334155, hairColor: 0x18181b, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0369a1 },
 
       // 8. Mexico City Zócalo Realm
@@ -1949,7 +1953,8 @@ export class VoxelWorld {
 
     for (const c of citizens) {
       const citizenGroup = new THREE.Group();
-      citizenGroup.position.set(c.x, c.y, c.z);
+      const groundY = this.getGroundHeight(c.x, c.z, c.y);
+      citizenGroup.position.set(c.x, groundY, c.z);
       citizenGroup.rotation.y = c.heading;
 
       const skinMat = new THREE.MeshLambertMaterial({ color: c.skinColor });
@@ -2099,7 +2104,7 @@ export class VoxelWorld {
       this.scene.add(citizenGroup);
       this.worldCitizens.push({
         mesh: citizenGroup,
-        basePos: new THREE.Vector3(c.x, c.y, c.z),
+        basePos: new THREE.Vector3(c.x, groundY, c.z),
         initialHeading: c.heading,
         armL,
         armR,
@@ -2145,6 +2150,39 @@ export class VoxelWorld {
     const block = this.getBlock(x, y, z);
     if (!block) return false;
     return block.type !== 'water' && block.type !== 'portal';
+  }
+
+  public getGroundHeight(x: number, z: number, preferredY?: number): number {
+    const ix = Math.floor(x);
+    const iz = Math.floor(z);
+
+    const isWalkable = (type?: string) => {
+      if (!type) return false;
+      if (type === 'water' || type === 'portal') return false;
+      if (type.includes('leaves') || type.includes('fence')) return false;
+      return true;
+    };
+
+    const startY = (preferredY !== undefined) ? Math.min(60, Math.floor(preferredY) + 2) : 60;
+    for (let y = startY; y >= -2; y--) {
+      const block = this.getBlock(ix, y, iz);
+      if (block && isWalkable(block.type)) {
+        const blockAbove = this.getBlock(ix, y + 1, iz);
+        if (!blockAbove || !isWalkable(blockAbove.type)) {
+          return y + 1.0;
+        }
+      }
+    }
+
+    // Fallback: search entire vertical column
+    for (let y = 60; y >= -2; y--) {
+      const block = this.getBlock(ix, y, iz);
+      if (block && isWalkable(block.type)) {
+        return y + 1.0;
+      }
+    }
+
+    return 2.0;
   }
 
   public getBlock(x: number, y: number, z: number): VoxelBlock | undefined {

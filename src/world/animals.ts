@@ -12,14 +12,27 @@ export interface AnimalEntity {
   interact?: () => void;
 }
 
+export interface GroundQueryWorld {
+  getGroundHeight?: (x: number, z: number, preferredY?: number) => number;
+}
+
 export class AnimalManager {
   private scene: THREE.Scene;
+  private world?: GroundQueryWorld;
   public animals: AnimalEntity[] = [];
   private lastSoundTime: number = 0;
 
-  constructor(scene: THREE.Scene) {
+  constructor(scene: THREE.Scene, world?: GroundQueryWorld) {
     this.scene = scene;
+    this.world = world;
     this.spawnAllZooAnimals();
+  }
+
+  public getGroundHeight(x: number, z: number, preferredY?: number): number {
+    if (this.world && typeof this.world.getGroundHeight === 'function') {
+      return this.world.getGroundHeight(x, z, preferredY);
+    }
+    return preferredY !== undefined ? preferredY + 1.0 : 2.0;
   }
 
   public update(time: number, playerPos: THREE.Vector3) {
@@ -69,8 +82,8 @@ export class AnimalManager {
   }
 
   private spawnAllZooAnimals() {
-    // 1. Giant Panda Bamboo Valley (NW: X around -56, Z around -14)
-    this.createPanda(-56, 1.0, -14, '🐼 Bao Bao', 'Giant Panda', true);
+    // 1. Giant Panda Bamboo Valley (NW: X around -54, Z around -12)
+    this.createPanda(-54, 1.0, -12, '🐼 Bao Bao', 'Giant Panda', true);
     this.createPanda(-52, 1.0, -16, '🐼 Mei Xiang', 'Panda Mother', false);
     this.createPanda(-60, 1.0, -11, '🐼 Xiao Qi', 'Panda Cub', false, 0.65);
 
@@ -79,10 +92,10 @@ export class AnimalManager {
     this.createLion(-90, 2.0, -11, '🦁 Nala', 'Lioness', false);
     this.createLion(-96, 2.0, -16, '🦁 Kiara', 'Lioness Cub', false, 0.7);
 
-    // 3. Gentle African Elephant Oasis (SW: X around -90, Z around 12)
-    this.createElephant(-90, 1.0, 12, '🐘 Tembo', 'African Bull Elephant', 1.2);
+    // 3. Gentle African Elephant Oasis (SW: X around -86, Z around 12)
+    this.createElephant(-86, 1.0, 12, '🐘 Tembo', 'African Bull Elephant', 1.2);
     this.createElephant(-84, 1.0, 15, '🐘 Zola', 'Elephant Matriarch', 1.0);
-    this.createElephant(-95, 1.0, 16, '🐘 Toto', 'Baby Elephant Calf', 0.65);
+    this.createElephant(-86, 1.0, 18, '🐘 Toto', 'Baby Elephant Calf', 0.65);
 
     // 4. Rothschild Giraffe Canopy Reserve (South-Center: X around -66, Z around 14)
     this.createGiraffe(-66, 1.0, 14, '🦒 Twiga', "Rothschild's Giraffe", 1.15);
@@ -90,45 +103,46 @@ export class AnimalManager {
     this.createGiraffe(-60, 1.0, 13, '🦒 Zawadi', 'Giraffe Calf', 0.75);
 
     // 5. Arctic Glacier & Polar Cove (North-West: X around -75, Z around -14)
-    this.createPolarBear(-76, 1.0, -14, '🐻‍❄️ Nanook', 'Apex Polar Bear');
+    this.createPolarBear(-80, 1.0, -14, '🐻‍❄️ Nanook', 'Apex Polar Bear');
     this.createPolarBear(-71, 1.0, -17, '🐻‍❄️ Siku', 'Arctic Polar Bear', 0.8);
     this.createPenguin(-74, 1.0, -9, '🐧 Pingu', 'Emperor Penguin');
     this.createPenguin(-77, 1.0, -10, '🐧 Piper', 'Emperor Penguin');
-    this.createPenguin(-79, 1.0, -8, '🐧 Pebble', 'Baby Penguin');
+    this.createPenguin(-76, 1.0, -10, '🐧 Pebble', 'Baby Penguin');
 
     // 6. Children's Petting Zoo & Barnyard (SE: X around -47, Z around 14)
     this.createSheep(-46, 1.0, 14, '🐑 Woolly', 'Merino Sheep');
     this.createSheep(-49, 1.0, 17, '🐑 Cloud', 'Merino Sheep');
-    this.createPig(-44, 1.0, 17, '🐖 Wilbur', 'Pink Piglet');
+    this.createPig(-44, 1.0, 15, '🐖 Wilbur', 'Pink Piglet');
     this.createPig(-47, 1.0, 11, '🐖 Babe', 'Farm Pig');
 
-    // 7. Savanna Zebra & Wetland Reserve (Central: X around -76, Z around 0)
-    this.createZebra(-77, 1.0, -2, '🦓 Marty', 'Plains Zebra');
-    this.createZebra(-82, 1.0, 2, '🦓 Stripes', 'Plains Zebra', 0.85);
+    // 7. Savanna Zebra & Wetland Reserve (Central: X around -75, Z around 3)
+    this.createZebra(-75, 1.0, 3, '🦓 Marty', 'Plains Zebra');
+    this.createZebra(-82, 1.0, 3, '🦓 Stripes', 'Plains Zebra', 0.85);
 
-    // 8. Flamingo Lagoon (Central Wetland: X around -62, Z around -2)
+    // 8. Flamingo Lagoon (Central Wetland: X around -63, Z around -3)
     this.createFlamingo(-63, 1.0, -3, '🦩 Flora', 'Greater Flamingo');
-    this.createFlamingo(-65, 1.0, -1, '🦩 Coral', 'Greater Flamingo');
+    this.createFlamingo(-65, 1.0, -2, '🦩 Coral', 'Greater Flamingo');
 
     // 9. Imperial India Realm: Living Iconic Fauna
     // Royal Bengal Tigers (Sanctuary grove by the Banyan trees)
-    this.createTiger(52, 1.0, -142, '🐅 Sher Khan', 'Royal Bengal Tiger (National Animal)', 1.05);
-    this.createTiger(57, 1.0, -138, '🐅 Sundari', 'Bengal Tigress', 0.95);
+    this.createTiger(50, 1.0, -140, '🐅 Sher Khan', 'Royal Bengal Tiger (National Animal)', 1.05);
+    this.createTiger(48, 1.0, -136, '🐅 Sundari', 'Bengal Tigress', 0.95);
 
     // Dancing Indian Blue Peacocks (Taj Mahal Yamuna Lotus Pool)
-    this.createPeacock(73, 1.0, -118, '🦚 Mayura', 'Indian Blue Peacock (National Bird)', 1.0);
-    this.createPeacock(87, 1.0, -118, '🦚 Nilakantha', 'Indian Blue Peacock', 1.0);
+    this.createPeacock(73, 2.0, -118, '🦚 Mayura', 'Indian Blue Peacock (National Bird)', 1.0);
+    this.createPeacock(87, 2.0, -118, '🦚 Nilakantha', 'Indian Blue Peacock', 1.0);
 
     // Sacred Caparisoned Temple Bull Elephant (Dravidian Temple Gopuram Mandapam)
-    this.createTempleElephant(115, 1.0, -122, '🐘 Gajendra', 'Caparisoned Temple Elephant', 1.22);
+    this.createTempleElephant(115, 2.0, -122, '🐘 Gajendra', 'Caparisoned Temple Elephant', 1.22);
   }
 
   // ==========================================
   // 1. GIANT PANDA (Ailuropoda melanoleuca)
   // ==========================================
   private createPanda(x: number, y: number, z: number, name: string, species: string, isSeated: boolean, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const whiteMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
@@ -224,13 +238,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'panda',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         // Idle breathing and head bobbing
@@ -263,8 +277,9 @@ export class AnimalManager {
   // 2. AFRICAN LION (Panthera leo)
   // ==========================================
   private createLion(x: number, y: number, z: number, name: string, species: string, isMale: boolean, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const goldMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
@@ -345,13 +360,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'lion',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         // Subtle breathing
@@ -383,8 +398,9 @@ export class AnimalManager {
   // 3. AFRICAN ELEPHANT (Loxodonta africana)
   // ==========================================
   private createElephant(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const greyMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
@@ -468,13 +484,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'elephant',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         // Deep breathing
@@ -505,8 +521,9 @@ export class AnimalManager {
   // 4. ROTHSCHILD'S GIRAFFE (Giraffa camelopardalis)
   // ==========================================
   private createGiraffe(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const yellowMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
@@ -601,7 +618,7 @@ export class AnimalManager {
       type: 'giraffe',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         // Graceful tall neck sway
@@ -624,8 +641,9 @@ export class AnimalManager {
   // 5. POLAR BEAR (Ursus maritimus)
   // ==========================================
   private createPolarBear(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const furMat = new THREE.MeshLambertMaterial({ color: 0xf1f5f9 });
@@ -682,13 +700,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'polar_bear',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         root.position.y = basePosY + Math.sin(time * 1.8 + z) * 0.03;
@@ -710,8 +728,9 @@ export class AnimalManager {
   // 6. EMPEROR PENGUIN (Aptenodytes forsteri)
   // ==========================================
   private createPenguin(x: number, y: number, z: number, name: string, species: string, scale: number = 0.85) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const blackMat = new THREE.MeshLambertMaterial({ color: 0x0f172a });
@@ -777,7 +796,7 @@ export class AnimalManager {
       type: 'penguin',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Adorable rapid waddle (side-to-side roll and flipper flap)
@@ -796,8 +815,9 @@ export class AnimalManager {
   // 7. MERINO SHEEP (Ovis aries)
   // ==========================================
   private createSheep(x: number, y: number, z: number, name: string, species: string, scale: number = 0.95) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const woolMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
@@ -855,7 +875,7 @@ export class AnimalManager {
       type: 'sheep',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Grazing cycle: head dips to ground to chew grass, then raises up
@@ -872,8 +892,9 @@ export class AnimalManager {
   // 8. BARNYARD PIG (Sus domesticus)
   // ==========================================
   private createPig(x: number, y: number, z: number, name: string, species: string, scale: number = 0.85) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const pinkMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 });
@@ -938,7 +959,7 @@ export class AnimalManager {
       type: 'pig',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Snout wiggle and tail wagging
@@ -954,8 +975,9 @@ export class AnimalManager {
   // 9. SAVANNA ZEBRA (Equus quagga)
   // ==========================================
   private createZebra(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -1020,7 +1042,7 @@ export class AnimalManager {
       type: 'zebra',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         headGroup.rotation.x = Math.sin(time * 1.5 + x) * 0.08;
@@ -1034,8 +1056,9 @@ export class AnimalManager {
   // 10. GREATER FLAMINGO (Phoenicopterus roseus)
   // ==========================================
   private createFlamingo(x: number, y: number, z: number, name: string, species: string, scale: number = 0.9) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const pinkMat = new THREE.MeshLambertMaterial({ color: 0xf43f5e });
@@ -1107,7 +1130,7 @@ export class AnimalManager {
       type: 'flamingo',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Subtle neck filter-feeding dip
@@ -1123,8 +1146,9 @@ export class AnimalManager {
   // National Animal of India
   // ==========================================
   private createTiger(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const orangeMat = new THREE.MeshLambertMaterial({ color: 0xea580c });
@@ -1223,13 +1247,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'tiger',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, playerPos) => {
         // Subtle predatory breathing
@@ -1258,8 +1282,9 @@ export class AnimalManager {
   // National Bird of India
   // ==========================================
   private createPeacock(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const blueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 }); // Radiant royal cobalt blue
@@ -1339,13 +1364,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'peacock',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Proud bird breathing & train plumage shimmering sway
@@ -1363,8 +1388,9 @@ export class AnimalManager {
   // Sacred South Indian Temple Elephant
   // ==========================================
   private createTempleElephant(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const groundY = this.getGroundHeight(x, z, y);
     const root = new THREE.Group();
-    root.position.set(x, y, z);
+    root.position.set(x, groundY, z);
     root.scale.setScalar(scale);
 
     const greyMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
@@ -1483,13 +1509,13 @@ export class AnimalManager {
 
     this.scene.add(root);
 
-    const basePosY = y;
+    const basePosY = groundY;
     const entity: AnimalEntity = {
       group: root,
       type: 'temple_elephant',
       name,
       species,
-      basePos: new THREE.Vector3(x, y, z),
+      basePos: new THREE.Vector3(x, groundY, z),
       heading: 0,
       update: (time, _playerPos) => {
         // Slow majestic breathing
