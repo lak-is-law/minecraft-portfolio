@@ -888,7 +888,7 @@ export class WorldBuilder {
     ], 'west');
   }
 
-  private buildFlagpole(px: number, pz: number, title: string, desc: string, pattern: string[][], dir: 'east' | 'west') {
+  private buildFlagpole(px: number, pz: number, title: string, desc: string, _pattern?: string[][], _dir?: 'east' | 'west') {
     // Flagpole plinth and shaft (Y = 1 to 8)
     this.setBlock(px, 1, pz, 'smooth_stone');
     for (let y = 2; y <= 8; y++) {
@@ -896,17 +896,7 @@ export class WorldBuilder {
     }
     this.setBlock(px, 9, pz, 'gold_block'); // Eagle/finial
 
-    // Flag banner (pattern width blocks at Y = 6 to 8)
-    for (let row = 0; row < pattern.length; row++) {
-      const y = 8 - row;
-      for (let col = 0; col < pattern[row].length; col++) {
-        const mat = pattern[row][col];
-        const bx = (dir === 'east') ? px + 1 + col : px - 1 - col;
-        this.setBlock(bx, y, pz, mat);
-      }
-    }
-
-    // Interactive Flag Plaque Sign
+    // Interactive Flag Plaque Sign at base
     const signX = px;
     const signZ = (pz <= 0) ? pz + 1 : pz - 1;
     this.setBlock(signX, 2, signZ, 'quartz_block', {
@@ -916,89 +906,94 @@ export class WorldBuilder {
     });
   }
 
-  // Authentic National Cartography Kiosks Across All 10 World Realms
+  // High Skyline Billboard Structural Pylons Across All 10 World Realms
   private buildCountryMapKiosks() {
-    const kiosks = [
+    const billboards = [
       {
-        x: 95, y: 1, z: -4,
-        flag: ['redstone_block', 'quartz_block', 'lapis_block'],
-        title: 'United States Geographic Map · National Cartography 🇺🇸',
+        x: 95, y: 1, z: -4, rotY: Math.PI / 2,
+        title: 'United States Geographic Cartography & Dossier',
         text: 'Capital: Washington, D.C. · 50 States · Area: 9.83M km²\nMajor Centers: New York, Las Vegas Strip, Los Angeles, Chicago, San Francisco.\nDistrict: USA Metropolis, Las Vegas Mega-Casinos & Hollywood Boulevard.'
       },
       {
-        x: 80, y: 1, z: -120,
-        flag: ['indian_saffron', 'quartz_block', 'indian_green'],
-        title: 'Republic of India Geographic Map · Survey of India 🇮🇳',
+        x: 80, y: 1, z: -120, rotY: 0,
+        title: 'Republic of India Geographic Cartography · Survey of India',
         text: 'Capital: New Delhi · 28 States & 8 UTs · Area: 3.28M km²\nMajor Centers: Chennai (SRMIST), Mumbai, Varanasi, Bengaluru, Hyderabad, Agra.\nDistrict: Imperial India Realm, Taj Mahal & Academic Honors Courtyard.'
       },
       {
-        x: -34, y: 1, z: -60,
-        flag: ['lapis_block', 'quartz_block', 'redstone_block'],
-        title: 'United Kingdom Geographic Map · Ordnance Survey 🇬🇧',
+        x: -34, y: 1, z: -60, rotY: 0,
+        title: 'United Kingdom Geographic Cartography · Ordnance Survey',
         text: 'Capital: London · England, Scotland, Wales & Northern Ireland · Area: 243K km²\nMajor Centers: London, Edinburgh, Manchester, Oxford, Cambridge, Cardiff, Belfast.\nDistrict: London Realm, Big Ben Clocktower & Tower Bridge.'
       },
       {
-        x: 26, y: 1, z: -30,
-        flag: ['lapis_block', 'quartz_block', 'redstone_block'],
-        title: 'République Française Geographic Map · Cartographie Nationale 🇫🇷',
+        x: 26, y: 1, z: -30, rotY: 0,
+        title: 'République Française Cartographie Nationale · IGN',
         text: 'Capital: Paris · 18 Régions · Area: 643K km²\nMajor Centers: Paris, Lyon, Marseille, Nice, Toulouse, Bordeaux, Strasbourg.\nDistrict: Paris District, Eiffel Tower & Champ de Mars Gardens.'
       },
       {
-        x: -153, y: 1, z: -75,
-        flag: ['quartz_block', 'redstone_block', 'quartz_block'],
-        title: 'Japan Geographic Map · 国土地理院 🇯🇵',
+        x: -153, y: 1, z: -75, rotY: Math.PI / 2,
+        title: 'Japan Geographic Cartography · 国土地理院',
         text: 'Capital: Tokyo · 47 Prefectures · Area: 377K km²\nMajor Islands: Honshu, Hokkaido, Kyushu, Shikoku · Major Centers: Tokyo, Kyoto, Osaka.\nDistrict: Tokyo Shibuya Realm, Scramble Crossing & Bullet Train.'
       },
       {
-        x: -65, y: 1, z: -88,
-        flag: ['quartz_block', 'redstone_block', 'lapis_block'],
-        title: 'Republic of Korea Geographic Map · 대한민국 지도 🇰🇷',
+        x: -65, y: 1, z: -88, rotY: 0,
+        title: 'Republic of Korea Geographic Cartography · 대한민국 지도',
         text: 'Capital: Seoul · 9 Provinces · Area: 100K km²\nMajor Centers: Seoul, Busan, Incheon, Daegu, Gwangju, Jeju Island.\nDistrict: Seoul Realm, Gwanghwamun Palace & N Seoul Tower.'
       },
       {
-        x: -108, y: 1, z: -100,
-        flag: ['red_terracotta', 'gold_block', 'red_terracotta'],
-        title: 'People\'s Republic of China Geographic Map · 中国国家地理 🇨🇳',
+        x: -108, y: 1, z: -100, rotY: 0,
+        title: 'People\'s Republic of China Cartography · 中国国家地理',
         text: 'Capital: Beijing · 23 Provinces, 5 Regions · Area: 9.60M km²\nMajor Centers: Beijing, Shanghai, Guangzhou, Shenzhen, Xi\'an, Chengdu.\nDistrict: China Realm, Great Wall Ramparts & Imperial Dragon Pagoda.'
       },
       {
-        x: -150, y: 1, z: 42,
-        flag: ['redstone_block', 'gold_block', 'coal_block'],
-        title: 'Arab Republic of Egypt Geographic Map · خريطة مصر 🇪🇬',
+        x: -150, y: 1, z: 42, rotY: -Math.PI / 2,
+        title: 'Arab Republic of Egypt Cartography · خريطة مصر',
         text: 'Capital: Cairo · 27 Governorates · Area: 1.01M km²\nKey Geography: River Nile, Delta, Sinai Peninsula, Red Sea · Major Centers: Cairo, Alexandria, Giza, Luxor.\nDistrict: Giza Plateau, Great Pyramids & Sphinx.'
       },
       {
-        x: 165, y: 1, z: 35,
-        flag: ['redstone_block', 'emerald_block', 'coal_block'],
-        title: 'United Arab Emirates Geographic Map · خريطة الإمارات 🇦🇪',
+        x: 165, y: 1, z: 35, rotY: -Math.PI / 2,
+        title: 'United Arab Emirates Cartography · خريطة الإمارات',
         text: 'Capital: Abu Dhabi · 7 Emirates · Area: 83.6K km²\nMajor Centers: Dubai, Abu Dhabi, Sharjah, Palm Jumeirah.\nDistrict: Dubai Realm, Burj Khalifa & Palm Lagoon Waterfront.'
       },
       {
-        x: -100, y: 1, z: 55,
-        flag: ['emerald_block', 'quartz_block', 'redstone_block'],
-        title: 'Estados Unidos Mexicanos Geographic Map · Cartografía INEGI 🇲🇽',
+        x: -100, y: 1, z: 55, rotY: 0,
+        title: 'Estados Unidos Mexicanos Cartografía · INEGI',
         text: 'Capital: Mexico City · 31 States & CDMX · Area: 1.97M km²\nMajor Centers: Mexico City, Guadalajara, Monterrey, Puebla, Cancún, Mérida.\nDistrict: Mexico City Zócalo, Metropolitan Cathedral & Chichén Itzá.'
       }
     ];
 
-    kiosks.forEach(k => {
-      // 3-wide pedestal base
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dz = -1; dz <= 1; dz++) {
-          this.setBlock(k.x + dx, k.y, k.z + dz, 'stone_bricks');
-        }
+    billboards.forEach(b => {
+      const isAlongZ = Math.abs(b.rotY) > 0.1;
+      const offX = isAlongZ ? 0 : 3;
+      const offZ = isAlongZ ? 3 : 0;
+      const gy = Math.max(1, this.getTerrainHeight(b.x, b.z));
+
+      // Dual Steel Industrial Lattice Support Pylons (Rising from ground Y = gy to 16)
+      for (let y = gy; y <= 16; y++) {
+        const blk = (y === gy) ? 'smooth_stone' : (y % 2 === 0 ? 'iron_block' : 'quartz_pillar');
+        this.setBlock(b.x - offX, y, b.z - offZ, blk);
+        this.setBlock(b.x + offX, y, b.z + offZ, blk);
       }
-      this.setBlock(k.x - 1, k.y + 1, k.z, 'quartz_pillar');
-      this.setBlock(k.x + 1, k.y + 1, k.z, 'quartz_pillar');
-      this.setBlock(k.x, k.y + 1, k.z, 'gold_block');
-      this.setBlock(k.x, k.y + 2, k.z, 'sea_lantern', {
+
+      // Upper Billboard Foundation Crossbeam at Y = 13 (underneath billboard)
+      const minStep = -3;
+      const maxStep = 3;
+      for (let s = minStep; s <= maxStep; s++) {
+        const sx = isAlongZ ? b.x : b.x + s;
+        const sz = isAlongZ ? b.z + s : b.z;
+        this.setBlock(sx, 13, sz, 'smooth_stone');
+      }
+
+      // Skyline Spotlights at Y = 17
+      this.setBlock(b.x - offX, 17, b.z - offZ, 'sea_lantern');
+      this.setBlock(b.x + offX, 17, b.z + offZ, 'sea_lantern');
+
+      // Ground Directory Pedestal and Information Sign (leaves pathways clear)
+      this.setBlock(b.x, gy, b.z, 'smooth_stone');
+      this.setBlock(b.x, gy + 1, b.z, 'quartz_block', {
         type: 'sign',
-        title: k.title,
-        text: k.text
+        title: b.title,
+        text: b.text
       });
-      this.setBlock(k.x, k.y + 3, k.z, 'gold_block');
-      this.setBlock(k.x - 1, k.y + 2, k.z, k.flag[0]);
-      this.setBlock(k.x + 1, k.y + 2, k.z, k.flag[2]);
     });
   }
 
@@ -1416,17 +1411,11 @@ export class WorldBuilder {
     this.setBlock(gwX, 18, gwZ, 'gold_block');
     this.setBlock(gwX, 19, gwZ, 'beacon');
 
-    // Monumental Flying Indian Tiranga Flag atop the Gateway of India
+    // Monumental Flagpole Mast atop the Gateway of India (hoisting real 3D waving Tiranga)
     for (let y = 20; y <= 26; y++) {
       this.setBlock(gwX, y, gwZ, 'iron_block');
     }
     this.setBlock(gwX, 27, gwZ, 'gold_block');
-    // 5-block wide Tiranga streaming eastward in the sea breeze (Y = 24..26)
-    for (let col = 1; col <= 5; col++) {
-      this.setBlock(gwX + col, 26, gwZ, 'indian_saffron');
-      this.setBlock(gwX + col, 25, gwZ, (col === 3) ? 'ashoka_chakra' : 'quartz_block');
-      this.setBlock(gwX + col, 24, gwZ, 'indian_green');
-    }
 
     this.setBlock(gwX, 2, gwZ + 5, 'stone_bricks', {
       type: 'sign',
@@ -5483,14 +5472,19 @@ export class WorldBuilder {
       { x: 74, z: 33, h: 5 },
       { x: 92, z: 33, h: 5 },
       { x: 104, z: 32, h: 5 },
-      { x: 124, z: 38, h: 5 },
-      { x: 128, z: 52, h: 5 },
-      { x: 128, z: 68, h: 5 },
-      { x: 118, z: 78, h: 5 },
-      { x: 96, z: 86, h: 5 },
-      { x: 68, z: 90, h: 5 },
-      { x: 44, z: 90, h: 5 },
-      { x: 24, z: 88, h: 5 },
+      { x: 116, z: 28, h: 5 },  // Neo York Skyway Station
+      { x: 124, z: 38, h: 5 },  // Eastern Bay Scenic Viaduct
+      { x: 128, z: 48, h: 5 },  // Airport Skyport Station (North Concourse)
+      { x: 144, z: 50, h: 5 },  // Airport East Approach Viaduct
+      { x: 158, z: 64, h: 5 },  // East Bay Viaduct (clear of ATC Tower at 142, 58)
+      { x: 174, z: 78, h: 5 },  // East Coastal Viaduct
+      { x: 180, z: 88, h: 5 },  // East Coastal Viaduct (clear of runway threshold at 165)
+      { x: 174, z: 98, h: 5 },  // South Coast Turn (clear of runway at Z=90)
+      { x: 144, z: 98, h: 5 },  // South Coastal Viaduct (clear of runway at Z=90)
+      { x: 112, z: 98, h: 5 },  // South Coastal Viaduct (clear of runway at Z=90)
+      { x: 80, z: 96, h: 5 },   // Harbor Bay Scenic Viaduct
+      { x: 50, z: 92, h: 5 },   // Grand Carnival Approach Viaduct
+      { x: 24, z: 88, h: 5 },   // South Coast Beach & Pier Station
       { x: 12, z: 74, h: 5 },
       { x: 8, z: 54, h: 5 },
       { x: 6, z: 36, h: 5 },
@@ -5888,79 +5882,54 @@ export class WorldBuilder {
     this.setBlock(atcX, 23, atcZ, 'beacon');
     this.setBlock(atcX, 24, atcZ, 'glowstone');
 
-    // 8. Airport Railway Station Platform (X in [122, 136], Z in [68, 73])
+    // 8. Airport Railway Station Platform (North Landside Entrance at X in [122, 136], Z in [43, 47], Y = 5.0)
     for (let x = 122; x <= 136; x++) {
-      for (let z = 68; z <= 73; z++) {
-        this.setBlock(x, 1, z, 'stone_bricks');
-        this.setBlock(x, 2, z, 'smooth_stone');
+      for (let z = 43; z <= 47; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
+        this.setBlock(x, 5, z, 'smooth_stone'); // Elevated boarding deck
       }
-      this.setBlock(x, 2, 68, 'gold_block'); // Platform caution tactile line
+      this.setBlock(x, 5, 47, 'gold_block'); // Caution tactile edge facing track at Z = 48
       if (x % 4 === 0) {
-        this.setBlock(x, 3, 73, 'quartz_pillar');
-        this.setBlock(x, 4, 73, 'glowstone');
+        this.setBlock(x, 6, 43, 'quartz_pillar');
+        this.setBlock(x, 7, 43, 'quartz_pillar');
+        this.setBlock(x, 8, 43, 'glowstone');
       }
     }
-    // Direct Covered Walkway connecting Platform to Airport Terminal Concourse (X = 126 to 128, Z = 65 to 68)
-    for (let z = 65; z <= 68; z++) {
-      for (let x = 126; x <= 128; x++) {
-        this.setBlock(x, 1, z, 'smooth_stone');
-        this.setBlock(x, 2, z, 'smooth_stone');
+    // Elevated Covered Skybridge connecting Platform to Airport Terminal Concourse North Wall (Z = 48 to 54)
+    for (let z = 48; z <= 54; z++) {
+      for (let x = 127; x <= 129; x++) {
+        this.setBlock(x, 5, z, 'quartz_block'); // Skybridge floor
+        if (x === 127 || x === 129) {
+          this.setBlock(x, 6, z, 'cyber_glass'); // Glass enclosure
+        }
+        this.setBlock(x, 7, z, 'quartz_block'); // Canopy
       }
     }
-    this.setBlock(129, 3, 72, 'glowstone', {
+    // Concourse North Skybridge Portal entry (clearing glass at Z = 54 for seamless walk-in)
+    for (let x = 127; x <= 129; x++) {
+      this.setBlock(x, 5, 54, 'quartz_block');
+      this.setBlock(x, 6, 54, 'cyber_glass');
+    }
+    // Access Stairs connecting Ground Station Avenue (Y = 1) up to Elevated Platform (Y = 5)
+    for (let step = 0; step <= 4; step++) {
+      const sx = 121 - step;
+      for (let z = 44; z <= 46; z++) {
+        for (let y = 1; y <= 5 - step; y++) {
+          this.setBlock(sx, y, z, 'smooth_stone');
+        }
+      }
+    }
+    this.setBlock(129, 6, 44, 'glowstone', {
       type: 'sign',
       title: 'Airport Terminal Skyport Station',
-      text: 'Island Express Rapid Transit · Transfer to Flight AG-2026 Concourse. Press [E] to Board.'
+      text: 'Island Express Rapid Transit · Direct Concourse Transfer. Press [E] to Board.'
     });
-    this.setBlock(124, 3, 72, 'oak_planks'); // Bench
-    this.setBlock(125, 3, 72, 'oak_planks');
+    this.setBlock(124, 6, 44, 'oak_planks'); // Waiting benches
+    this.setBlock(125, 6, 44, 'oak_planks');
 
-    // 9. Second Commercial Airliner on Runway Threshold 09 Lined Up for Takeoff (Facing East)
-    const runPlaneX = 98;
-    const runPlaneZ = 85;
-    // Aerodynamic Fuselage (X from 90 to 106)
-    // Pointed Nose cone
-    this.setBlock(106, 3, runPlaneZ, 'quartz_block');
-    this.setBlock(105, 3, runPlaneZ, 'quartz_block');
-    this.setBlock(105, 4, runPlaneZ, 'quartz_block');
-    this.setBlock(104, 4, runPlaneZ, 'cyber_glass'); // Cockpit
-    this.setBlock(104, 4, runPlaneZ - 1, 'cyber_glass');
-    this.setBlock(104, 4, runPlaneZ + 1, 'cyber_glass');
-    // Cabin Body
-    for (let x = 93; x <= 103; x++) {
-      this.setBlock(x, 2, runPlaneZ, 'iron_block');
-      this.setBlock(x, 3, runPlaneZ - 1, 'quartz_block');
-      this.setBlock(x, 3, runPlaneZ + 1, 'quartz_block');
-      this.setBlock(x, 4, runPlaneZ - 1, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      this.setBlock(x, 4, runPlaneZ + 1, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      this.setBlock(x, 5, runPlaneZ, 'quartz_block');
-    }
-    // Swept-Back Wings with Flaps Extended
-    for (let offset = 0; offset <= 6; offset++) {
-      const wx = runPlaneX - Math.round(offset * 0.5);
-      this.setBlock(wx, 3, runPlaneZ - 2 - offset, 'quartz_block');
-      this.setBlock(wx, 3, runPlaneZ + 2 + offset, 'quartz_block');
-    }
-    this.setBlock(runPlaneX - 3, 3, runPlaneZ - 8, 'emerald_block'); // Nav light
-    this.setBlock(runPlaneX - 3, 3, runPlaneZ + 8, 'redstone_block');
-    // Jet Turbines spooling up with hot glowing thrust
-    for (const ez of [runPlaneZ - 3, runPlaneZ + 3]) {
-      this.setBlock(runPlaneX, 2, ez, 'iron_block');
-      this.setBlock(runPlaneX - 1, 2, ez, 'magma_block'); // Jet exhaust
-      this.setBlock(runPlaneX - 2, 2, ez, 'glowstone');
-    }
-    // Tailfin & Stabilizers
-    for (let y = 5; y <= 8; y++) {
-      this.setBlock(91 + (y - 5), y, runPlaneZ, 'red_terracotta');
-    }
-    for (let dz = -2; dz <= 2; dz++) {
-      this.setBlock(92, 6, runPlaneZ + dz, 'quartz_block');
-    }
-    this.setBlock(106, 2, runPlaneZ, 'gold_block', {
-      type: 'sign',
-      title: 'Flight AG-101 · Cleared for Takeoff',
-      text: 'Heavy passenger jet spooling full thrust for departure on Runway 09 Eastbound!'
-    });
+    // 9. Active Commercial Runway Corridor (Kept clear for real-time animated airliner takeoff and landing)
 
     // 10. Executive Twin-Turboprop Plane on Apron (135, 1, 72)
     const tpX = 135;

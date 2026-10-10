@@ -1,4 +1,5 @@
 import { DragonManager } from './dragons';
+import { FlagManager } from './flags';
 import * as THREE from 'three';
 import { TextureManager } from '../engine/textures';
 import { WorldBuilder, VoxelBlock } from './buildings';
@@ -20,8 +21,9 @@ export class VoxelWorld {
   private blockIndices: Map<string, { type: string; index: number }> = new Map();
   private blockTypes: string[] = [];
 
-  // Dragons & Animals
+  // Dragons, Flags & Animals
   public dragonManager!: DragonManager;
+  public flagManager!: FlagManager;
   private catMesh: THREE.Group | null = null;
   public dogMesh: THREE.Group | null = null;
   private dogTailMesh: THREE.Mesh | null = null;
@@ -35,7 +37,7 @@ export class VoxelWorld {
   public static readonly STATIONS = [
     { name: 'Crossroads Central Station', pos: new THREE.Vector3(58, 5.0, 33), tag: '[CENTRAL]' },
     { name: 'Neo York Skyway Station', pos: new THREE.Vector3(116, 5.0, 28), tag: '[NEO YORK]' },
-    { name: 'Airport Terminal Skyport Station', pos: new THREE.Vector3(128, 5.0, 68), tag: '[AIRPORT]' },
+    { name: 'Airport Terminal Skyport Station', pos: new THREE.Vector3(128, 5.0, 48), tag: '[AIRPORT]' },
     { name: 'South Coast Beach & Pier Station', pos: new THREE.Vector3(24, 5.0, 88), tag: '[BEACH]' },
     { name: 'Citadel Gateway Station', pos: new THREE.Vector3(8, 5.0, 22), tag: '[CITADEL]' },
   ];
@@ -77,6 +79,8 @@ export class VoxelWorld {
     this.createAnimatedAirplanes();
     this.createWorldCitizens();
     this.dragonManager = new DragonManager(this.scene);
+    this.flagManager = new FlagManager(this.scene);
+    this.createAllWorldFlags();
   }
 
   // Efficient batching using InstancedMesh
@@ -248,14 +252,13 @@ export class VoxelWorld {
     });
   }
 
-  // Create High-Definition Geographic Country Map Display Banners in All 10 Realms
+  // Create High-Definition Geographic Country Map Display Banners on High Billboards in All 10 Realms
   private createCountryMapWallBanners() {
     interface CountryMapDef {
       id: string;
       title: string;
       nativeName: string;
       code: string;
-      flag: string;
       accentColor: string;
       capital: string;
       coords: { x: number; y: number; z: number; rotY?: number };
@@ -270,11 +273,10 @@ export class VoxelWorld {
         id: 'usa',
         title: 'UNITED STATES OF AMERICA',
         nativeName: 'National Geographic Cartography',
-        code: 'USA · 🇺🇸',
-        flag: '🇺🇸',
+        code: 'USA',
         accentColor: '#3b82f6',
         capital: 'Washington, D.C.',
-        coords: { x: 95, y: 5.2, z: -4, rotY: Math.PI / 2 },
+        coords: { x: 95, y: 16.0, z: -4, rotY: Math.PI / 2 },
         stats: ['Capital: Washington, D.C.', '50 States · 9.83M km²', 'Pop: 335 Million', 'District: Las Vegas Strip & Hollywood'],
         cities: [
           { name: 'Washington D.C. ⭐', x: 0.82, y: 0.44, isCap: true },
@@ -300,11 +302,10 @@ export class VoxelWorld {
         id: 'india',
         title: 'REPUBLIC OF INDIA',
         nativeName: 'भारत गणराज्य · Survey of India',
-        code: 'IND · 🇮🇳',
-        flag: '🇮🇳',
+        code: 'IND',
         accentColor: '#f97316',
         capital: 'New Delhi',
-        coords: { x: 80, y: 5.2, z: -120, rotY: 0 },
+        coords: { x: 80, y: 16.0, z: -120, rotY: 0 },
         stats: ['Capital: New Delhi', '28 States & 8 UTs · 3.28M km²', 'Pop: 1.43 Billion', 'District: Imperial India & Taj Mahal'],
         cities: [
           { name: 'New Delhi ⭐', x: 0.44, y: 0.28, isCap: true },
@@ -326,11 +327,10 @@ export class VoxelWorld {
         id: 'uk',
         title: 'UNITED KINGDOM',
         nativeName: 'Ordnance Survey of Great Britain',
-        code: 'GBR · 🇬🇧',
-        flag: '🇬🇧',
+        code: 'GBR',
         accentColor: '#ef4444',
         capital: 'London',
-        coords: { x: -34, y: 5.2, z: -60, rotY: 0 },
+        coords: { x: -34, y: 16.0, z: -60, rotY: 0 },
         stats: ['Capital: London', '4 Countries · 243K km²', 'Pop: 68 Million', 'District: Big Ben & Tower Bridge'],
         cities: [
           { name: 'London ⭐', x: 0.68, y: 0.74, isCap: true },
@@ -352,11 +352,10 @@ export class VoxelWorld {
         id: 'france',
         title: 'RÉPUBLIQUE FRANÇAISE',
         nativeName: 'Institut Géographique National (IGN)',
-        code: 'FRA · 🇫🇷',
-        flag: '🇫🇷',
+        code: 'FRA',
         accentColor: '#38bdf8',
         capital: 'Paris',
-        coords: { x: 26, y: 5.2, z: -30, rotY: 0 },
+        coords: { x: 26, y: 16.0, z: -30, rotY: 0 },
         stats: ['Capital: Paris', '18 Regions · 643K km²', 'Pop: 68 Million', 'District: Paris Eiffel & Champ de Mars'],
         cities: [
           { name: 'Paris ⭐', x: 0.52, y: 0.32, isCap: true },
@@ -376,11 +375,10 @@ export class VoxelWorld {
         id: 'japan',
         title: 'JAPAN · 日本国',
         nativeName: '国土地理院 (GSI Cartography)',
-        code: 'JPN · 🇯🇵',
-        flag: '🇯🇵',
+        code: 'JPN',
         accentColor: '#f43f5e',
         capital: 'Tokyo',
-        coords: { x: -153, y: 5.2, z: -75, rotY: Math.PI / 2 },
+        coords: { x: -153, y: 17.0, z: -75, rotY: Math.PI / 2 },
         stats: ['Capital: Tokyo', '47 Prefectures · 377K km²', 'Pop: 125 Million', 'District: Tokyo Shibuya & Shinkansen'],
         cities: [
           { name: 'Tokyo ⭐', x: 0.68, y: 0.54, isCap: true },
@@ -406,11 +404,10 @@ export class VoxelWorld {
         id: 'korea',
         title: 'REPUBLIC OF KOREA',
         nativeName: '대한민국 · 국토지리정보원',
-        code: 'KOR · 🇰🇷',
-        flag: '🇰🇷',
+        code: 'KOR',
         accentColor: '#0ea5e9',
         capital: 'Seoul',
-        coords: { x: -65, y: 5.2, z: -88, rotY: 0 },
+        coords: { x: -65, y: 16.0, z: -88, rotY: 0 },
         stats: ['Capital: Seoul', '9 Provinces · 100K km²', 'Pop: 52 Million', 'District: Seoul Gwanghwamun & N Seoul Tower'],
         cities: [
           { name: 'Seoul ⭐', x: 0.42, y: 0.28, isCap: true },
@@ -432,11 +429,10 @@ export class VoxelWorld {
         id: 'china',
         title: "PEOPLE'S REPUBLIC OF CHINA",
         nativeName: '中华人民共和国 · 国家测绘地理信息局',
-        code: 'CHN · 🇨🇳',
-        flag: '🇨🇳',
+        code: 'CHN',
         accentColor: '#dc2626',
         capital: 'Beijing',
-        coords: { x: -108, y: 5.2, z: -100, rotY: 0 },
+        coords: { x: -108, y: 16.0, z: -100, rotY: 0 },
         stats: ['Capital: Beijing', '23 Provinces, 5 Regions · 9.60M km²', 'Pop: 1.41 Billion', 'District: Great Wall Ramparts & Pagoda'],
         cities: [
           { name: 'Beijing ⭐', x: 0.68, y: 0.32, isCap: true },
@@ -456,11 +452,10 @@ export class VoxelWorld {
         id: 'egypt',
         title: 'ARAB REPUBLIC OF EGYPT',
         nativeName: 'جمهورية مصر العربية · الهيئة العامة للمساحة',
-        code: 'EGY · 🇪🇬',
-        flag: '🇪🇬',
+        code: 'EGY',
         accentColor: '#eab308',
         capital: 'Cairo',
-        coords: { x: -150, y: 5.2, z: 42, rotY: -Math.PI / 2 },
+        coords: { x: -150, y: 16.0, z: 42, rotY: -Math.PI / 2 },
         stats: ['Capital: Cairo', '27 Governorates · 1.01M km²', 'Pop: 110 Million', 'District: Giza Pyramids Plateau & Sphinx'],
         cities: [
           { name: 'Cairo ⭐', x: 0.64, y: 0.28, isCap: true },
@@ -479,11 +474,10 @@ export class VoxelWorld {
         id: 'uae',
         title: 'UNITED ARAB EMIRATES',
         nativeName: 'الإمارات العربية المتحدة · المركز الوطني للمساحة',
-        code: 'ARE · 🇦🇪',
-        flag: '🇦🇪',
+        code: 'ARE',
         accentColor: '#10b981',
         capital: 'Abu Dhabi',
-        coords: { x: 165, y: 5.2, z: 35, rotY: -Math.PI / 2 },
+        coords: { x: 165, y: 17.0, z: 35, rotY: -Math.PI / 2 },
         stats: ['Capital: Abu Dhabi', '7 Emirates · 83.6K km²', 'Pop: 10 Million', 'District: Dubai Burj Khalifa & Palm Lagoon'],
         cities: [
           { name: 'Abu Dhabi ⭐', x: 0.46, y: 0.58, isCap: true },
@@ -501,11 +495,10 @@ export class VoxelWorld {
         id: 'mexico',
         title: 'ESTADOS UNIDOS MEXICANOS',
         nativeName: 'Instituto Nacional de Estadística y Geografía (INEGI)',
-        code: 'MEX · 🇲🇽',
-        flag: '🇲🇽',
+        code: 'MEX',
         accentColor: '#059669',
         capital: 'Mexico City',
-        coords: { x: -100, y: 5.2, z: 55, rotY: 0 },
+        coords: { x: -100, y: 16.0, z: 55, rotY: 0 },
         stats: ['Capital: Mexico City', '31 States & CDMX · 1.97M km²', 'Pop: 130 Million', 'District: Mexico City Zócalo & Chichén Itzá'],
         cities: [
           { name: 'Mexico City ⭐', x: 0.54, y: 0.66, isCap: true },
@@ -729,15 +722,119 @@ export class VoxelWorld {
       texture.magFilter = THREE.LinearFilter;
       texture.colorSpace = THREE.SRGBColorSpace;
 
-      // 3D Display Mesh: 5.2 blocks wide x 3.6 blocks high
-      const mapGeo = new THREE.PlaneGeometry(5.2, 3.6);
-      const mapMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-      const mapMesh = new THREE.Mesh(mapGeo, mapMat);
+      // Monumental High Skyline 3D Electronic Billboard Mesh (7.2m x 4.8m)
+      const billboardGroup = new THREE.Group();
+      billboardGroup.position.set(cm.coords.x, cm.coords.y, cm.coords.z);
+      billboardGroup.rotation.y = cm.coords.rotY ?? 0;
 
-      mapMesh.position.set(cm.coords.x, cm.coords.y, cm.coords.z);
-      mapMesh.rotation.y = cm.coords.rotY ?? 0;
-      this.scene.add(mapMesh);
+      // 1. High-Resolution Front Display Screen (7.2m wide x 4.8m tall)
+      const mapGeo = new THREE.PlaneGeometry(7.2, 4.8);
+      const mapMat = new THREE.MeshBasicMaterial({ map: texture });
+      const mapMesh = new THREE.Mesh(mapGeo, mapMat);
+      billboardGroup.add(mapMesh);
+
+      // 2. Heavy Industrial Metal Backboard & Structural Housing
+      const backGeo = new THREE.BoxGeometry(7.4, 5.0, 0.28);
+      const backMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.7, roughness: 0.35 });
+      const backMesh = new THREE.Mesh(backGeo, backMat);
+      backMesh.position.z = -0.15;
+      billboardGroup.add(backMesh);
+
+      // 3. Cyber/Metallic Billboard Bezel Frame Rim
+      const frameGeo = new THREE.BoxGeometry(7.5, 5.1, 0.08);
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.2 });
+      const frameMesh = new THREE.Mesh(frameGeo, frameMat);
+      frameMesh.position.z = -0.02;
+      billboardGroup.add(frameMesh);
+
+      // 4. Maintenance Service Catwalk with Steel Safety Railing along bottom
+      const catwalkGeo = new THREE.BoxGeometry(7.6, 0.12, 0.8);
+      const catwalkMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
+      const catwalk = new THREE.Mesh(catwalkGeo, catwalkMat);
+      catwalk.position.set(0, -2.5, 0.4);
+      billboardGroup.add(catwalk);
+
+      const railGeo = new THREE.BoxGeometry(7.6, 0.6, 0.05);
+      const railMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85, roughness: 0.25 });
+      const railing = new THREE.Mesh(railGeo, railMat);
+      railing.position.set(0, -2.2, 0.8);
+      billboardGroup.add(railing);
+
+      // 5. Overhead Industrial Spotlight Fixtures illuminating the billboard
+      const lampGeo = new THREE.BoxGeometry(0.35, 0.18, 0.5);
+      const lampArmGeo = new THREE.BoxGeometry(0.08, 0.4, 0.5);
+      const lampMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.2 });
+      const bulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a }); // warm floodlight bulb
+      const bulbGeo = new THREE.BoxGeometry(0.3, 0.08, 0.4);
+
+      for (const lx of [-2.6, -0.9, 0.9, 2.6]) {
+        const arm = new THREE.Mesh(lampArmGeo, lampMat);
+        arm.position.set(lx, 2.65, 0.25);
+        billboardGroup.add(arm);
+
+        const lamp = new THREE.Mesh(lampGeo, lampMat);
+        lamp.position.set(lx, 2.8, 0.48);
+        billboardGroup.add(lamp);
+
+        const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+        bulb.position.set(lx, 2.73, 0.48);
+        billboardGroup.add(bulb);
+      }
+
+      // 6. Dual Vertical Structural Mounting Columns (Anchored to building / roof / pylon)
+      const columnGeo = new THREE.BoxGeometry(0.35, 4.0, 0.35);
+      const columnMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
+      for (const cx of [-2.2, 2.2]) {
+        const col = new THREE.Mesh(columnGeo, columnMat);
+        col.position.set(cx, -3.5, -0.2);
+        billboardGroup.add(col);
+      }
+
+      this.scene.add(billboardGroup);
     });
+  }
+
+  // Create Authentic 3D Waving Cloth Flags on Majestic Flagpoles Across the World
+  private createAllWorldFlags() {
+    if (!this.flagManager) return;
+
+    // 1. Crossroads Citadel Spawn Plaza (Parade of Nations)
+    // 10 National Masts surrounding the central hub
+    this.flagManager.addFlag('india', 6, 8.5, -14, 'east');
+    this.flagManager.addFlag('korea', -6, 8.5, -14, 'west');
+    this.flagManager.addFlag('japan', -12, 8.5, -10, 'west');
+    this.flagManager.addFlag('china', -14, 8.5, -6, 'west');
+    this.flagManager.addFlag('uk', -14, 8.5, 6, 'west');
+    this.flagManager.addFlag('france', -12, 8.5, 10, 'west');
+    this.flagManager.addFlag('mexico', -6, 8.5, 14, 'west');
+    this.flagManager.addFlag('usa', 6, 8.5, 14, 'east');
+    this.flagManager.addFlag('egypt', 12, 8.5, 10, 'east');
+    this.flagManager.addFlag('uae', 12, 8.5, -10, 'east');
+
+    // 2. The 10 World Realms (Majestic Masts erected in each specific district)
+    // India: Imperial India & Taj Mahal Realm
+    this.flagManager.addFlag('india', 80, 8.5, -118, 'east');
+    // USA: Las Vegas Boulevard in front of Hollywood & LK Tower
+    this.flagManager.addFlag('usa', 138, 8.5, -46, 'east');
+    // UK: London Realm near Big Ben & Tower Bridge
+    this.flagManager.addFlag('uk', -34, 8.5, -58, 'west');
+    // France: Paris District facing Eiffel Tower
+    this.flagManager.addFlag('france', 26, 8.5, -28, 'east');
+    // Japan: Tokyo Shibuya Realm near Scramble Crossing
+    this.flagManager.addFlag('japan', -153, 8.5, -73, 'west');
+    // South Korea: Seoul Realm near Gwanghwamun Palace
+    this.flagManager.addFlag('korea', -65, 8.5, -86, 'west');
+    // China: China Realm by Great Wall & Dragon Pagoda
+    this.flagManager.addFlag('china', -108, 8.5, -98, 'west');
+    // Egypt: Giza Pyramids Realm near Great Sphinx
+    this.flagManager.addFlag('egypt', -150, 8.5, 44, 'west');
+    // UAE: Dubai Realm at foot of Burj Khalifa
+    this.flagManager.addFlag('uae', 165, 8.5, 37, 'east');
+    // Mexico: Mexico Realm near Zócalo & Chichén Itzá
+    this.flagManager.addFlag('mexico', -100, 8.5, 57, 'west');
+
+    // 3. Gateway of India (Monumental Flying Tiranga atop the Apollo Bunder Arch at Y = 26.5)
+    this.flagManager.addFlag('india', 75, 26.5, -150, 'east', 1.35);
   }
 
   // Check if player raycast hits any hammerable project banner
@@ -1523,6 +1620,10 @@ export class VoxelWorld {
       this.dragonManager.update(0.016);
     }
 
+    if (this.flagManager) {
+      this.flagManager.update(time);
+    }
+
     if (this.volcanoSmoke) {
       const pos = this.volcanoSmoke.geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < pos.length / 3; i++) {
@@ -1577,12 +1678,16 @@ export class VoxelWorld {
       new THREE.Vector3(104, 5.0, 32),  // Elevated crossing south of project avenue (Z=32 > Z=20)
       new THREE.Vector3(116, 5.0, 28),  // Neo York Skyway Station Platform (Elevated Skyway)
       new THREE.Vector3(124, 5.0, 38),  // Eastern Bay Scenic Viaduct
-      new THREE.Vector3(128, 5.0, 52),  // Airport Northern Approach Viaduct
-      new THREE.Vector3(128, 5.0, 68),  // Crossroads Airport Terminal Skyport Station Platform
-      new THREE.Vector3(118, 5.0, 78),  // South Coast Viaduct curve
-      new THREE.Vector3(96, 5.0, 86),   // Coastal meadow mainline viaduct
-      new THREE.Vector3(68, 5.0, 90),   // Harbor bay viaduct
-      new THREE.Vector3(44, 5.0, 90),   // Grand Carnival approach viaduct
+      new THREE.Vector3(128, 5.0, 48),  // Airport Terminal Skyport Station Platform (North Concourse)
+      new THREE.Vector3(144, 5.0, 50),  // Airport East Approach Viaduct
+      new THREE.Vector3(158, 5.0, 64),  // East Bay Viaduct (clear of ATC Tower at 142, 58)
+      new THREE.Vector3(174, 5.0, 78),  // East Coastal Viaduct
+      new THREE.Vector3(180, 5.0, 88),  // East Coastal Viaduct (clear of runway threshold at 165)
+      new THREE.Vector3(174, 5.0, 98),  // South Coast Turn (clear of runway at Z=90)
+      new THREE.Vector3(144, 5.0, 98),  // South Coastal Viaduct (clear of runway at Z=90)
+      new THREE.Vector3(112, 5.0, 98),  // South Coastal Viaduct (clear of runway at Z=90)
+      new THREE.Vector3(80, 5.0, 96),   // Harbor Bay Scenic Viaduct
+      new THREE.Vector3(50, 5.0, 92),   // Grand Carnival Approach Viaduct
       new THREE.Vector3(24, 5.0, 88),   // South Coast Beach & Pier Station Platform
       new THREE.Vector3(12, 5.0, 74),   // South meadow scenic viaduct
       new THREE.Vector3(8, 5.0, 54),    // Riverbank straightaway viaduct
