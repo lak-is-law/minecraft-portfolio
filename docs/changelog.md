@@ -57,3 +57,4 @@
 - 2026-10-10 13:05: docs(engine): document voxel coordinate transformation pipeline
 - 2026-10-10 14:37: feat(monument): LK brick monument voxel texture atlas
 - 2026-10-10 15:20: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-10-10 16:59: feat(lighting): directional sunlight ray casting across voxel faces
