@@ -998,6 +998,55 @@ export class TextureManager {
       ctx.fillStyle = '#38bdf8';
       ctx.fillRect(5, 5, 6, 6);
     }));
+
+    // 60. Indian Saffron (Kesari · #FF9933 Deep Golden Saffron for Indian National Flag)
+    this.textures.set('indian_saffron', createPixelTexture((ctx, s) => {
+      const rng = createRng(4201);
+      const saffron = ['#ff9933', '#f97316', '#ea580c', '#fb923c', '#ff8800'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          ctx.fillStyle = saffron[Math.floor(rng() * saffron.length)];
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }));
+
+    // 61. Ashoka Chakra (White silk field with 24-spoke Navy Blue Dharma Chakra)
+    this.textures.set('ashoka_chakra', createPixelTexture((ctx, s) => {
+      // Crisp white silk background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, s, s);
+      // Subtle weave texture
+      ctx.fillStyle = '#f8fafc';
+      for (let y = 0; y < s; y += 2) {
+        for (let x = 0; x < s; x += 2) {
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      // Navy Blue Outer Ring
+      ctx.strokeStyle = '#000080';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(s / 2, s / 2, 4.8, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Central Hub
+      ctx.fillStyle = '#000080';
+      ctx.beginPath();
+      ctx.arc(s / 2, s / 2, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Radiating 24 Spokes
+      for (let i = 0; i < 24; i++) {
+        const angle = (i * Math.PI) / 12;
+        const x2 = s / 2 + Math.cos(angle) * 4.4;
+        const y2 = s / 2 + Math.sin(angle) * 4.4;
+        ctx.beginPath();
+        ctx.moveTo(s / 2, s / 2);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+    }));
   }
 
   private createMaterials() {
@@ -1197,6 +1246,10 @@ export class TextureManager {
 
     // Cauldron
     this.materials.set('cauldron', new THREE.MeshLambertMaterial({ map: this.getTexture('cauldron') }));
+
+    // Indian National Flag Materials
+    this.materials.set('indian_saffron', new THREE.MeshLambertMaterial({ map: this.getTexture('indian_saffron') }));
+    this.materials.set('ashoka_chakra', new THREE.MeshLambertMaterial({ map: this.getTexture('ashoka_chakra') }));
 
     // Oak Wood Aliases (ensure oak_log, oak_fence, oak_stairs render with proper wood textures instead of fallback)
     this.materials.set('oak_log', this.materials.get('log')!);

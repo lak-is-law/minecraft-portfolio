@@ -742,10 +742,10 @@ export class WorldBuilder {
 
   // Parade of Nations: Authentic 3D Country Flags on Majestic Flagpoles
   private buildAllCountryFlags() {
-    // 1. India 🇮🇳 (Saffron, White with Ashoka Chakra, Green)
-    this.buildFlagpole(6, -14, 'Republic of India 🇮🇳', 'Tiranga · Saffron, White with Navy Ashoka Chakra, and India Green.', [
-      ['red_terracotta', 'red_terracotta', 'red_terracotta', 'red_terracotta'],
-      ['quartz_block', 'lapis_block', 'lapis_block', 'quartz_block'],
+    // 1. India 🇮🇳 (Deep Kesari Saffron, White with Navy 24-Spoke Ashoka Chakra, India Green)
+    this.buildFlagpole(6, -14, 'Republic of India 🇮🇳', 'Tiranga · Saffron (Courage & Sacrifice), White (Peace & Truth) with 24-spoke Navy Ashoka Chakra, and Green (Faith & Chivalry).', [
+      ['indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron'],
+      ['quartz_block', 'ashoka_chakra', 'ashoka_chakra', 'quartz_block'],
       ['emerald_block', 'emerald_block', 'emerald_block', 'emerald_block']
     ], 'east');
 
@@ -1254,6 +1254,18 @@ export class WorldBuilder {
     }
     this.setBlock(gwX, 18, gwZ, 'gold_block');
     this.setBlock(gwX, 19, gwZ, 'beacon');
+
+    // Monumental Flying Indian Tiranga Flag atop the Gateway of India
+    for (let y = 20; y <= 26; y++) {
+      this.setBlock(gwX, y, gwZ, 'iron_block');
+    }
+    this.setBlock(gwX, 27, gwZ, 'gold_block');
+    // 5-block wide Tiranga streaming eastward in the sea breeze (Y = 24..26)
+    for (let col = 1; col <= 5; col++) {
+      this.setBlock(gwX + col, 26, gwZ, 'indian_saffron');
+      this.setBlock(gwX + col, 25, gwZ, (col === 3) ? 'ashoka_chakra' : 'quartz_block');
+      this.setBlock(gwX + col, 24, gwZ, 'emerald_block');
+    }
 
     this.setBlock(gwX, 2, gwZ + 5, 'stone_bricks', {
       type: 'sign',
