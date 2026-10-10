@@ -53,3 +53,4 @@
 - 2026-10-09 11:56: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-10-09 14:10: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-10 11:35: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-10-10 12:11: feat(audio): spatial distance attenuation for ambient loops
