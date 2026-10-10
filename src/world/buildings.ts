@@ -143,20 +143,29 @@ export class WorldBuilder {
 
     // 5. South-West: Mexico Canyon Mesas & Egypt Giza Dunes
     if (x <= -20 && z >= 20) {
-      // Egypt Giza Plateau (X <= -145, Z in [15, 60])
-      if (x <= -145 && z >= 15 && z <= 60) {
-        return 1;
+      // Egypt Nile River Channel (X in [-131, -127], Z in [10, 65])
+      if (x >= -131 && x <= -127 && z >= 10 && z <= 65) {
+        return 0; // Nile waterway at Y = 0
       }
-      // Mesa 1 terrace around Zócalo:
-      if (x >= -135 && x <= -75 && z >= 35 && z <= 75) {
-        if (Math.hypot(x - (-95), z - 55) <= 22) {
-          return 2; // Leveled Zócalo plaza floor
+      // Egypt Giza Plateau & Desert Oasis (X <= -126 && X >= -185 && Z in [10, 65])
+      if (x <= -126 && x >= -185 && z >= 10 && z <= 65) {
+        return 1; // Level plateau for Pyramids, Sphinx, temples, and Bedouin oasis
+      }
+      // Mexico City Zócalo Historic Center (X in [-132, -78], Z in [34, 88])
+      if (x >= -132 && x <= -78 && z >= 34 && z <= 88) {
+        return 1; // Uniform level ground for Zócalo plaza, Cathedral, and Palacio Nacional
+      }
+      // Surrounding Mexico Canyon Mesa Rim (X in [-140, -70], Z in [26, 94])
+      if (x >= -140 && x <= -70 && z >= 26 && z <= 94) {
+        return 3; // Natural badlands mesa bluff encircling the valley
+      }
+      // Chichén Itzá Mesoamerican Sacred Valley (X in [-165, -115], Z in [95, 140])
+      if (x >= -165 && x <= -115 && z >= 95 && z <= 140) {
+        // Sacred Cenote sinkhole pool at (-120, 125)
+        if (Math.hypot(x - (-120), z - 125) <= 5.5) {
+          return 0; // Crystal turquoise cenote water
         }
-        return 5; // Surrounding canyon mesa bluff
-      }
-      // Mesa 2 (Grand Pyramid Mesa terrace):
-      if (x >= -160 && x <= -120 && z >= 85 && z <= 135) {
-        return 5; // Step pyramid terrace
+        return 1; // Level terrace for El Castillo pyramid and Mayan courts
       }
       // Rolling desert dunes
       const dune = 1.6 + Math.sin(x * 0.08) * 1.2 + Math.cos(z * 0.08) * 1.0;
@@ -1822,6 +1831,245 @@ export class WorldBuilder {
       title: 'Gentle Street Cow · गौमाता',
       text: 'Peacefully resting by the roadside. Remember: The cow always has right of way in traffic!'
     });
+
+    // H. Classic Green & Yellow Bajaj Auto-Rickshaw (Tuk-Tuk) at (43, 1, -80)
+    const rickX = 43;
+    const rickZ = -80;
+    // 3 Wheels (1 front, 2 rear)
+    this.setBlock(rickX + 2, 1, rickZ, 'coal_block'); // Front wheel
+    this.setBlock(rickX - 1, 1, rickZ - 1, 'coal_block'); // Rear left wheel
+    this.setBlock(rickX - 1, 1, rickZ + 1, 'coal_block'); // Rear right wheel
+
+    // Green Lower Chassis (Y = 2)
+    for (let x = rickX - 1; x <= rickX + 1; x++) {
+      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
+        this.setBlock(x, 2, z, 'emerald_block');
+      }
+    }
+    // Front Nose / Fork
+    this.setBlock(rickX + 2, 2, rickZ, 'emerald_block');
+    this.setBlock(rickX + 3, 2, rickZ, 'glowstone'); // Headlight
+
+    // Driver Cab & Passenger Seat (Y = 3)
+    this.setBlock(rickX - 1, 3, rickZ - 1, 'red_terracotta'); // Passenger seat cushion
+    this.setBlock(rickX - 1, 3, rickZ, 'red_terracotta');
+    this.setBlock(rickX - 1, 3, rickZ + 1, 'red_terracotta');
+    this.setBlock(rickX + 1, 3, rickZ, 'iron_block'); // Handlebars
+    this.setBlock(rickX + 1, 3, rickZ - 1, 'redstone_block'); // Mechanical Fare Meter
+    this.setBlock(rickX + 2, 3, rickZ, 'cyber_glass'); // Windshield
+
+    // Yellow Canopy Roof (Y = 4)
+    for (let x = rickX - 1; x <= rickX + 1; x++) {
+      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
+        this.setBlock(x, 4, z, 'gold_block');
+      }
+    }
+    this.setBlock(rickX + 2, 4, rickZ, 'gold_block'); // Canopy visor
+    this.setBlock(rickX, 4, rickZ, 'lantern'); // Interior roof cabin lamp
+
+    this.setBlock(rickX - 2, 2, rickZ, 'emerald_block', {
+      type: 'sign',
+      title: 'Bajaj Auto-Rickshaw · Tuk-Tuk 🛺',
+      text: '★ MUMBAI 02 ★ Meter Jamgega: The iconic 3-wheeled champion of Indian streets! Agile, unstoppable, and pure nostalgia. Press [E] to honk.'
+    });
+
+    // I. ISRO Spaceport & Chandrayaan-3 Lunar South Pole Mission at (115, -85)
+    const isroX = 115;
+    const isroZ = -85;
+    // Reinforced Staged Launch/Test Surface (Y = 1)
+    for (let x = isroX - 6; x <= isroX + 6; x++) {
+      for (let z = isroZ - 6; z <= isroZ + 6; z++) {
+        const isBorder = Math.abs(x - isroX) === 6 || Math.abs(z - isroZ) === 6;
+        this.setBlock(x, 1, z, isBorder ? ((x + z) % 2 === 0 ? 'gold_block' : 'coal_block') : 'smooth_stone');
+      }
+    }
+
+    // Vikram Lunar Lander Module (Centered at isroX, isroZ, Y = 2 to 7)
+    // 4 Landing Struts / Shock Absorbing Footpads at corners
+    const landerLegs = [
+      [isroX - 2, isroZ - 2], [isroX + 2, isroZ - 2],
+      [isroX - 2, isroZ + 2], [isroX + 2, isroZ + 2]
+    ];
+    for (const [lx, lz] of landerLegs) {
+      this.setBlock(lx, 2, lz, 'end_stone_bricks');
+      this.setBlock(lx, 3, lz, 'iron_block');
+    }
+    // Main Lander Core with Gold Thermal Insulation Blanket (Y = 3 to 5)
+    for (let x = isroX - 1; x <= isroX + 1; x++) {
+      for (let z = isroZ - 1; z <= isroZ + 1; z++) {
+        for (let y = 3; y <= 5; y++) {
+          this.setBlock(x, y, z, 'gold_block');
+        }
+      }
+    }
+    // Retrorocket Thruster Nozzle underneath
+    this.setBlock(isroX, 2, isroZ, 'magma_block');
+    this.setBlock(isroX, 2, isroZ - 1, 'iron_block');
+    this.setBlock(isroX, 2, isroZ + 1, 'iron_block');
+
+    // Deployed Solar Panels (East & West Wings at Y = 4)
+    this.setBlock(isroX - 2, 4, isroZ, 'lapis_block');
+    this.setBlock(isroX - 3, 4, isroZ, 'cyber_glass');
+    this.setBlock(isroX + 2, 4, isroZ, 'lapis_block');
+    this.setBlock(isroX + 3, 4, isroZ, 'cyber_glass');
+
+    // High-Gain Communication Dish & Nav Cameras at Y = 6 to 7
+    this.setBlock(isroX, 6, isroZ, 'quartz_block');
+    this.setBlock(isroX, 7, isroZ, 'iron_block');
+    this.setBlock(isroX + 1, 6, isroZ, 'glowstone'); // Laser altimeter
+
+    // Tricolor Emblem Insignia on South face of Lander
+    this.setBlock(isroX - 1, 4, isroZ + 2, 'indian_saffron');
+    this.setBlock(isroX, 4, isroZ + 2, 'quartz_block');
+    this.setBlock(isroX + 1, 4, isroZ + 2, 'indian_green');
+
+    // Pragyan Lunar Rover on Ramp (South of Lander)
+    // Deployment Ramp
+    this.setBlock(isroX, 2, isroZ + 2, 'smooth_stone');
+    this.setBlock(isroX, 2, isroZ + 3, 'iron_block');
+    // 6-wheeled Pragyan Rover at (isroX, isroZ + 4)
+    this.setBlock(isroX - 1, 2, isroZ + 4, 'coal_block'); // Left wheels
+    this.setBlock(isroX + 1, 2, isroZ + 4, 'coal_block'); // Right wheels
+    this.setBlock(isroX, 2, isroZ + 4, 'gold_block'); // Rover chassis
+    this.setBlock(isroX, 3, isroZ + 4, 'lapis_block'); // Solar panel
+    this.setBlock(isroX, 3, isroZ + 5, 'sea_lantern'); // NavCam / APXS Spectrometer
+
+    // Mission Control Terminal Plaque
+    this.setBlock(isroX, 2, isroZ - 7, 'iron_block', {
+      type: 'sign',
+      title: 'ISRO Chandrayaan-3 · Shiv Shakti Point 🚀',
+      text: 'Historical Lunar South Pole soft landing! Vikram Lander & Pragyan Rover embody India\'s cutting-edge aerospace engineering, deep-space telemetry, and scientific triumph.'
+    });
+
+    // J. Jaipur Hawa Mahal (Palace of Winds) at (58, -108) to (58, -98)
+    const hawaX = 58;
+    // 5-Tiered Rajasthani Rose Sandstone Honeycomb Facade
+    for (let z = -108; z <= -98; z++) {
+      // Tier 1 Base (Y = 1 to 3)
+      for (let y = 1; y <= 3; y++) {
+        this.setBlock(hawaX, y, z, 'red_sandstone');
+      }
+      // Honeycomb Jharokhas (Tier 2: Y = 4 to 6)
+      for (let y = 4; y <= 6; y++) {
+        const isJharokhaWindow = (z % 2 === 0);
+        this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
+        if (isJharokhaWindow && y === 5) {
+          this.setBlock(hawaX - 1, y, z, 'sandstone'); // Projecting oriel balcony
+          this.setBlock(hawaX, y, z, 'lantern');
+        }
+      }
+      // Honeycomb Jharokhas (Tier 3: Y = 7 to 9, stepped inward)
+      if (z >= -106 && z <= -100) {
+        for (let y = 7; y <= 9; y++) {
+          const isJharokhaWindow = (z % 2 !== 0);
+          this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
+          if (isJharokhaWindow && y === 8) {
+            this.setBlock(hawaX - 1, y, z, 'sandstone');
+          }
+        }
+      }
+      // Honeycomb Jharokhas (Tier 4: Y = 10 to 11)
+      if (z >= -105 && z <= -101) {
+        for (let y = 10; y <= 11; y++) {
+          this.setBlock(hawaX, y, z, 'red_sandstone');
+        }
+      }
+      // Tier 5 Top Crown & Kalasam Finials (Y = 12 to 13)
+      if (z >= -104 && z <= -102) {
+        this.setBlock(hawaX, 12, z, 'red_sandstone');
+        this.setBlock(hawaX, 13, z, 'gold_block'); // Golden urn finials
+      }
+    }
+    // Hawa Mahal Plaque
+    this.setBlock(hawaX - 2, 2, -103, 'red_sandstone', {
+      type: 'sign',
+      title: 'Hawa Mahal · Palace of Winds (Jaipur 🌸)',
+      text: 'Built in 1799 from pink and red sandstone with 953 honeycombed jharokha lattice windows designed to funnel refreshing royal breezes.'
+    });
+
+    // K. India Gate & Amar Jawan Jyoti Memorial Arch at (80, -60)
+    const igX = 80;
+    const igZ = -60;
+    // Monumental Sandstone Pylons & Archway (Y = 1 to 14)
+    for (let x = igX - 6; x <= igX + 6; x++) {
+      for (let z = igZ - 2; z <= igZ + 2; z++) {
+        const isCenterVault = Math.abs(x - igX) <= 2;
+        for (let y = 1; y <= 14; y++) {
+          if (y <= 9 && isCenterVault) {
+            // Open archway passage
+            if (y === 1) this.setBlock(x, 1, z, 'red_sandstone'); // Paved arch floor
+          } else if (y <= 12) {
+            // Arch walls & barrel vault crown
+            const isPylonFace = (Math.abs(x - igX) >= 3 || y >= 10);
+            if (isPylonFace) {
+              const isAccent = (y === 6 || y === 10);
+              this.setBlock(x, y, z, isAccent ? 'sandstone' : 'red_sandstone');
+            }
+          } else {
+            // Stepped Attic Cornice (Y = 13 to 14)
+            if (Math.abs(x - igX) <= 5) {
+              this.setBlock(x, y, z, (y === 14) ? 'sandstone' : 'red_sandstone');
+            }
+          }
+        }
+      }
+    }
+    // Amar Jawan Jyoti (Eternal Flame Cenotaph under archway)
+    this.setBlock(igX, 2, igZ, 'obsidian'); // Black marble cenotaph
+    this.setBlock(igX, 3, igZ, 'iron_block'); // Inverted bayonet rifle
+    this.setBlock(igX, 4, igZ, 'iron_block'); // Soldier's helmet
+    // 4 Eternal Flame Braziers
+    const flames = [[igX - 1, igZ - 1], [igX + 1, igZ - 1], [igX - 1, igZ + 1], [igX + 1, igZ + 1]];
+    for (const [fx, fz] of flames) {
+      this.setBlock(fx, 2, fz, 'gold_block');
+      this.setBlock(fx, 3, fz, 'magma_block');
+      this.setBlock(fx, 4, fz, 'lantern');
+    }
+    // India Gate Memorial Plaque
+    this.setBlock(igX, 2, igZ + 4, 'red_sandstone', {
+      type: 'sign',
+      title: 'India Gate & Amar Jawan Jyoti 🇮🇳',
+      text: 'Monumental 42-meter triumphal arch in New Delhi with the eternal flame commemorating the supreme sacrifice and eternal valor of Indian soldiers.'
+    });
+
+    // L. Diwali Festival of Lights, Marigold Garlands & Rangoli Mandala
+    // 1. Marigold Floral Swags across Darwaza-i-Rauza Great Gate at Z = -70
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      this.setBlock(x, 6, -70, (x % 2 === 0) ? 'indian_saffron' : 'gold_block'); // Marigold garland
+      if (Math.abs(x - cx) === 3 || Math.abs(x - cx) === 5) {
+        this.setBlock(x, 5, -70, 'lantern'); // Hanging Diwali lantern
+      }
+    }
+    // 2. Floating Illuminated Diyas along Yamuna Reflecting Pool & Stepwell Kulam
+    for (const dyZ of [-112, -98, -84]) {
+      this.setBlock(cx - 2, 2, dyZ, 'glowstone');
+      this.setBlock(cx + 2, 2, dyZ, 'glowstone');
+    }
+    for (const dyZ of [gpZ + 20, gpZ + 24]) {
+      this.setBlock(gpX - 2, 1, dyZ, 'glowstone');
+      this.setBlock(gpX + 2, 1, dyZ, 'glowstone');
+    }
+    // 3. Ornate Royal Peacock Rangoli Mandala in Front Courtyard at (80, 1, -73)
+    const rangX = 80;
+    const rangZ = -73;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 1.0) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, 'gold_block');
+        } else if (d <= 2.2) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, ((dx + dz) % 2 === 0) ? 'lapis_block' : 'emerald_block');
+        } else if (d <= 3.2) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, 'red_terracotta');
+        }
+      }
+    }
+    this.setBlock(rangX, 2, rangZ, 'sea_lantern');
+    this.setBlock(rangX, 2, rangZ + 4, 'gold_block', {
+      type: 'sign',
+      title: 'Grand Diwali Rangoli Mandala 🪔',
+      text: 'Intricate folk art crafted with vibrant colored rice powders, turmeric, and vermillion, celebrating prosperity, light, and new beginnings!'
+    });
   }
 
   // London & Westminster Realm (Westminster Palace, Big Ben, Tower Bridge, Routemaster Bus, Red Phone Booths)
@@ -1835,12 +2083,10 @@ export class WorldBuilder {
       for (let z = clockZ - 3; z <= clockZ + 3; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
         // Interior ground floor paving at Y = 2
-        const isInterior = Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1;
         const isDoorway = x === clockX && (z === clockZ + 2 || z === clockZ + 3);
-        if (isDoorway) {
+        const isInterior = Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1;
+        if (isDoorway || isInterior) {
           this.setBlock(x, 2, z, 'smooth_stone'); // Walkable threshold
-        } else if (isInterior) {
-          this.setBlock(x, 2, z, 'smooth_stone');
         } else {
           this.setBlock(x, 2, z, 'stone_bricks');
         }
@@ -1890,27 +2136,25 @@ export class WorldBuilder {
     this.setBlock(clockX + 1, 4, clockZ + 3, 'lantern');
 
     // Walkable Spiral Staircase inside Tower Core (Y = 2 to 28)
-    // Core cells: (clockX + dx, y, clockZ + dz) where dx, dz in [-1, 1]
+    // 8 perimeter positions around newel post starting at south portal
     const spiralOffsets = [
-      [-1, -1], [0, -1], [1, -1],
-      [1, 0],   [1, 1],  [0, 1],
-      [-1, 1],  [-1, 0]
+      [0, 1],   // Y=2
+      [1, 1],   // Y=3
+      [1, 0],   // Y=4
+      [1, -1],  // Y=5
+      [0, -1],  // Y=6
+      [-1, -1], // Y=7
+      [-1, 0],  // Y=8
+      [-1, 1]   // Y=9
     ];
     for (let y = 2; y <= 28; y++) {
-      // Central newel column
+      // Central newel column with embedded lighting
       this.setBlock(clockX, y, clockZ, (y % 4 === 0) ? 'sea_lantern' : 'iron_block');
 
       // Spiral stepping platform along perimeter
       const stepIdx = (y - 2) % spiralOffsets.length;
       const [sx, sz] = spiralOffsets[stepIdx];
       this.setBlock(clockX + sx, y, clockZ + sz, 'oak_planks');
-
-      // Next half step to allow smooth jumping/walking up
-      const nextIdx = (stepIdx + 1) % spiralOffsets.length;
-      const [nx, nz] = spiralOffsets[nextIdx];
-      if (y < 28) {
-        this.setBlock(clockX + nx, y, clockZ + nz, 'stone_bricks');
-      }
     }
 
     // Clock Stage (Y = 29 to 33) - 4-sided illuminated clock face
@@ -1919,23 +2163,39 @@ export class WorldBuilder {
         for (let z = clockZ - 3; z <= clockZ + 3; z++) {
           const isOuterWall = Math.abs(x - clockX) === 3 || Math.abs(z - clockZ) === 3;
           if (isOuterWall) {
-            const isRim = Math.abs(x - clockX) === 3 && Math.abs(z - clockZ) === 3;
-            if (isRim) {
-              this.setBlock(x, y, z, 'gold_block');
+            const isCorner = Math.abs(x - clockX) === 3 && Math.abs(z - clockZ) === 3;
+            if (isCorner) {
+              // Ornate Gothic corner turrets
+              this.setBlock(x, y, z, (y === 33) ? 'gold_block' : 'stone_bricks');
             } else if (y >= 30 && y <= 32) {
-              // Clock Dial
-              const isCenter = y === 31 && (x === clockX || z === clockZ);
-              if (isCenter) {
-                this.setBlock(x, y, z, 'coal_block'); // Clock hands hub
+              // Clock Dial on 4 faces with visible clock hands!
+              const isCenterHub = (y === 31) && ((Math.abs(z - clockZ) === 3 && x === clockX) || (Math.abs(x - clockX) === 3 && z === clockZ));
+              const isMinuteHand = (y === 32) && ((Math.abs(z - clockZ) === 3 && x === clockX) || (Math.abs(x - clockX) === 3 && z === clockZ));
+              const isHourHand = (y === 31) && (
+                (z === clockZ + 3 && x === clockX + 1) || // South: pointing right
+                (z === clockZ - 3 && x === clockX - 1) || // North: pointing right
+                (x === clockX + 3 && z === clockZ - 1) || // East: pointing right
+                (x === clockX - 3 && z === clockZ + 1)    // West: pointing right
+              );
+
+              if (isCenterHub || isMinuteHand || isHourHand) {
+                this.setBlock(x, y, z, 'coal_block'); // Wrought iron clock hands
               } else {
-                this.setBlock(x, y, z, 'quartz_block');
+                // Opal glowing dial backdrop
+                const isInnerGlow = Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1;
+                this.setBlock(x, y, z, isInnerGlow ? 'sea_lantern' : 'quartz_block');
               }
             } else {
-              this.setBlock(x, y, z, 'gold_block');
+              // Upper & lower gold & stone dial moldings
+              this.setBlock(x, y, z, (y === 29 || y === 33) ? 'gold_block' : 'stone_bricks');
             }
           } else if (y === 29) {
-            // Floor of Clock Chamber
-            this.setBlock(x, 29, z, (Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1 && (x === clockX - 1 && z === clockZ - 1)) ? 'smooth_stone' : 'oak_planks');
+            // Floor of Clock Chamber: Keep stair exit OPEN at top of spiral stair!
+            // Top of stairs (Y=28) is at [1, 0] so leave [1, 0] and [1, 1] clear!
+            const isStairHatch = (x === clockX + 1 && (z === clockZ || z === clockZ + 1));
+            if (!isStairHatch) {
+              this.setBlock(x, 29, z, 'smooth_stone');
+            }
           }
         }
       }
@@ -1944,30 +2204,30 @@ export class WorldBuilder {
     // Great Clockwork Escapement Mechanism in center of Clock Stage
     this.setBlock(clockX, 30, clockZ, 'iron_block');
     this.setBlock(clockX, 31, clockZ, 'gold_block'); // Main gear cog
-    this.setBlock(clockX + 1, 31, clockZ, 'redstone_block');
     this.setBlock(clockX - 1, 31, clockZ, 'redstone_block');
+    this.setBlock(clockX, 31, clockZ - 1, 'redstone_block');
     this.setBlock(clockX, 32, clockZ, 'iron_block'); // Escapement anchor
 
     // Clock Interior Illumination
     for (let y = 30; y <= 32; y++) {
       this.setBlock(clockX, y, clockZ - 2, 'glowstone');
-      this.setBlock(clockX, y, clockZ + 2, 'glowstone');
       this.setBlock(clockX - 2, y, clockZ, 'glowstone');
-      this.setBlock(clockX + 2, y, clockZ, 'glowstone');
     }
 
-    // Stairway connection from Clock Stage (Y=29) to Belfry Chamber (Y=34)
+    // Walkable Stairway connection from Clock Stage (Y=29) to Belfry Chamber (Y=34)
     for (let sy = 30; sy <= 33; sy++) {
       const sox = -1 + (sy - 30);
-      this.setBlock(clockX + sox, sy, clockZ + 1, 'oak_planks');
-      this.setBlock(clockX + sox, sy, clockZ + 2, 'oak_planks');
+      this.setBlock(clockX - 1, sy, clockZ + sox - 1, 'oak_planks');
     }
 
     // Belfry Chamber with open Gothic colonnade & the Great Bell (Y = 34 to 38)
     for (let x = clockX - 2; x <= clockX + 2; x++) {
       for (let z = clockZ - 2; z <= clockZ + 2; z++) {
-        // Belfry viewing floor
-        this.setBlock(x, 34, z, (x === clockX && z === clockZ + 1) ? 'smooth_stone' : 'stone_bricks');
+        // Belfry viewing floor: Leave stair exit hatch open at (clockX - 1, clockZ + 2)
+        const isBelfryStairHatch = (x === clockX - 1 && z >= clockZ + 1);
+        if (!isBelfryStairHatch) {
+          this.setBlock(x, 34, z, 'stone_bricks');
+        }
         // Belfry ceiling / spire base
         this.setBlock(x, 38, z, 'stone_bricks');
       }
@@ -1989,6 +2249,22 @@ export class WorldBuilder {
       }
     }
 
+    // 4 Iconic Gothic Corner Pinnacles of Elizabeth Tower (Y = 34 to 43)
+    const towerCorners = [
+      [clockX - 3, clockZ - 3], [clockX + 3, clockZ - 3],
+      [clockX - 3, clockZ + 3], [clockX + 3, clockZ + 3]
+    ];
+    for (const [tcx, tcz] of towerCorners) {
+      for (let y = 34; y <= 38; y++) {
+        this.setBlock(tcx, y, tcz, 'stone_bricks');
+      }
+      for (let y = 39; y <= 41; y++) {
+        this.setBlock(tcx, y, tcz, 'quartz_pillar');
+      }
+      this.setBlock(tcx, 42, tcz, 'lantern');
+      this.setBlock(tcx, 43, tcz, 'gold_block'); // Gold pinnacle finial
+    }
+
     // Great Bell ("Big Ben") in center of Belfry
     this.setBlock(clockX, 38, clockZ, 'iron_block'); // Overhead mounting beam
     this.setBlock(clockX, 37, clockZ, 'gold_block'); // Crown of bell
@@ -1999,30 +2275,47 @@ export class WorldBuilder {
     this.setBlock(clockX, 36, clockZ + 1, 'gold_block'); // Skirt
     this.setBlock(clockX, 35, clockZ, 'iron_block'); // Clapper
 
-    // Interactive Great Bell Sign (triggers authentic chime)
-    this.setBlock(clockX, 35, clockZ + 1, 'stone_bricks', {
+    // Interactive Great Bell Sign (triggers authentic Westminster chime!)
+    this.setBlock(clockX, 35, clockZ - 1, 'stone_bricks', {
       type: 'sign',
       title: 'The Great Bell · Big Ben 🔔',
       text: 'Westminster Great Bell cast in 1858 at Whitechapel Bell Foundry. Weighs 13.7 tonnes and chimes the iconic E-natural note across London! [Click to chime Big Ben]'
     });
 
-    // Gothic Steeple & Copper Lantern Spire (Y = 39 to 47)
-    for (let y = 39; y <= 45; y++) {
-      const span = Math.max(0, 43 - y);
-      for (let dx = -span; dx <= span; dx++) {
-        for (let dz = -span; dz <= span; dz++) {
-          this.setBlock(clockX + dx, y, clockZ + dz, 'lapis_block');
+    // Authentic Gothic Slate & Copper Steeple (Y = 39 to 50)
+    // Tier 1: 5x5 Base with Gold Gables (Y = 39 to 40)
+    for (let y = 39; y <= 40; y++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          const isEdge = Math.abs(dx) === 2 || Math.abs(dz) === 2;
+          this.setBlock(clockX + dx, y, clockZ + dz, isEdge ? 'prismarine_bricks' : 'smooth_stone');
         }
       }
     }
-    this.setBlock(clockX, 46, clockZ, 'beacon');
-    this.setBlock(clockX, 47, clockZ, 'gold_block');
+    // Tier 2: 3x3 Steeple Shaft with Gilded Dormers (Y = 41 to 43)
+    for (let y = 41; y <= 43; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const isGable = Math.abs(dx) + Math.abs(dz) === 1 && y === 42;
+          this.setBlock(clockX + dx, y, clockZ + dz, isGable ? 'gold_block' : 'prismarine_bricks');
+        }
+      }
+    }
+    // Tier 3: Slender Spire Needle (Y = 44 to 47)
+    for (let y = 44; y <= 47; y++) {
+      this.setBlock(clockX, y, clockZ, (y % 2 === 0) ? 'gold_block' : 'quartz_pillar');
+    }
+    // Tier 4: Ayrton Lantern & Beacon (Y = 48)
+    this.setBlock(clockX, 48, clockZ, 'beacon');
+    // Tier 5: Gilded Crown Finial Cross (Y = 49 to 50)
+    this.setBlock(clockX, 49, clockZ, 'gold_block');
+    this.setBlock(clockX, 50, clockZ, 'gold_block');
 
     // Elizabeth Tower Ground Entrance Sign
     this.setBlock(clockX, 2, clockZ + 4, 'stone_bricks', {
       type: 'sign',
       title: 'Big Ben · Elizabeth Tower 🇬🇧',
-      text: 'Historic 96m Gothic landmark of the Palace of Westminster overlooking the River Thames.\n\nWalk through the southern portal to climb the interior spiral staircase up to the Clockwork Chamber and Belfry Gallery!'
+      text: 'Historic 96m Gothic landmark of the Palace of Westminster overlooking the River Thames.\n\nClimb the interior spiral staircase up to the Clockwork Chamber and the Belfry to hear the Westminster Chimes!'
     });
 
     // 2. River Thames Waterway & Tower Bridge (X in [-44, -20], Z in [-55, -47])
@@ -4028,6 +4321,7 @@ export class WorldBuilder {
     // Hollywood Mountain & Illuminated Block-Built Sign at (165, -100)
     this.buildHollywoodMountain(165, -100);
 
+
     // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
     this.buildVegasStripInFrontOfHollywoodAndLKTower();
   }
@@ -5290,6 +5584,636 @@ export class WorldBuilder {
 
     // Summit Beacon on top of Mount Lee peak
     this.setBlock(cx, peakHeight + 1, cz, 'beacon');
+  }
+
+  // ==========================================
+  // 7C. EXPANDED HOLLYWOOD ENTERTAINMENT DISTRICT
+  // ==========================================
+
+  // 1. Hollywood Boulevard Walk of Fame & Palm Promenade
+  private buildHollywoodWalkOfFame() {
+    // Avenue runs North-South between Mount Lee overlook (Z = -84) and Vegas/Metropolis junction (Z = -54)
+    // Roadway X in [159, 163], Sidewalks X in [155, 158] (West) and [164, 167] (East)
+    for (let z = -84; z <= -54; z++) {
+      // Main 5-block asphalt road
+      for (let x = 159; x <= 163; x++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        // Yellow center divider dashed line at X = 161
+        if (x === 161 && Math.abs(z) % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+
+      // Stone brick sidewalks on both sides
+      for (let x = 155; x <= 158; x++) this.setBlock(x, 1, z, 'stone_bricks');
+      for (let x = 164; x <= 167; x++) this.setBlock(x, 1, z, 'stone_bricks');
+
+      // Curb trim along road edge
+      this.setBlock(158, 1, z, 'smooth_stone');
+      this.setBlock(164, 1, z, 'smooth_stone');
+    }
+
+    // Pedestrian Zebra Crossings at key junctions
+    for (const cz of [-84, -70, -56]) {
+      for (let x = 159; x <= 163; x++) {
+        if (x % 2 === 1) this.setBlock(x, 1, cz, 'smooth_stone');
+      }
+    }
+
+    // Legendary Brass Walk of Fame Stars embedded in sidewalks
+    const stars: { x: number; z: number; name: string; category: string; bio: string }[] = [
+      { x: 157, z: -82, name: 'Charlie Chaplin ⭐', category: 'Motion Pictures Pioneer', bio: 'The Little Tramp · Silent film icon and visionary co-founder of United Artists.' },
+      { x: 165, z: -82, name: 'Marilyn Monroe ⭐', category: 'Motion Pictures Legend', bio: 'Golden Age silver-screen icon celebrated in Some Like It Hot & Gentlemen Prefer Blondes.' },
+      { x: 157, z: -76, name: 'Steven Spielberg ⭐', category: 'Director of the Century', bio: 'Visionary master of Jurassic Park, Jaws, Raiders of the Lost Ark, and E.T.' },
+      { x: 165, z: -76, name: 'Walt Disney ⭐', category: 'Animation & Storytelling', bio: 'Pioneer of classic animated feature films and creator of worlds of imagination.' },
+      { x: 157, z: -70, name: 'Lakshya K ⭐', category: 'Chief Metaverse Architect', bio: 'Lead creator of this 3D Minecraft interactive portfolio realm & software architect.' },
+      { x: 165, z: -70, name: 'Keanu Reeves ⭐', category: 'Sci-Fi & Action Icon', bio: "Beloved star of The Matrix, John Wick, and Cyberpunk. You're breathtaking!" },
+      { x: 157, z: -64, name: 'Audrey Hepburn ⭐', category: 'Golden Age Cinema & Philanthropy', bio: "Iconic star of Breakfast at Tiffany's, Roman Holiday, and UNICEF Goodwill Ambassador." },
+      { x: 165, z: -64, name: 'Morgan Freeman ⭐', category: 'Master of Dramatic Arts', bio: 'The definitive resonant narrator of cinema, beloved in Shawshank Redemption & Driving Miss Daisy.' },
+      { x: 157, z: -58, name: 'Hans Zimmer ⭐', category: 'Cinematic Score Composer', bio: 'Composer of breathtaking film scores: Interstellar, Inception, Gladiator, and The Dark Knight.' },
+      { x: 165, z: -58, name: 'Robin Williams ⭐', category: 'Comedic & Dramatic Genius', bio: 'Beloved improvisational master of Good Will Hunting, Dead Poets Society, and Aladdin.' }
+    ];
+
+    for (const star of stars) {
+      this.setBlock(star.x, 1, star.z, 'gold_block', {
+        type: 'sign',
+        title: `Walk of Fame: ${star.name}`,
+        text: `${star.category}\n"${star.bio}"`
+      });
+      // Decorative border around the star
+      this.setBlock(star.x - 1, 1, star.z, 'red_terracotta');
+      this.setBlock(star.x + 1, 1, star.z, 'red_terracotta');
+    }
+
+    // Vintage Hollywood Boulevard Lampposts & Royal California Palms
+    for (let z = -84; z <= -54; z += 6) {
+      // West Lamppost
+      this.setBlock(155, 2, z, 'iron_block');
+      this.setBlock(155, 3, z, 'iron_block');
+      this.setBlock(155, 4, z, 'sea_lantern');
+      this.setBlock(155, 2, z - 1, 'oak_leaves'); // Planter box
+
+      // East Lamppost
+      this.setBlock(167, 2, z, 'iron_block');
+      this.setBlock(167, 3, z, 'iron_block');
+      this.setBlock(167, 4, z, 'sea_lantern');
+      this.setBlock(167, 2, z - 1, 'oak_leaves');
+    }
+
+    // Tall California Royal Palm Trees
+    const palmZCoords = [-80, -72, -64, -56];
+    for (const pz of palmZCoords) {
+      // West side palm at (154, pz)
+      for (let y = 1; y <= 7; y++) this.setBlock(154, y, pz, 'jungle_log');
+      this.setBlock(154, 7, pz, 'sea_lantern');
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(154 + dx, 8, pz + dz, 'oak_leaves');
+        }
+      }
+      this.setBlock(154, 9, pz, 'oak_leaves');
+
+      // East side palm at (168, pz)
+      for (let y = 1; y <= 7; y++) this.setBlock(168, y, pz, 'jungle_log');
+      this.setBlock(168, 7, pz, 'sea_lantern');
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(168 + dx, 8, pz + dz, 'oak_leaves');
+        }
+      }
+      this.setBlock(168, 9, pz, 'oak_leaves');
+    }
+
+    // Hollywood Boulevard Grand Gateway Neon Arch at Z = -54
+    for (let y = 1; y <= 6; y++) {
+      this.setBlock(158, y, -54, 'gold_block');
+      this.setBlock(164, y, -54, 'gold_block');
+    }
+    for (let x = 158; x <= 164; x++) {
+      this.setBlock(x, 7, -54, 'sea_lantern');
+      this.setBlock(x, 8, -54, 'gold_block');
+    }
+    this.setBlock(161, 9, -54, 'beacon');
+    this.setBlock(161, 7, -54, 'glowstone', {
+      type: 'sign',
+      title: 'HOLLYWOOD BOULEVARD ⭐',
+      text: 'Historic corridor of world cinema! Famous Walk of Fame stars, Hollywood Bowl amphitheatre, film soundstages, and legendary movie palaces.'
+    });
+
+    // Connecting plaza from Hollywood Blvd (158..164, -54) toward Vegas Blvd (140, -52)
+    for (let x = 144; x <= 158; x++) {
+      for (let z = -55; z <= -52; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (z === -53 && x % 4 <= 1) this.setBlock(x, 1, z, 'gold_block');
+      }
+    }
+  }
+
+  // 2. The Hollywood Bowl Amphitheater nestled in the Eastern Foothills
+  private buildHollywoodBowl(cx: number, cz: number) {
+    // Stage center at (cx, cz) = (180, -76)
+    // Acoustic shells facing West (towards Hollywood Boulevard)
+    // Ground platform at Y = 2
+    for (let x = cx - 3; x <= cx + 6; x++) {
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        this.setBlock(x, 2, z, 'oak_planks');
+      }
+    }
+
+    // Nested semicircular acoustic shells (outer, middle, inner concentric arches)
+    // Shell 1 (Outer arch, radius 7, Y up to 13 at X = cx + 5)
+    for (let dz = -7; dz <= 7; dz++) {
+      const archH = Math.round(Math.sqrt(Math.max(0, 49 - dz * dz)) * 1.5);
+      for (let y = 2; y <= 2 + archH; y++) {
+        this.setBlock(cx + 5, y, cz + dz, 'quartz_block');
+        this.setBlock(cx + 6, y, cz + dz, 'stone_bricks');
+      }
+    }
+
+    // Shell 2 (Middle arch, radius 5.5, Y up to 11 at X = cx + 3)
+    for (let dz = -5; dz <= 5; dz++) {
+      const archH = Math.round(Math.sqrt(Math.max(0, 30 - dz * dz)) * 1.5);
+      for (let y = 2; y <= 2 + archH; y++) {
+        this.setBlock(cx + 3, y, cz + dz, 'quartz_block');
+      }
+    }
+
+    // Shell 3 (Inner arch, radius 4, Y up to 9 at X = cx + 1)
+    for (let dz = -3; dz <= 3; dz++) {
+      const archH = Math.round(Math.sqrt(Math.max(0, 16 - dz * dz)) * 1.5);
+      for (let y = 2; y <= 2 + archH; y++) {
+        this.setBlock(cx + 1, y, cz + dz, 'quartz_block');
+      }
+    }
+
+    // Acoustic shell crown illumination
+    this.setBlock(cx + 5, 14, cz, 'sea_lantern');
+    this.setBlock(cx + 3, 12, cz, 'sea_lantern');
+    this.setBlock(cx + 1, 10, cz, 'sea_lantern');
+
+    // Concert Grand Piano at (cx + 2, 3, cz)
+    this.setBlock(cx + 2, 3, cz, 'coal_block');
+    this.setBlock(cx + 2, 3, cz - 1, 'coal_block');
+    this.setBlock(cx + 3, 3, cz, 'coal_block');
+    this.setBlock(cx + 2, 3, cz + 1, 'quartz_block'); // Piano keyboard
+    this.setBlock(cx + 1, 3, cz + 1, 'oak_planks'); // Piano stool
+
+    // Concert Stage Microphones & Audio Wings
+    this.setBlock(cx - 1, 3, cz, 'iron_block'); // Center mic stand
+    this.setBlock(cx - 1, 4, cz, 'lantern');
+
+    // Left and Right Audio Monitor Stack Towers
+    for (const dz of [-6, 6]) {
+      this.setBlock(cx + 1, 3, cz + dz, 'obsidian');
+      this.setBlock(cx + 1, 4, cz + dz, 'sea_lantern');
+      this.setBlock(cx + 1, 5, cz + dz, 'obsidian');
+    }
+
+    // Stage Front Footlights
+    for (let dz = -6; dz <= 6; dz += 2) {
+      this.setBlock(cx - 2, 2, cz + dz, 'sea_lantern');
+    }
+
+    // Outdoor Amphitheater Terraced Bench Seating facing the shell (X in [cx - 12, cx - 4])
+    for (let tier = 1; tier <= 4; tier++) {
+      const tierX = cx - 4 - tier * 2;
+      const tierY = 1 + tier;
+      for (let z = cz - 7; z <= cz + 7; z++) {
+        // Skip central aisle
+        if (z === cz) {
+          this.setBlock(tierX, tierY, z, 'smooth_stone');
+          if (tier % 2 === 0) this.setBlock(tierX, tierY + 1, z, 'lantern');
+          continue;
+        }
+        // Substructure plinth
+        this.setBlock(tierX, tierY - 1, z, 'stone_bricks');
+        // Bench seating
+        this.setBlock(tierX, tierY, z, 'oak_planks');
+      }
+    }
+
+    // Historical Amphitheatre Plaque
+    this.setBlock(cx - 5, 3, cz + 4, 'gold_block', {
+      type: 'sign',
+      title: 'The Hollywood Bowl · World Famous Amphitheatre 🎶',
+      text: 'Legendary natural acoustic amphitheater opened in 1922 in the Hollywood Hills. Hosted the Los Angeles Philharmonic, The Beatles, Frank Sinatra, and world-renowned film symphony nights!'
+    });
+  }
+
+  // 3. Hollywood Pictures Studio Lot, Soundstage 1 & Water Tower
+  private buildHollywoodStudioLot(cx: number, cz: number) {
+    // Center at (cx, cz) = (144, -76)
+    // Lot pavement at Y = 1: X in [134, 153], Z in [-84, -69]
+    for (let x = 134; x <= 153; x++) {
+      for (let z = -84; z <= -69; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+      }
+    }
+
+    // A. Studio Entrance Gateway Arch at X = 153, Z = cz
+    for (let y = 1; y <= 5; y++) {
+      this.setBlock(153, y, cz - 3, 'stone_bricks');
+      this.setBlock(153, y, cz + 3, 'stone_bricks');
+    }
+    for (let z = cz - 3; z <= cz + 3; z++) {
+      this.setBlock(153, 6, z, 'gold_block');
+    }
+    this.setBlock(153, 7, cz, 'beacon');
+    this.setBlock(153, 6, cz, 'sea_lantern', {
+      type: 'sign',
+      title: 'HOLLYWOOD PICTURES STUDIOS 🎬',
+      text: 'Historic backlot soundstages, prop departments, and motion picture production studios. Authorized film personnel only!'
+    });
+
+    // B. Iconic Warner Bros / Paramount Style Studio Water Tower at (136, -81)
+    const wtX = 136;
+    const wtZ = -81;
+    // 4 Heavy steel stilt legs rising to Y = 13
+    const stilts = [[wtX - 2, wtZ - 2], [wtX + 2, wtZ - 2], [wtX - 2, wtZ + 2], [wtX + 2, wtZ + 2]];
+    for (const [sx, sz] of stilts) {
+      for (let y = 1; y <= 13; y++) {
+        this.setBlock(sx, y, sz, 'iron_block');
+      }
+    }
+    // Cross braces between legs
+    for (const y of [5, 9, 13]) {
+      for (let x = wtX - 2; x <= wtX + 2; x++) {
+        this.setBlock(x, y, wtZ - 2, 'iron_block');
+        this.setBlock(x, y, wtZ + 2, 'iron_block');
+      }
+      for (let z = wtZ - 2; z <= wtZ + 2; z++) {
+        this.setBlock(wtX - 2, y, z, 'iron_block');
+        this.setBlock(wtX + 2, y, z, 'iron_block');
+      }
+    }
+
+    // Cylindrical Water Tank from Y = 14 to Y = 18
+    for (let y = 14; y <= 18; y++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; // Round corners
+          const isFace = (dx === 2 && Math.abs(dz) <= 1); // East face towards lot
+          if (isFace && (y === 16 || y === 17)) {
+            this.setBlock(wtX + dx, y, wtZ + dz, 'gold_block'); // "HP" studio logo
+          } else {
+            this.setBlock(wtX + dx, y, wtZ + dz, 'lapis_block');
+          }
+        }
+      }
+    }
+
+    // Water Tower Conical Roof & Aircraft Beacon
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(wtX + dx, 19, wtZ + dz, 'smooth_stone');
+      }
+    }
+    this.setBlock(wtX, 20, wtZ, 'iron_block');
+    this.setBlock(wtX, 21, wtZ, 'redstone_block');
+    this.setBlock(wtX, 22, wtZ, 'beacon');
+
+    this.setBlock(wtX, 2, wtZ + 3, 'iron_block', {
+      type: 'sign',
+      title: 'Hollywood Pictures Water Tower · Est. 1928 💧',
+      text: 'Iconic landmark rising 22 blocks above the backlot soundstages. Symbol of classic Hollywood cinema, legendary cartoons, and movie-making magic!'
+    });
+
+    // C. Soundstage 1 (Massive Hangar Building) at X in [139, 151], Z in [-81, -71]
+    const stageX1 = 139;
+    const stageX2 = 151;
+    const stageZ1 = -81;
+    const stageZ2 = -71;
+
+    // Stage walls and roof
+    for (let x = stageX1; x <= stageX2; x++) {
+      for (let z = stageZ1; z <= stageZ2; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+        const isWall = (x === stageX1 || x === stageX2 || z === stageZ1 || z === stageZ2);
+        if (isWall) {
+          for (let y = 2; y <= 9; y++) {
+            // Soundstage Doorway opening at East Wall (X = stageX2, Z in [-77, -75], Y in [2, 5])
+            if (x === stageX2 && z >= -77 && z <= -75 && y <= 5) continue;
+            this.setBlock(x, y, z, (y === 9) ? 'stone_bricks' : 'smooth_stone');
+          }
+        }
+        // Industrial roof deck
+        this.setBlock(x, 10, z, 'stone_bricks');
+      }
+    }
+
+    // Stage 1 Entrance Sign & Recording Warning Beacon
+    this.setBlock(stageX2, 6, -76, 'redstone_block');
+    this.setBlock(stageX2 + 1, 6, -76, 'glowstone', {
+      type: 'sign',
+      title: 'SOUNDSTAGE 1 · FILMING IN PROGRESS 🔴',
+      text: 'Silence on set! Soundstage 1 is actively recording. Enter to observe film production, camera dolly, green screen, and director\'s chair.'
+    });
+
+    // Interior Movie Set inside Soundstage 1:
+    // 1. Chroma Key Green Screen Wall on West interior wall
+    for (let z = stageZ1 + 2; z <= stageZ2 - 2; z++) {
+      for (let y = 2; y <= 6; y++) {
+        this.setBlock(stageX1 + 1, y, z, 'emerald_block');
+      }
+      this.setBlock(stageX1 + 2, 2, z, 'emerald_block'); // Green floor extension
+    }
+
+    // 2. Camera Dolly on Rolling Steel Rails
+    for (let z = -78; z <= -74; z++) {
+      this.setBlock(145, 2, z, 'iron_block'); // Camera dolly rails
+    }
+    // Camera rig on dolly
+    this.setBlock(145, 3, -76, 'coal_block');
+    this.setBlock(145, 4, -76, 'obsidian'); // 35mm Studio Cinema Camera
+    this.setBlock(144, 4, -76, 'sea_lantern'); // Camera optics lens pointing at green screen
+    this.setBlock(146, 3, -76, 'oak_planks'); // Camera operator seat
+
+    // 3. Director's Canvas Chair & Megaphone
+    this.setBlock(148, 2, -78, 'oak_planks');
+    this.setBlock(148, 3, -78, 'gold_block', {
+      type: 'sign',
+      title: 'Director\'s Chair · Scene 42 Take 1 🎬',
+      text: 'DIRECTOR: LAKSHYA K\nFilm: "Journey Through the 3D Portfolio"\nStatus: Rolling! Quiet on set... and ACTION!'
+    });
+
+    // 4. Overhead Lighting Truss Rig at Y = 8
+    for (let x = stageX1 + 2; x <= stageX2 - 2; x += 3) {
+      for (let z = stageZ1 + 2; z <= stageZ2 - 2; z += 3) {
+        this.setBlock(x, 8, z, 'iron_block');
+        this.setBlock(x, 7, z, 'sea_lantern'); // Studio spotlight
+      }
+    }
+  }
+
+  // 4. Capitol Records Building / Vinyl Spire Tower
+  private buildCapitolRecordsTower(cx: number, cz: number) {
+    // Centered at (cx, cz) = (174, -59)
+    // A. Ground Plaza & Landscape Terrace at Y = 1..2
+    for (let dx = -6; dx <= 6; dx++) {
+      for (let dz = -6; dz <= 6; dz++) {
+        const dist = Math.hypot(dx, dz);
+        if (dist <= 6) {
+          this.setBlock(cx + dx, 1, cz + dz, 'smooth_stone');
+          if (dist > 4.8) {
+            this.setBlock(cx + dx, 2, cz + dz, 'oak_leaves'); // Manicured hedge ring
+          } else {
+            this.setBlock(cx + dx, 2, cz + dz, 'quartz_block');
+          }
+        }
+      }
+    }
+
+    // B. 6 Cylindrical Vinyl Record Stack Floors (Y = 3 to Y = 14)
+    // Welton Becket's iconic 1956 architecture: glass ribbon with cantilevered porcelain sunshade disc louvers
+    for (let f = 0; f < 6; f++) {
+      const baseY = 3 + f * 2;
+      // Lower level of floor: recessed cylindrical glass window wall (radius 3.8)
+      for (let dx = -4; dx <= 4; dx++) {
+        for (let dz = -4; dz <= 4; dz++) {
+          const dist = Math.hypot(dx, dz);
+          if (dist <= 3.8) {
+            const isGlassWall = dist >= 2.6;
+            this.setBlock(cx + dx, baseY, cz + dz, isGlassWall ? 'cyber_glass' : 'quartz_pillar');
+          }
+        }
+      }
+
+      // Upper level of floor: protruding cantilevered sunshade disc (radius 5) resembling a vinyl LP edge!
+      for (let dx = -5; dx <= 5; dx++) {
+        for (let dz = -5; dz <= 5; dz++) {
+          const dist = Math.hypot(dx, dz);
+          if (dist <= 5) {
+            this.setBlock(cx + dx, baseY + 1, cz + dz, 'quartz_block');
+          }
+        }
+      }
+    }
+
+    // C. Roof Deck at Y = 15
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) {
+        if (Math.hypot(dx, dz) <= 4) {
+          this.setBlock(cx + dx, 15, cz + dz, 'smooth_stone');
+        }
+      }
+    }
+
+    // D. Iconic 90-Foot Spire Antenna rising to Y = 25
+    for (let y = 16; y <= 24; y++) {
+      this.setBlock(cx, y, cz, (y % 2 === 0) ? 'iron_block' : 'quartz_pillar');
+    }
+
+    // Red Spire Morse Code Beacon at Y = 25..26
+    this.setBlock(cx, 25, cz, 'redstone_block');
+    this.setBlock(cx, 26, cz, 'beacon');
+
+    // E. Commemorative Building Plaque at entrance (cx - 5, 2, cz)
+    this.setBlock(cx - 5, 2, cz, 'gold_block', {
+      type: 'sign',
+      title: 'Capitol Records Tower · Hollywood & Vine 🎙️',
+      text: 'The world\'s first circular office tower (1956), designed to evoke a stack of vinyl records. Its 90-foot spire beacon continuously blinks "H-O-L-L-Y-W-O-O-D" in Morse code! Studio home of Frank Sinatra, The Beatles, Nat King Cole, and Beach Boys.'
+    });
+  }
+
+  // 5. VIP Red Carpet Film Premiere, Oscar Statuette & Stretch Limousine
+  private buildHollywoodPremiereAndOscar(cx: number, cz: number) {
+    // Center at (cx, cz) = (151, -61)
+    // A. Crimson Red Carpet Walkway
+    for (let z = -65; z <= -57; z++) {
+      for (let x = 149; x <= 153; x++) {
+        this.setBlock(x, 1, z, 'red_terracotta'); // Velvet red carpet
+      }
+      // Golden velvet rope stanchions flanking both sides of red carpet
+      this.setBlock(148, 2, z, 'gold_block');
+      this.setBlock(154, 2, z, 'gold_block');
+      if (Math.abs(z) % 2 === 0) {
+        this.setBlock(148, 3, z, 'redstone_block');
+        this.setBlock(154, 3, z, 'redstone_block');
+      }
+    }
+
+    // Paparazzi Flashbulb Spotlights
+    for (const [px, pz] of [[147, -65], [155, -65], [147, -57], [155, -57]]) {
+      this.setBlock(px, 2, pz, 'iron_block');
+      this.setBlock(px, 3, pz, 'sea_lantern');
+    }
+
+    // B. Monumental 7-Block Golden Oscar Statuette at (cx, 2, -66)
+    const oscX = cx;
+    const oscZ = -66;
+    // Black obsidian & quartz stepped plinth
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(oscX + dx, 1, oscZ + dz, 'obsidian');
+        this.setBlock(oscX + dx, 2, oscZ + dz, 'smooth_stone');
+      }
+    }
+    this.setBlock(oscX, 3, oscZ, 'obsidian');
+
+    // Golden Oscar body holding crusader sword
+    this.setBlock(oscX, 4, oscZ, 'gold_block'); // Feet & gown base
+    this.setBlock(oscX, 5, oscZ, 'gold_block'); // Legs
+    this.setBlock(oscX, 6, oscZ, 'gold_block'); // Torso
+    this.setBlock(oscX - 1, 6, oscZ, 'gold_block'); // Left arm holding sword
+    this.setBlock(oscX + 1, 6, oscZ, 'gold_block'); // Right arm holding sword
+    this.setBlock(oscX, 7, oscZ, 'gold_block'); // Head
+    this.setBlock(oscX, 8, oscZ, 'gold_block'); // Golden laurel crown
+    this.setBlock(oscX, 9, oscZ, 'beacon');     // Heavenly beacon
+
+    // Oscar Historical Inscription
+    this.setBlock(oscX, 2, oscZ + 2, 'gold_block', {
+      type: 'sign',
+      title: 'The Academy Award · Oscar Statuette ⭐',
+      text: 'The definitive symbol of cinematic excellence! Awarded for outstanding achievement in directing, performance, artistry, and vision. Dedicated to all creators who turn imagination into reality.'
+    });
+
+    // C. VIP Stretch Limousine parked alongside the red carpet (X in [145, 147], Z in [-66, -58])
+    const limoZ1 = -66;
+    const limoZ2 = -58;
+    for (let z = limoZ1; z <= limoZ2; z++) {
+      for (let x = 145; x <= 147; x++) {
+        // Wheels at front and rear corners
+        const isWheel = (z === limoZ1 + 1 || z === limoZ2 - 1) && (x === 145 || x === 147);
+        if (isWheel) {
+          this.setBlock(x, 1, z, 'coal_block');
+          this.setBlock(x, 2, z, 'iron_block');
+        } else {
+          this.setBlock(x, 1, z, 'coal_block'); // Underbody
+          this.setBlock(x, 2, z, 'obsidian');   // Glossy black chassis
+        }
+
+        // Tinted panoramic cabin windows & roof
+        if (z > limoZ1 && z < limoZ2) {
+          const isEdge = (x === 145 || x === 147 || z === limoZ1 + 1 || z === limoZ2 - 1);
+          this.setBlock(x, 3, z, isEdge ? 'cyber_glass' : 'smooth_stone');
+          this.setBlock(x, 4, z, 'obsidian'); // Roof
+        }
+      }
+    }
+    // Headlights (facing North towards red carpet) & Tail lights
+    this.setBlock(145, 2, limoZ1, 'sea_lantern');
+    this.setBlock(147, 2, limoZ1, 'sea_lantern');
+    this.setBlock(145, 2, limoZ2, 'redstone_block');
+    this.setBlock(147, 2, limoZ2, 'redstone_block');
+
+    // Limousine Interior VIP Lounge & Champagne Bar
+    this.setBlock(146, 2, -62, 'gold_block'); // Bar
+    this.setBlock(146, 3, -62, 'sea_lantern');
+    this.setBlock(146, 2, -61, 'quartz_block'); // Leather passenger seat
+    this.setBlock(146, 2, -63, 'quartz_block');
+
+    this.setBlock(144, 2, -62, 'iron_block', {
+      type: 'sign',
+      title: 'VIP Hollywood Stretch Limousine 🥂',
+      text: 'Chauffeured obsidian stretch limousine awaiting A-list stars and Academy Award nominees for tonight\'s glamorous world premiere.'
+    });
+  }
+
+  // 6. Mel's Retro 1950s Drive-In Diner & Classic Coupe
+  private buildMelsRetroDiner(cx: number, cz: number) {
+    // Centered at (cx, cz) = (139, -60)
+    // Diner footprint: X in [134, 143], Z in [-65, -55]
+    const dX1 = 134;
+    const dX2 = 143;
+    const dZ1 = -65;
+    const dZ2 = -55;
+
+    // A. Checkerboard black and white tile floor at Y = 1
+    for (let x = dX1; x <= dX2; x++) {
+      for (let z = dZ1; z <= dZ2; z++) {
+        const isWhite = (x + z) % 2 === 0;
+        this.setBlock(x, 1, z, isWhite ? 'quartz_block' : 'coal_block');
+
+        // Exterior Walls (Y = 2 to Y = 4)
+        const isWall = (x === dX1 || x === dX2 || z === dZ1 || z === dZ2);
+        if (isWall) {
+          // Diner Entrance Doorway at East Wall (X = dX2, Z = -60)
+          if (x === dX2 && (z === -60 || z === -59)) {
+            this.setBlock(x, 2, z, 'cyber_glass');
+            this.setBlock(x, 3, z, 'cyber_glass');
+            this.setBlock(x, 4, z, 'red_terracotta');
+            continue;
+          }
+
+          this.setBlock(x, 2, z, 'red_terracotta'); // Red stainless steel wainscot
+          this.setBlock(x, 3, z, 'cyber_glass');    // Panoramic ribbon windows
+          this.setBlock(x, 4, z, 'red_terracotta');
+        }
+
+        // Flat streamline roof deck at Y = 5
+        this.setBlock(x, 5, z, 'smooth_stone');
+      }
+    }
+
+    // Neon Teal & Red Roof Fascia Parapet at Y = 6
+    for (let x = dX1; x <= dX2; x++) {
+      this.setBlock(x, 6, dZ1, 'prismarine_bricks');
+      this.setBlock(x, 6, dZ2, 'prismarine_bricks');
+    }
+    for (let z = dZ1; z <= dZ2; z++) {
+      this.setBlock(dX1, 6, z, 'prismarine_bricks');
+      this.setBlock(dX2, 6, z, 'prismarine_bricks');
+    }
+
+    // Illuminated Neon Diner Marquee Sign atop roof
+    this.setBlock(cx, 7, cz, 'redstone_block');
+    this.setBlock(cx, 8, cz, 'sea_lantern');
+    this.setBlock(cx, 7, cz + 1, 'sea_lantern', {
+      type: 'sign',
+      title: 'MEL\'S DRIVE-IN · 24 HR HOLLYWOOD DINER 🍔',
+      text: 'Authentic 1950s American roadside neon diner! Famous smashburgers, malted chocolate milkshakes, crispy fries, and jukebox rock \'n roll since 1947.'
+    });
+
+    // B. Interior Diner Layout:
+    // Chrome lunch counter at X = 137, Z in [-63, -57]
+    for (let z = -63; z <= -57; z++) {
+      this.setBlock(137, 2, z, 'smooth_stone'); // Countertop
+      // Chrome swivel barstools facing counter
+      this.setBlock(138, 2, z, (z % 2 === 0) ? 'red_terracotta' : 'iron_block');
+    }
+    // Soda Fountain & Shake Mixer
+    this.setBlock(136, 2, -61, 'cauldron');
+    this.setBlock(136, 3, -61, 'sea_lantern');
+
+    // Retro 1950s Wurlitzer Jukebox at (135, 2, -64)
+    this.setBlock(135, 2, -64, 'bookshelf');
+    this.setBlock(135, 3, -64, 'gold_block');
+    this.setBlock(135, 4, -64, 'sea_lantern', {
+      type: 'sign',
+      title: 'Wurlitzer 1015 Golden Jukebox 🎵',
+      text: 'Playing classic rock \'n roll, doo-wop, and swing hits on original 45 RPM vinyl records! Press [E] to drop in a nickel.'
+    });
+
+    // C. Vintage 1957 Turquoise Convertible Hot-Rod parked in Drive-In bay at (142, -54)
+    const carX = 142;
+    const carZ1 = -54;
+    const carZ2 = -51;
+    for (let z = carZ1; z <= carZ2; z++) {
+      // Wheels
+      if (z === carZ1 || z === carZ2) {
+        this.setBlock(carX - 1, 1, z, 'coal_block');
+        this.setBlock(carX + 1, 1, z, 'coal_block');
+      }
+      for (let x = carX - 1; x <= carX + 1; x++) {
+        this.setBlock(x, 2, z, 'prismarine_bricks'); // Retro turquoise chassis
+      }
+    }
+    // Windshield & White leather interior
+    this.setBlock(carX - 1, 3, carZ1 + 1, 'cyber_glass');
+    this.setBlock(carX, 3, carZ1 + 1, 'cyber_glass');
+    this.setBlock(carX + 1, 3, carZ1 + 1, 'cyber_glass');
+    this.setBlock(carX, 2, carZ1 + 2, 'quartz_block'); // Seat
+    // Headlights & Tail lights
+    this.setBlock(carX - 1, 2, carZ2, 'sea_lantern');
+    this.setBlock(carX + 1, 2, carZ2, 'sea_lantern');
+    this.setBlock(carX - 1, 2, carZ1, 'redstone_block');
+    this.setBlock(carX + 1, 2, carZ1, 'redstone_block');
+
+    this.setBlock(carX + 2, 2, -53, 'sea_lantern', {
+      type: 'sign',
+      title: '1957 Classic Hollywood Convertible Coupe 🚘',
+      text: 'Turquoise cruiser parked under the neon lights of Mel\'s Diner. Ready for a scenic cruise down Sunset Boulevard!'
+    });
   }
 
   private buildHospital(cx: number, cz: number) {

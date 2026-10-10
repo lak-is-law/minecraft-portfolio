@@ -448,6 +448,20 @@ export class HUDManager {
     ctx.ellipse(originX + 165 * scale, originZ - 100 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
     ctx.fill();
 
+    // Hollywood Boulevard Walk of Fame & Hollywood Bowl in USA
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.4 * scale;
+    ctx.beginPath();
+    ctx.moveTo(originX + 161 * scale, originZ - 84 * scale);
+    ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#f8fafc';
+    ctx.lineWidth = 1.8 * scale;
+    ctx.beginPath();
+    ctx.arc(originX + 180 * scale, originZ - 76 * scale, 5 * scale, -Math.PI * 0.4, Math.PI * 0.4);
+    ctx.stroke();
+
     ctx.restore(); // restore island clip
 
     // Main Roads
@@ -460,6 +474,7 @@ export class HUDManager {
     ctx.moveTo(originX - 2 * scale, originZ - 55 * scale); ctx.lineTo(originX - 70 * scale, originZ - 85 * scale);
     ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 79 * scale, originZ + 50 * scale);
     ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 160 * scale);
+    ctx.moveTo(originX + 161 * scale, originZ - 84 * scale); ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
     ctx.stroke();
 
     // Island Express Railway Transit Loop

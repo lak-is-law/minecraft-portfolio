@@ -415,6 +415,8 @@ export const PORTFOLIO_DATA = {
     { name: "Neo York Tech Metropolis", coords: [100, 2, 0], tag: "[NEO YORK]", desc: "American cyberpunk metropolis with glass skyscrapers, Times Square screens, and AI research labs" },
     { name: "Lak Tower (\"LK\" Monument)", coords: [150, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel-inspired tower with illuminated LK monogram and observation skydeck" },
     { name: "Hollywood Hills & Sign", coords: [165, 26, -100], tag: "[HOLLYWOOD]", desc: "Scenic mountain ridge and illuminated block-built HOLLYWOOD sign overlooking the American tech hub" },
+    { name: "The Hollywood Bowl & Amphitheatre", coords: [178, 3, -76], tag: "[HOLLYWOOD]", desc: "Iconic acoustic shell nested in the foothills, stage piano, tiered benches, and symphonic concert grounds" },
+    { name: "Hollywood Pictures Studios & Walk of Fame", coords: [151, 2, -61], tag: "[HOLLYWOOD]", desc: "Historic studio soundstage lot, 22-block water tower, Walk of Fame brass stars, and red carpet Oscar premiere" },
     { name: "Imperial India · Taj Mahal", coords: [80, 4, -135], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, Yamuna reflecting canal, and SRMIST academic honors" },
     { name: "Varanasi Ghats & Haveli", coords: [45, 2, -120], tag: "[VARANASI]", desc: "Historic riverfront stone steps, sacred banyan trees, and ornate Rajasthani Haveli chhatris" },
     { name: "China · Great Wall & Pagoda", coords: [-110, 2, -110], tag: "[GREAT WALL]", desc: "Mighty stone ramparts, watchtowers, 5-tier dragon pagoda, bamboo groves, and Foreign Languages embassy" },
@@ -432,15 +434,18 @@ export const PORTFOLIO_DATA = {
     { name: "Crossroads Wildlife Park", coords: [-65, 2, 0], tag: "[ZOO]", desc: "Expansive safari wildlife reserve featuring real animated pandas, lions, elephants, giraffes, polar bears, penguins, zebras, and farm petting zoo" },
     { name: "Rapunzel’s Castle", coords: [-70, 2, -34], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and golden braid above secluded gardens" },
     { name: "Eiffel Tower · Paris", coords: [26, 2, -38], tag: "[EIFFEL]", desc: "Gustave Eiffel's lattice landmark with walkable archways, Champ de Mars gardens, and Café de Paris" },
-    { name: "London · Big Ben & Tower Bridge", coords: [-32, 2, -65], tag: "[LONDON]", desc: "Gothic Elizabeth Tower clock, Great Bell, Tower Bridge walkways, and red Routemaster double-decker bus" },
+    { name: "London · Big Ben & Tower Bridge", coords: [-32, 2, -58], tag: "[LONDON]", desc: "Gothic Elizabeth Tower clock, Westminster chime & Great Bell, Tower Bridge walkways, and red Routemaster double-decker bus" },
     { name: "Tokyo · Shibuya Scramble Crossing", coords: [-155, 2, -80], tag: "[TOKYO]", desc: "Vibrant neon-lit scramble crossing, giant LED billboard towers, Hachiko plaza, and Shinkansen bullet train" },
     { name: "Seoul · Gwanghwamun Palace Gate", coords: [-65, 2, -95], tag: "[SEOUL]", desc: "Historic Joseon royal pavilion with Dancheong eaves, stone portals, and Hongdae K-Pop street food" },
     { name: "Seoul · N Seoul Tower (Namsan)", coords: [-52, 16, -115], tag: "[SEOUL]", desc: "Mount Namsan observation spire with 360-degree glass skydeck and illuminated communication antenna" },
     { name: "Egypt · Giza Pyramids & Great Sphinx", coords: [-155, 2, 36], tag: "[GIZA]", desc: "Pyramid of Khufu with hollow torch-lit burial chamber, Great Sphinx of Giza, and desert camels" },
     { name: "Dubai · Burj Khalifa & Palm Jumeirah", coords: [170, 2, 42], tag: "[DUBAI]", desc: "828m spider-lily skyscraper with glass observation skydeck at Y=46 and Palm Jumeirah lagoon villas" },
-    { name: "Mumbai · Gateway of India & Local Train", coords: [40, 2, -95], tag: "[MUMBAI]", desc: "Indo-Saracenic basalt triumphal arch, Apollo Bunder harbor, and Western Railway Mumbai Local coach" },
-    { name: "Dravidian Temple Gopuram & Mandapam", coords: [115, 2, -135], tag: "[TEMPLE]", desc: "Vibrant 24-block sculptural tiers, 16-pillared stone mandapam hall, brass bells, and sacred kulam tank" },
+    { name: "Mumbai · Gateway of India & Local Train", coords: [40, 2, -95], tag: "[MUMBAI]", desc: "Indo-Saracenic basalt triumphal arch, Apollo Bunder harbor, Western Railway Mumbai Local coach, and Bajaj Auto-Rickshaw" },
+    { name: "Dravidian Temple Gopuram & Mandapam", coords: [115, 2, -135], tag: "[TEMPLE]", desc: "Vibrant 24-block sculptural tiers, 16-pillared stone mandapam hall, brass bells, sacred kulam tank, and caparisoned Temple Elephant Gajendra" },
     { name: "Chennai · Marina Beach Lighthouse", coords: [145, 2, -125], tag: "[MARINA]", desc: "Striped maritime lighthouse, fishing catamarans on the sand, sundal cart, and beach kites" },
-    { name: "Sher-e-Punjab Highway Dhaba & Tata Truck", coords: [55, 2, -75], tag: "[DHABA]", desc: "Grand Trunk Road dhaba with woven charpai cots, smoking tandoor oven, and decorated 'Horn OK Please' Tata truck" }
+    { name: "Sher-e-Punjab Highway Dhaba & Tata Truck", coords: [55, 2, -75], tag: "[DHABA]", desc: "Grand Trunk Road dhaba with woven charpai cots, smoking tandoor oven, and decorated 'Horn OK Please' Tata truck" },
+    { name: "ISRO Spaceport · Chandrayaan-3", coords: [115, 2, -85], tag: "[ISRO]", desc: "Lunar South Pole Vikram lander, Pragyan rover, deployed solar wings, and deep-space telemetry center" },
+    { name: "Jaipur · Hawa Mahal (Palace of Winds)", coords: [58, 2, -103], tag: "[HAWA MAHAL]", desc: "5-tiered Rajasthani rose sandstone facade with 953 honeycombed jharokha lattice balconies" },
+    { name: "India Gate & Amar Jawan Jyoti", coords: [80, 2, -60], tag: "[INDIA GATE]", desc: "Monumental New Delhi triumphal arch with perpetual eternal flame braziers and Diwali illuminations" }
   ]
 };

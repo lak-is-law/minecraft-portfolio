@@ -3,7 +3,7 @@ import { sound } from '../engine/audio';
 
 export interface AnimalEntity {
   group: THREE.Group;
-  type: 'panda' | 'lion' | 'elephant' | 'giraffe' | 'polar_bear' | 'penguin' | 'sheep' | 'pig' | 'zebra' | 'flamingo';
+  type: 'panda' | 'lion' | 'elephant' | 'giraffe' | 'polar_bear' | 'penguin' | 'sheep' | 'pig' | 'zebra' | 'flamingo' | 'tiger' | 'peacock' | 'temple_elephant';
   name: string;
   species: string;
   basePos: THREE.Vector3;
@@ -109,6 +109,18 @@ export class AnimalManager {
     // 8. Flamingo Lagoon (Central Wetland: X around -62, Z around -2)
     this.createFlamingo(-63, 1.0, -3, '🦩 Flora', 'Greater Flamingo');
     this.createFlamingo(-65, 1.0, -1, '🦩 Coral', 'Greater Flamingo');
+
+    // 9. Imperial India Realm: Living Iconic Fauna
+    // Royal Bengal Tigers (Sanctuary grove by the Banyan trees)
+    this.createTiger(52, 1.0, -142, '🐅 Sher Khan', 'Royal Bengal Tiger (National Animal)', 1.05);
+    this.createTiger(57, 1.0, -138, '🐅 Sundari', 'Bengal Tigress', 0.95);
+
+    // Dancing Indian Blue Peacocks (Taj Mahal Yamuna Lotus Pool)
+    this.createPeacock(73, 1.0, -118, '🦚 Mayura', 'Indian Blue Peacock (National Bird)', 1.0);
+    this.createPeacock(87, 1.0, -118, '🦚 Nilakantha', 'Indian Blue Peacock', 1.0);
+
+    // Sacred Caparisoned Temple Bull Elephant (Dravidian Temple Gopuram Mandapam)
+    this.createTempleElephant(115, 1.0, -122, '🐘 Gajendra', 'Caparisoned Temple Elephant', 1.22);
   }
 
   // ==========================================
@@ -1100,6 +1112,393 @@ export class AnimalManager {
       update: (time, _playerPos) => {
         // Subtle neck filter-feeding dip
         neckGroup.rotation.x = Math.sin(time * 1.6 + x) * 0.12;
+      }
+    };
+
+    this.animals.push(entity);
+  }
+
+  // ==========================================
+  // 9. ROYAL BENGAL TIGER (Panthera tigris tigris)
+  // National Animal of India
+  // ==========================================
+  private createTiger(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const root = new THREE.Group();
+    root.position.set(x, y, z);
+    root.scale.setScalar(scale);
+
+    const orangeMat = new THREE.MeshLambertMaterial({ color: 0xea580c });
+    const blackMat = new THREE.MeshLambertMaterial({ color: 0x18181b });
+    const whiteMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+    const eyeMat = new THREE.MeshLambertMaterial({ color: 0xf59e0b });
+
+    // Torso (sleek, muscular predator build)
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.62, 1.3), orangeMat);
+    body.position.set(0, 0.72, 0);
+    body.castShadow = true;
+    root.add(body);
+
+    // White underbelly
+    const underbelly = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 1.1), whiteMat);
+    underbelly.position.set(0, 0.44, 0);
+    root.add(underbelly);
+
+    // Transverse Black Tiger Stripes on back & flanks
+    for (let s = -0.4; s <= 0.4; s += 0.2) {
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.08), blackMat);
+      stripe.position.set(0, 0.76, s);
+      root.add(stripe);
+    }
+
+    // Head Group
+    const head = new THREE.Group();
+    head.position.set(0, 1.08, 0.7);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.48, 0.48), orangeMat);
+    head.add(headMesh);
+
+    // White Cheeks & Chin
+    const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.3), whiteMat);
+    cheekL.position.set(-0.25, -0.1, 0.08);
+    head.add(cheekL);
+    const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.3), whiteMat);
+    cheekR.position.set(0.25, -0.1, 0.08);
+    head.add(cheekR);
+
+    // Muzzle & Black Nose
+    const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.18, 0.22), whiteMat);
+    muzzle.position.set(0, -0.12, 0.3);
+    head.add(muzzle);
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.06), blackMat);
+    nose.position.set(0, -0.06, 0.42);
+    head.add(nose);
+
+    // Amber Piercing Eyes
+    const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), eyeMat);
+    eyeL.position.set(-0.16, 0.08, 0.25);
+    head.add(eyeL);
+    const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), eyeMat);
+    eyeR.position.set(0.16, 0.08, 0.25);
+    head.add(eyeR);
+
+    // Rounded Ears (black outside with white flash center)
+    const earL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.08), blackMat);
+    earL.position.set(-0.22, 0.28, -0.05);
+    head.add(earL);
+    const earR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.08), blackMat);
+    earR.position.set(0.22, 0.28, -0.05);
+    head.add(earR);
+
+    root.add(head);
+
+    // 4 Muscular Paws & Legs
+    const legOffsets: [number, number][] = [[-0.28, 0.45], [0.28, 0.45], [-0.28, -0.45], [0.28, -0.45]];
+    for (const [lx, lz] of legOffsets) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.58, 0.24), orangeMat);
+      leg.position.set(lx, 0.32, lz);
+      // White paw
+      const paw = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.26), whiteMat);
+      paw.position.set(0, -0.24, 0.02);
+      leg.add(paw);
+      root.add(leg);
+    }
+
+    // Articulated Swishing Tail
+    const tailGroup = new THREE.Group();
+    tailGroup.position.set(0, 0.85, -0.65);
+    const tailSeg1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.45), orangeMat);
+    tailSeg1.position.set(0, -0.15, -0.2);
+    tailSeg1.rotation.x = -0.4;
+    tailGroup.add(tailSeg1);
+    const tailTip = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.35), blackMat);
+    tailTip.position.set(0, -0.1, -0.4);
+    tailTip.rotation.x = 0.5;
+    tailSeg1.add(tailTip);
+    root.add(tailGroup);
+
+    // Overhead Name Tag
+    const tag = this.createNameTag(name, species, '#f97316');
+    tag.position.set(0, 1.85, 0.3);
+    root.add(tag);
+
+    this.scene.add(root);
+
+    const basePosY = y;
+    const entity: AnimalEntity = {
+      group: root,
+      type: 'tiger',
+      name,
+      species,
+      basePos: new THREE.Vector3(x, y, z),
+      heading: 0,
+      update: (time, playerPos) => {
+        // Subtle predatory breathing
+        root.position.y = basePosY + Math.sin(time * 2.4 + x) * 0.02;
+        // Tail swishing
+        tailGroup.rotation.y = Math.sin(time * 3.0 + z) * 0.35;
+
+        const dist = root.position.distanceTo(playerPos);
+        if (dist < 10) {
+          const dx = playerPos.x - root.position.x;
+          const dz = playerPos.z - root.position.z;
+          head.rotation.y = Math.atan2(dx, dz) * 0.4;
+          head.rotation.x = -0.05;
+        } else {
+          head.rotation.y = Math.sin(time * 0.8) * 0.12;
+          head.rotation.x = 0;
+        }
+      }
+    };
+
+    this.animals.push(entity);
+  }
+
+  // ==========================================
+  // 10. INDIAN PEACOCK (Pavo cristatus)
+  // National Bird of India
+  // ==========================================
+  private createPeacock(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const root = new THREE.Group();
+    root.position.set(x, y, z);
+    root.scale.setScalar(scale);
+
+    const blueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 }); // Radiant royal cobalt blue
+    const emeraldMat = new THREE.MeshLambertMaterial({ color: 0x059669 }); // Rich emerald plumage
+    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 }); // Gold crown crest & beak
+    const ocelliMat = new THREE.MeshLambertMaterial({ color: 0x1e1b4b }); // Eye spots
+    const legMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
+
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.42, 0.55), blueMat);
+    body.position.set(0, 0.6, 0);
+    body.castShadow = true;
+    root.add(body);
+
+    // Graceful Upright Neck & Head Group
+    const neckGroup = new THREE.Group();
+    neckGroup.position.set(0, 0.72, 0.22);
+
+    const neck = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.45, 0.18), blueMat);
+    neck.position.set(0, 0.2, 0.06);
+    neck.rotation.x = 0.25;
+    neckGroup.add(neck);
+
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.22), blueMat);
+    head.position.set(0, 0.42, 0.16);
+    neckGroup.add(head);
+
+    // Golden Beak
+    const beak = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.14), goldMat);
+    beak.position.set(0, 0.38, 0.28);
+    neckGroup.add(beak);
+
+    // Crown Crest of Fan Feathers
+    const crest = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.14, 0.04), goldMat);
+    crest.position.set(0, 0.54, 0.16);
+    neckGroup.add(crest);
+
+    root.add(neckGroup);
+
+    // Spectacular Fan Train Plumage behind
+    const trainGroup = new THREE.Group();
+    trainGroup.position.set(0, 0.65, -0.25);
+
+    // Fan of upright emerald feathers
+    const fan = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 0.08), emeraldMat);
+    fan.position.set(0, 0.45, -0.15);
+    fan.rotation.x = 0.35;
+    trainGroup.add(fan);
+
+    // Dotted eye-spots (ocelli) across fan
+    for (const [ox, oy] of [[-0.4, 0.6], [-0.15, 0.75], [0.15, 0.75], [0.4, 0.6], [0, 0.45], [-0.3, 0.3], [0.3, 0.3]]) {
+      const eyeSpot = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.09), ocelliMat);
+      eyeSpot.position.set(ox, oy, -0.15);
+      eyeSpot.rotation.x = 0.35;
+      trainGroup.add(eyeSpot);
+
+      const goldDot = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.1), goldMat);
+      goldDot.position.set(ox, oy, -0.14);
+      goldDot.rotation.x = 0.35;
+      trainGroup.add(goldDot);
+    }
+
+    root.add(trainGroup);
+
+    // Legs
+    const legL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), legMat);
+    legL.position.set(-0.12, 0.22, 0);
+    root.add(legL);
+    const legR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), legMat);
+    legR.position.set(0.12, 0.22, 0);
+    root.add(legR);
+
+    // Overhead Name Tag
+    const tag = this.createNameTag(name, species, '#10b981');
+    tag.position.set(0, 1.75, 0.2);
+    root.add(tag);
+
+    this.scene.add(root);
+
+    const basePosY = y;
+    const entity: AnimalEntity = {
+      group: root,
+      type: 'peacock',
+      name,
+      species,
+      basePos: new THREE.Vector3(x, y, z),
+      heading: 0,
+      update: (time, _playerPos) => {
+        // Proud bird breathing & train plumage shimmering sway
+        root.position.y = basePosY + Math.sin(time * 2.8 + x) * 0.015;
+        trainGroup.rotation.y = Math.sin(time * 1.8 + z) * 0.14;
+        neckGroup.rotation.z = Math.sin(time * 2.0 + x) * 0.08;
+      }
+    };
+
+    this.animals.push(entity);
+  }
+
+  // ==========================================
+  // 11. CAPARISONED TEMPLE ELEPHANT (Elephas maximus indicus)
+  // Sacred South Indian Temple Elephant
+  // ==========================================
+  private createTempleElephant(x: number, y: number, z: number, name: string, species: string, scale: number = 1.0) {
+    const root = new THREE.Group();
+    root.position.set(x, y, z);
+    root.scale.setScalar(scale);
+
+    const greyMat = new THREE.MeshLambertMaterial({ color: 0x64748b });
+    const darkGreyMat = new THREE.MeshLambertMaterial({ color: 0x475569 });
+    const ivoryMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const goldMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 }); // Gold Nettipattam & bells
+    const silkMat = new THREE.MeshLambertMaterial({ color: 0xdc2626 }); // Crimson silk Jhool
+    const greenMat = new THREE.MeshLambertMaterial({ color: 0x16a34a }); // Saffron/Emerald trim
+
+    // Massive Elephant Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.35, 1.9), greyMat);
+    body.position.set(0, 1.45, 0);
+    body.castShadow = true;
+    root.add(body);
+
+    // Ornate Ceremonial Jhool (Embroidered Silk Saddle Cloth)
+    const jhool = new THREE.Mesh(new THREE.BoxGeometry(1.46, 0.95, 1.4), silkMat);
+    jhool.position.set(0, 1.6, 0);
+    root.add(jhool);
+
+    // Golden decorative borders & medallions on Jhool
+    const jhoolTrim = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.16, 1.42), goldMat);
+    jhoolTrim.position.set(0, 1.15, 0);
+    root.add(jhoolTrim);
+    const jhoolCenter = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.4, 0.4), greenMat);
+    jhoolCenter.position.set(0, 1.5, 0);
+    root.add(jhoolCenter);
+
+    // Head Group
+    const head = new THREE.Group();
+    head.position.set(0, 1.78, 1.15);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.0, 0.9), greyMat);
+    head.add(headMesh);
+
+    // Radiant Golden Nettipattam (Temple Elephant Forehead Plate)
+    const nettipattam = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.78, 0.08), goldMat);
+    nettipattam.position.set(0, 0.1, 0.47);
+    nettipattam.rotation.x = -0.1;
+    head.add(nettipattam);
+
+    // Central jewel on forehead
+    const foreheadJewel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.12), silkMat);
+    foreheadJewel.position.set(0, 0.15, 0.5);
+    head.add(foreheadJewel);
+
+    // Ears
+    const earL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.85, 0.65), darkGreyMat);
+    earL.position.set(-0.58, 0.08, -0.15);
+    earL.rotation.y = 0.25;
+    head.add(earL);
+
+    const earR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.85, 0.65), darkGreyMat);
+    earR.position.set(0.58, 0.08, -0.15);
+    earR.rotation.y = -0.25;
+    head.add(earR);
+
+    // Pure White Sacred Ivory Tusks
+    const tuskL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.65), ivoryMat);
+    tuskL.position.set(-0.35, -0.38, 0.6);
+    tuskL.rotation.x = 0.35;
+    head.add(tuskL);
+
+    const tuskR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.65), ivoryMat);
+    tuskR.position.set(0.35, -0.38, 0.6);
+    tuskR.rotation.x = 0.35;
+    head.add(tuskR);
+
+    // Articulated Blessing Trunk with golden tip
+    const trunkRoot = new THREE.Group();
+    trunkRoot.position.set(0, -0.2, 0.5);
+
+    const trunk1 = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.55, 0.28), greyMat);
+    trunk1.position.set(0, -0.25, 0);
+    trunkRoot.add(trunk1);
+
+    const trunk2 = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.5, 0.24), greyMat);
+    trunk2.position.set(0, -0.7, 0.1);
+    trunk2.rotation.x = 0.45;
+    trunkRoot.add(trunk2);
+
+    const trunkTip = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.35, 0.2), goldMat); // Sacred golden blessing bell/ring
+    trunkTip.position.set(0, -1.0, 0.32);
+    trunkTip.rotation.x = 0.85;
+    trunkRoot.add(trunkTip);
+
+    head.add(trunkRoot);
+    root.add(head);
+
+    // 4 Columnar Pillar Legs
+    const legFL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.15, 0.38), greyMat);
+    legFL.position.set(-0.48, 0.58, 0.65);
+    root.add(legFL);
+    const legFR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.15, 0.38), greyMat);
+    legFR.position.set(0.48, 0.58, 0.65);
+    root.add(legFR);
+    const legBL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.15, 0.38), greyMat);
+    legBL.position.set(-0.48, 0.58, -0.65);
+    root.add(legBL);
+    const legBR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.15, 0.38), greyMat);
+    legBR.position.set(0.48, 0.58, -0.65);
+    root.add(legBR);
+
+    // Golden Ankle Bangles on front legs
+    const ankletL = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.42), goldMat);
+    ankletL.position.set(-0.48, 0.12, 0.65);
+    root.add(ankletL);
+    const ankletR = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.42), goldMat);
+    ankletR.position.set(0.48, 0.12, 0.65);
+    root.add(ankletR);
+
+    // Overhead Name Tag
+    const tag = this.createNameTag(name, species, '#eab308');
+    tag.position.set(0, 2.7, 0.3);
+    root.add(tag);
+
+    this.scene.add(root);
+
+    const basePosY = y;
+    const entity: AnimalEntity = {
+      group: root,
+      type: 'temple_elephant',
+      name,
+      species,
+      basePos: new THREE.Vector3(x, y, z),
+      heading: 0,
+      update: (time, _playerPos) => {
+        // Slow majestic breathing
+        root.position.y = basePosY + Math.sin(time * 1.5 + x) * 0.025;
+        // Ear flapping
+        earL.rotation.y = 0.25 + Math.sin(time * 2.2) * 0.12;
+        earR.rotation.y = -0.25 - Math.sin(time * 2.2) * 0.12;
+        // Trunk waving in blessing
+        trunkRoot.rotation.x = Math.sin(time * 2.0) * 0.18;
       }
     };
 

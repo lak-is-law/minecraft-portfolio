@@ -1892,7 +1892,7 @@ export class VoxelWorld {
       pantsColor: number;
       hairColor: number;
       tagColor: string;
-      hatType?: 'turban' | 'beret' | 'cap' | 'none';
+      hatType?: 'turban' | 'beret' | 'cap' | 'sombrero' | 'none';
       hatColor?: number;
     }
 
@@ -1902,6 +1902,8 @@ export class VoxelWorld {
       { name: 'Priya Patel', role: 'Classical Sitar Maestro', x: 86, y: 2, z: -116, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xd97706, pantsColor: 0xb45309, hairColor: 0x09090b, tagColor: '#f59e0b', hatType: 'none' },
       { name: 'Rajesh Kumar', role: 'Dhaba Chai Master', x: 44, y: 2, z: -76, heading: 0, skinColor: 0xa0522d, shirtColor: 0xef4444, pantsColor: 0x1e293b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0xd97706 },
       { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 80, y: 2, z: -140, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
+      { name: 'Dr. Vikram Nair', role: 'ISRO Aerospace Director', x: 112, y: 2, z: -88, heading: Math.PI * 0.75, skinColor: 0x935116, shirtColor: 0x3b82f6, pantsColor: 0x1e293b, hairColor: 0x27272a, tagColor: '#38bdf8', hatType: 'none' },
+      { name: 'Murugan Pillai', role: 'Mumbai Auto Captain', x: 45, y: 2, z: -83, heading: 0, skinColor: 0x8d5524, shirtColor: 0xca8a04, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#eab308', hatType: 'cap', hatColor: 0x854d0e },
 
       // 2. Tokyo Shibuya Realm: Shibuya fashion, Harajuku, salaryman, student
       { name: 'Kenji Sato', role: 'Shibuya Tech Architect', x: -152, y: 2, z: -78, heading: Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x1e293b, pantsColor: 0x0f172a, hairColor: 0x18181b, tagColor: '#38bdf8', hatType: 'none' },
@@ -1916,6 +1918,11 @@ export class VoxelWorld {
       { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 130, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },
       { name: 'Jack Sullivan', role: 'Broadway Choreographer', x: 124, y: 2, z: -32, heading: 0, skinColor: 0xffdbac, shirtColor: 0xe11d48, pantsColor: 0x0f172a, hairColor: 0x475569, tagColor: '#f43f5e', hatType: 'none' },
       { name: 'Chloe Davis', role: 'Sunset Boulevard Vlogger', x: 136, y: 2, z: -34, heading: -Math.PI / 2, skinColor: 0xf2c49b, shirtColor: 0x06b6d4, pantsColor: 0xffffff, hairColor: 0xfacc15, tagColor: '#22d3ee', hatType: 'cap', hatColor: 0xfacc15 },
+      { name: 'Leonardo Vance', role: 'A-List Hollywood Actor', x: 151, y: 2, z: -63, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0x18181b, pantsColor: 0x09090b, hairColor: 0x27272a, tagColor: '#fbbf24', hatType: 'none' },
+      { name: 'Seraphina Gold', role: 'Academy Award Actress', x: 165, y: 2, z: -70, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0xf59e0b, pantsColor: 0xd97706, hairColor: 0x451a03, tagColor: '#f59e0b', hatType: 'none' },
+      { name: 'Marco Rossi', role: 'Hollywood Bowl Conductor', x: 179, y: 3, z: -76, heading: -Math.PI / 2, skinColor: 0xf5d0b5, shirtColor: 0x1e1b4b, pantsColor: 0x0f172a, hairColor: 0x94a3b8, tagColor: '#c084fc', hatType: 'none' },
+      { name: 'Rex Wilder', role: 'Movie Stunt Coordinator', x: 147, y: 2, z: -74, heading: Math.PI / 4, skinColor: 0xffe0bd, shirtColor: 0x78350f, pantsColor: 0x18181b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'DJ Sterling', role: 'Capitol Audio Engineer', x: 171, y: 2, z: -58, heading: -Math.PI / 3, skinColor: 0x8d5524, shirtColor: 0x06b6d4, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0284c7 },
 
       // 5. London Westminster & Big Ben Realm
       { name: 'Oliver Wright', role: 'Royal Guard Guide', x: -30, y: 2, z: -68, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xdc2626, pantsColor: 0x111827, hairColor: 0x78350f, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x111827 },
@@ -1927,11 +1934,16 @@ export class VoxelWorld {
 
       // 7. Egypt Giza & Sphinx Realm
       { name: 'Tarek Mansour', role: 'Giza Desert Guide', x: -145, y: 2, z: 46, heading: 0, skinColor: 0xa0522d, shirtColor: 0xfef08a, pantsColor: 0x78350f, hairColor: 0x111111, tagColor: '#eab308', hatType: 'turban', hatColor: 0xfef08a },
+      { name: 'Dr. Amira Hassan', role: 'Chief Egyptologist', x: -152, y: 2, z: 20, heading: Math.PI / 4, skinColor: 0xbf8558, shirtColor: 0x0284c7, pantsColor: 0x334155, hairColor: 0x18181b, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0369a1 },
 
-      // 8. Dubai Burj Khalifa Realm
+      // 8. Mexico City Zócalo Realm
+      { name: 'Mateo Morales', role: 'Mariachi Guitarrista', x: -103, y: 2, z: 62, heading: 0, skinColor: 0xbf8558, shirtColor: 0x18181b, pantsColor: 0x18181b, hairColor: 0x09090b, tagColor: '#ef4444', hatType: 'sombrero', hatColor: 0x18181b },
+      { name: 'Sofia Hernandez', role: 'Mercado Artisan', x: -94, y: 2, z: 58, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0x059669, pantsColor: 0xd97706, hairColor: 0x111111, tagColor: '#10b981', hatType: 'none' },
+
+      // 9. Dubai Burj Khalifa Realm
       { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff },
 
-      // 9. Crossroads Wildlife Park (Zoo)
+      // 10. Crossroads Wildlife Park (Zoo)
       { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -40, y: 2, z: 2, heading: Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 }
     ];
 
@@ -1983,6 +1995,21 @@ export class VoxelWorld {
         const visor = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.03, 0.22), capMat);
         visor.position.set(0, 0.18, 0.3);
         head.add(visor);
+      } else if (c.hatType === 'sombrero' && c.hatColor) {
+        const sombreroMat = new THREE.MeshLambertMaterial({ color: c.hatColor });
+        const goldTrimMat = new THREE.MeshLambertMaterial({ color: 0xfbbf24 });
+        // Wide curved brim
+        const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.50, 0.46, 0.05, 14), sombreroMat);
+        brim.position.set(0, 0.23, 0);
+        head.add(brim);
+        // Ornate golden trim ring
+        const brimTrim = new THREE.Mesh(new THREE.CylinderGeometry(0.51, 0.47, 0.02, 14), goldTrimMat);
+        brimTrim.position.set(0, 0.22, 0);
+        head.add(brimTrim);
+        // Tall tapered crown
+        const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.24, 0.28, 12), sombreroMat);
+        crown.position.set(0, 0.37, 0);
+        head.add(crown);
       }
 
       // Eyes

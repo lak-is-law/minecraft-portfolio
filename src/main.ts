@@ -549,9 +549,33 @@ class Game {
       if (title.includes('Big Ben') || title.includes('Great Bell') || title.includes('Elizabeth Tower')) {
         sound.playBell();
         this.hud.pushChatMessage('Westminster', '🔔 Big Ben\'s Great Bell chimes resonantly across London!');
-      } else if (title.includes('Safari') || title.includes('Wildlife') || title.includes('Panda') || title.includes('Lion') || title.includes('Elephant') || title.includes('Giraffe') || title.includes('Penguin') || title.includes('Zoo')) {
+      } else if (title.includes('Auto-Rickshaw') || title.includes('Tuk-Tuk')) {
+        sound.playAutoHorn();
+        this.hud.pushChatMessage('Auto-Rickshaw', '🛺 Pee-peep! Meter down! The Bajaj 3-wheeler darts through the avenue with style!');
+      } else if (title.includes('Gopuram') || title.includes('Mandapam') || title.includes('Temple')) {
+        sound.playTempleBell();
+        this.hud.pushChatMessage('Mandapam', '🔔 Sacred bronze temple bell rings out with peace and auspicious blessings.');
+      } else if (title.includes('ISRO') || title.includes('Chandrayaan')) {
+        sound.playRocketRumble();
+        this.hud.pushChatMessage('ISRO Telemetry', '🚀 Chandrayaan-3 soft touchdown at Shiv Shakti Point! Lunar exploration active.');
+      } else if (title.includes('Cricket')) {
+        sound.playBlockBreak();
+        this.hud.pushChatMessage('Gully Cricket', '🏏 SIXER! Out of the ground and over the rooftops! What a magnificent shot!');
+      } else if (title.includes('Chai') || title.includes('Dhaba') || title.includes('Golgappe') || title.includes('Dosa') || title.includes('Sundal')) {
+        sound.playSlurp();
+        this.hud.pushChatMessage('Street Food', '☕ Kadak ginger-cardamom cutting chai enjoyed! Energy fully restored!');
+      } else if (title.includes('Hawa Mahal')) {
+        sound.playSitar();
+        this.hud.pushChatMessage('Jaipur Royal Court', '🌸 Cool desert winds whisper through Hawa Mahal\'s 953 honeycombed jharokhas.');
+      } else if (title.includes('India Gate') || title.includes('Amar Jawan')) {
         sound.playLevelUp();
-        this.hud.pushChatMessage('Safari Sanctuary', `Observing habitat: ${title}`);
+        this.hud.pushChatMessage('Amar Jawan Jyoti', '🇮🇳 Saluting the eternal flame and the indomitable courage of India\'s guardians.');
+      } else if (title.includes('Rangoli') || title.includes('Diwali')) {
+        sound.playSitar();
+        this.hud.pushChatMessage('Diwali Festival', '🪔 Sparkling diyas and royal Rangoli bring festive light and joy to the realm!');
+      } else if (title.includes('Safari') || title.includes('Wildlife') || title.includes('Panda') || title.includes('Lion') || title.includes('Elephant') || title.includes('Giraffe') || title.includes('Penguin') || title.includes('Tiger') || title.includes('Peacock') || title.includes('Zoo')) {
+        sound.playLevelUp();
+        this.hud.pushChatMessage('Sanctuary', `Observing habitat: ${title}`);
       }
       this.modals.openSignModal(title, text);
     } else if (inter.type === 'teleport') {

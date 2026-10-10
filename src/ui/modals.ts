@@ -287,15 +287,15 @@ export class ModalManager {
       { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', tag: '[CITADEL]', tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
       { number: '02', name: 'Crossroads Wildlife Park', subtitle: 'Grand Safari Zoo & Habitats · 🦁', detail: 'Expansive wildlife reserve featuring living animated pandas, lions, elephants, giraffes, polar bears, and shaded trails.', tag: '[ZOO]', tone: 'citadel', direction: 'WEST · X −65 / Z 0' },
       { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', tag: '[TOKYO]', tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
-      { number: '04', name: 'Imperial India · Taj Mahal', subtitle: 'India', detail: 'Explore the grand white marble Taj Mahal, Yamuna reflecting pool, Varanasi Ghats, and SRMIST honors.', tag: '[TAJ MAHAL]', tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
+      { number: '04', name: 'Imperial India · Taj Mahal & ISRO', subtitle: 'India', detail: 'Grand Taj Mahal, ISRO Chandrayaan-3 Moon lander, Jaipur Hawa Mahal, India Gate, living Royal Bengal Tigers, dancing Peacocks, and Diwali lights.', tag: '[TAJ MAHAL]', tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
       { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
-      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Metropolitan Cathedral, Palacio Nacional, and ancient Chichén Itzá 9-step pyramid plateau.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
-      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Monumental Pyramid of Khufu with torch-lit tomb, Great Sphinx, and desert camel caravan.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
+      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Mercado stalls & Mayan Cenote.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
+      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Pyramids of Khufu & Khafre, Nile River Felucca, Avenue of Sphinxes, and Luxor Temple Pylons.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
       { number: '08', name: 'Dubai · Burj Khalifa', subtitle: 'United Arab Emirates', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46 and Palm Jumeirah lagoon.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
-      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock, Tower Bridge pedestrian walkways, and red Routemaster bus.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −65' },
+      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock with Westminster chime, Great Bell, and Tower Bridge walkways.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −58' },
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
-      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
+      { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
     ];
     const regionsHtml = atlasRegions.map((region) => {
       const targetIdx = PORTFOLIO_DATA.landmarks.findIndex(lm => lm.tag === region.tag);
@@ -442,7 +442,7 @@ export class ModalManager {
       ctx.fillText('[REALM QUADRANTS]', 22, 34);
 
       const biomes = [
-        { name: 'NE: Imperial India', color: '#fef08a', desc: 'Taj Mahal & Yamuna' },
+        { name: 'NE: Imperial India', color: '#fef08a', desc: 'Taj Mahal, ISRO & Jaipur' },
         { name: 'NW: China Realm', color: '#34d399', desc: 'Great Wall & Pagoda' },
         { name: 'SW: Mexico Realm', color: '#fb923c', desc: 'Zócalo & Aztec Pyramid' },
         { name: 'SE: USA & Neo York', color: '#38bdf8', desc: 'Times Sq, Lak & Hollywood' },
@@ -676,8 +676,22 @@ export class ModalManager {
       ctx.beginPath();
       ctx.ellipse(hollywoodX, hollywoodZ + 6 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fff8e8';
       ctx.fillRect(hollywoodX - 18 * scale, hollywoodZ + 5 * scale, 36 * scale, 2 * scale);
+
+      // Hollywood Boulevard Walk of Fame & Hollywood Bowl Shell on Map
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3.2 * scale;
+      ctx.beginPath();
+      ctx.moveTo(cx + 161 * scale, cy - 84 * scale);
+      ctx.lineTo(cx + 161 * scale, cy - 54 * scale);
+      ctx.stroke();
+
+      // Hollywood Bowl acoustic concentric shell arc
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 2.4 * scale;
+      ctx.beginPath();
+      ctx.arc(cx + 180 * scale, cy - 76 * scale, 6 * scale, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.stroke();
 
       // Main Arterial Routes
       const route = (points: [number, number][]) => {

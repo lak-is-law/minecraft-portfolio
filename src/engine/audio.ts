@@ -287,8 +287,172 @@ export class SoundEngine {
     gain.connect(this.ctx.destination);
   }
 
-  // Resonant bell chime for Big Ben & temple bells
+  // Resonant Westminster Chimes & Great Bell ("Big Ben" E-natural strike)
   public playBell() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+
+    // 1. Westminster Quarters Chime Sequence (G#4, E4, F#4, B3)
+    const quarters = [
+      { f: 415.30, time: 0.0, dur: 0.8 }, // G#4
+      { f: 329.63, time: 0.5, dur: 0.8 }, // E4
+      { f: 369.99, time: 1.0, dur: 0.8 }, // F#4
+      { f: 246.94, time: 1.5, dur: 1.0 }, // B3
+    ];
+
+    for (const q of quarters) {
+      const qTime = t + q.time;
+      // Fundamental
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(q.f, qTime);
+      gain.gain.setValueAtTime(0.22, qTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, qTime + q.dur);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(qTime);
+      osc.stop(qTime + q.dur);
+
+      // Soft bell harmonic overtone
+      const hOsc = this.ctx.createOscillator();
+      const hGain = this.ctx.createGain();
+      hOsc.type = 'triangle';
+      hOsc.frequency.setValueAtTime(q.f * 2.76, qTime);
+      hGain.gain.setValueAtTime(0.06, qTime);
+      hGain.gain.exponentialRampToValueAtTime(0.001, qTime + q.dur * 0.6);
+      hOsc.connect(hGain);
+      hGain.connect(this.ctx.destination);
+      hOsc.start(qTime);
+      hOsc.stop(qTime + q.dur * 0.6);
+    }
+
+    // 2. The 13.7-Tonne Great Bell Deep E-Natural Strike at t + 2.3s
+    const strikeTime = t + 2.3;
+    const strikeDur = 3.8;
+    const baseFreq = 164.81; // E3 Great Bell primary tone
+
+    // Primary bell tone
+    const bOsc = this.ctx.createOscillator();
+    const bGain = this.ctx.createGain();
+    bOsc.type = 'sine';
+    bOsc.frequency.setValueAtTime(baseFreq, strikeTime);
+    bGain.gain.setValueAtTime(0.45, strikeTime);
+    bGain.gain.exponentialRampToValueAtTime(0.0005, strikeTime + strikeDur);
+    bOsc.connect(bGain);
+    bGain.connect(this.ctx.destination);
+    bOsc.start(strikeTime);
+    bOsc.stop(strikeTime + strikeDur);
+
+    // Deep sub-octave rumble (E2 82.4 Hz)
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(baseFreq * 0.5, strikeTime);
+    subGain.gain.setValueAtTime(0.35, strikeTime);
+    subGain.gain.exponentialRampToValueAtTime(0.0005, strikeTime + strikeDur * 0.85);
+    subOsc.connect(subGain);
+    subGain.connect(this.ctx.destination);
+    subOsc.start(strikeTime);
+    subOsc.stop(strikeTime + strikeDur * 0.85);
+
+    // Metallic bronze strike transients (overtones)
+    for (const mult of [2.4, 3.8, 5.2]) {
+      const harmOsc = this.ctx.createOscillator();
+      const harmGain = this.ctx.createGain();
+      harmOsc.type = 'triangle';
+      harmOsc.frequency.setValueAtTime(baseFreq * mult, strikeTime);
+      harmGain.gain.setValueAtTime(0.12 / mult, strikeTime);
+      harmGain.gain.exponentialRampToValueAtTime(0.0005, strikeTime + 1.2);
+      harmOsc.connect(harmGain);
+      harmGain.connect(this.ctx.destination);
+      harmOsc.start(strikeTime);
+      harmOsc.stop(strikeTime + 1.2);
+    }
+  }
+
+  // Sacred Indian bronze temple bell with rich overtones
+  public playTempleBell() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const partials = [587.33, 1174.66, 1762.0, 2349.3]; // D5 with pure bronze harmonics
+    const weights = [0.22, 0.12, 0.08, 0.04];
+    const decays = [2.4, 1.8, 1.2, 0.8];
+
+    partials.forEach((freq, idx) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      // Subtle pitch bend for authentic hammered metal
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.992, t + decays[idx]);
+      gain.gain.setValueAtTime(weights[idx], t);
+      gain.gain.exponentialRampToValueAtTime(0.0005, t + decays[idx]);
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(t);
+      osc.stop(t + decays[idx]);
+    });
+  }
+
+  // Classic Indian Auto-Rickshaw "Pee-Peep!" horn
+  public playAutoHorn() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    [0, 0.11].forEach((delay) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, t + delay);
+      osc.frequency.linearRampToValueAtTime(940, t + delay + 0.07);
+      gain.gain.setValueAtTime(0.18, t + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.08);
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.08);
+    });
+  }
+
+  // Melodic plucked Sitar chime with sympathetic string resonance
+  public playSitar() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    // Main note (D4) with quick buzz (jawari)
+    const notes = [293.66, 440.0, 587.33];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      const filter = this.ctx!.createBiquadFilter();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, t + i * 0.08);
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(freq * 2.2, t + i * 0.08);
+      filter.Q.setValueAtTime(3.0, t + i * 0.08);
+      gain.gain.setValueAtTime(0.12, t + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.8);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(t + i * 0.08);
+      osc.stop(t + i * 0.08 + 0.8);
+    });
+  }
+
+  // ISRO Space Rocket deep thruster rumble
+  public playRocketRumble() {
     if (!this.enabled) return;
     this.initContext();
     if (!this.ctx) return;
@@ -296,14 +460,24 @@ export class SoundEngine {
     const t = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(523.25, t); // C5
-    gain.gain.setValueAtTime(0.25, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
-    osc.connect(gain);
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(65, t);
+    osc.frequency.linearRampToValueAtTime(120, t + 0.6);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 1.4);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(240, t);
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(0.22, t + 0.2);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(t);
-    osc.stop(t + 1.8);
+    osc.stop(t + 1.4);
   }
 
   // Street food eating / cutting chai slurp sound
@@ -334,40 +508,55 @@ export class SoundEngine {
 
     const t = this.ctx.currentTime;
 
-    if (type === 'lion') {
-      // Low roaring swell
+    if (type === 'tiger' || type === 'lion') {
+      // Low roaring swell / rumble
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(95, t);
-      osc.frequency.linearRampToValueAtTime(130, t + 0.4);
-      osc.frequency.exponentialRampToValueAtTime(70, t + 1.2);
+      osc.frequency.setValueAtTime(type === 'tiger' ? 85 : 95, t);
+      osc.frequency.linearRampToValueAtTime(140, t + 0.4);
+      osc.frequency.exponentialRampToValueAtTime(60, t + 1.2);
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(320, t);
       gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.2, t + 0.3);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.3);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
       osc.stop(t + 1.2);
-    } else if (type === 'elephant') {
+    } else if (type === 'peacock') {
+      // High-pitched celebratory peacock call ("Mayura ke-ka!")
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(680, t);
+      osc.frequency.linearRampToValueAtTime(920, t + 0.2);
+      osc.frequency.exponentialRampToValueAtTime(540, t + 0.7);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.16, t + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.7);
+    } else if (type === 'elephant' || type === 'temple_elephant') {
       // High-to-low brassy trumpet
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(380, t);
-      osc.frequency.linearRampToValueAtTime(460, t + 0.25);
-      osc.frequency.exponentialRampToValueAtTime(260, t + 0.9);
+      osc.frequency.linearRampToValueAtTime(480, t + 0.25);
+      osc.frequency.exponentialRampToValueAtTime(260, t + 0.95);
       gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.2);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.95);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.9);
+      osc.stop(t + 0.95);
     } else if (type === 'sheep') {
       // Gentle bleat
       const osc = this.ctx.createOscillator();
