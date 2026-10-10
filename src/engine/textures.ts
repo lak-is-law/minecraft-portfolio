@@ -999,54 +999,74 @@ export class TextureManager {
       ctx.fillRect(5, 5, 6, 6);
     }));
 
-    // 60. Indian Saffron (Kesari · #FF9933 Deep Golden Saffron for Indian National Flag)
+    // 60. Indian Saffron (Kesari · Official #FF9933 Clean Deep Saffron Silk)
     this.textures.set('indian_saffron', createPixelTexture((ctx, s) => {
+      // Official Tiranga Saffron (#FF9933) with fine silk cloth texture
+      ctx.fillStyle = '#ff9933';
+      ctx.fillRect(0, 0, s, s);
       const rng = createRng(4201);
-      const saffron = ['#ff9933', '#f97316', '#ea580c', '#fb923c', '#ff8800'];
+      const subtle = ['#ff9933', '#ffa447', '#f88f28', '#ff9f3d'];
       for (let y = 0; y < s; y++) {
         for (let x = 0; x < s; x++) {
-          ctx.fillStyle = saffron[Math.floor(rng() * saffron.length)];
-          ctx.fillRect(x, y, 1, 1);
+          if (rng() > 0.4) {
+            ctx.fillStyle = subtle[Math.floor(rng() * subtle.length)];
+            ctx.fillRect(x, y, 1, 1);
+          }
         }
       }
-    }));
+    }, 32));
 
-    // 61. Ashoka Chakra (White silk field with 24-spoke Navy Blue Dharma Chakra)
+    // 61. Ashoka Chakra (White silk field with sharp 24-spoke Navy Blue Dharma Chakra at 64x64)
     this.textures.set('ashoka_chakra', createPixelTexture((ctx, s) => {
-      // Crisp white silk background
+      // Pure White silk field
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, s, s);
-      // Subtle weave texture
-      ctx.fillStyle = '#f8fafc';
-      for (let y = 0; y < s; y += 2) {
-        for (let x = 0; x < s; x += 2) {
-          ctx.fillRect(x, y, 1, 1);
-        }
-      }
-      // Navy Blue Outer Ring
+
+      const center = s / 2;
+      const radius = s * 0.38;
+
+      // Navy Blue Outer Ring (#000080)
       ctx.strokeStyle = '#000080';
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = Math.max(1.5, s * 0.045);
       ctx.beginPath();
-      ctx.arc(s / 2, s / 2, 4.8, 0, Math.PI * 2);
+      ctx.arc(center, center, radius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Central Hub
+      // Central Navy Hub
       ctx.fillStyle = '#000080';
       ctx.beginPath();
-      ctx.arc(s / 2, s / 2, 1.2, 0, Math.PI * 2);
+      ctx.arc(center, center, radius * 0.22, 0, Math.PI * 2);
       ctx.fill();
 
-      // Radiating 24 Spokes
+      // Exactly 24 Spokes of Dharma
+      ctx.lineWidth = Math.max(1, s * 0.022);
       for (let i = 0; i < 24; i++) {
         const angle = (i * Math.PI) / 12;
-        const x2 = s / 2 + Math.cos(angle) * 4.4;
-        const y2 = s / 2 + Math.sin(angle) * 4.4;
+        const x2 = center + Math.cos(angle) * (radius - 1);
+        const y2 = center + Math.sin(angle) * (radius - 1);
         ctx.beginPath();
-        ctx.moveTo(s / 2, s / 2);
+        ctx.moveTo(center, center);
         ctx.lineTo(x2, y2);
         ctx.stroke();
       }
-    }));
+    }, 64));
+
+    // 62. Indian Green (India Green · Official #138808 Silk Banner)
+    this.textures.set('indian_green', createPixelTexture((ctx, s) => {
+      // Official Tiranga Green (#138808) with fine silk weave texture
+      ctx.fillStyle = '#138808';
+      ctx.fillRect(0, 0, s, s);
+      const rng = createRng(4301);
+      const subtle = ['#138808', '#16960a', '#107a06', '#148e09'];
+      for (let y = 0; y < s; y++) {
+        for (let x = 0; x < s; x++) {
+          if (rng() > 0.4) {
+            ctx.fillStyle = subtle[Math.floor(rng() * subtle.length)];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+    }, 32));
   }
 
   private createMaterials() {
@@ -1250,6 +1270,7 @@ export class TextureManager {
     // Indian National Flag Materials
     this.materials.set('indian_saffron', new THREE.MeshLambertMaterial({ map: this.getTexture('indian_saffron') }));
     this.materials.set('ashoka_chakra', new THREE.MeshLambertMaterial({ map: this.getTexture('ashoka_chakra') }));
+    this.materials.set('indian_green', new THREE.MeshLambertMaterial({ map: this.getTexture('indian_green') }));
 
     // Oak Wood Aliases (ensure oak_log, oak_fence, oak_stairs render with proper wood textures instead of fallback)
     this.materials.set('oak_log', this.materials.get('log')!);

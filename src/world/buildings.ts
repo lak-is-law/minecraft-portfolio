@@ -742,11 +742,11 @@ export class WorldBuilder {
 
   // Parade of Nations: Authentic 3D Country Flags on Majestic Flagpoles
   private buildAllCountryFlags() {
-    // 1. India 🇮🇳 (Deep Kesari Saffron, White with Navy 24-Spoke Ashoka Chakra, India Green)
-    this.buildFlagpole(6, -14, 'Republic of India 🇮🇳', 'Tiranga · Saffron (Courage & Sacrifice), White (Peace & Truth) with 24-spoke Navy Ashoka Chakra, and Green (Faith & Chivalry).', [
-      ['indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron'],
-      ['quartz_block', 'ashoka_chakra', 'ashoka_chakra', 'quartz_block'],
-      ['emerald_block', 'emerald_block', 'emerald_block', 'emerald_block']
+    // 1. India 🇮🇳 (Official Tiranga: Deep Kesari Saffron, Silk White with single centered 24-spoke Navy Ashoka Chakra, India Green)
+    this.buildFlagpole(6, -14, 'Republic of India 🇮🇳', 'Tiranga · Top band Saffron (Courage & Sacrifice), Middle band White (Peace & Truth) with single centered Navy Blue 24-Spoke Ashoka Chakra, and Bottom band India Green (Prosperity & Faith).', [
+      ['indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron'],
+      ['quartz_block', 'quartz_block', 'ashoka_chakra', 'quartz_block', 'quartz_block'],
+      ['indian_green', 'indian_green', 'indian_green', 'indian_green', 'indian_green']
     ], 'east');
 
     // 2. South Korea 🇰🇷 (White field, Red/Blue Taegeuk, Black Trigrams)
@@ -821,10 +821,10 @@ export class WorldBuilder {
     }
     this.setBlock(px, 9, pz, 'gold_block'); // Eagle/finial
 
-    // Flag banner (4x3 blocks at Y = 6 to 8)
-    for (let row = 0; row < 3; row++) {
+    // Flag banner (pattern width blocks at Y = 6 to 8)
+    for (let row = 0; row < pattern.length; row++) {
       const y = 8 - row;
-      for (let col = 0; col < 4; col++) {
+      for (let col = 0; col < pattern[row].length; col++) {
         const mat = pattern[row][col];
         const bx = (dir === 'east') ? px + 1 + col : px - 1 - col;
         this.setBlock(bx, y, pz, mat);
@@ -1264,7 +1264,7 @@ export class WorldBuilder {
     for (let col = 1; col <= 5; col++) {
       this.setBlock(gwX + col, 26, gwZ, 'indian_saffron');
       this.setBlock(gwX + col, 25, gwZ, (col === 3) ? 'ashoka_chakra' : 'quartz_block');
-      this.setBlock(gwX + col, 24, gwZ, 'emerald_block');
+      this.setBlock(gwX + col, 24, gwZ, 'indian_green');
     }
 
     this.setBlock(gwX, 2, gwZ + 5, 'stone_bricks', {
