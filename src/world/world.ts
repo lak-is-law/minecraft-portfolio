@@ -276,7 +276,7 @@ export class VoxelWorld {
         code: 'USA',
         accentColor: '#3b82f6',
         capital: 'Washington, D.C.',
-        coords: { x: 95, y: 16.0, z: -4, rotY: Math.PI / 2 },
+        coords: { x: 95, y: 24.0, z: -4, rotY: Math.PI / 2 },
         stats: ['Capital: Washington, D.C.', '50 States · 9.83M km²', 'Pop: 335 Million', 'District: Las Vegas Strip & Hollywood'],
         cities: [
           { name: 'Washington D.C. ⭐', x: 0.82, y: 0.44, isCap: true },
@@ -305,7 +305,7 @@ export class VoxelWorld {
         code: 'IND',
         accentColor: '#f97316',
         capital: 'New Delhi',
-        coords: { x: 80, y: 16.0, z: -120, rotY: 0 },
+        coords: { x: 80, y: 22.0, z: -120, rotY: 0 },
         stats: ['Capital: New Delhi', '28 States & 8 UTs · 3.28M km²', 'Pop: 1.43 Billion', 'District: Imperial India & Taj Mahal'],
         cities: [
           { name: 'New Delhi ⭐', x: 0.44, y: 0.28, isCap: true },
@@ -330,7 +330,7 @@ export class VoxelWorld {
         code: 'GBR',
         accentColor: '#ef4444',
         capital: 'London',
-        coords: { x: -34, y: 16.0, z: -60, rotY: 0 },
+        coords: { x: -34, y: 22.0, z: -60, rotY: 0 },
         stats: ['Capital: London', '4 Countries · 243K km²', 'Pop: 68 Million', 'District: Big Ben & Tower Bridge'],
         cities: [
           { name: 'London ⭐', x: 0.68, y: 0.74, isCap: true },
@@ -355,7 +355,7 @@ export class VoxelWorld {
         code: 'FRA',
         accentColor: '#38bdf8',
         capital: 'Paris',
-        coords: { x: 26, y: 16.0, z: -30, rotY: 0 },
+        coords: { x: 26, y: 22.0, z: -30, rotY: 0 },
         stats: ['Capital: Paris', '18 Regions · 643K km²', 'Pop: 68 Million', 'District: Paris Eiffel & Champ de Mars'],
         cities: [
           { name: 'Paris ⭐', x: 0.52, y: 0.32, isCap: true },
@@ -378,7 +378,7 @@ export class VoxelWorld {
         code: 'JPN',
         accentColor: '#f43f5e',
         capital: 'Tokyo',
-        coords: { x: -153, y: 17.0, z: -75, rotY: Math.PI / 2 },
+        coords: { x: -153, y: 24.0, z: -75, rotY: Math.PI / 2 },
         stats: ['Capital: Tokyo', '47 Prefectures · 377K km²', 'Pop: 125 Million', 'District: Tokyo Shibuya & Shinkansen'],
         cities: [
           { name: 'Tokyo ⭐', x: 0.68, y: 0.54, isCap: true },
@@ -407,7 +407,7 @@ export class VoxelWorld {
         code: 'KOR',
         accentColor: '#0ea5e9',
         capital: 'Seoul',
-        coords: { x: -65, y: 16.0, z: -88, rotY: 0 },
+        coords: { x: -65, y: 22.0, z: -88, rotY: 0 },
         stats: ['Capital: Seoul', '9 Provinces · 100K km²', 'Pop: 52 Million', 'District: Seoul Gwanghwamun & N Seoul Tower'],
         cities: [
           { name: 'Seoul ⭐', x: 0.42, y: 0.28, isCap: true },
@@ -432,7 +432,7 @@ export class VoxelWorld {
         code: 'CHN',
         accentColor: '#dc2626',
         capital: 'Beijing',
-        coords: { x: -108, y: 16.0, z: -100, rotY: 0 },
+        coords: { x: -108, y: 22.0, z: -100, rotY: 0 },
         stats: ['Capital: Beijing', '23 Provinces, 5 Regions · 9.60M km²', 'Pop: 1.41 Billion', 'District: Great Wall Ramparts & Pagoda'],
         cities: [
           { name: 'Beijing ⭐', x: 0.68, y: 0.32, isCap: true },
@@ -455,7 +455,7 @@ export class VoxelWorld {
         code: 'EGY',
         accentColor: '#eab308',
         capital: 'Cairo',
-        coords: { x: -150, y: 16.0, z: 42, rotY: -Math.PI / 2 },
+        coords: { x: -150, y: 22.0, z: 42, rotY: -Math.PI / 2 },
         stats: ['Capital: Cairo', '27 Governorates · 1.01M km²', 'Pop: 110 Million', 'District: Giza Pyramids Plateau & Sphinx'],
         cities: [
           { name: 'Cairo ⭐', x: 0.64, y: 0.28, isCap: true },
@@ -477,7 +477,7 @@ export class VoxelWorld {
         code: 'ARE',
         accentColor: '#10b981',
         capital: 'Abu Dhabi',
-        coords: { x: 165, y: 17.0, z: 35, rotY: -Math.PI / 2 },
+        coords: { x: 165, y: 25.0, z: 35, rotY: -Math.PI / 2 },
         stats: ['Capital: Abu Dhabi', '7 Emirates · 83.6K km²', 'Pop: 10 Million', 'District: Dubai Burj Khalifa & Palm Lagoon'],
         cities: [
           { name: 'Abu Dhabi ⭐', x: 0.46, y: 0.58, isCap: true },
@@ -498,7 +498,7 @@ export class VoxelWorld {
         code: 'MEX',
         accentColor: '#059669',
         capital: 'Mexico City',
-        coords: { x: -100, y: 16.0, z: 55, rotY: 0 },
+        coords: { x: -100, y: 22.0, z: 55, rotY: 0 },
         stats: ['Capital: Mexico City', '31 States & CDMX · 1.97M km²', 'Pop: 130 Million', 'District: Mexico City Zócalo & Chichén Itzá'],
         cities: [
           { name: 'Mexico City ⭐', x: 0.54, y: 0.66, isCap: true },
@@ -722,42 +722,42 @@ export class VoxelWorld {
       texture.magFilter = THREE.LinearFilter;
       texture.colorSpace = THREE.SRGBColorSpace;
 
-      // Monumental High Skyline 3D Electronic Billboard Mesh (7.2m x 4.8m)
+      // Monumental High Skyline 3D Electronic Billboard Mesh (8.4m x 5.6m)
       const billboardGroup = new THREE.Group();
       billboardGroup.position.set(cm.coords.x, cm.coords.y, cm.coords.z);
       billboardGroup.rotation.y = cm.coords.rotY ?? 0;
 
-      // 1. High-Resolution Front Display Screen (7.2m wide x 4.8m tall)
-      const mapGeo = new THREE.PlaneGeometry(7.2, 4.8);
+      // 1. High-Resolution Front Display Screen (8.4m wide x 5.6m tall)
+      const mapGeo = new THREE.PlaneGeometry(8.4, 5.6);
       const mapMat = new THREE.MeshBasicMaterial({ map: texture });
       const mapMesh = new THREE.Mesh(mapGeo, mapMat);
       billboardGroup.add(mapMesh);
 
       // 2. Heavy Industrial Metal Backboard & Structural Housing
-      const backGeo = new THREE.BoxGeometry(7.4, 5.0, 0.28);
+      const backGeo = new THREE.BoxGeometry(8.6, 5.8, 0.3);
       const backMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.7, roughness: 0.35 });
       const backMesh = new THREE.Mesh(backGeo, backMat);
-      backMesh.position.z = -0.15;
+      backMesh.position.z = -0.16;
       billboardGroup.add(backMesh);
 
       // 3. Cyber/Metallic Billboard Bezel Frame Rim
-      const frameGeo = new THREE.BoxGeometry(7.5, 5.1, 0.08);
+      const frameGeo = new THREE.BoxGeometry(8.7, 5.9, 0.1);
       const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.2 });
       const frameMesh = new THREE.Mesh(frameGeo, frameMat);
       frameMesh.position.z = -0.02;
       billboardGroup.add(frameMesh);
 
       // 4. Maintenance Service Catwalk with Steel Safety Railing along bottom
-      const catwalkGeo = new THREE.BoxGeometry(7.6, 0.12, 0.8);
+      const catwalkGeo = new THREE.BoxGeometry(8.8, 0.14, 0.95);
       const catwalkMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
       const catwalk = new THREE.Mesh(catwalkGeo, catwalkMat);
-      catwalk.position.set(0, -2.5, 0.4);
+      catwalk.position.set(0, -2.9, 0.5);
       billboardGroup.add(catwalk);
 
-      const railGeo = new THREE.BoxGeometry(7.6, 0.6, 0.05);
+      const railGeo = new THREE.BoxGeometry(8.8, 0.7, 0.05);
       const railMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.85, roughness: 0.25 });
       const railing = new THREE.Mesh(railGeo, railMat);
-      railing.position.set(0, -2.2, 0.8);
+      railing.position.set(0, -2.55, 0.95);
       billboardGroup.add(railing);
 
       // 5. Overhead Industrial Spotlight Fixtures illuminating the billboard
@@ -767,26 +767,26 @@ export class VoxelWorld {
       const bulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a }); // warm floodlight bulb
       const bulbGeo = new THREE.BoxGeometry(0.3, 0.08, 0.4);
 
-      for (const lx of [-2.6, -0.9, 0.9, 2.6]) {
+      for (const lx of [-3.2, -1.1, 1.1, 3.2]) {
         const arm = new THREE.Mesh(lampArmGeo, lampMat);
-        arm.position.set(lx, 2.65, 0.25);
+        arm.position.set(lx, 3.05, 0.3);
         billboardGroup.add(arm);
 
         const lamp = new THREE.Mesh(lampGeo, lampMat);
-        lamp.position.set(lx, 2.8, 0.48);
+        lamp.position.set(lx, 3.2, 0.55);
         billboardGroup.add(lamp);
 
         const bulb = new THREE.Mesh(bulbGeo, bulbMat);
-        bulb.position.set(lx, 2.73, 0.48);
+        bulb.position.set(lx, 3.12, 0.55);
         billboardGroup.add(bulb);
       }
 
-      // 6. Dual Vertical Structural Mounting Columns (Anchored to building / roof / pylon)
-      const columnGeo = new THREE.BoxGeometry(0.35, 4.0, 0.35);
+      // 6. Dual Vertical Structural Mounting Columns (Anchored downwards)
+      const columnGeo = new THREE.BoxGeometry(0.4, 5.0, 0.4);
       const columnMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
-      for (const cx of [-2.2, 2.2]) {
+      for (const cx of [-2.8, 2.8]) {
         const col = new THREE.Mesh(columnGeo, columnMat);
-        col.position.set(cx, -3.5, -0.2);
+        col.position.set(cx, -4.5, -0.2);
         billboardGroup.add(col);
       }
 

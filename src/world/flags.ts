@@ -536,6 +536,48 @@ export class FlagManager {
       mesh.rotation.y = -Math.PI / 2;
     }
 
+    // ------------------------------------------------------------------------
+    // Sleek, Authentic Thin Stainless Steel Flagpole Mast
+    // ------------------------------------------------------------------------
+    const baseY = (poleY > 20) ? 19.5 : (poleZ < -110 && poleX > 60 ? 4.0 : 1.0);
+    const poleHeight = (poleY + 0.45) - baseY;
+    const mastY = baseY + poleHeight / 2;
+
+    const mastGeo = new THREE.CylinderGeometry(0.045, 0.07, poleHeight, 16);
+    const mastMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      metalness: 0.92,
+      roughness: 0.18
+    });
+    const mastMesh = new THREE.Mesh(mastGeo, mastMat);
+    mastMesh.position.set(poleX, mastY, poleZ);
+    this.scene.add(mastMesh);
+
+    // Polished Golden Spherical Finial Ball at top of mast
+    const finialGeo = new THREE.SphereGeometry(0.12 * scaleMultiplier, 16, 16);
+    const finialMat = new THREE.MeshStandardMaterial({
+      color: 0xfbbf24,
+      metalness: 0.95,
+      roughness: 0.15
+    });
+    const finialMesh = new THREE.Mesh(finialGeo, finialMat);
+    finialMesh.position.set(poleX, poleY + 0.45, poleZ);
+    this.scene.add(finialMesh);
+
+    // Circular Metal Collar / Pedestal at base
+    const baseGeo = new THREE.CylinderGeometry(0.2, 0.28, 0.35, 16);
+    const baseMesh = new THREE.Mesh(baseGeo, mastMat);
+    baseMesh.position.set(poleX, baseY + 0.175, poleZ);
+    this.scene.add(baseMesh);
+
+    // Thin White Halyard Rope
+    const ropeGeo = new THREE.CylinderGeometry(0.006, 0.006, poleHeight - 0.2, 8);
+    const ropeMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+    const ropeMesh = new THREE.Mesh(ropeGeo, ropeMat);
+    const ropeOffset = (dir === 'east' || dir === 'west') ? new THREE.Vector3(0, 0, 0.06) : new THREE.Vector3(0.06, 0, 0);
+    ropeMesh.position.set(poleX + ropeOffset.x, mastY, poleZ + ropeOffset.z);
+    this.scene.add(ropeMesh);
+
     this.scene.add(mesh);
 
     const flagInstance: FlagInstance = {

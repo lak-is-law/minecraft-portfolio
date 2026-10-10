@@ -889,12 +889,8 @@ export class WorldBuilder {
   }
 
   private buildFlagpole(px: number, pz: number, title: string, desc: string, _pattern?: string[][], _dir?: 'east' | 'west') {
-    // Flagpole plinth and shaft (Y = 1 to 8)
+    // Flagpole plinth at ground level (authentic thin steel mast and finial rendered in 3D by FlagManager)
     this.setBlock(px, 1, pz, 'smooth_stone');
-    for (let y = 2; y <= 8; y++) {
-      this.setBlock(px, y, pz, 'iron_block');
-    }
-    this.setBlock(px, 9, pz, 'gold_block'); // Eagle/finial
 
     // Interactive Flag Plaque Sign at base
     const signX = px;
@@ -906,7 +902,7 @@ export class WorldBuilder {
     });
   }
 
-  // High Skyline Billboard Structural Pylons Across All 10 World Realms
+  // Sky-High Billboard Ground Information Directories Across All 10 World Realms
   private buildCountryMapKiosks() {
     const billboards = [
       {
@@ -962,32 +958,9 @@ export class WorldBuilder {
     ];
 
     billboards.forEach(b => {
-      const isAlongZ = Math.abs(b.rotY) > 0.1;
-      const offX = isAlongZ ? 0 : 3;
-      const offZ = isAlongZ ? 3 : 0;
       const gy = Math.max(1, this.getTerrainHeight(b.x, b.z));
 
-      // Dual Steel Industrial Lattice Support Pylons (Rising from ground Y = gy to 16)
-      for (let y = gy; y <= 16; y++) {
-        const blk = (y === gy) ? 'smooth_stone' : (y % 2 === 0 ? 'iron_block' : 'quartz_pillar');
-        this.setBlock(b.x - offX, y, b.z - offZ, blk);
-        this.setBlock(b.x + offX, y, b.z + offZ, blk);
-      }
-
-      // Upper Billboard Foundation Crossbeam at Y = 13 (underneath billboard)
-      const minStep = -3;
-      const maxStep = 3;
-      for (let s = minStep; s <= maxStep; s++) {
-        const sx = isAlongZ ? b.x : b.x + s;
-        const sz = isAlongZ ? b.z + s : b.z;
-        this.setBlock(sx, 13, sz, 'smooth_stone');
-      }
-
-      // Skyline Spotlights at Y = 17
-      this.setBlock(b.x - offX, 17, b.z - offZ, 'sea_lantern');
-      this.setBlock(b.x + offX, 17, b.z + offZ, 'sea_lantern');
-
-      // Ground Directory Pedestal and Information Sign (leaves pathways clear)
+      // Ground Directory Pedestal and Information Sign (leaves pathways wide open)
       this.setBlock(b.x, gy, b.z, 'smooth_stone');
       this.setBlock(b.x, gy + 1, b.z, 'quartz_block', {
         type: 'sign',
@@ -1411,11 +1384,7 @@ export class WorldBuilder {
     this.setBlock(gwX, 18, gwZ, 'gold_block');
     this.setBlock(gwX, 19, gwZ, 'beacon');
 
-    // Monumental Flagpole Mast atop the Gateway of India (hoisting real 3D waving Tiranga)
-    for (let y = 20; y <= 26; y++) {
-      this.setBlock(gwX, y, gwZ, 'iron_block');
-    }
-    this.setBlock(gwX, 27, gwZ, 'gold_block');
+
 
     this.setBlock(gwX, 2, gwZ + 5, 'stone_bricks', {
       type: 'sign',
