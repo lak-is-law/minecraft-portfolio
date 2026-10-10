@@ -429,7 +429,7 @@ export const PORTFOLIO_DATA = {
     { name: "Crossroads General Hospital", coords: [43, 2, 58], tag: "[HOSPITAL]", desc: "Quartz-and-glass community hospital with a red cross and emergency ambulance bay" },
     { name: "Crossroads Police Station", coords: [51, 2, 60], tag: "[POLICE]", desc: "A blue-striped public safety station serving the southern districts" },
     { name: "Crossroads Public School", coords: [43, 2, 36], tag: "[SCHOOL]", desc: "A neighborhood school with a library, bright windows, and bell tower" },
-    { name: "Crossroads Wildlife Park", coords: [-38, 2, -32], tag: "[ZOO]", desc: "A wooded city zoo with animal habitats, a pond, and shady family trails" },
+    { name: "Crossroads Wildlife Park", coords: [-38, 2, -21], tag: "[ZOO]", desc: "Wooded safari zoo with pandas, lions, elephants, giraffes, polar bears, and shaded family trails" },
     { name: "Rapunzel’s Castle", coords: [-70, 2, -34], tag: "[CASTLE]", desc: "Fairytale keep with a high lantern tower and golden braid above secluded gardens" },
     { name: "Eiffel Tower · Paris", coords: [26, 2, -38], tag: "[EIFFEL]", desc: "Gustave Eiffel's lattice landmark with walkable archways, Champ de Mars gardens, and Café de Paris" },
     { name: "London · Big Ben & Tower Bridge", coords: [-32, 2, -65], tag: "[LONDON]", desc: "Gothic Elizabeth Tower clock, Great Bell, Tower Bridge walkways, and red Routemaster double-decker bus" },

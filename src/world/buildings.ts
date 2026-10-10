@@ -97,8 +97,25 @@ export class WorldBuilder {
       return 1;
     }
 
-    // 4. North-West: China, Tokyo, Seoul Mountain Ridge
-    if (x <= -20 && z <= -35) {
+    // 4. North-West: China, Tokyo, Seoul Mountain Ridge, London & Zoo
+    if (x <= -20 && z <= -18) {
+      // London Realm: leveled ground with River Thames waterway channel (Y = 0)
+      if (x >= -48 && x <= -20 && z >= -78 && z <= -46) {
+        if (z >= -54 && z <= -48 && x <= -22 && x >= -44) {
+          return 0; // River Thames waterway channel under Tower Bridge
+        }
+        return 1;
+      }
+
+      // Crossroads Wildlife Park (Zoo) leveled park grounds at Y = 1
+      if (x >= -54 && x <= -22 && z >= -46 && z <= -18) {
+        return 1;
+      }
+
+      if (z > -35) {
+        return 1;
+      }
+
       // Seoul Namsan knoll for N Seoul Tower
       if (x >= -65 && x <= -40 && z >= -125 && z <= -105) {
         const towerKnoll = Math.hypot((x - (-52)) / 10, (z - (-115)) / 8);
@@ -405,6 +422,38 @@ export class WorldBuilder {
         this.setBlock(px, gy, pz - 2, 'stone_bricks');
         this.setBlock(px, gy + 1, pz - 2, 'red_terracotta');
         this.setBlock(px, gy + 2, pz - 2, 'glowstone');
+      }
+    }
+
+    // Scenic West Safari Trail to Crossroads Wildlife Park & Zoo (From West Bridge (-24, 0) to Zoo Entrance (-38, -21))
+    for (let step = 0; step <= 24; step++) {
+      const u = step / 24;
+      const px = Math.round(-24 + (-38 - (-24)) * u);
+      const pz = Math.round(0 + (-21 - 0) * u);
+      const gy = this.getTerrainHeight(px, pz);
+      for (let dx = -1; dx <= 1; dx++) {
+        this.setBlock(px + dx, gy, pz, (step % 2 === 0) ? 'cobblestone' : 'mossy_cobblestone');
+      }
+      if (step % 6 === 0) {
+        this.setBlock(px - 2, gy, pz, 'oak_log');
+        this.setBlock(px - 2, gy + 1, pz, 'oak_fence');
+        this.setBlock(px - 2, gy + 2, pz, 'lantern');
+        this.setBlock(px + 2, gy, pz, 'oak_log');
+        this.setBlock(px + 2, gy + 1, pz, 'oak_fence');
+        this.setBlock(px + 2, gy + 2, pz, 'lantern');
+      }
+    }
+
+    // Fairytale Woodland Path from Zoo to Rapunzel's Castle (From (-38, -21) to (-68, -23))
+    for (let x = -38; x >= -68; x--) {
+      const z = Math.round(-21 + (x - (-38)) * 0.07);
+      const gy = this.getTerrainHeight(x, z);
+      this.setBlock(x, gy, z, 'mossy_stone_bricks');
+      this.setBlock(x, gy, z - 1, 'stone_bricks');
+      this.setBlock(x, gy, z + 1, 'stone_bricks');
+      if (Math.abs(x) % 6 === 0) {
+        this.setBlock(x, gy + 1, z - 2, 'oak_fence');
+        this.setBlock(x, gy + 2, z - 2, 'lantern');
       }
     }
 
@@ -984,7 +1033,7 @@ export class WorldBuilder {
     }
     // Twin Full-Canopy Japanese Sakura Cherry Blossom Trees
     this.buildSakuraTree(-12, 1, -12);
-    this.buildSakuraTree(-8, 1, -14);
+    this.buildSakuraTree(-8, 1, -7);
     // Zen Reflection Lotus Pool with submerged lanterns
     for (let x = -11; x <= -8; x++) {
       for (let z = -11; z <= -8; z++) {
@@ -1037,10 +1086,9 @@ export class WorldBuilder {
       this.setBlock(ncx, 1, ncz + step, 'water');
       this.setBlock(ncx, 1, ncz - step, 'water');
     }
-    // Symmetrical Aromatic Flowerbeds & Topiary Cypress Pines
+    // Symmetrical Aromatic Flowerbeds & Topiary Cypress Pines (placed away from the Indian flag at 6, -14)
     this.buildCypressTree(7, 1, -7);
     this.buildCypressTree(15, 1, -7);
-    this.buildCypressTree(7, 1, -15);
     this.buildCypressTree(15, 1, -15);
     // Rose bushes and amethyst borders
     for (const [fx, fz] of [[8, -9], [9, -8], [13, -9], [14, -8], [8, -13], [9, -14], [13, -13], [14, -14]]) {
@@ -1288,8 +1336,9 @@ export class WorldBuilder {
       text: 'Monumental red sandstone portal leading to the Taj Mahal reflecting pool.'
     });
 
-    // Symmetrical Cypress Pines along canal
+    // Symmetrical Cypress Pines along canal (leaving clear open perimeter around Indian flag at Z = -118)
     for (let z = cz + 20; z <= cz + 62; z += 7) {
+      if (Math.abs(z - (-118)) <= 3) continue; // Skip Z = -120 to keep flag sightline completely unobstructed
       this.buildCypressTree(cx - 6, 1, z);
       this.buildCypressTree(cx + 6, 1, z);
     }
@@ -1778,15 +1827,32 @@ export class WorldBuilder {
     for (let x = clockX - 3; x <= clockX + 3; x++) {
       for (let z = clockZ - 3; z <= clockZ + 3; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
-        this.setBlock(x, 2, z, 'stone_bricks');
+        // Interior ground floor paving at Y = 2
+        const isInterior = Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1;
+        const isDoorway = x === clockX && (z === clockZ + 2 || z === clockZ + 3);
+        if (isDoorway) {
+          this.setBlock(x, 2, z, 'smooth_stone'); // Walkable threshold
+        } else if (isInterior) {
+          this.setBlock(x, 2, z, 'smooth_stone');
+        } else {
+          this.setBlock(x, 2, z, 'stone_bricks');
+        }
       }
     }
+
     // Main Gothic Tower Shaft (Y = 3 to 28)
     for (let y = 3; y <= 28; y++) {
       for (let x = clockX - 2; x <= clockX + 2; x++) {
         for (let z = clockZ - 2; z <= clockZ + 2; z++) {
           const isCorner = Math.abs(x - clockX) === 2 && Math.abs(z - clockZ) === 2;
           const isWall = Math.abs(x - clockX) === 2 || Math.abs(z - clockZ) === 2;
+          const isSouthPortal = (z === clockZ + 2 && x === clockX && y <= 5);
+
+          if (isSouthPortal) {
+            // Keep south portal opening clear for entry!
+            continue;
+          }
+
           if (isCorner) {
             this.setBlock(x, y, z, (y % 4 === 0) ? 'mossy_stone_bricks' : 'stone_bricks');
           } else if (isWall) {
@@ -1804,7 +1870,43 @@ export class WorldBuilder {
         }
       }
     }
-    // Clock Stage (Y = 29 to 33) - 4-sided clock face
+
+    // Grand Gothic South Entrance Portal
+    this.setBlock(clockX - 1, 3, clockZ + 2, 'quartz_pillar');
+    this.setBlock(clockX - 1, 4, clockZ + 2, 'quartz_pillar');
+    this.setBlock(clockX + 1, 3, clockZ + 2, 'quartz_pillar');
+    this.setBlock(clockX + 1, 4, clockZ + 2, 'quartz_pillar');
+    this.setBlock(clockX, 5, clockZ + 2, 'gold_block');
+    this.setBlock(clockX - 1, 5, clockZ + 2, 'stone_bricks');
+    this.setBlock(clockX + 1, 5, clockZ + 2, 'stone_bricks');
+    this.setBlock(clockX - 1, 4, clockZ + 3, 'lantern');
+    this.setBlock(clockX + 1, 4, clockZ + 3, 'lantern');
+
+    // Walkable Spiral Staircase inside Tower Core (Y = 2 to 28)
+    // Core cells: (clockX + dx, y, clockZ + dz) where dx, dz in [-1, 1]
+    const spiralOffsets = [
+      [-1, -1], [0, -1], [1, -1],
+      [1, 0],   [1, 1],  [0, 1],
+      [-1, 1],  [-1, 0]
+    ];
+    for (let y = 2; y <= 28; y++) {
+      // Central newel column
+      this.setBlock(clockX, y, clockZ, (y % 4 === 0) ? 'sea_lantern' : 'iron_block');
+
+      // Spiral stepping platform along perimeter
+      const stepIdx = (y - 2) % spiralOffsets.length;
+      const [sx, sz] = spiralOffsets[stepIdx];
+      this.setBlock(clockX + sx, y, clockZ + sz, 'oak_planks');
+
+      // Next half step to allow smooth jumping/walking up
+      const nextIdx = (stepIdx + 1) % spiralOffsets.length;
+      const [nx, nz] = spiralOffsets[nextIdx];
+      if (y < 28) {
+        this.setBlock(clockX + nx, y, clockZ + nz, 'stone_bricks');
+      }
+    }
+
+    // Clock Stage (Y = 29 to 33) - 4-sided illuminated clock face
     for (let y = 29; y <= 33; y++) {
       for (let x = clockX - 3; x <= clockX + 3; x++) {
         for (let z = clockZ - 3; z <= clockZ + 3; z++) {
@@ -1824,36 +1926,80 @@ export class WorldBuilder {
             } else {
               this.setBlock(x, y, z, 'gold_block');
             }
+          } else if (y === 29) {
+            // Floor of Clock Chamber
+            this.setBlock(x, 29, z, (Math.abs(x - clockX) <= 1 && Math.abs(z - clockZ) <= 1 && (x === clockX - 1 && z === clockZ - 1)) ? 'smooth_stone' : 'oak_planks');
           }
         }
       }
     }
+
+    // Great Clockwork Escapement Mechanism in center of Clock Stage
+    this.setBlock(clockX, 30, clockZ, 'iron_block');
+    this.setBlock(clockX, 31, clockZ, 'gold_block'); // Main gear cog
+    this.setBlock(clockX + 1, 31, clockZ, 'redstone_block');
+    this.setBlock(clockX - 1, 31, clockZ, 'redstone_block');
+    this.setBlock(clockX, 32, clockZ, 'iron_block'); // Escapement anchor
+
     // Clock Interior Illumination
     for (let y = 30; y <= 32; y++) {
-      this.setBlock(clockX, y, clockZ, 'glowstone');
+      this.setBlock(clockX, y, clockZ - 2, 'glowstone');
+      this.setBlock(clockX, y, clockZ + 2, 'glowstone');
+      this.setBlock(clockX - 2, y, clockZ, 'glowstone');
+      this.setBlock(clockX + 2, y, clockZ, 'glowstone');
     }
 
-    // Belfry Chamber with the Great Bell (Y = 34 to 38)
-    for (let y = 34; y <= 38; y++) {
+    // Stairway connection from Clock Stage (Y=29) to Belfry Chamber (Y=34)
+    for (let sy = 30; sy <= 33; sy++) {
+      const sox = -1 + (sy - 30);
+      this.setBlock(clockX + sox, sy, clockZ + 1, 'oak_planks');
+      this.setBlock(clockX + sox, sy, clockZ + 2, 'oak_planks');
+    }
+
+    // Belfry Chamber with open Gothic colonnade & the Great Bell (Y = 34 to 38)
+    for (let x = clockX - 2; x <= clockX + 2; x++) {
+      for (let z = clockZ - 2; z <= clockZ + 2; z++) {
+        // Belfry viewing floor
+        this.setBlock(x, 34, z, (x === clockX && z === clockZ + 1) ? 'smooth_stone' : 'stone_bricks');
+        // Belfry ceiling / spire base
+        this.setBlock(x, 38, z, 'stone_bricks');
+      }
+    }
+
+    for (let y = 35; y <= 37; y++) {
       for (let x = clockX - 2; x <= clockX + 2; x++) {
         for (let z = clockZ - 2; z <= clockZ + 2; z++) {
           const isCorner = Math.abs(x - clockX) === 2 && Math.abs(z - clockZ) === 2;
           if (isCorner) {
-            this.setBlock(x, y, z, 'stone_bricks');
+            this.setBlock(x, y, z, 'quartz_pillar');
+          } else if (Math.abs(x - clockX) === 2 || Math.abs(z - clockZ) === 2) {
+            // Low balustrade at Y=35, open panoramic viewing gallery at Y=36..37
+            if (y === 35) {
+              this.setBlock(x, y, z, 'stone_bricks');
+            }
           }
         }
       }
     }
-    // Great Bell ("Big Ben") in center
-    this.setBlock(clockX, 35, clockZ, 'iron_block');
-    this.setBlock(clockX, 36, clockZ, 'gold_block');
-    this.setBlock(clockX, 37, clockZ, 'gold_block');
-    this.setBlock(clockX - 1, 36, clockZ, 'gold_block');
-    this.setBlock(clockX + 1, 36, clockZ, 'gold_block');
-    this.setBlock(clockX, 36, clockZ - 1, 'gold_block');
-    this.setBlock(clockX, 36, clockZ + 1, 'gold_block');
 
-    // Gothic Steeple & Copper Lantern Spire (Y = 39 to 46)
+    // Great Bell ("Big Ben") in center of Belfry
+    this.setBlock(clockX, 38, clockZ, 'iron_block'); // Overhead mounting beam
+    this.setBlock(clockX, 37, clockZ, 'gold_block'); // Crown of bell
+    this.setBlock(clockX, 36, clockZ, 'gold_block'); // Waist of bell
+    this.setBlock(clockX - 1, 36, clockZ, 'gold_block'); // Skirt
+    this.setBlock(clockX + 1, 36, clockZ, 'gold_block'); // Skirt
+    this.setBlock(clockX, 36, clockZ - 1, 'gold_block'); // Skirt
+    this.setBlock(clockX, 36, clockZ + 1, 'gold_block'); // Skirt
+    this.setBlock(clockX, 35, clockZ, 'iron_block'); // Clapper
+
+    // Interactive Great Bell Sign (triggers authentic chime)
+    this.setBlock(clockX, 35, clockZ + 1, 'stone_bricks', {
+      type: 'sign',
+      title: 'The Great Bell · Big Ben 🔔',
+      text: 'Westminster Great Bell cast in 1858 at Whitechapel Bell Foundry. Weighs 13.7 tonnes and chimes the iconic E-natural note across London! [Click to chime Big Ben]'
+    });
+
+    // Gothic Steeple & Copper Lantern Spire (Y = 39 to 47)
     for (let y = 39; y <= 45; y++) {
       const span = Math.max(0, 43 - y);
       for (let dx = -span; dx <= span; dx++) {
@@ -1865,16 +2011,31 @@ export class WorldBuilder {
     this.setBlock(clockX, 46, clockZ, 'beacon');
     this.setBlock(clockX, 47, clockZ, 'gold_block');
 
-    this.setBlock(clockX, 3, clockZ + 4, 'stone_bricks', {
+    // Elizabeth Tower Ground Entrance Sign
+    this.setBlock(clockX, 2, clockZ + 4, 'stone_bricks', {
       type: 'sign',
-      title: 'Big Ben · Palace of Westminster',
-      text: 'The iconic Elizabeth Tower, chiming clock dials, and Great Bell overlooking the River Thames.'
+      title: 'Big Ben · Elizabeth Tower 🇬🇧',
+      text: 'Historic 96m Gothic landmark of the Palace of Westminster overlooking the River Thames.\n\nWalk through the southern portal to climb the interior spiral staircase up to the Clockwork Chamber and Belfry Gallery!'
     });
 
-    // 2. Tower Bridge spanning the northern waterway (X in [-40, -24], Z in [-55, -47])
+    // 2. River Thames Waterway & Tower Bridge (X in [-44, -20], Z in [-55, -47])
+    // River Thames channel bed and flowing water (Y = 0)
+    for (let x = -44; x <= -20; x++) {
+      for (let z = -54; z <= -48; z++) {
+        this.setBlock(x, -1, z, 'sand');
+        this.setBlock(x, 0, z, 'water');
+      }
+      // Victoria & Southwark Embankment retaining walls (Y = 1 to 2)
+      this.setBlock(x, 1, -55, 'stone_bricks');
+      this.setBlock(x, 2, -55, 'smooth_stone');
+      this.setBlock(x, 1, -47, 'stone_bricks');
+      this.setBlock(x, 2, -47, 'smooth_stone');
+    }
+
+    // Tower Bridge twin gothic stone towers
     // West Tower at (-38, -51), East Tower at (-26, -51)
     for (const tx of [-38, -26]) {
-      // Pier Base
+      // River Pier Base (rising from riverbed Y=-1 to Y=3)
       for (let x = tx - 2; x <= tx + 2; x++) {
         for (let z = -53; z <= -49; z++) {
           for (let y = 1; y <= 3; y++) {
@@ -1882,7 +2043,7 @@ export class WorldBuilder {
           }
         }
       }
-      // Twin Gothic Turrets rising to Y = 18
+      // Twin Gothic Turrets rising to Y = 17
       for (let y = 4; y <= 17; y++) {
         for (let x = tx - 2; x <= tx + 2; x++) {
           for (let z = -53; z <= -49; z++) {
@@ -1911,7 +2072,7 @@ export class WorldBuilder {
       }
     }
 
-    // High-Level Walkways between towers at Y = 15 and Y = 16
+    // High-Level Glass Walkways between towers at Y = 15 and Y = 16
     for (let x = -35; x <= -29; x++) {
       this.setBlock(x, 15, -53, 'iron_block');
       this.setBlock(x, 15, -49, 'iron_block');
@@ -1923,7 +2084,7 @@ export class WorldBuilder {
       if (x % 3 === 0) this.setBlock(x, 16, -51, 'glowstone');
     }
 
-    // Roadway bascules at Y = 3 spanning between towers
+    // Roadway bascules at Y = 3 spanning between towers across the Thames
     for (let x = -42; x <= -22; x++) {
       for (let z = -52; z <= -50; z++) {
         this.setBlock(x, 3, z, (z === -51 && x % 4 === 0) ? 'smooth_stone' : 'asphalt_road');
@@ -1932,57 +2093,93 @@ export class WorldBuilder {
       this.setBlock(x, 4, -49, 'iron_block');
     }
 
+    this.setBlock(-32, 4, -49, 'stone_bricks', {
+      type: 'sign',
+      title: 'Tower Bridge · River Thames',
+      text: 'Iconic Victorian Gothic suspension and bascule bridge completed in 1894. Spans across the River Thames with 65-meter towers and high-level walkways.'
+    });
+
     // 3. Classic Red Double-Decker Routemaster Bus at (-26, 1, -70)
     const busX = -26;
     const busZ = -70;
-    // Wheels (4 wheels)
+
+    // Heavy duty rubber tires (4 wheels at Y = 1)
     for (const [wx, wz] of [[busX - 2, busZ - 1], [busX + 2, busZ - 1], [busX - 2, busZ + 1], [busX + 2, busZ + 1]]) {
       this.setBlock(wx, 1, wz, 'coal_block');
     }
+
     // Lower Deck (Y = 1 to 2)
     for (let x = busX - 3; x <= busX + 3; x++) {
       for (let z = busZ - 1; z <= busZ + 1; z++) {
-        if (Math.abs(z) <= 1) {
-          this.setBlock(x, 1, z, 'red_terracotta');
-          // Windows on lower deck
-          const isWindow = (x >= busX - 2 && x <= busX + 2 && Math.abs(z - busZ) === 1);
-          this.setBlock(x, 2, z, isWindow ? 'cyber_glass' : 'red_terracotta');
+        // Floor at Y = 1
+        this.setBlock(x, 1, z, 'red_terracotta');
+
+        // Lower deck body & windows at Y = 2
+        const isSide = Math.abs(z - busZ) === 1;
+        const isRearEntry = (x === busX + 3 && z === busZ + 1);
+        const isFrontWindshield = (x === busX - 3);
+
+        if (isRearEntry) {
+          this.setBlock(x, 2, z, 'smooth_stone'); // Open hop-on platform
+        } else if (isFrontWindshield) {
+          this.setBlock(x, 2, z, 'cyber_glass');
+        } else if (isSide) {
+          // Glass passenger windows
+          this.setBlock(x, 2, z, (Math.abs(x - busX) <= 2) ? 'cyber_glass' : 'red_terracotta');
+        } else {
+          // Center aisle and seats
+          this.setBlock(x, 2, z, (Math.abs(x - busX) <= 1) ? 'oak_planks' : 'smooth_stone');
         }
       }
     }
+
     // Upper Deck (Y = 3 to 4)
     for (let x = busX - 3; x <= busX + 3; x++) {
       for (let z = busZ - 1; z <= busZ + 1; z++) {
-        this.setBlock(x, 3, z, (Math.abs(z - busZ) === 1) ? 'cyber_glass' : 'red_terracotta');
-        this.setBlock(x, 4, z, 'red_terracotta'); // Roof
+        const isSide = Math.abs(z - busZ) === 1;
+        const isEnd = (x === busX - 3 || x === busX + 3);
+
+        // Upper deck panoramic glazing
+        if (isSide || isEnd) {
+          this.setBlock(x, 3, z, 'cyber_glass');
+        } else {
+          this.setBlock(x, 3, z, 'oak_planks');
+        }
+
+        // Roof at Y = 4
+        this.setBlock(x, 4, z, 'red_terracotta');
       }
     }
-    // Headlights & Tail Lights & Destination Display
-    this.setBlock(busX - 3, 1, busZ - 1, 'glowstone');
-    this.setBlock(busX - 3, 1, busZ + 1, 'glowstone');
-    this.setBlock(busX + 3, 1, busZ - 1, 'redstone_block');
-    this.setBlock(busX + 3, 1, busZ + 1, 'redstone_block');
+
+    // Headlights, Grille & Tail Lights
+    this.setBlock(busX - 3, 1, busZ, 'iron_block'); // Chrome grille
+    this.setBlock(busX - 3, 1, busZ - 1, 'glowstone'); // Left headlight
+    this.setBlock(busX - 3, 1, busZ + 1, 'glowstone'); // Right headlight
+    this.setBlock(busX + 3, 1, busZ - 1, 'redstone_block'); // Left taillight
+    this.setBlock(busX + 3, 1, busZ + 1, 'redstone_block'); // Right taillight
+
+    // Route 159 Heritage Destination Display Sign
     this.setBlock(busX - 3, 3, busZ, 'gold_block', {
       type: 'sign',
       title: 'London Routemaster Bus · Route 159',
-      text: 'Piccadilly Circus · Westminster · Tower Bridge · London Heritage Bus'
+      text: 'AEC Routemaster (RM 159) · Red London Icon\nRoute: Oxford Circus · Piccadilly · Trafalgar Square · Westminster · Tower Bridge.'
     });
 
     // 4. Red K2 Telephone Booths at (-28, 1, -64) and (-36, 1, -64)
     for (const phX of [-28, -36]) {
-      this.setBlock(phX, 1, -64, 'stone_bricks');
-      this.setBlock(phX, 2, -64, 'red_terracotta');
-      this.setBlock(phX, 3, -64, 'cyber_glass');
-      this.setBlock(phX, 4, -64, 'red_terracotta');
-      this.setBlock(phX, 3, -64, 'lantern');
+      this.setBlock(phX, 1, -64, 'stone_bricks'); // Base plinth
+      this.setBlock(phX, 2, -64, 'red_terracotta'); // Red kiosk frame
+      this.setBlock(phX, 3, -64, 'cyber_glass'); // Glazed window panes
+      this.setBlock(phX, 4, -64, 'red_terracotta'); // Domed red roof
+      this.setBlock(phX, 3, -63, 'lantern'); // Warm interior illumination
       this.setBlock(phX, 2, -63, 'smooth_stone', {
         type: 'sign',
-        title: 'K2 Telephone Box',
-        text: 'Classic British Post Office red telephone kiosk designed by Sir Giles Gilbert Scott.'
+        title: 'K2 Telephone Box ☎️',
+        text: 'Classic British General Post Office red telephone kiosk designed by Sir Giles Gilbert Scott in 1924.'
       });
     }
 
-    // Cast Iron Streetlamps along Westminster Promenade
+    // Cast Iron Victorian Streetlamps along Westminster Embankment Promenade
     for (let z = -74; z <= -56; z += 6) {
       this.setBlock(-36, 1, z, 'stone_bricks');
       this.setBlock(-36, 2, z, 'iron_block');
@@ -5159,35 +5356,323 @@ export class WorldBuilder {
   }
 
   private buildCityZoo(cx: number, cz: number) {
-    for (let x = cx - 12; x <= cx + 12; x++) {
-      for (let z = cz - 10; z <= cz + 10; z++) {
-        this.setBlock(x, 1, z, ((x + z) % 5 === 0) ? 'grass' : 'oak_planks');
-        if (x === cx - 12 || x === cx + 12 || z === cz - 10 || z === cz + 10) {
+    // Crossroads Wildlife Park & Safari Sanctuary (Footprint: X in [cx - 15, cx + 15], Z in [cz - 14, cz + 11])
+    // cx = -38, cz = -32
+
+    // 1. Overall Park Perimeter Fence & Landscaping
+    for (let x = cx - 15; x <= cx + 15; x++) {
+      for (let z = cz - 14; z <= cz + 11; z++) {
+        // Base ground level at Y = 1
+        const isPath = (Math.abs(x - cx) <= 2) || (Math.abs(z - cz) <= 1 && Math.abs(x - cx) <= 6);
+        this.setBlock(x, 1, z, isPath ? 'smooth_stone' : (((x + z) % 7 === 0) ? 'cobblestone' : 'grass'));
+
+        // Boundary fence
+        const isPerimeter = (x === cx - 15 || x === cx + 15 || z === cz - 14 || z === cz + 11);
+        const isSouthEntranceOpening = (z === cz + 11 && Math.abs(x - cx) <= 3);
+
+        if (isPerimeter && !isSouthEntranceOpening) {
           this.setBlock(x, 2, z, 'oak_fence');
           this.setBlock(x, 3, z, 'oak_fence');
         }
       }
     }
-    for (const x of [cx - 4, cx + 4]) {
-      for (let z = cz - 8; z <= cz + 8; z++) {
-        if (z < cz - 2 || z > cz + 2) this.setBlock(x, 2, z, 'oak_fence');
+
+    // 2. Grand Welcoming Timber Entrance Archway & Gate Plaza (Z = cz + 11)
+    // Pillars at (cx - 3) and (cx + 3)
+    for (const px of [cx - 3, cx + 3]) {
+      for (let y = 1; y <= 5; y++) {
+        this.setBlock(px, y, cz + 11, 'oak_log');
+      }
+      this.setBlock(px, 5, cz + 10, 'lantern');
+      this.setBlock(px, 5, cz + 12, 'lantern');
+    }
+    // Overhead Archway Beam across Z = cz + 11
+    for (let x = cx - 2; x <= cx + 2; x++) {
+      this.setBlock(x, 5, cz + 11, 'oak_log');
+      this.setBlock(x, 6, cz + 11, (x === cx) ? 'gold_block' : 'oak_planks');
+    }
+    this.setBlock(cx, 7, cz + 11, 'sea_lantern');
+
+    // Welcoming Park Portal Sign
+    this.setBlock(cx, 2, cz + 12, 'oak_log', {
+      type: 'sign',
+      title: '🦁 Crossroads Wildlife Park & Safari 🐼',
+      text: 'Welcome to the island animal sanctuary!\nStroll along shaded nature trails to explore giant pandas, African lions, gentle elephants, polar bears, giraffes, and visit the petting zoo!'
+    });
+
+    // Visitor Center & Information Kiosk at (cx + 5, cz + 9)
+    for (let x = cx + 4; x <= cx + 6; x++) {
+      this.setBlock(x, 1, cz + 9, 'oak_planks');
+      this.setBlock(x, 2, cz + 9, (x === cx + 5) ? 'cyber_glass' : 'oak_planks');
+      this.setBlock(x, 3, cz + 9, 'oak_planks');
+    }
+    this.setBlock(cx + 5, 2, cz + 10, 'oak_planks', {
+      type: 'sign',
+      title: 'Safari Visitor Information & Map 🗺️',
+      text: 'Sanctuary Guide:\n• 🐼 Bamboo Grove (NW)\n• 🦁 African Lion Ridge (NE)\n• 🐘 Elephant Oasis (SW)\n• ❄️ Polar Basin & Penguins (W)\n• 🦒 Giraffe Reserve (Center)\n• 🐑 Petting Zoo (SE)\nEnjoy your visit!'
+    });
+
+    // 3. Central Sunken Duck & Wildlife Pond (Z in [cz - 2, cz + 2], X in [cx - 4, cx - 1])
+    for (let x = cx - 4; x <= cx - 1; x++) {
+      for (let z = cz - 2; z <= cz + 2; z++) {
+        this.setBlock(x, -1, z, 'sand');
+        this.setBlock(x, 0, z, 'water'); // Sunken water surface at Y = 0
+        this.setBlock(x, 1, z, 'water'); // Water up to ground rim Y = 1
       }
     }
-    for (let x = cx - 10; x <= cx + 10; x++) {
-      if (x < cx - 2 || x > cx + 2) this.setBlock(x, 2, cz, 'oak_fence');
+    // Pond stone rim and weeping cypress trees
+    this.setBlock(cx - 5, 1, cz, 'mossy_cobblestone');
+    this.setBlock(cx, 1, cz, 'mossy_cobblestone');
+    this.setBlock(cx - 3, 2, cz - 3, 'leaves'); // Lily pad
+    this.setBlock(cx - 2, 2, cz + 3, 'leaves');
+    this.buildCypressTree(cx - 5, 1, cz - 3);
+    this.buildCypressTree(cx, 1, cz + 3);
+
+    // 4. Habitat 1: Giant Panda Bamboo Grove (NW: X in [cx - 14, cx - 6], Z in [cz - 13, cz - 5])
+    // Fenced partition
+    for (let x = cx - 14; x <= cx - 6; x++) {
+      this.setBlock(x, 2, cz - 5, 'oak_fence');
     }
-    for (let x = cx - 10; x <= cx - 6; x++) {
-      for (let z = cz - 3; z <= cz + 2; z++) this.setBlock(x, 2, z, 'water');
+    for (let z = cz - 13; z <= cz - 5; z++) {
+      this.setBlock(cx - 6, 2, z, 'oak_fence');
     }
-    for (const [x, z] of [[cx - 8, cz - 7], [cx + 8, cz - 7], [cx - 8, cz + 7], [cx + 8, cz + 7]]) {
-      this.buildCypressTree(x, 1, z);
+    // Bamboo stalks inside panda habitat
+    for (const [bx, bz] of [[cx - 12, cz - 11], [cx - 13, cz - 8], [cx - 9, cz - 12], [cx - 7, cz - 8]]) {
+      this.setBlock(bx, 1, bz, 'grass');
+      this.setBlock(bx, 2, bz, 'emerald_block');
+      this.setBlock(bx, 3, bz, 'leaves');
+      this.setBlock(bx, 4, bz, 'leaves');
     }
-    this.setBlock(cx, 2, cz + 9, 'glowstone', {
+    // Voxel Adult Panda Bear (Seated happily eating bamboo at cx - 10, cz - 9)
+    const panX = cx - 10;
+    const panZ = cz - 9;
+    this.setBlock(panX - 1, 1, panZ, 'coal_block'); // Left foot
+    this.setBlock(panX + 1, 1, panZ, 'coal_block'); // Right foot
+    this.setBlock(panX, 1, panZ, 'quartz_block'); // White belly
+    this.setBlock(panX, 2, panZ, 'quartz_block'); // Body
+    this.setBlock(panX - 1, 2, panZ, 'coal_block'); // Left arm
+    this.setBlock(panX + 1, 2, panZ, 'coal_block'); // Right arm
+    this.setBlock(panX, 3, panZ, 'quartz_block'); // White head
+    this.setBlock(panX - 1, 4, panZ, 'coal_block'); // Left black ear
+    this.setBlock(panX + 1, 4, panZ, 'coal_block'); // Right black ear
+    this.setBlock(panX, 3, panZ + 1, 'coal_block'); // Snout
+    this.setBlock(panX, 2, panZ + 1, 'emerald_block'); // Fresh bamboo stalk in paws!
+
+    // Baby Panda Cub at (cx - 8, cz - 11)
+    this.setBlock(cx - 8, 1, cz - 11, 'quartz_block');
+    this.setBlock(cx - 8, 2, cz - 11, 'coal_block');
+
+    // Panda Habitat Plaque Sign
+    this.setBlock(cx - 6, 2, cz - 5, 'stone_bricks', {
       type: 'sign',
-      title: 'Crossroads Wildlife Park',
-      text: 'A wooded city zoo with animal habitats, a pond, and shady family trails.'
+      title: 'Giant Panda Sanctuary · Ailuropoda melanoleuca 🐼',
+      text: 'Native to the misty mountain bamboo forests of southwest China.\nGiant pandas spend over 12 hours every day munching on fresh bamboo shoots, consuming up to 38 kilograms daily!'
     });
-    this.setBlock(cx, 2, cz, 'gold_block');
+
+    // 5. Habitat 2: African Savannah Lion Pride (NE: X in [cx + 6, cx + 14], Z in [cz - 13, cz - 5])
+    // Fenced partition
+    for (let x = cx + 6; x <= cx + 14; x++) {
+      this.setBlock(x, 2, cz - 5, 'oak_fence');
+    }
+    for (let z = cz - 13; z <= cz - 5; z++) {
+      this.setBlock(cx + 6, 2, z, 'oak_fence');
+    }
+    // Red Sandstone Kopje Rocky Outcrop
+    for (let x = cx + 8; x <= cx + 12; x++) {
+      for (let z = cz - 11; z <= cz - 8; z++) {
+        this.setBlock(x, 2, z, 'red_sandstone');
+      }
+    }
+    this.setBlock(cx + 10, 3, cz - 10, 'red_sandstone');
+    this.setBlock(cx + 10, 3, cz - 9, 'red_sandstone');
+
+    // Voxel Majestic Male Lion atop Kopje
+    const lionX = cx + 10;
+    const lionZ = cz - 10;
+    this.setBlock(lionX - 1, 4, lionZ, 'gold_block'); // Hindquarters
+    this.setBlock(lionX, 4, lionZ, 'gold_block'); // Torso
+    this.setBlock(lionX + 1, 4, lionZ, 'terracotta_adobe'); // Chest & Dark Mane
+    this.setBlock(lionX + 1, 5, lionZ, 'red_sandstone'); // Full Mane Crown
+    this.setBlock(lionX + 1, 5, lionZ + 1, 'gold_block'); // Head & Snout
+    this.setBlock(lionX - 2, 4, lionZ, 'oak_fence'); // Swishing Tail
+
+    // Resting Lioness nearby at (cx + 12, cz - 8)
+    this.setBlock(cx + 12, 2, cz - 8, 'gold_block');
+    this.setBlock(cx + 13, 2, cz - 8, 'gold_block');
+
+    // Lion Habitat Plaque Sign
+    this.setBlock(cx + 6, 2, cz - 5, 'stone_bricks', {
+      type: 'sign',
+      title: 'African Lion Pride · Panthera leo 🦁',
+      text: 'The apex predator of the Serengeti.\nKnown as the King of Beasts, lions live in close-knit social prides. A lion\'s majestic roar can be heard across the savannah from over 8 kilometers away!'
+    });
+
+    // 6. Habitat 3: Gentle Elephant Oasis (SW: X in [cx - 14, cx - 6], Z in [cz - 4, cz + 4])
+    // Fenced partition
+    for (let x = cx - 14; x <= cx - 6; x++) {
+      this.setBlock(x, 2, cz + 4, 'oak_fence');
+    }
+    for (let z = cz - 4; z <= cz + 4; z++) {
+      this.setBlock(cx - 6, 2, z, 'oak_fence');
+    }
+    // Mud bath watering hole
+    for (let x = cx - 13; x <= cx - 11; x++) {
+      for (let z = cz - 2; z <= cz; z++) {
+        this.setBlock(x, 1, z, 'sand');
+        this.setBlock(x, 1, z, 'water');
+      }
+    }
+    // Voxel African Elephant
+    const eleX = cx - 9;
+    const eleZ = cz;
+    // 4 Sturdy Legs
+    this.setBlock(eleX - 1, 1, eleZ - 1, 'smooth_stone');
+    this.setBlock(eleX + 1, 1, eleZ - 1, 'smooth_stone');
+    this.setBlock(eleX - 1, 1, eleZ + 1, 'smooth_stone');
+    this.setBlock(eleX + 1, 1, eleZ + 1, 'smooth_stone');
+    // Massive Body
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(eleX + dx, 2, eleZ + dz, 'smooth_stone');
+        this.setBlock(eleX + dx, 3, eleZ + dz, 'smooth_stone');
+      }
+    }
+    // Head, Ears, Curved Trunk & Ivory Tusks
+    this.setBlock(eleX, 4, eleZ + 2, 'smooth_stone'); // Head
+    this.setBlock(eleX - 1, 4, eleZ + 2, 'smooth_stone'); // Left Ear
+    this.setBlock(eleX + 1, 4, eleZ + 2, 'smooth_stone'); // Right Ear
+    this.setBlock(eleX, 3, eleZ + 2, 'smooth_stone'); // Upper trunk
+    this.setBlock(eleX, 2, eleZ + 2, 'smooth_stone'); // Lower trunk tip
+    this.setBlock(eleX - 1, 3, eleZ + 2, 'quartz_block'); // Left tusk
+    this.setBlock(eleX + 1, 3, eleZ + 2, 'quartz_block'); // Right tusk
+
+    // Elephant Habitat Plaque Sign
+    this.setBlock(cx - 6, 2, cz - 4, 'stone_bricks', {
+      type: 'sign',
+      title: 'African Elephant Oasis · Loxodonta africana 🐘',
+      text: 'The largest living land animal on Earth!\nElephants possess incredible emotional intelligence, deep memory, and complex trunks containing over 40,000 distinct muscles.'
+    });
+
+    // 7. Habitat 4: Arctic Polar Bear Basin & Penguin Cove (W: X in [cx - 14, cx - 6], Z in [cz + 5, cz + 10])
+    for (let x = cx - 14; x <= cx - 6; x++) {
+      this.setBlock(x, 2, cz + 5, 'oak_fence');
+    }
+    for (let z = cz + 5; z <= cz + 10; z++) {
+      this.setBlock(cx - 6, 2, z, 'oak_fence');
+    }
+    // Snow ground and ice sheets
+    for (let x = cx - 13; x <= cx - 7; x++) {
+      for (let z = cz + 6; z <= cz + 10; z++) {
+        this.setBlock(x, 1, z, ((x + z) % 2 === 0) ? 'snow' : 'ice');
+      }
+    }
+    // Voxel Polar Bear
+    const polX = cx - 11;
+    const polZ = cz + 8;
+    this.setBlock(polX - 1, 2, polZ, 'quartz_block'); // Hind
+    this.setBlock(polX, 2, polZ, 'quartz_block'); // Body
+    this.setBlock(polX + 1, 2, polZ, 'quartz_block'); // Chest
+    this.setBlock(polX + 1, 3, polZ, 'quartz_block'); // Head
+    this.setBlock(polX + 1, 3, polZ + 1, 'coal_block'); // Black nose
+
+    // Voxel Emperor Penguins
+    this.setBlock(cx - 8, 2, cz + 7, 'coal_block');
+    this.setBlock(cx - 8, 2, cz + 8, 'quartz_block');
+    this.setBlock(cx - 8, 3, cz + 7, 'gold_block'); // Beak
+
+    this.setBlock(cx - 7, 2, cz + 9, 'coal_block');
+    this.setBlock(cx - 7, 3, cz + 9, 'gold_block');
+
+    // Polar Habitat Plaque Sign
+    this.setBlock(cx - 6, 2, cz + 5, 'stone_bricks', {
+      type: 'sign',
+      title: 'Arctic Polar Basin & Penguin Cove ❄️🐧',
+      text: 'Champions of the frozen polar seas!\nWith thick insulating blubber and water-repellent hollow fur, polar bears navigate the Arctic ice alongside playful emperor penguins.'
+    });
+
+    // 8. Habitat 5: Tall Giraffe Acacia Reserve (Center-East: X in [cx + 6, cx + 14], Z in [cz - 4, cz + 4])
+    for (let x = cx + 6; x <= cx + 14; x++) {
+      this.setBlock(x, 2, cz + 4, 'oak_fence');
+    }
+    for (let z = cz - 4; z <= cz + 4; z++) {
+      this.setBlock(cx + 6, 2, z, 'oak_fence');
+    }
+    // Tall Acacia Feeding Tree
+    const treeX = cx + 12;
+    const treeZ = cz;
+    for (let y = 1; y <= 7; y++) {
+      this.setBlock(treeX, y, treeZ, 'oak_log');
+    }
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(treeX + dx, 8, treeZ + dz, 'leaves');
+      }
+    }
+
+    // Voxel Rothschild's Giraffe feeding high in the tree
+    const girX = cx + 9;
+    const girZ = cz;
+    // Slender legs
+    this.setBlock(girX - 1, 1, girZ, 'gold_block');
+    this.setBlock(girX + 1, 1, girZ, 'gold_block');
+    // Body with spots
+    this.setBlock(girX, 2, girZ, 'gold_block');
+    this.setBlock(girX, 3, girZ, 'terracotta_adobe');
+    // Towering Neck (Y = 4 to 6)
+    this.setBlock(girX + 1, 4, girZ, 'gold_block');
+    this.setBlock(girX + 1, 5, girZ, 'terracotta_adobe');
+    this.setBlock(girX + 1, 6, girZ, 'gold_block');
+    // Head reaching into leaves
+    this.setBlock(girX + 2, 7, girZ, 'gold_block');
+    this.setBlock(girX + 2, 8, girZ, 'oak_fence'); // Horns (ossicones)
+
+    // Giraffe Habitat Plaque Sign
+    this.setBlock(cx + 6, 2, cz - 4, 'stone_bricks', {
+      type: 'sign',
+      title: 'Rothschild\'s Giraffe Reserve · Giraffa camelopardalis 🦒',
+      text: 'The tallest mammal in the world!\nA giraffe\'s neck alone can measure over 2 meters in length, allowing them to browse nutritious leaves from the highest acacia tree canopies.'
+    });
+
+    // 9. Habitat 6: Children\'s Petting Zoo & Farm Friends (SE: X in [cx + 6, cx + 14], Z in [cz + 5, cz + 10])
+    for (let x = cx + 6; x <= cx + 14; x++) {
+      this.setBlock(x, 2, cz + 5, 'oak_fence');
+    }
+    for (let z = cz + 5; z <= cz + 10; z++) {
+      this.setBlock(cx + 6, 2, z, 'oak_fence');
+    }
+    // Water and feeding trough
+    this.setBlock(cx + 8, 1, cz + 8, 'cauldron');
+    this.setBlock(cx + 8, 1, cz + 7, 'oak_planks'); // Hay feeder
+
+    // Friendly Merino Sheep (cx + 10, cz + 7)
+    this.setBlock(cx + 10, 1, cz + 7, 'quartz_block'); // Fluffy wool body
+    this.setBlock(cx + 10, 2, cz + 7, 'quartz_block');
+    this.setBlock(cx + 11, 2, cz + 7, 'coal_block'); // Black face
+
+    // Friendly Pink Piglet (cx + 12, cz + 9)
+    this.setBlock(cx + 12, 1, cz + 9, 'red_terracotta');
+    this.setBlock(cx + 13, 1, cz + 9, 'red_terracotta');
+
+    // Petting Zoo Sign
+    this.setBlock(cx + 6, 2, cz + 5, 'stone_bricks', {
+      type: 'sign',
+      title: 'Children\'s Petting Zoo & Farm Barnyard 🐑🐖',
+      text: 'Gentle and affectionate farm friends!\nVisitors are warmly invited to pet our woolly Merino sheep and greet our friendly piglets. Treats available at the keeper station!'
+    });
+
+    // 10. Park Amenities: Safari Scoops Refreshment Stand at (cx, cz - 12)
+    this.setBlock(cx - 1, 1, cz - 12, 'oak_planks');
+    this.setBlock(cx, 1, cz - 12, 'oak_planks');
+    this.setBlock(cx + 1, 1, cz - 12, 'oak_planks');
+    this.setBlock(cx - 1, 2, cz - 12, 'gold_block');
+    this.setBlock(cx, 2, cz - 12, 'smooth_stone');
+    this.setBlock(cx + 1, 2, cz - 12, 'gold_block');
+    this.setBlock(cx, 3, cz - 12, 'sea_lantern');
+    this.setBlock(cx, 2, cz - 11, 'oak_planks', {
+      type: 'sign',
+      title: 'Safari Scoops · Shaved Ice & Café 🍧',
+      text: 'Cool down with artisanal tropical gelato, iced fruit coolers, and organic animal crackers!'
+    });
   }
 
   private buildRapunzelCastle(cx: number, cz: number) {

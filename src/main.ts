@@ -544,7 +544,16 @@ class Game {
       this.modals.openResumeChestModal();
       this.hud.pushChatMessage('Loot', 'Opened Ancient Resume Chest!');
     } else if (inter.type === 'sign') {
-      this.modals.openSignModal(inter.title || 'Notice', inter.text || '');
+      const title = inter.title || 'Notice';
+      const text = inter.text || '';
+      if (title.includes('Big Ben') || title.includes('Great Bell') || title.includes('Elizabeth Tower')) {
+        sound.playBell();
+        this.hud.pushChatMessage('Westminster', '🔔 Big Ben\'s Great Bell chimes resonantly across London!');
+      } else if (title.includes('Safari') || title.includes('Wildlife') || title.includes('Panda') || title.includes('Lion') || title.includes('Elephant') || title.includes('Giraffe') || title.includes('Penguin') || title.includes('Zoo')) {
+        sound.playLevelUp();
+        this.hud.pushChatMessage('Safari Sanctuary', `Observing habitat: ${title}`);
+      }
+      this.modals.openSignModal(title, text);
     } else if (inter.type === 'teleport') {
       this.modals.openFastTravelModal();
     } else if (inter.type === 'npc') {

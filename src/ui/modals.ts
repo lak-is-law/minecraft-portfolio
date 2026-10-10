@@ -284,28 +284,32 @@ export class ModalManager {
     const curZ = Math.round(playerPos?.z || 0);
 
     const atlasRegions = [
-      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', index: 0, tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
-      { number: '02', name: 'Frostpeak Range', subtitle: 'Snow & alpine heights · 🏔️', detail: 'Climb the alpine ridges to the overlook and suspension bridge above the clouds.', index: 8, tone: 'frost', direction: 'NORTH · Z −95' },
-      { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', index: 4, tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
-      { number: '04', name: 'Imperial India · Taj Mahal', subtitle: 'India', detail: 'Explore the grand white marble Taj Mahal, Yamuna reflecting pool, Varanasi Ghats, and SRMIST honors.', index: 3, tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
-      { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', index: 1, tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
-      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Metropolitan Cathedral, Palacio Nacional, and ancient Chichén Itzá 9-step pyramid plateau.', index: 5, tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
-      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Monumental Pyramid of Khufu with torch-lit tomb, Great Sphinx, and desert camel caravan.', index: 21, tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
-      { number: '08', name: 'Dubai · Burj Khalifa', subtitle: 'United Arab Emirates', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46 and Palm Jumeirah lagoon.', index: 22, tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
-      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock, Tower Bridge pedestrian walkways, and red Routemaster bus.', index: 18, tone: 'citadel', direction: 'NORTH · X −32 / Z −65' },
-      { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', index: 16, tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
-      { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', index: 7, tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
-      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
+      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', tag: '[CITADEL]', tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
+      { number: '02', name: 'Crossroads Wildlife Park', subtitle: 'Safari Zoo & Habitats · 🦁', detail: 'Wooded wildlife reserve featuring pandas, lions, elephants, giraffes, polar bears, and shaded trails.', tag: '[ZOO]', tone: 'citadel', direction: 'WEST · X −38 / Z −21' },
+      { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', tag: '[TOKYO]', tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
+      { number: '04', name: 'Imperial India · Taj Mahal', subtitle: 'India', detail: 'Explore the grand white marble Taj Mahal, Yamuna reflecting pool, Varanasi Ghats, and SRMIST honors.', tag: '[TAJ MAHAL]', tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
+      { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
+      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Metropolitan Cathedral, Palacio Nacional, and ancient Chichén Itzá 9-step pyramid plateau.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
+      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Monumental Pyramid of Khufu with torch-lit tomb, Great Sphinx, and desert camel caravan.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
+      { number: '08', name: 'Dubai · Burj Khalifa', subtitle: 'United Arab Emirates', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46 and Palm Jumeirah lagoon.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
+      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock, Tower Bridge pedestrian walkways, and red Routemaster bus.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −65' },
+      { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
+      { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
+      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
     ];
-    const regionsHtml = atlasRegions.map((region) => `
+    const regionsHtml = atlasRegions.map((region) => {
+      const targetIdx = PORTFOLIO_DATA.landmarks.findIndex(lm => lm.tag === region.tag);
+      const safeIdx = targetIdx >= 0 ? targetIdx : 0;
+      return `
       <article class="atlas-region-card atlas-${region.tone}">
         <div class="atlas-card-topline"><span>${region.number} / REALM</span><span class="atlas-region-dot"></span></div>
         <h3>${region.name}</h3>
         <p class="atlas-region-subtitle">${region.subtitle}</p>
         <p class="atlas-region-detail">${region.detail}</p>
-        <div class="atlas-card-bottom"><span>${region.direction}</span><button class="atlas-region-warp mc-map-chip-btn" data-index="${region.index}" aria-label="Travel to ${region.name}">GO <span aria-hidden="true">↗</span></button></div>
+        <div class="atlas-card-bottom"><span>${region.direction}</span><button class="atlas-region-warp mc-map-chip-btn" data-index="${safeIdx}" aria-label="Travel to ${region.name}">GO <span aria-hidden="true">↗</span></button></div>
       </article>
-    `).join('');
+    `;
+    }).join('');
     const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
       <button class="atlas-destination mc-map-chip-btn" data-index="${idx}">
         <span class="atlas-destination-tag">${lm.tag.replace(/[\[\]]/g, '')}</span>
@@ -786,6 +790,15 @@ export class ModalManager {
         else if (lm.tag.includes('PYRAMID')) col = '#f59e0b';
         else if (lm.tag.includes('CARNIVAL')) col = '#f472b6';
         else if (lm.tag.includes('VARANASI')) col = '#fb923c';
+        else if (lm.tag.includes('LONDON')) col = '#ef4444';
+        else if (lm.tag.includes('TOKYO')) col = '#ec4899';
+        else if (lm.tag.includes('SEOUL')) col = '#8b5cf6';
+        else if (lm.tag.includes('GIZA')) col = '#eab308';
+        else if (lm.tag.includes('DUBAI')) col = '#06b6d4';
+        else if (lm.tag.includes('MUMBAI')) col = '#f97316';
+        else if (lm.tag.includes('TEMPLE')) col = '#a855f7';
+        else if (lm.tag.includes('MARINA')) col = '#38bdf8';
+        else if (lm.tag.includes('DHABA')) col = '#fb923c';
 
         // Glowing outer halo
         ctx.fillStyle = col + '44';

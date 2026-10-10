@@ -1922,7 +1922,10 @@ export class VoxelWorld {
       { name: 'Tarek Mansour', role: 'Giza Desert Guide', x: -145, y: 2, z: 46, heading: 0, skinColor: 0xa0522d, shirtColor: 0xfef08a, pantsColor: 0x78350f, hairColor: 0x111111, tagColor: '#eab308', hatType: 'turban', hatColor: 0xfef08a },
 
       // 8. Dubai Burj Khalifa Realm
-      { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff }
+      { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff },
+
+      // 9. Crossroads Wildlife Park (Zoo)
+      { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -35, y: 2, z: -19, heading: Math.PI, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 }
     ];
 
     for (const c of citizens) {
