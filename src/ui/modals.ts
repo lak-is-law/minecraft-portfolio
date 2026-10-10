@@ -285,7 +285,7 @@ export class ModalManager {
 
     const atlasRegions = [
       { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', tag: '[CITADEL]', tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
-      { number: '02', name: 'Crossroads Wildlife Park', subtitle: 'Safari Zoo & Habitats · 🦁', detail: 'Wooded wildlife reserve featuring pandas, lions, elephants, giraffes, polar bears, and shaded trails.', tag: '[ZOO]', tone: 'citadel', direction: 'WEST · X −38 / Z −21' },
+      { number: '02', name: 'Crossroads Wildlife Park', subtitle: 'Grand Safari Zoo & Habitats · 🦁', detail: 'Expansive wildlife reserve featuring living animated pandas, lions, elephants, giraffes, polar bears, and shaded trails.', tag: '[ZOO]', tone: 'citadel', direction: 'WEST · X −65 / Z 0' },
       { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', tag: '[TOKYO]', tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
       { number: '04', name: 'Imperial India · Taj Mahal', subtitle: 'India', detail: 'Explore the grand white marble Taj Mahal, Yamuna reflecting pool, Varanasi Ghats, and SRMIST honors.', tag: '[TAJ MAHAL]', tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
       { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },

@@ -325,6 +325,91 @@ export class SoundEngine {
     osc.start(t);
     osc.stop(t + 0.14);
   }
+
+  // Wildlife sound generator for safari animals
+  public playAnimalSound(type: string) {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+
+    if (type === 'lion') {
+      // Low roaring swell
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(95, t);
+      osc.frequency.linearRampToValueAtTime(130, t + 0.4);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 1.2);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(320, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 1.2);
+    } else if (type === 'elephant') {
+      // High-to-low brassy trumpet
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(380, t);
+      osc.frequency.linearRampToValueAtTime(460, t + 0.25);
+      osc.frequency.exponentialRampToValueAtTime(260, t + 0.9);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.9);
+    } else if (type === 'sheep') {
+      // Gentle bleat
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, t);
+      osc.frequency.linearRampToValueAtTime(260, t + 0.3);
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.45);
+    } else if (type === 'penguin') {
+      // Playful honk / chirp
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(620, t);
+      osc.frequency.exponentialRampToValueAtTime(880, t + 0.15);
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    } else {
+      // Gentle nature chirp / snort for panda, pig, zebra, giraffe, flamingo
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.linearRampToValueAtTime(420, t + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(220, t + 0.2);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    }
+  }
 }
 
 export const sound = new SoundEngine();

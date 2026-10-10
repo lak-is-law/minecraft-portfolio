@@ -1,5 +1,6 @@
 import { DragonManager } from './dragons';
 import { FlagManager } from './flags';
+import { AnimalManager } from './animals';
 import * as THREE from 'three';
 import { TextureManager } from '../engine/textures';
 import { WorldBuilder, VoxelBlock } from './buildings';
@@ -24,6 +25,7 @@ export class VoxelWorld {
   // Dragons, Flags & Animals
   public dragonManager!: DragonManager;
   public flagManager!: FlagManager;
+  public animalManager!: AnimalManager;
   private catMesh: THREE.Group | null = null;
   public dogMesh: THREE.Group | null = null;
   private dogTailMesh: THREE.Mesh | null = null;
@@ -79,6 +81,7 @@ export class VoxelWorld {
     this.createWorldCitizens();
     this.dragonManager = new DragonManager(this.scene);
     this.flagManager = new FlagManager(this.scene);
+    this.animalManager = new AnimalManager(this.scene);
     this.createAllWorldFlags();
   }
 
@@ -1081,6 +1084,10 @@ export class VoxelWorld {
       this.flagManager.update(time);
     }
 
+    if (this.animalManager) {
+      this.animalManager.update(time, playerPos);
+    }
+
     if (this.volcanoSmoke) {
       const pos = this.volcanoSmoke.geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < pos.length / 3; i++) {
@@ -1925,7 +1932,7 @@ export class VoxelWorld {
       { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff },
 
       // 9. Crossroads Wildlife Park (Zoo)
-      { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -35, y: 2, z: -19, heading: Math.PI, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 }
+      { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -40, y: 2, z: 2, heading: Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 }
     ];
 
     for (const c of citizens) {
