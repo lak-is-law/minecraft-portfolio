@@ -902,71 +902,72 @@ export class WorldBuilder {
     });
   }
 
-  // Sky-High Billboard Ground Information Directories Across All 10 World Realms
+  // Authentic Country Information Kiosks Across All 10 World Realms
   private buildCountryMapKiosks() {
-    const billboards = [
+    const kiosks = [
       {
-        x: 95, y: 1, z: -4, rotY: Math.PI / 2,
-        title: 'United States Geographic Cartography & Dossier',
-        text: 'Capital: Washington, D.C. · 50 States · Area: 9.83M km²\nMajor Centers: New York, Las Vegas Strip, Los Angeles, Chicago, San Francisco.\nDistrict: USA Metropolis, Las Vegas Mega-Casinos & Hollywood Boulevard.'
+        x: 95, y: 1, z: -4,
+        title: 'United States of America 🇺🇸 · Country Info',
+        text: 'Capital: Washington, D.C. · 50 States · Area: 9.83M km² · Pop: 335 Million\nMajor Centers: New York, Las Vegas Strip, Los Angeles, Chicago, San Francisco.\nDistrict: USA Metropolis, Las Vegas Mega-Casinos & Hollywood Boulevard.'
       },
       {
-        x: 80, y: 1, z: -120, rotY: 0,
-        title: 'Republic of India Geographic Cartography · Survey of India',
-        text: 'Capital: New Delhi · 28 States & 8 UTs · Area: 3.28M km²\nMajor Centers: Chennai (SRMIST), Mumbai, Varanasi, Bengaluru, Hyderabad, Agra.\nDistrict: Imperial India Realm, Taj Mahal & Academic Honors Courtyard.'
+        x: 80, y: 1, z: -120,
+        title: 'Republic of India 🇮🇳 · Country Info',
+        text: 'Capital: New Delhi · 28 States & 8 UTs · Area: 3.28M km² · Pop: 1.43 Billion\nMajor Centers: Chennai (SRMIST), Mumbai, Varanasi, Bengaluru, Hyderabad, Agra.\nDistrict: Imperial India Realm, Taj Mahal & Academic Honors Courtyard.'
       },
       {
-        x: -34, y: 1, z: -60, rotY: 0,
-        title: 'United Kingdom Geographic Cartography · Ordnance Survey',
-        text: 'Capital: London · England, Scotland, Wales & Northern Ireland · Area: 243K km²\nMajor Centers: London, Edinburgh, Manchester, Oxford, Cambridge, Cardiff, Belfast.\nDistrict: London Realm, Big Ben Clocktower & Tower Bridge.'
+        x: -34, y: 1, z: -60,
+        title: 'United Kingdom 🇬🇧 · Country Info',
+        text: 'Capital: London · England, Scotland, Wales & Northern Ireland · Area: 243K km² · Pop: 68 Million\nMajor Centers: London, Edinburgh, Manchester, Oxford, Cambridge, Cardiff, Belfast.\nDistrict: London Realm, Big Ben Clocktower & Tower Bridge.'
       },
       {
-        x: 26, y: 1, z: -30, rotY: 0,
-        title: 'République Française Cartographie Nationale · IGN',
-        text: 'Capital: Paris · 18 Régions · Area: 643K km²\nMajor Centers: Paris, Lyon, Marseille, Nice, Toulouse, Bordeaux, Strasbourg.\nDistrict: Paris District, Eiffel Tower & Champ de Mars Gardens.'
+        x: 26, y: 1, z: -30,
+        title: 'French Republic 🇫🇷 · Country Info',
+        text: 'Capital: Paris · 18 Régions · Area: 643K km² · Pop: 68 Million\nMajor Centers: Paris, Lyon, Marseille, Nice, Toulouse, Bordeaux, Strasbourg.\nDistrict: Paris District, Eiffel Tower & Champ de Mars Gardens.'
       },
       {
-        x: -153, y: 1, z: -75, rotY: Math.PI / 2,
-        title: 'Japan Geographic Cartography · 国土地理院',
-        text: 'Capital: Tokyo · 47 Prefectures · Area: 377K km²\nMajor Islands: Honshu, Hokkaido, Kyushu, Shikoku · Major Centers: Tokyo, Kyoto, Osaka.\nDistrict: Tokyo Shibuya Realm, Scramble Crossing & Bullet Train.'
+        x: -153, y: 1, z: -75,
+        title: 'Japan · 日本国 🇯🇵 · Country Info',
+        text: 'Capital: Tokyo · 47 Prefectures · Area: 377K km² · Pop: 125 Million\nMajor Islands: Honshu, Hokkaido, Kyushu, Shikoku · Major Centers: Tokyo, Kyoto, Osaka.\nDistrict: Tokyo Shibuya Realm, Scramble Crossing & Bullet Train.'
       },
       {
-        x: -65, y: 1, z: -88, rotY: 0,
-        title: 'Republic of Korea Geographic Cartography · 대한민국 지도',
-        text: 'Capital: Seoul · 9 Provinces · Area: 100K km²\nMajor Centers: Seoul, Busan, Incheon, Daegu, Gwangju, Jeju Island.\nDistrict: Seoul Realm, Gwanghwamun Palace & N Seoul Tower.'
+        x: -65, y: 1, z: -88,
+        title: 'Republic of Korea 🇰🇷 · Country Info',
+        text: 'Capital: Seoul · 9 Provinces · Area: 100K km² · Pop: 52 Million\nMajor Centers: Seoul, Busan, Incheon, Daegu, Gwangju, Jeju Island.\nDistrict: Seoul Realm, Gwanghwamun Palace & N Seoul Tower.'
       },
       {
-        x: -108, y: 1, z: -100, rotY: 0,
-        title: 'People\'s Republic of China Cartography · 中国国家地理',
-        text: 'Capital: Beijing · 23 Provinces, 5 Regions · Area: 9.60M km²\nMajor Centers: Beijing, Shanghai, Guangzhou, Shenzhen, Xi\'an, Chengdu.\nDistrict: China Realm, Great Wall Ramparts & Imperial Dragon Pagoda.'
+        x: -108, y: 1, z: -100,
+        title: 'People\'s Republic of China 🇨🇳 · Country Info',
+        text: 'Capital: Beijing · 23 Provinces, 5 Regions · Area: 9.60M km² · Pop: 1.41 Billion\nMajor Centers: Beijing, Shanghai, Guangzhou, Shenzhen, Xi\'an, Chengdu.\nDistrict: China Realm, Great Wall Ramparts & Imperial Dragon Pagoda.'
       },
       {
-        x: -150, y: 1, z: 42, rotY: -Math.PI / 2,
-        title: 'Arab Republic of Egypt Cartography · خريطة مصر',
-        text: 'Capital: Cairo · 27 Governorates · Area: 1.01M km²\nKey Geography: River Nile, Delta, Sinai Peninsula, Red Sea · Major Centers: Cairo, Alexandria, Giza, Luxor.\nDistrict: Giza Plateau, Great Pyramids & Sphinx.'
+        x: -150, y: 1, z: 42,
+        title: 'Arab Republic of Egypt 🇪🇬 · Country Info',
+        text: 'Capital: Cairo · 27 Governorates · Area: 1.01M km² · Pop: 110 Million\nKey Geography: River Nile, Delta, Sinai Peninsula, Red Sea · Major Centers: Cairo, Alexandria, Giza, Luxor.\nDistrict: Giza Plateau, Great Pyramids & Sphinx.'
       },
       {
-        x: 165, y: 1, z: 35, rotY: -Math.PI / 2,
-        title: 'United Arab Emirates Cartography · خريطة الإمارات',
-        text: 'Capital: Abu Dhabi · 7 Emirates · Area: 83.6K km²\nMajor Centers: Dubai, Abu Dhabi, Sharjah, Palm Jumeirah.\nDistrict: Dubai Realm, Burj Khalifa & Palm Lagoon Waterfront.'
+        x: 165, y: 1, z: 35,
+        title: 'United Arab Emirates 🇦🇪 · Country Info',
+        text: 'Capital: Abu Dhabi · 7 Emirates · Area: 83.6K km² · Pop: 10 Million\nMajor Centers: Dubai, Abu Dhabi, Sharjah, Palm Jumeirah.\nDistrict: Dubai Realm, Burj Khalifa & Palm Lagoon Waterfront.'
       },
       {
-        x: -100, y: 1, z: 55, rotY: 0,
-        title: 'Estados Unidos Mexicanos Cartografía · INEGI',
-        text: 'Capital: Mexico City · 31 States & CDMX · Area: 1.97M km²\nMajor Centers: Mexico City, Guadalajara, Monterrey, Puebla, Cancún, Mérida.\nDistrict: Mexico City Zócalo, Metropolitan Cathedral & Chichén Itzá.'
+        x: -100, y: 1, z: 55,
+        title: 'Estados Unidos Mexicanos 🇲🇽 · Country Info',
+        text: 'Capital: Mexico City · 31 States & CDMX · Area: 1.97M km² · Pop: 130 Million\nMajor Centers: Mexico City, Guadalajara, Monterrey, Puebla, Cancún, Mérida.\nDistrict: Mexico City Zócalo, Metropolitan Cathedral & Chichén Itzá.'
       }
     ];
 
-    billboards.forEach(b => {
-      const gy = Math.max(1, this.getTerrainHeight(b.x, b.z));
+    kiosks.forEach(k => {
+      const gy = Math.max(1, this.getTerrainHeight(k.x, k.z));
 
-      // Ground Directory Pedestal and Information Sign (leaves pathways wide open)
-      this.setBlock(b.x, gy, b.z, 'smooth_stone');
-      this.setBlock(b.x, gy + 1, b.z, 'quartz_block', {
+      // Small authentic country info pedestal (compact, neat, leaves paths wide open)
+      this.setBlock(k.x, gy, k.z, 'smooth_stone');
+      this.setBlock(k.x, gy + 1, k.z, 'quartz_block', {
         type: 'sign',
-        title: b.title,
-        text: b.text
+        title: k.title,
+        text: k.text
       });
+      this.setBlock(k.x, gy + 2, k.z, 'lantern');
     });
   }
 
