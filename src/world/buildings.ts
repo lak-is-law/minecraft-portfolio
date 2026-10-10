@@ -4371,6 +4371,116 @@ export class WorldBuilder {
       text: 'Original 1923 landmark rebuilt with monumental 7-block quartz lettering, scaffolding, and spotlights overlooking Los Angeles.'
     });
 
+    // 3B. Hollywood Boulevard Times-Square Style Neon Entertainment Plaza & Canyon (Z in [cz + 16, cz + 30])
+    // Broad, bustling pedestrian plaza, illuminated Walk of Fame stars, giant neon billboard towers, and red viewing bleachers
+    for (let x = cx - 18; x <= cx + 18; x++) {
+      for (let z = cz + 16; z <= cz + 30; z++) {
+        // Alternating asphalt roadway and polished quartz/smooth stone pedestrian promenade
+        const isRoadway = (z >= cz + 21 && z <= cz + 25);
+        if (isRoadway) {
+          this.setBlock(x, 1, z, 'asphalt_road');
+          if (z === cz + 23 && x % 4 <= 1) {
+            this.setBlock(x, 1, z, 'gold_block'); // Yellow center dash
+          }
+        } else {
+          // Walk of Fame Promenade with Terrazzo and Brass Stars
+          const isStar = (Math.abs(x - cx) % 3 === 0 && (z === cz + 18 || z === cz + 28));
+          this.setBlock(x, 1, z, isStar ? 'gold_block' : 'smooth_stone');
+          if (isStar) {
+            this.setBlock(x, 1, z, 'gold_block', {
+              type: 'sign',
+              title: 'Hollywood Walk of Fame ⭐',
+              text: 'Brass star embedded in terrazzo sidewalk celebrating world entertainment legends.'
+            });
+          }
+        }
+      }
+    }
+
+    // Hollywood Times Square Red Tiered Glass Bleachers (X in [cx - 6, cx + 6], Z in [cz + 26, cz + 30])
+    for (let z = cz + 26; z <= cz + 30; z++) {
+      const stepY = 2 + (z - (cz + 26));
+      for (let x = cx - 6; x <= cx + 6; x++) {
+        for (let y = 1; y <= stepY; y++) {
+          this.setBlock(x, y, z, (y === stepY) ? 'redstone_block' : 'red_terracotta');
+        }
+        this.setBlock(x, stepY + 1, z, 'cyber_glass'); // Glowing illuminated glass treads
+      }
+    }
+    this.setBlock(cx, 8, cz + 30, 'sea_lantern', {
+      type: 'sign',
+      title: 'Hollywood Red Viewing Steps · Sunset Bleachers',
+      text: 'Take a seat on the glowing red bleachers to view the neon billboards and the illuminated Hollywood Sign above!'
+    });
+
+    // Twin Soaring Neon Billboard Towers (West at cx - 16, East at cx + 16)
+    for (const bbx of [cx - 16, cx + 16]) {
+      // Structural Steel Lattice Pylon
+      for (let y = 1; y <= 16; y++) {
+        this.setBlock(bbx, y, cz + 20, 'iron_block');
+        this.setBlock(bbx, y, cz + 21, 'iron_block');
+      }
+      // Giant Multi-Screen LED Billboard Displays
+      for (let y = 6; y <= 15; y++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          const screenZ = cz + 20 + dz;
+          // Animated cyber glass and colored glowstone mosaic screen
+          const screenBlock = ((y + dz + bbx) % 3 === 0) ? 'sea_lantern' : ((y + dz) % 2 === 0 ? 'diamond_block' : 'cyber_glass');
+          this.setBlock(bbx + (bbx < cx ? 1 : -1), y, screenZ, screenBlock);
+        }
+      }
+      this.setBlock(bbx, 17, cz + 20, 'sea_lantern');
+    }
+
+    // Classic Hollywood Cinema Marquee & Neon News Ticker at (cx, cz + 17)
+    for (let x = cx - 8; x <= cx + 8; x++) {
+      this.setBlock(x, 4, cz + 17, 'gold_block');
+      this.setBlock(x, 5, cz + 17, ((x + cx) % 2 === 0) ? 'sea_lantern' : 'redstone_block');
+    }
+
+    // Street Food & Hot Dog Carts in the Pedestrian Concourse
+    // Hot dog cart at (cx - 10, cz + 18)
+    this.setBlock(cx - 10, 1, cz + 18, 'coal_block');
+    this.setBlock(cx - 10, 2, cz + 18, 'iron_block');
+    this.setBlock(cx - 10, 3, cz + 18, 'redstone_block'); // Ketchup
+    this.setBlock(cx - 10, 3, cz + 19, 'gold_block'); // Mustard
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(cx - 10 + dx, 5, cz + 18 + dz, ((dx + dz) % 2 === 0) ? 'gold_block' : 'redstone_block');
+      }
+    }
+    this.setBlock(cx - 10, 4, cz + 18, 'iron_block');
+    this.setBlock(cx - 10, 2, cz + 17, 'smooth_stone', {
+      type: 'sign',
+      title: 'Pink’s Famous Hollywood Hot Dogs',
+      text: 'Legendary chili cheese dogs served to Hollywood movie stars since 1939!'
+    });
+
+    // Boba & Espresso Bar at (cx + 10, cz + 18)
+    this.setBlock(cx + 10, 1, cz + 18, 'oak_planks');
+    this.setBlock(cx + 10, 2, cz + 18, 'bookshelf');
+    this.setBlock(cx + 10, 3, cz + 18, 'sea_lantern');
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(cx + 10 + dx, 5, cz + 18 + dz, ((dx + dz) % 2 === 0) ? 'lapis_block' : 'quartz_block');
+      }
+    }
+    this.setBlock(cx + 10, 4, cz + 18, 'iron_block');
+    this.setBlock(cx + 10, 2, cz + 17, 'smooth_stone', {
+      type: 'sign',
+      title: 'Hollywood Sunset Boba & Coffee',
+      text: 'Iced matcha lattes, boba milk tea, and fresh espresso for directors and actors!'
+    });
+
+    // Parked Yellow Taxi at (cx + 12, cz + 23)
+    this.setBlock(cx + 10, 1, cz + 23, 'coal_block');
+    this.setBlock(cx + 14, 1, cz + 23, 'coal_block');
+    for (let x = cx + 10; x <= cx + 14; x++) {
+      this.setBlock(x, 2, cz + 23, 'gold_block');
+      this.setBlock(x, 3, cz + 23, (x === cx + 12) ? 'cyber_glass' : 'gold_block');
+    }
+    this.setBlock(cx + 12, 4, cz + 23, 'sea_lantern'); // Taxi roof light
+
     // 4. Griffith Observatory on the Summit Ridge (cx + 8, cz - 5, Y = 22..28)
     const obsX = cx + 8;
     const obsZ = cz - 5;
@@ -4986,85 +5096,16 @@ export class WorldBuilder {
       this.setBlock(110, 1, z, 'gold_block');
     }
 
-    // 4. Voxel Twin-Engine Passenger Jet Airliner parked on Apron facing West
-    const planeX = 118;
-    const planeZ = 73;
-
-    // Aerodynamic Fuselage (X from 108 to 128, Y from 2 to 5, Z from 72 to 74)
-    // Streamlined Nose cone
-    this.setBlock(108, 3, planeZ, 'quartz_block');
-    this.setBlock(109, 3, planeZ, 'quartz_block');
-    this.setBlock(109, 4, planeZ, 'quartz_block');
-    // Cockpit windshield
-    this.setBlock(110, 4, planeZ, 'cyber_glass');
-    this.setBlock(110, 4, planeZ - 1, 'cyber_glass');
-    this.setBlock(110, 4, planeZ + 1, 'cyber_glass');
-    this.setBlock(110, 3, planeZ, 'quartz_block');
-
-    // Main Cabin Body
-    for (let x = 111; x <= 125; x++) {
-      // Cabin floor
-      this.setBlock(x, 2, planeZ, 'iron_block');
-      this.setBlock(x, 2, planeZ - 1, 'iron_block');
-      this.setBlock(x, 2, planeZ + 1, 'iron_block');
-      // Cabin walls and passenger windows
-      this.setBlock(x, 3, planeZ - 1, 'quartz_block');
-      this.setBlock(x, 3, planeZ + 1, 'quartz_block');
-      this.setBlock(x, 4, planeZ - 1, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      this.setBlock(x, 4, planeZ + 1, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      // Cabin ceiling / roof
-      this.setBlock(x, 5, planeZ, 'quartz_block');
-      this.setBlock(x, 5, planeZ - 1, 'quartz_block');
-      this.setBlock(x, 5, planeZ + 1, 'quartz_block');
-      // Interior passenger lighting
-      if (x === 115 || x === 121) {
-        this.setBlock(x, 4, planeZ, 'glowstone');
-      }
+    // 4. Open Gate Stand & Ground Support Equipment (Apron clear for active animated flights)
+    for (let x = 114; x <= 124; x += 5) {
+      this.setBlock(x, 1, 71, 'iron_block');
+      this.setBlock(x, 1, 74, 'iron_block');
     }
-
-    // Swept-Back Wings with Red/Green Wingtip Nav Lights
-    for (let offset = 0; offset <= 7; offset++) {
-      const wx = planeX + Math.round(offset * 0.6);
-      // Starboard (North) wing towards terminal
-      this.setBlock(wx, 3, planeZ - 2 - offset, 'quartz_block');
-      this.setBlock(wx + 1, 3, planeZ - 2 - offset, 'quartz_block');
-      // Port (South) wing towards runway
-      this.setBlock(wx, 3, planeZ + 2 + offset, 'quartz_block');
-      this.setBlock(wx + 1, 3, planeZ + 2 + offset, 'quartz_block');
-    }
-    // Wingtip navigation beacons
-    this.setBlock(planeX + 5, 3, planeZ - 9, 'emerald_block'); // Green starboard
-    this.setBlock(planeX + 5, 3, planeZ + 9, 'redstone_block'); // Red port
-
-    // Twin High-Bypass Jet Turbines under Wings
-    for (const engZ of [planeZ - 4, planeZ + 4]) {
-      // Pylon
-      this.setBlock(planeX, 3, engZ, 'iron_block');
-      // Engine nacelle (X in [planeX - 1, planeX + 1])
-      this.setBlock(planeX - 1, 2, engZ, 'obsidian'); // Jet intake
-      this.setBlock(planeX, 2, engZ, 'iron_block'); // Core compressor
-      this.setBlock(planeX + 1, 2, engZ, 'glowstone'); // Turbine exhaust flare
-    }
-
-    // T-Tail Vertical Stabilizer & Horizontal Tailwings
-    for (let y = 5; y <= 9; y++) {
-      const tx = 126 + Math.round((y - 5) * 0.4);
-      this.setBlock(tx, y, planeZ, 'lapis_block');
-      this.setBlock(tx + 1, y, planeZ, 'gold_block');
-    }
-    for (let dz = -3; dz <= 3; dz++) {
-      this.setBlock(127, 7, planeZ + dz, 'quartz_block');
-    }
-
-    // Tricycle Heavy Landing Gear resting on tarmac
-    // Nose gear
-    this.setBlock(110, 2, planeZ, 'iron_block');
-    this.setBlock(110, 1, planeZ, 'coal_block');
-    // Main landing gear
-    this.setBlock(planeX, 2, planeZ - 2, 'iron_block');
-    this.setBlock(planeX, 1, planeZ - 2, 'coal_block');
-    this.setBlock(planeX, 2, planeZ + 2, 'iron_block');
-    this.setBlock(planeX, 1, planeZ + 2, 'coal_block');
+    // Luggage tug & baggage cart parked at stand
+    this.setBlock(126, 1, 70, 'coal_block');
+    this.setBlock(127, 1, 70, 'coal_block');
+    this.setBlock(126, 2, 70, 'gold_block');
+    this.setBlock(127, 2, 70, 'iron_block');
 
     // 5. Enclosed Glass Jet Bridge connecting Terminal Gate to Aircraft
     for (let z = 65; z <= 71; z++) {

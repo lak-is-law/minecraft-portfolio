@@ -39,6 +39,7 @@ export class VoxelWorld {
   public animatedAirplanes: THREE.Group[] = [];
   private airplaneStrobes: THREE.Mesh[] = [];
   private airplaneWheels: THREE.Group[] = [];
+  public worldCitizens: { mesh: THREE.Group; basePos: THREE.Vector3; initialHeading: number; armL: THREE.Group; armR: THREE.Group; head: THREE.Group }[] = [];
 
   // Hammerable Project Banners
   public projectBanners: ProjectBanner[] = [];
@@ -65,6 +66,7 @@ export class VoxelWorld {
     this.createBeachCat();
     this.createVolcanoSmoke();
     this.createAnimatedAirplanes();
+    this.createWorldCitizens();
     this.dragonManager = new DragonManager(this.scene);
   }
 
@@ -1002,6 +1004,7 @@ export class VoxelWorld {
   public update(time: number, playerPos: THREE.Vector3) {
     this.updateLiveTrains(time);
     this.updateAnimatedAirplanes(time);
+    this.updateWorldCitizens(time, playerPos);
 
     for (let i = 0; i < this.spinningIcons.length; i++) {
       const g = this.spinningIcons[i];
@@ -1711,6 +1714,237 @@ export class VoxelWorld {
     seatOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.autoRickshawMesh.rotation.y);
     const seatPos = this.autoRickshawMesh.position.clone().add(seatOffset);
     return { position: seatPos, rotationY: this.autoRickshawMesh.rotation.y };
+  }
+
+  // -------------------------------------------------------------
+  // LIVING WORLD CITIZENS: CULTURALLY AUTHENTIC RESIDENTS
+  // -------------------------------------------------------------
+  private createWorldCitizens() {
+    interface CitizenConfig {
+      name: string;
+      role: string;
+      x: number;
+      y: number;
+      z: number;
+      heading: number;
+      skinColor: number;
+      shirtColor: number;
+      pantsColor: number;
+      hairColor: number;
+      tagColor: string;
+      hatType?: 'turban' | 'beret' | 'cap' | 'none';
+      hatColor?: number;
+    }
+
+    const citizens: CitizenConfig[] = [
+      // 1. Imperial India Realm: Saffron turbans, sherwanis, kurtas near Taj Mahal & Ghats
+      { name: 'Aarav Sharma', role: 'Varanasi Ghat Pundit', x: 74, y: 2, z: -112, heading: Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xe0e7ff, pantsColor: 0xf59e0b, hairColor: 0x111111, tagColor: '#f97316', hatType: 'turban', hatColor: 0xf97316 },
+      { name: 'Priya Patel', role: 'Classical Sitar Maestro', x: 86, y: 2, z: -116, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xd97706, pantsColor: 0xb45309, hairColor: 0x09090b, tagColor: '#f59e0b', hatType: 'none' },
+      { name: 'Rajesh Kumar', role: 'Dhaba Chai Master', x: 44, y: 2, z: -76, heading: 0, skinColor: 0xa0522d, shirtColor: 0xef4444, pantsColor: 0x1e293b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0xd97706 },
+      { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 80, y: 2, z: -140, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
+
+      // 2. Tokyo Shibuya Realm: Shibuya fashion, Harajuku, salaryman, student
+      { name: 'Kenji Sato', role: 'Shibuya Tech Architect', x: -152, y: 2, z: -78, heading: Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x1e293b, pantsColor: 0x0f172a, hairColor: 0x18181b, tagColor: '#38bdf8', hatType: 'none' },
+      { name: 'Hana Tanaka', role: 'Harajuku Anime Artist', x: -148, y: 2, z: -84, heading: -Math.PI * 0.75, skinColor: 0xffe0bd, shirtColor: 0xf43f5e, pantsColor: 0x4f46e5, hairColor: 0xec4899, tagColor: '#f43f5e', hatType: 'beret', hatColor: 0x18181b },
+      { name: 'Daiki Takahashi', role: 'Shinkansen Conductor', x: -155, y: 2, z: -94, heading: 0, skinColor: 0xf1c27d, shirtColor: 0x1e3a8a, pantsColor: 0x1e3a8a, hairColor: 0x18181b, tagColor: '#2563eb', hatType: 'cap', hatColor: 0x1e3a8a },
+
+      // 3. Seoul Gwanghwamun Realm: Modern K-pop & palace heritage
+      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 2, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 2, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+
+      // 4. Hollywood & Times Square USA Realm: Directors, film stars, reporters
+      { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 130, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },
+      { name: 'Jack Sullivan', role: 'Broadway Choreographer', x: 124, y: 2, z: -32, heading: 0, skinColor: 0xffdbac, shirtColor: 0xe11d48, pantsColor: 0x0f172a, hairColor: 0x475569, tagColor: '#f43f5e', hatType: 'none' },
+      { name: 'Chloe Davis', role: 'Sunset Boulevard Vlogger', x: 136, y: 2, z: -34, heading: -Math.PI / 2, skinColor: 0xf2c49b, shirtColor: 0x06b6d4, pantsColor: 0xffffff, hairColor: 0xfacc15, tagColor: '#22d3ee', hatType: 'cap', hatColor: 0xfacc15 },
+
+      // 5. London Westminster & Big Ben Realm
+      { name: 'Oliver Wright', role: 'Royal Guard Guide', x: -30, y: 2, z: -68, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xdc2626, pantsColor: 0x111827, hairColor: 0x78350f, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x111827 },
+      { name: 'Emma Watson', role: 'London Historian', x: -36, y: 2, z: -72, heading: -Math.PI / 3, skinColor: 0xf5d0b5, shirtColor: 0x047857, pantsColor: 0x374151, hairColor: 0xb45309, tagColor: '#10b981', hatType: 'beret', hatColor: 0x047857 },
+
+      // 6. Paris Eiffel Tower Realm
+      { name: 'Jean-Luc Moreau', role: 'Montmartre Painter', x: 28, y: 2, z: -42, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x475569, pantsColor: 0x0f172a, hairColor: 0x94a3b8, tagColor: '#94a3b8', hatType: 'beret', hatColor: 0x18181b },
+      { name: 'Camille Dubois', role: 'Parisian Patissier', x: 22, y: 2, z: -46, heading: Math.PI / 4, skinColor: 0xffe0bd, shirtColor: 0xffffff, pantsColor: 0x1e293b, hairColor: 0x451a03, tagColor: '#f8fafc', hatType: 'cap', hatColor: 0xffffff },
+
+      // 7. Egypt Giza & Sphinx Realm
+      { name: 'Tarek Mansour', role: 'Giza Desert Guide', x: -145, y: 2, z: 46, heading: 0, skinColor: 0xa0522d, shirtColor: 0xfef08a, pantsColor: 0x78350f, hairColor: 0x111111, tagColor: '#eab308', hatType: 'turban', hatColor: 0xfef08a },
+
+      // 8. Dubai Burj Khalifa Realm
+      { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff }
+    ];
+
+    for (const c of citizens) {
+      const citizenGroup = new THREE.Group();
+      citizenGroup.position.set(c.x, c.y, c.z);
+      citizenGroup.rotation.y = c.heading;
+
+      const skinMat = new THREE.MeshLambertMaterial({ color: c.skinColor });
+      const shirtMat = new THREE.MeshLambertMaterial({ color: c.shirtColor });
+      const pantsMat = new THREE.MeshLambertMaterial({ color: c.pantsColor });
+      const hairMat = new THREE.MeshLambertMaterial({ color: c.hairColor });
+      const shoeMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const pupilMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+
+      // Head Group
+      const head = new THREE.Group();
+      head.position.set(0, 1.48, 0);
+
+      const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.44), skinMat);
+      head.add(headMesh);
+
+      // Hair
+      const hairMesh = new THREE.Mesh(new THREE.BoxGeometry(0.47, 0.16, 0.47), hairMat);
+      hairMesh.position.set(0, 0.16, 0);
+      head.add(hairMesh);
+
+      // Optional Hats (Turban, Beret, Cap)
+      if (c.hatType === 'turban' && c.hatColor) {
+        const turbanMat = new THREE.MeshLambertMaterial({ color: c.hatColor });
+        const turban = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.22, 0.52), turbanMat);
+        turban.position.set(0, 0.22, 0);
+        head.add(turban);
+        const crest = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.12), turbanMat);
+        crest.position.set(0, 0.32, 0.14);
+        head.add(crest);
+      } else if (c.hatType === 'beret' && c.hatColor) {
+        const beretMat = new THREE.MeshLambertMaterial({ color: c.hatColor });
+        const beret = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.24, 0.08, 12), beretMat);
+        beret.position.set(0.04, 0.24, 0.02);
+        beret.rotation.z = -0.15;
+        head.add(beret);
+      } else if (c.hatType === 'cap' && c.hatColor) {
+        const capMat = new THREE.MeshLambertMaterial({ color: c.hatColor });
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.48), capMat);
+        cap.position.set(0, 0.22, 0);
+        head.add(cap);
+        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.03, 0.22), capMat);
+        visor.position.set(0, 0.18, 0.3);
+        head.add(visor);
+      }
+
+      // Eyes
+      for (const side of [-0.1, 0.1]) {
+        const eye = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.02), eyeMat);
+        eye.position.set(side, 0.02, 0.225);
+        head.add(eye);
+        const pupil = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.025), pupilMat);
+        pupil.position.set(side, 0.02, 0.23);
+        head.add(pupil);
+      }
+      citizenGroup.add(head);
+
+      // Torso
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.65, 0.26), shirtMat);
+      torso.position.set(0, 0.95, 0);
+      citizenGroup.add(torso);
+
+      // Arms
+      const armL = new THREE.Group();
+      armL.position.set(-0.34, 1.15, 0);
+      const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.35, 0.18), shirtMat);
+      sleeveL.position.set(0, -0.05, 0);
+      armL.add(sleeveL);
+      const handL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.3, 0.16), skinMat);
+      handL.position.set(0, -0.32, 0);
+      armL.add(handL);
+      citizenGroup.add(armL);
+
+      const armR = new THREE.Group();
+      armR.position.set(0.34, 1.15, 0);
+      const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.35, 0.18), shirtMat);
+      sleeveR.position.set(0, -0.05, 0);
+      armR.add(sleeveR);
+      const handR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.3, 0.16), skinMat);
+      handR.position.set(0, -0.32, 0);
+      armR.add(handR);
+      citizenGroup.add(armR);
+
+      // Legs
+      for (const side of [-0.12, 0.12]) {
+        const legGroup = new THREE.Group();
+        legGroup.position.set(side, 0.6, 0);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.44, 0.2), pantsMat);
+        leg.position.set(0, -0.22, 0);
+        legGroup.add(leg);
+        const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.26), shoeMat);
+        shoe.position.set(0, -0.42, 0.03);
+        legGroup.add(shoe);
+        citizenGroup.add(legGroup);
+      }
+
+      // Nameplate Banner Overhead
+      const tagCanvas = document.createElement('canvas');
+      tagCanvas.width = 320;
+      tagCanvas.height = 76;
+      const tagCtx = tagCanvas.getContext('2d')!;
+      tagCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      tagCtx.fillRect(0, 0, 320, 76);
+      tagCtx.strokeStyle = c.tagColor;
+      tagCtx.lineWidth = 3;
+      tagCtx.strokeRect(2, 2, 316, 72);
+
+      tagCtx.fillStyle = c.tagColor;
+      tagCtx.font = 'bold 22px monospace';
+      tagCtx.textAlign = 'center';
+      tagCtx.fillText(c.name, 160, 30);
+
+      tagCtx.fillStyle = '#ffffff';
+      tagCtx.font = '16px monospace';
+      tagCtx.fillText(c.role, 160, 58);
+
+      const tagTex = new THREE.CanvasTexture(tagCanvas);
+      tagTex.magFilter = THREE.NearestFilter;
+      const tagSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tagTex }));
+      tagSprite.scale.set(1.9, 0.45, 1);
+      tagSprite.position.set(0, 2.1, 0);
+      citizenGroup.add(tagSprite);
+
+      citizenGroup.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
+
+      this.scene.add(citizenGroup);
+      this.worldCitizens.push({
+        mesh: citizenGroup,
+        basePos: new THREE.Vector3(c.x, c.y, c.z),
+        initialHeading: c.heading,
+        armL,
+        armR,
+        head
+      });
+    }
+  }
+
+  private updateWorldCitizens(time: number, playerPos: THREE.Vector3) {
+    if (this.worldCitizens.length === 0) return;
+
+    for (let i = 0; i < this.worldCitizens.length; i++) {
+      const c = this.worldCitizens[i];
+      const dist = c.mesh.position.distanceTo(playerPos);
+
+      // Subtle breathing & idle idle limb movement
+      const breath = Math.sin(time * 2.2 + i * 1.5) * 0.02;
+      c.mesh.position.y = c.basePos.y + breath;
+
+      // Gentle arm sway
+      c.armL.rotation.x = Math.sin(time * 1.8 + i) * 0.08;
+      c.armR.rotation.x = -Math.sin(time * 1.8 + i) * 0.08;
+
+      if (dist < 12) {
+        // Look towards player when nearby
+        const dx = playerPos.x - c.mesh.position.x;
+        const dz = playerPos.z - c.mesh.position.z;
+        const targetAngle = Math.atan2(dx, dz);
+        // Smooth head rotation towards player
+        c.mesh.rotation.y = THREE.MathUtils.lerp(c.mesh.rotation.y, targetAngle, 0.05);
+      } else {
+        // Return to natural world heading
+        c.mesh.rotation.y = THREE.MathUtils.lerp(c.mesh.rotation.y, c.initialHeading, 0.02);
+      }
+    }
   }
 
   public hasBlock(x: number, y: number, z: number): boolean {
