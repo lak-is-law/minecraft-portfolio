@@ -414,7 +414,7 @@ export const PORTFOLIO_DATA = {
     { name: "Crossroads Citadel (Spawn)", coords: [0, 2, 0], tag: "[CITADEL]", desc: "Central drop-in nexus with marble compass rose, sky beacon, and Lakshya guide" },
     { name: "Neo York Tech Metropolis", coords: [100, 2, 0], tag: "[NEO YORK]", desc: "American cyberpunk metropolis with glass skyscrapers, Times Square screens, and AI research labs" },
     { name: "Lak Tower (\"LK\" Monument)", coords: [150, 2, 0], tag: "[LAK TOWER]", desc: "55-block tall Eiffel-inspired tower with illuminated LK monogram and observation skydeck" },
-    { name: "Hollywood Hills & Sign", coords: [130, 24, -50], tag: "[HOLLYWOOD]", desc: "Scenic mountain ridge and illuminated block-built HOLLYWOOD sign overlooking the American tech hub" },
+    { name: "Hollywood Hills & Sign", coords: [145, 26, -85], tag: "[HOLLYWOOD]", desc: "Scenic mountain ridge and illuminated block-built HOLLYWOOD sign overlooking the American tech hub" },
     { name: "Imperial India · Taj Mahal", coords: [80, 4, -135], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, Yamuna reflecting canal, and SRMIST academic honors" },
     { name: "Varanasi Ghats & Haveli", coords: [45, 2, -120], tag: "[VARANASI]", desc: "Historic riverfront stone steps, sacred banyan trees, and ornate Rajasthani Haveli chhatris" },
     { name: "China · Great Wall & Pagoda", coords: [-110, 2, -110], tag: "[GREAT WALL]", desc: "Mighty stone ramparts, watchtowers, 5-tier dragon pagoda, bamboo groves, and Foreign Languages embassy" },

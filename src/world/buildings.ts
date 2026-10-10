@@ -159,9 +159,9 @@ export class WorldBuilder {
         }
         return 1;
       }
-      // Hollywood Hills
-      if (x <= 160 && z >= -80 && z <= -25) {
-        const hillDist = Math.hypot((x - 132) / 22, (z - (-52)) / 16);
+      // Hollywood Hills (Mount Lee & Griffith Observatory north of Vegas Boulevard)
+      if (x >= 120 && x <= 170 && z >= -105 && z <= -65) {
+        const hillDist = Math.hypot((x - 145) / 22, (z - (-85)) / 16);
         if (hillDist <= 1) {
           const peak = Math.round(20 * Math.pow(1 - hillDist, 1.1));
           return Math.max(2, peak);
@@ -563,9 +563,9 @@ export class WorldBuilder {
       }
     }
 
-    // B. Eastern Parkway Arc: Marina (140, -115) -> Hollywood (130, -50) -> Lak Tower (150, 0) -> Dubai (160, 42) -> Airport (130, 80) -> Pier (35, 125)
+    // B. Eastern Parkway Arc: Marina (140, -115) -> Hollywood (145, -85) -> Vegas Strip (140, -54) -> Lak Tower (150, 0) -> Dubai (160, 42) -> Airport (130, 80) -> Pier (35, 125)
     const eastWaypoints: [number, number][] = [
-      [140, -115], [130, -50], [150, 0], [160, 42], [130, 80], [35, 125]
+      [140, -115], [145, -85], [140, -54], [150, 0], [160, 42], [130, 80], [35, 125]
     ];
     for (let i = 0; i < eastWaypoints.length - 1; i++) {
       const [x1, z1] = eastWaypoints[i];
@@ -707,7 +707,7 @@ export class WorldBuilder {
     this.setBlock(1, 2, 6, 'quartz_block', {
       type: 'sign',
       title: 'East & South-East Realms',
-      text: '• Imperial India & Taj Mahal (80, -135)\n• USA & Times Square (100, 0)\n• Hollywood Sign & Hills (130, -50)\n• Dubai Burj Khalifa (170, 42)\n• International Airport (130, 80)'
+      text: '• Imperial India & Taj Mahal (80, -135)\n• USA & Times Square (100, 0)\n• Hollywood Sign & Hills (145, -85)\n• Dubai Burj Khalifa (170, 42)\n• International Airport (130, 80)'
     });
 
     // 5. Four Monumental Archway Gatehouses over Moat Bridges
@@ -3361,8 +3361,8 @@ export class WorldBuilder {
       }
     }
 
-    // Connecting Boulevard directly into Hollywood Plaza (Z in [-54, -48], X in [104, 128])
-    for (let x = 104; x <= 128; x++) {
+    // Connecting Boulevard directly into Las Vegas Strip & Hollywood Parkway (Z in [-52, -48], X in [104, 138])
+    for (let x = 104; x <= 138; x++) {
       for (let z = -52; z <= -48; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
         if (z === -50 && x % 4 <= 1) this.setBlock(x, 1, z, 'gold_block');
@@ -3862,8 +3862,8 @@ export class WorldBuilder {
     // Lak Tower ("LK" Monument Wonder: 55-block Eiffel tower at X = 150, Z = 0)
     this.buildLakTower(150, 0);
 
-    // Hollywood Mountain & Illuminated Block-Built Sign at (130, -50)
-    this.buildHollywoodMountain(130, -50);
+    // Hollywood Mountain & Illuminated Block-Built Sign at (145, -85)
+    this.buildHollywoodMountain(145, -85);
 
     // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
     this.buildVegasStripInFrontOfHollywoodAndLKTower();
@@ -3871,7 +3871,7 @@ export class WorldBuilder {
 
   // 7B. Dazzling Las Vegas Boulevard in front of Hollywood and LK Tower
   private buildVegasStripInFrontOfHollywoodAndLKTower() {
-    // 1. The Grand Boulevard Avenue connecting Hollywood (130, -50) to Lak Tower (150, 0)
+    // 1. The Grand Boulevard Avenue connecting Hollywood (145, -85) to Lak Tower (150, 0)
     // Roadway: X in [136, 144], Z in [-54, 4]
     for (let x = 136; x <= 144; x++) {
       for (let z = -54; z <= 4; z++) {

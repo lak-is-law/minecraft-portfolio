@@ -445,7 +445,7 @@ export class HUDManager {
     // Hollywood ridge in USA
     ctx.fillStyle = 'rgba(215,168,121,.9)';
     ctx.beginPath();
-    ctx.ellipse(originX + 132 * scale, originZ - 52 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
+    ctx.ellipse(originX + 145 * scale, originZ - 85 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore(); // restore island clip
