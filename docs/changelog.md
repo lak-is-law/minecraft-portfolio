@@ -56,3 +56,4 @@
 - 2026-10-10 12:11: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-10 13:05: docs(engine): document voxel coordinate transformation pipeline
 - 2026-10-10 14:37: feat(monument): LK brick monument voxel texture atlas
+- 2026-10-10 15:20: fix(controls): pointer lock sensitivity on high-DPI displays
