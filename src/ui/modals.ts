@@ -295,7 +295,7 @@ export class ModalManager {
       { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom · 🇬🇧', detail: 'Historic Elizabeth Tower clock, Tower Bridge pedestrian walkways, and red Routemaster bus.', index: 18, tone: 'citadel', direction: 'NORTH · X −32 / Z −65' },
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France · 🇫🇷', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', index: 16, tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China · 🇨🇳', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', index: 7, tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
-      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States · 🇺🇸', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 145 / Z −85' },
+      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States · 🇺🇸', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
     ];
     const regionsHtml = atlasRegions.map((region) => `
       <article class="atlas-region-card atlas-${region.tone}">
@@ -666,8 +666,8 @@ export class ModalManager {
       ctx.stroke();
 
       // Hollywood Hills Ridge in USA Realm
-      const hollywoodX = cx + 145 * scale;
-      const hollywoodZ = cy - 85 * scale;
+      const hollywoodX = cx + 165 * scale;
+      const hollywoodZ = cy - 100 * scale;
       ctx.fillStyle = 'rgba(91,61,43,.48)';
       ctx.beginPath();
       ctx.ellipse(hollywoodX, hollywoodZ + 6 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);

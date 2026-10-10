@@ -159,11 +159,11 @@ export class WorldBuilder {
         }
         return 1;
       }
-      // Hollywood Hills (Mount Lee & Griffith Observatory north of Vegas Boulevard)
-      if (x >= 120 && x <= 170 && z >= -105 && z <= -65) {
-        const hillDist = Math.hypot((x - 145) / 22, (z - (-85)) / 16);
+      // Hollywood Hills (Mount Lee & Griffith Observatory north-east ridge)
+      if (x >= 140 && x <= 190 && z >= -120 && z <= -80) {
+        const hillDist = Math.hypot((x - 165) / 22, (z - (-100)) / 16);
         if (hillDist <= 1) {
-          const peak = Math.round(20 * Math.pow(1 - hillDist, 1.1));
+          const peak = Math.round(22 * Math.pow(1 - hillDist, 1.1));
           return Math.max(2, peak);
         }
       }
@@ -563,9 +563,9 @@ export class WorldBuilder {
       }
     }
 
-    // B. Eastern Parkway Arc: Marina (140, -115) -> Hollywood (145, -85) -> Vegas Strip (140, -54) -> Lak Tower (150, 0) -> Dubai (160, 42) -> Airport (130, 80) -> Pier (35, 125)
+    // B. Eastern Parkway Arc: Marina (140, -115) -> Hollywood (165, -100) -> Vegas Strip (140, -54) -> Lak Tower (150, 0) -> Dubai (160, 42) -> Airport (130, 80) -> Pier (35, 125)
     const eastWaypoints: [number, number][] = [
-      [140, -115], [145, -85], [140, -54], [150, 0], [160, 42], [130, 80], [35, 125]
+      [140, -115], [165, -100], [140, -54], [150, 0], [160, 42], [130, 80], [35, 125]
     ];
     for (let i = 0; i < eastWaypoints.length - 1; i++) {
       const [x1, z1] = eastWaypoints[i];
@@ -707,7 +707,7 @@ export class WorldBuilder {
     this.setBlock(1, 2, 6, 'quartz_block', {
       type: 'sign',
       title: 'East & South-East Realms',
-      text: '• Imperial India & Taj Mahal (80, -135)\n• USA & Times Square (100, 0)\n• Hollywood Sign & Hills (145, -85)\n• Dubai Burj Khalifa (170, 42)\n• International Airport (130, 80)'
+      text: '• Imperial India & Taj Mahal (80, -135)\n• USA & Times Square (100, 0)\n• Hollywood Sign & Hills (165, -100)\n• Dubai Burj Khalifa (170, 42)\n• International Airport (130, 80)'
     });
 
     // 5. Four Monumental Archway Gatehouses over Moat Bridges
@@ -3862,8 +3862,8 @@ export class WorldBuilder {
     // Lak Tower ("LK" Monument Wonder: 55-block Eiffel tower at X = 150, Z = 0)
     this.buildLakTower(150, 0);
 
-    // Hollywood Mountain & Illuminated Block-Built Sign at (145, -85)
-    this.buildHollywoodMountain(145, -85);
+    // Hollywood Mountain & Illuminated Block-Built Sign at (165, -100)
+    this.buildHollywoodMountain(165, -100);
 
     // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
     this.buildVegasStripInFrontOfHollywoodAndLKTower();
@@ -3871,7 +3871,7 @@ export class WorldBuilder {
 
   // 7B. Dazzling Las Vegas Boulevard in front of Hollywood and LK Tower
   private buildVegasStripInFrontOfHollywoodAndLKTower() {
-    // 1. The Grand Boulevard Avenue connecting Hollywood (145, -85) to Lak Tower (150, 0)
+    // 1. The Grand Boulevard Avenue connecting Hollywood (165, -100) to Lak Tower (150, 0)
     // Roadway: X in [136, 144], Z in [-54, 4]
     for (let x = 136; x <= 144; x++) {
       for (let z = -54; z <= 4; z++) {
@@ -5008,99 +5008,28 @@ export class WorldBuilder {
       text: 'Original 1923 landmark rebuilt with monumental 7-block quartz lettering, scaffolding, and spotlights overlooking Los Angeles.'
     });
 
-    // 3B. Hollywood Boulevard Times-Square Style Neon Entertainment Plaza & Canyon (Z in [cz + 16, cz + 30])
-    // Broad, bustling pedestrian plaza, illuminated Walk of Fame stars, giant neon billboard towers, and red viewing bleachers
-    for (let x = cx - 18; x <= cx + 18; x++) {
-      for (let z = cz + 16; z <= cz + 30; z++) {
-        // Alternating asphalt roadway and polished quartz/smooth stone pedestrian promenade
-        const isRoadway = (z >= cz + 21 && z <= cz + 25);
-        if (isRoadway) {
-          this.setBlock(x, 1, z, 'asphalt_road');
-          if (z === cz + 23 && x % 4 <= 1) {
-            this.setBlock(x, 1, z, 'gold_block'); // Yellow center dash
-          }
-        } else {
-          // Walk of Fame Promenade with Terrazzo and Brass Stars
-          const isStar = (Math.abs(x - cx) % 3 === 0 && (z === cz + 18 || z === cz + 28));
-          this.setBlock(x, 1, z, isStar ? 'gold_block' : 'smooth_stone');
-          if (isStar) {
-            this.setBlock(x, 1, z, 'gold_block', {
-              type: 'sign',
-              title: 'Hollywood Walk of Fame ⭐',
-              text: 'Brass star embedded in terrazzo sidewalk celebrating world entertainment legends.'
-            });
-          }
+    // 3B. Mount Lee Scenic Vista & Griffith Park Hiking Trail (Overlooking the Valley)
+    // Natural stone overlook terrace with bronze telescope pedestals and trail lanterns
+    for (let x = cx - 14; x <= cx + 14; x++) {
+      for (let z = cz + 10; z <= cz + 16; z++) {
+        this.setBlock(x, 2, z, 'smooth_stone');
+        if (z === cz + 16 || Math.abs(x - cx) === 14) {
+          this.setBlock(x, 3, z, 'stone_bricks');
         }
       }
     }
-
-    // Twin Soaring Neon Billboard Towers (West at cx - 16, East at cx + 16)
-    for (const bbx of [cx - 16, cx + 16]) {
-      // Structural Steel Lattice Pylon
-      for (let y = 1; y <= 16; y++) {
-        this.setBlock(bbx, y, cz + 20, 'iron_block');
-        this.setBlock(bbx, y, cz + 21, 'iron_block');
-      }
-      // Giant Multi-Screen LED Billboard Displays
-      for (let y = 6; y <= 15; y++) {
-        for (let dz = -2; dz <= 2; dz++) {
-          const screenZ = cz + 20 + dz;
-          // Animated cyber glass and colored glowstone mosaic screen
-          const screenBlock = ((y + dz + bbx) % 3 === 0) ? 'sea_lantern' : ((y + dz) % 2 === 0 ? 'diamond_block' : 'cyber_glass');
-          this.setBlock(bbx + (bbx < cx ? 1 : -1), y, screenZ, screenBlock);
-        }
-      }
-      this.setBlock(bbx, 17, cz + 20, 'sea_lantern');
+    // High-powered ground floodlights illuminating the monumental HOLLYWOOD letters
+    for (let x = cx - 18; x <= cx + 18; x += 4) {
+      this.setBlock(x, 2, cz + 9, 'sea_lantern');
     }
-
-    // Classic Hollywood Cinema Marquee & Neon News Ticker at (cx, cz + 17)
-    for (let x = cx - 8; x <= cx + 8; x++) {
-      this.setBlock(x, 4, cz + 17, 'gold_block');
-      this.setBlock(x, 5, cz + 17, ((x + cx) % 2 === 0) ? 'sea_lantern' : 'redstone_block');
-    }
-
-    // Street Food & Hot Dog Carts in the Pedestrian Concourse
-    // Hot dog cart at (cx - 10, cz + 18)
-    this.setBlock(cx - 10, 1, cz + 18, 'coal_block');
-    this.setBlock(cx - 10, 2, cz + 18, 'iron_block');
-    this.setBlock(cx - 10, 3, cz + 18, 'redstone_block'); // Ketchup
-    this.setBlock(cx - 10, 3, cz + 19, 'gold_block'); // Mustard
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dz = -1; dz <= 1; dz++) {
-        this.setBlock(cx - 10 + dx, 5, cz + 18 + dz, ((dx + dz) % 2 === 0) ? 'gold_block' : 'redstone_block');
-      }
-    }
-    this.setBlock(cx - 10, 4, cz + 18, 'iron_block');
-    this.setBlock(cx - 10, 2, cz + 17, 'smooth_stone', {
+    // Scenic Trail Benches & Historical Viewpoint Markers
+    this.setBlock(cx - 6, 3, cz + 14, 'oak_planks');
+    this.setBlock(cx + 6, 3, cz + 14, 'oak_planks');
+    this.setBlock(cx, 3, cz + 15, 'gold_block', {
       type: 'sign',
-      title: 'Pink’s Famous Hollywood Hot Dogs',
-      text: 'Legendary chili cheese dogs served to Hollywood movie stars since 1939!'
+      title: 'Mount Lee Summit Vista ⭐',
+      text: 'Panoramic scenic overlook of the American Metropolis, Las Vegas Strip, and Pacific Ocean from the Hollywood Hills.'
     });
-
-    // Boba & Espresso Bar at (cx + 10, cz + 18)
-    this.setBlock(cx + 10, 1, cz + 18, 'oak_planks');
-    this.setBlock(cx + 10, 2, cz + 18, 'bookshelf');
-    this.setBlock(cx + 10, 3, cz + 18, 'sea_lantern');
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dz = -1; dz <= 1; dz++) {
-        this.setBlock(cx + 10 + dx, 5, cz + 18 + dz, ((dx + dz) % 2 === 0) ? 'lapis_block' : 'quartz_block');
-      }
-    }
-    this.setBlock(cx + 10, 4, cz + 18, 'iron_block');
-    this.setBlock(cx + 10, 2, cz + 17, 'smooth_stone', {
-      type: 'sign',
-      title: 'Hollywood Sunset Boba & Coffee',
-      text: 'Iced matcha lattes, boba milk tea, and fresh espresso for directors and actors!'
-    });
-
-    // Parked Yellow Taxi at (cx + 12, cz + 23)
-    this.setBlock(cx + 10, 1, cz + 23, 'coal_block');
-    this.setBlock(cx + 14, 1, cz + 23, 'coal_block');
-    for (let x = cx + 10; x <= cx + 14; x++) {
-      this.setBlock(x, 2, cz + 23, 'gold_block');
-      this.setBlock(x, 3, cz + 23, (x === cx + 12) ? 'cyber_glass' : 'gold_block');
-    }
-    this.setBlock(cx + 12, 4, cz + 23, 'sea_lantern'); // Taxi roof light
 
     // 4. Griffith Observatory on the Summit Ridge (cx + 8, cz - 5, Y = 22..28)
     const obsX = cx + 8;

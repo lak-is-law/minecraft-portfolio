@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lakshya-portfolio-shell-v1';
+const CACHE_NAME = 'lakshya-portfolio-shell-v3';
 const APP_SHELL = ['/', '/site.webmanifest', '/favicon.ico', '/android-chrome-192x192.png', '/android-chrome-512x512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', (event) => {
