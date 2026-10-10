@@ -3028,15 +3028,176 @@ export class WorldBuilder {
     });
   }
 
-  // Egypt & Giza Plateau (Three Sandstone Pyramids, Khufu Hollow Interior, Sphinx, Desert Oasis)
+  // Egypt & Giza Plateau (Three Sandstone Pyramids, Khufu Grand Gallery Tomb, Sphinx & Dream Stele, Nile & Felucca, Luxor Pylon & Obelisks, Bedouin Oasis)
   private buildEgyptGizaRealm() {
-    // 1. Great Pyramid of Khufu at (-165, 36)
+    // 1. The Fertile Nile River & Egyptian Felucca Sailboat (X in [-131, -127], Z in [10, 65])
+    for (let z = 10; z <= 65; z++) {
+      for (let x = -131; x <= -127; x++) {
+        this.setBlock(x, 0, z, 'water');
+      }
+      // Fertile green riverbanks with papyrus & reed vegetation
+      this.setBlock(-132, 1, z, 'grass');
+      this.setBlock(-126, 1, z, 'grass');
+      if (z % 7 === 0) {
+        this.setBlock(-132, 2, z, 'leaves');
+        this.setBlock(-126, 2, z, 'leaves');
+      }
+    }
+    // Palm groves along Nile banks
+    this.buildPalmTree(-133, 1, 16);
+    this.buildPalmTree(-133, 1, 35);
+    this.buildPalmTree(-133, 1, 55);
+    this.buildPalmTree(-125, 1, 25);
+    this.buildPalmTree(-125, 1, 48);
+
+    // Traditional Egyptian Felucca Sailboat floating on the Nile at (-129, 22)
+    const felX = -129;
+    const felZ = 22;
+    // Wooden Hull (Z = 19 to 25, X in [-130, -128])
+    for (let z = felZ - 3; z <= felZ + 3; z++) {
+      for (let x = felX - 1; x <= felX + 1; x++) {
+        const isEnd = (z === felZ - 3 || z === felZ + 3);
+        if (isEnd && (x === felX - 1 || x === felX + 1)) continue;
+        this.setBlock(x, 0, z, 'oak_planks');
+        this.setBlock(x, 1, z, isEnd ? 'smooth_stone' : 'oak_planks');
+      }
+    }
+    // Wooden Mast (Y = 2 to 9)
+    for (let y = 2; y <= 9; y++) {
+      this.setBlock(felX, y, felZ, 'oak_log');
+    }
+    // Angled Triangular Lateen White Sail (Y = 3 to 9)
+    for (let y = 3; y <= 9; y++) {
+      const sailZ = Math.round(felZ - 2 + (y - 3) * 0.7);
+      this.setBlock(felX, y, sailZ, 'quartz_block');
+      this.setBlock(felX, y, sailZ + 1, 'quartz_block');
+    }
+    this.setBlock(felX, 2, felZ + 2, 'lantern'); // Stern navigation lantern
+    // Felucca Mooring Wooden Pier
+    this.setBlock(felX - 2, 1, felZ, 'oak_planks');
+    this.setBlock(felX - 3, 1, felZ, 'oak_planks');
+    this.setBlock(felX - 4, 1, felZ, 'sandstone');
+    this.setBlock(felX - 3, 2, felZ, 'glowstone', {
+      type: 'sign',
+      title: 'Egyptian Felucca on the Nile ⛵',
+      text: 'Traditional wooden sailboat gliding peacefully along the sacred River Nile, lifeline of Egyptian civilization.'
+    });
+
+    // 2. Monumental Luxor & Karnak Temple Pylon Gateway & Twin Obelisks at (-136, 36)
+    const pylX = -136;
+    const pylZ = 36;
+    // Twin Sandstone Pylons flanking ceremonial avenue
+    for (const [pZStart, pZEnd] of [[pylZ - 8, pylZ - 2], [pylZ + 2, pylZ + 8]]) {
+      for (let z = pZStart; z <= pZEnd; z++) {
+        for (let x = pylX - 1; x <= pylX + 1; x++) {
+          for (let y = 1; y <= 8; y++) {
+            const isCornice = (y === 8);
+            this.setBlock(x, y, z, isCornice ? 'gold_block' : ((y % 2 === 0) ? 'red_sandstone' : 'sandstone'));
+          }
+        }
+      }
+    }
+    // High Egyptian Torus Lintel across portal (Y = 6 to 7, Z in [pylZ - 1, pylZ + 1])
+    for (let z = pylZ - 1; z <= pylZ + 1; z++) {
+      this.setBlock(pylX, 6, z, 'red_sandstone');
+      this.setBlock(pylX, 7, z, 'gold_block'); // Winged solar disk
+    }
+    // Twin Needle Obelisks of Luxor flanking the temple gateway
+    for (const obZ of [pylZ - 10, pylZ + 10]) {
+      this.setBlock(pylX, 1, obZ, 'smooth_stone'); // Base plinth
+      for (let y = 2; y <= 9; y++) {
+        this.setBlock(pylX, y, obZ, 'quartz_pillar'); // Sun-carved granite shaft
+      }
+      this.setBlock(pylX, 10, obZ, 'gold_block'); // Golden Pyramidion cap
+      this.setBlock(pylX, 11, obZ, 'sea_lantern'); // Radiance of Ra
+    }
+    // Portal Braziers
+    this.setBlock(pylX + 2, 1, pylZ - 2, 'cauldron');
+    this.setBlock(pylX + 2, 2, pylZ - 2, 'lantern');
+    this.setBlock(pylX + 2, 1, pylZ + 2, 'cauldron');
+    this.setBlock(pylX + 2, 2, pylZ + 2, 'lantern');
+
+    this.setBlock(pylX + 2, 2, pylZ, 'sandstone', {
+      type: 'sign',
+      title: 'Karnak & Luxor Temple Pylon Gateway 🏛️',
+      text: 'Monumental Egyptian gateway flanked by sacred obelisks dedicated to Amun-Ra, marking the entrance from the Nile to the Giza Plateau.'
+    });
+
+    // 3. Avenue of Sphinxes (Processional Causeway from Pylon to Plateau)
+    for (let x = -148; x <= pylX; x++) {
+      this.setBlock(x, 1, pylZ, 'smooth_stone');
+      this.setBlock(x, 1, pylZ - 1, 'sandstone');
+      this.setBlock(x, 1, pylZ + 1, 'sandstone');
+    }
+    // 4 Miniature Ram-headed Sphinx Statues lining causeway
+    for (const [asx, asz] of [[-140, pylZ - 3], [-144, pylZ - 3], [-140, pylZ + 3], [-144, pylZ + 3]]) {
+      this.setBlock(asx, 1, asz, 'sandstone');
+      this.setBlock(asx, 2, asz, 'sandstone');
+      this.setBlock(asx - 1, 2, asz, 'gold_block'); // Head
+      this.setBlock(asx, 3, asz, 'lantern');
+    }
+
+    // 4. Monumental Great Sphinx of Giza at (-152, 26) Facing East
+    const spX = -152;
+    const spZ = 26;
+    // Lion Body (length 14 along X from spX - 7 to spX + 3, width 6 along Z, height 4)
+    for (let x = spX - 7; x <= spX + 3; x++) {
+      for (let z = spZ - 2; z <= spZ + 2; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, (y === 1) ? 'sandstone' : ((x + y) % 3 === 0 ? 'red_sandstone' : 'sandstone'));
+        }
+      }
+    }
+    // Outstretched Front Paws facing East (X in [spX + 4, spX + 8])
+    for (let x = spX + 4; x <= spX + 8; x++) {
+      for (let y = 1; y <= 2; y++) {
+        this.setBlock(x, y, spZ - 2, 'sandstone');
+        this.setBlock(x, y, spZ + 2, 'sandstone');
+      }
+    }
+    // Dream Stele of Thutmose IV between front paws at (spX + 6, Y = 1 to 4, spZ)
+    this.setBlock(spX + 6, 1, spZ, 'red_sandstone');
+    this.setBlock(spX + 6, 2, spZ, 'smooth_stone');
+    this.setBlock(spX + 6, 3, spZ, 'red_sandstone');
+    this.setBlock(spX + 6, 4, spZ, 'gold_block');
+    this.setBlock(spX + 7, 2, spZ, 'glowstone', {
+      type: 'sign',
+      title: 'Dream Stele of Thutmose IV 📜',
+      text: 'Ancient granite tablet erected between the Sphinx\'s paws recounting how Prince Thutmose rested in the desert sand and was promised the pharaonic crown by Harmakhis.'
+    });
+
+    // Royal Human Head with Nemes Pharaonic Headdress (at spX + 3, Y = 5 to 9)
+    for (let y = 5; y <= 8; y++) {
+      for (let dx = -1; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          const isNemesFlap = (Math.abs(dz) === 2);
+          if (isNemesFlap) {
+            this.setBlock(spX + 3 + dx, y, spZ + dz, (y % 2 === 0) ? 'lapis_block' : 'gold_block');
+          } else {
+            this.setBlock(spX + 3 + dx, y, spZ + dz, 'sandstone');
+          }
+        }
+      }
+    }
+    // Pharaonic Braided Beard, Ceremonial Eyes & Uraeus Cobra Crown
+    this.setBlock(spX + 5, 4, spZ, 'gold_block'); // Beard
+    this.setBlock(spX + 5, 5, spZ, 'sandstone');
+    this.setBlock(spX + 4, 9, spZ, 'gold_block'); // Royal Uraeus Crown
+    this.setBlock(spX + 4, 10, spZ, 'redstone_block'); // Cobra Crest
+
+    this.setBlock(spX + 9, 2, spZ, 'sandstone', {
+      type: 'sign',
+      title: 'The Great Sphinx of Giza · أبو الهول 🦁',
+      text: 'Iconic limestone monolith with the recumbent body of a lion and royal head of Pharaoh Khafre, guarding the sacred plateau for 4,500 years.'
+    });
+
+    // 5. Great Pyramid of Khufu at (-165, 36) - Grand Gallery & Burial Chamber
     const kx = -165;
     const kz = 36;
     const kBaseHalf = 10; // 21x21 footprint
     const kHeight = 15; // steps from Y = 1 to Y = 16
 
-    // Stepped Pyramid Shell
+    // Stepped Pyramid Shell with Grand Interior Corridors
     for (let step = 0; step <= kHeight; step++) {
       const half = kBaseHalf - step;
       const y = 1 + step;
@@ -3044,12 +3205,12 @@ export class WorldBuilder {
       for (let dx = -half; dx <= half; dx++) {
         for (let dz = -half; dz <= half; dz++) {
           const isPerimeter = Math.abs(dx) === half || Math.abs(dz) === half;
-          // Hollow interior: Grand Gallery & Burial Chamber!
-          const isCorridor = (dx === 0 && dz <= 0 && dz >= -kBaseHalf && y >= 2 && y <= 4);
+          // Hollow interior: Grand Ascending Gallery & King's Chamber!
+          const isCorridor = (dx === 0 && dz <= 0 && dz >= -kBaseHalf && y >= 2 && y <= 5);
           const isChamber = (Math.abs(dx) <= 3 && Math.abs(dz) <= 3 && y >= 2 && y <= 6);
 
           if (isCorridor || isChamber) {
-            // Floor of chamber/corridor
+            // Paved Chamber & Corridor Floor
             if (y === 1) {
               this.setBlock(kx + dx, y, kz + dz, 'smooth_stone');
             }
@@ -3065,38 +3226,47 @@ export class WorldBuilder {
         }
       }
     }
-    // Solid Golden Pyramidion Capstone at top
+    // Solid Golden Pyramidion Capstone at top crowned with beacon beam!
     this.setBlock(kx, 2 + kHeight, kz, 'gold_block');
-    this.setBlock(kx, 3 + kHeight, kz, 'sea_lantern');
+    this.setBlock(kx, 3 + kHeight, kz, 'beacon');
 
     // Hollow Interior Pharaoh's Burial Chamber Details at (kx, kz)
-    // Sarcophagus in center
+    // King's Red Granite Chamber Walls & Lapis Inlays
     this.setBlock(kx, 2, kz, 'gold_block');
     this.setBlock(kx, 3, kz, 'lapis_block');
     this.setBlock(kx - 1, 2, kz, 'chest', {
       type: 'chest',
-      title: 'Pharaoh\'s Golden Sarcophagus',
-      text: 'Ancient burial treasures, lapis lazuli amulets, and royal hieroglyphs of Khufu.'
+      title: 'Pharaoh Khufu’s Royal Treasure Chest',
+      text: 'Ancient golden sarcophagus treasures, ceremonial lapis lazuli amulets, and royal papyri.'
     });
-    // Chamber Torches and Sacred Urns
+    // Canopic Sacred Jars (Four Sons of Horus)
     this.setBlock(kx - 2, 2, kz - 2, 'cauldron');
+    this.setBlock(kx - 2, 3, kz - 2, 'gold_block');
     this.setBlock(kx + 2, 2, kz - 2, 'cauldron');
-    this.setBlock(kx - 2, 3, kz - 2, 'lantern');
-    this.setBlock(kx + 2, 3, kz - 2, 'lantern');
-    this.setBlock(kx - 2, 3, kz + 2, 'lantern');
-    this.setBlock(kx + 2, 3, kz + 2, 'lantern');
+    this.setBlock(kx + 2, 3, kz - 2, 'gold_block');
+    this.setBlock(kx - 2, 2, kz + 2, 'cauldron');
+    this.setBlock(kx - 2, 3, kz + 2, 'gold_block');
+    this.setBlock(kx + 2, 2, kz + 2, 'cauldron');
+    this.setBlock(kx + 2, 3, kz + 2, 'gold_block');
 
-    // Corridor entrance torches
+    // Chamber Torches & Golden Chariot display
+    this.setBlock(kx + 2, 2, kz, 'coal_block'); // Chariot wheels
+    this.setBlock(kx + 3, 2, kz, 'gold_block');
+    this.setBlock(kx + 3, 3, kz, 'lantern');
+
+    // Grand Gallery Ascending Corridor Lighting
+    this.setBlock(kx, 4, kz - 4, 'sea_lantern');
+    this.setBlock(kx, 4, kz - 8, 'sea_lantern');
     this.setBlock(kx - 1, 3, kz - kBaseHalf + 1, 'lantern');
     this.setBlock(kx + 1, 3, kz - kBaseHalf + 1, 'lantern');
 
     this.setBlock(kx, 2, kz - kBaseHalf - 1, 'sandstone', {
       type: 'sign',
       title: 'Great Pyramid of Giza · Pyramid of Khufu',
-      text: 'Step inside the torch-lit Grand Gallery to explore the ancient pharaoh\'s burial chamber.'
+      text: 'Walk inside the torch-lit Grand Gallery to explore the ancient pharaoh\'s burial chamber, golden sarcophagus, and sacred canopic jars.'
     });
 
-    // 2. Pyramid of Khafre at (-148, 48) - 15x15 base
+    // 6. Pyramid of Khafre at (-148, 48) - 15x15 base with preserved casing peak
     const kfX = -148;
     const kfZ = 48;
     for (let step = 0; step <= 10; step++) {
@@ -3106,15 +3276,16 @@ export class WorldBuilder {
       for (let dx = -half; dx <= half; dx++) {
         for (let dz = -half; dz <= half; dz++) {
           if (Math.abs(dx) === half || Math.abs(dz) === half || step === 10) {
-            // Casing stone remnant at top
+            // Polished limestone casing remnant at top
             this.setBlock(kfX + dx, y, kfZ + dz, (step >= 8) ? 'smooth_stone' : 'sandstone');
           }
         }
       }
     }
     this.setBlock(kfX, 12, kfZ, 'gold_block');
+    this.setBlock(kfX, 13, kfZ, 'sea_lantern');
 
-    // 3. Pyramid of Menkaure at (-175, 20) - 11x11 base
+    // 7. Pyramid of Menkaure at (-175, 20) - 11x11 base with Red Granite lower courses
     const mkX = -175;
     const mkZ = 20;
     for (let step = 0; step <= 7; step++) {
@@ -3124,58 +3295,17 @@ export class WorldBuilder {
       for (let dx = -half; dx <= half; dx++) {
         for (let dz = -half; dz <= half; dz++) {
           if (Math.abs(dx) === half || Math.abs(dz) === half) {
-            this.setBlock(mkX + dx, y, mkZ + dz, 'sandstone');
+            this.setBlock(mkX + dx, y, mkZ + dz, (step <= 2) ? 'red_sandstone' : 'sandstone');
           }
         }
       }
     }
+    this.setBlock(mkX, 9, mkZ, 'gold_block');
 
-    // 4. Monumental Great Sphinx of Giza at (-152, 26) facing East
-    const spX = -152;
-    const spZ = 26;
-    // Lion Body (length 12 along X, width 6 along Z, height 4)
-    for (let x = spX - 6; x <= spX + 2; x++) {
-      for (let z = spZ - 2; z <= spZ + 2; z++) {
-        for (let y = 1; y <= 4; y++) {
-          this.setBlock(x, y, z, 'sandstone');
-        }
-      }
-    }
-    // Outstretched Front Paws facing East (X in [spX + 3, spX + 7])
-    for (let x = spX + 3; x <= spX + 7; x++) {
-      for (let y = 1; y <= 2; y++) {
-        this.setBlock(x, y, spZ - 2, 'sandstone');
-        this.setBlock(x, y, spZ + 2, 'sandstone');
-      }
-    }
-    // Royal Human Head with Nemes Pharaonic Headdress (at spX + 2, Y = 5 to 9)
-    for (let y = 5; y <= 8; y++) {
-      for (let dx = -1; dx <= 2; dx++) {
-        for (let dz = -2; dz <= 2; dz++) {
-          const isNemesFlap = (Math.abs(dz) === 2);
-          if (isNemesFlap) {
-            this.setBlock(spX + 2 + dx, y, spZ + dz, (y % 2 === 0) ? 'lapis_block' : 'gold_block');
-          } else {
-            this.setBlock(spX + 2 + dx, y, spZ + dz, 'sandstone');
-          }
-        }
-      }
-    }
-    // Pharaonic Beard and Uraeus Crown
-    this.setBlock(spX + 4, 4, spZ, 'gold_block');
-    this.setBlock(spX + 4, 5, spZ, 'sandstone');
-    this.setBlock(spX + 3, 9, spZ, 'gold_block'); // Crown
-
-    this.setBlock(spX + 8, 2, spZ, 'sandstone', {
-      type: 'sign',
-      title: 'Great Sphinx of Giza · أبو الهول',
-      text: 'Monumental limestone sculpture with the body of a lion and the head of Pharaoh Khafre.'
-    });
-
-    // 5. Desert Oasis & Camels at (-142, 38)
+    // 8. Desert Oasis & Bedouin Encampment at (-142, 46)
     const oasX = -142;
-    const oasZ = 38;
-    // Freshwater Pool
+    const oasZ = 46;
+    // Freshwater Oasis Pool
     for (let dx = -3; dx <= 3; dx++) {
       for (let dz = -3; dz <= 3; dz++) {
         if (Math.hypot(dx, dz) <= 3) {
@@ -3186,16 +3316,46 @@ export class WorldBuilder {
     // Date Palm Trees around oasis
     this.buildPalmTree(oasX - 4, 1, oasZ - 2);
     this.buildPalmTree(oasX + 4, 1, oasZ + 3);
+    this.buildPalmTree(oasX - 2, 1, oasZ + 4);
 
-    // Saddled Camels resting on dunes
-    for (const [camX, camZ] of [[-138, 34], [-140, 44]]) {
+    // Bedouin Desert Tent (Striped woven wool canopy) at (-138, 52)
+    const tentX = -138;
+    const tentZ = 52;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        // Tent carpet floor
+        this.setBlock(tentX + dx, 1, tentZ + dz, (dx + dz) % 2 === 0 ? 'red_terracotta' : 'terracotta_adobe');
+        // Canopy roof at Y = 4
+        const isCorner = Math.abs(dx) === 2 && Math.abs(dz) === 2;
+        if (isCorner) {
+          this.setBlock(tentX + dx, 2, tentZ + dz, 'oak_fence');
+          this.setBlock(tentX + dx, 3, tentZ + dz, 'oak_fence');
+        }
+        this.setBlock(tentX + dx, 4, tentZ + dz, (Math.abs(dx) % 2 === 0) ? 'red_terracotta' : 'lapis_block');
+      }
+    }
+    // Bedouin Campfire with seating cushions
+    this.setBlock(tentX, 1, tentZ - 4, 'magma_block');
+    this.setBlock(tentX, 2, tentZ - 4, 'lantern');
+    this.setBlock(tentX - 1, 1, tentZ - 4, 'oak_planks');
+    this.setBlock(tentX + 1, 1, tentZ - 4, 'oak_planks');
+
+    // Saddled Desert Camels resting on the sand
+    for (const [camX, camZ] of [[-137, 42], [-145, 52], [-140, 38]]) {
       this.setBlock(camX, 1, camZ, 'sandstone');
       this.setBlock(camX + 1, 1, camZ, 'sandstone');
-      this.setBlock(camX, 2, camZ, 'red_terracotta'); // Saddle
-      this.setBlock(camX + 1, 2, camZ, 'sandstone'); // Hump
-      this.setBlock(camX - 1, 2, camZ, 'sandstone'); // Neck
+      this.setBlock(camX, 2, camZ, 'red_terracotta'); // Striped Bedouin Saddle
+      this.setBlock(camX + 1, 2, camZ, 'sandstone'); // Camel Hump
+      this.setBlock(camX - 1, 2, camZ, 'sandstone'); // Long Neck
       this.setBlock(camX - 1, 3, camZ, 'sandstone'); // Head
+      this.setBlock(camX - 1, 3, camZ + 1, 'gold_block'); // Bridle / halter accent
     }
+
+    this.setBlock(oasX, 2, oasZ - 4, 'sandstone', {
+      type: 'sign',
+      title: 'Giza Desert Oasis & Bedouin Camp 🌴',
+      text: 'Fresh water spring shaded by date palms, where camel caravans rest beneath starry desert skies.'
+    });
   }
 
   // Dubai & Palm Jumeirah (Burj Khalifa Needle Spire Y=56, Glass Observation Deck, Palm Fronds & Villas)
@@ -3607,88 +3767,235 @@ export class WorldBuilder {
     }
   }
 
-  // 6. Mexico Realm (South-West: Zócalo, Cathedral, Mesoamerican Aztec Step Pyramid, Adobe Village, Cacti)
+  // 6. Mexico Realm (Zócalo, Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Taquería, Chichén Itzá & Mayan Cenote)
   private buildMexicoRealm() {
     const cx = -105;
     const cz = 60;
 
-    // Grand Zócalo Plaza (X in [cx - 24, cx + 24], Z in [cz - 24, cz + 24])
+    // 1. Grand Zócalo Plaza (X in [cx - 24, cx + 24], Z in [cz - 24, cz + 24])
+    // Uniform Level Plaza Pavement at Y = 1
     for (let x = cx - 24; x <= cx + 24; x++) {
       for (let z = cz - 24; z <= cz + 24; z++) {
-        const avenue = (x === cx || z === cz || Math.abs(x - cx) === 16 || Math.abs(z - cz) === 16);
-        this.setBlock(x, 1, z, avenue ? 'smooth_stone' : ((x + z) % 6 === 0 ? 'red_sandstone' : 'terracotta_adobe'));
+        const isMainAvenue = (x === cx || z === cz || Math.abs(x - cx) === 16 || Math.abs(z - cz) === 16);
+        const isDecorativeTile = (x + z) % 4 === 0;
+        this.setBlock(x, 1, z, isMainAvenue ? 'smooth_stone' : (isDecorativeTile ? 'red_sandstone' : 'terracotta_adobe'));
       }
     }
 
-    // Central Stone Fountain in Zócalo
-    for (let x = cx - 2; x <= cx + 2; x++) {
-      for (let z = cz - 2; z <= cz + 2; z++) {
-        this.setBlock(x, 2, z, (x === cx && z === cz) ? 'water' : 'quartz_block');
+    // 2. Monumental Mexican Flagpole (Asta Bandera Monumental) in Center of Zócalo
+    // Concentric Stone Plinth (Y = 1 to 2)
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        if (Math.hypot(dx, dz) <= 3) {
+          this.setBlock(cx + dx, 2, cz + dz, 'stone_bricks');
+        }
       }
     }
-    this.setBlock(cx, 3, cz, 'glowstone');
+    // High Steel Flagpole Mast (Y = 3 to 19)
+    for (let y = 3; y <= 19; y++) {
+      this.setBlock(cx, y, cz, 'iron_block');
+    }
+    this.setBlock(cx, 20, cz, 'gold_block'); // Mast finial
+    this.setBlock(cx, 21, cz, 'beacon'); // Night spotlight
 
-    // Metropolitan Cathedral on North side of Zócalo
-    for (let x = cx - 8; x <= cx + 8; x++) {
-      for (let z = cz - 22; z <= cz - 10; z++) {
-        const wall = (x === cx - 8 || x === cx + 8 || z === cz - 22 || z === cz - 10);
-        for (let y = 2; y <= 11; y++) {
-          if (wall || y === 11) {
-            this.setBlock(x, y, z, y === 11 ? 'gold_block' : 'quartz_block');
+    // Giant Monumental Mexican Flag (Bandera Monumental) waving Eastward (Y = 14 to 18)
+    for (let y = 14; y <= 18; y++) {
+      // Green field (Hope & Independence)
+      this.setBlock(cx + 1, y, cz, 'emerald_block');
+      this.setBlock(cx + 2, y, cz, 'emerald_block');
+      // White field with Golden Eagle & Serpent Emblem
+      this.setBlock(cx + 3, y, cz, (y === 16) ? 'gold_block' : 'quartz_block');
+      this.setBlock(cx + 4, y, cz, (y === 16) ? 'gold_block' : 'quartz_block');
+      // Red field (Heroes of the Fatherland)
+      this.setBlock(cx + 5, y, cz, 'redstone_block');
+      this.setBlock(cx + 6, y, cz, 'redstone_block');
+    }
+
+    this.setBlock(cx, 3, cz + 2, 'stone_bricks', {
+      type: 'sign',
+      title: 'Asta Bandera Monumental · Zócalo 🇲🇽',
+      text: 'Plaza de la Constitución: The historic epicenter of Mexico. Site of ancient Tenochtitlan where the eagle was found devouring the serpent in 1325!'
+    });
+
+    // Festive Strings of "Papel Picado" & Plaza Lanterns crisscrossing the Zócalo
+    const papelColors = ['emerald_block', 'gold_block', 'redstone_block', 'amethyst_block'];
+    for (let d = -16; d <= 16; d++) {
+      if (d === 0) continue;
+      const colIdx = Math.abs(d) % papelColors.length;
+      // North-South string
+      this.setBlock(cx + 8, 5, cz + d, papelColors[colIdx]);
+      this.setBlock(cx - 8, 5, cz + d, papelColors[(colIdx + 1) % papelColors.length]);
+      if (Math.abs(d) % 8 === 0) {
+        this.setBlock(cx + 8, 4, cz + d, 'lantern');
+        this.setBlock(cx - 8, 4, cz + d, 'lantern');
+      }
+    }
+
+    // 3. Catedral Metropolitana (Mexico City Metropolitan Cathedral) on North Side
+    // Cathedral footprint: X in [cx - 10, cx + 10], Z in [cz - 24, cz - 11]
+    // Nave main hall (Y = 2 to 12)
+    for (let x = cx - 9; x <= cx + 9; x++) {
+      for (let z = cz - 24; z <= cz - 11; z++) {
+        const isPerimeter = (x === cx - 9 || x === cx + 9 || z === cz - 24 || z === cz - 11);
+        for (let y = 2; y <= 12; y++) {
+          if (isPerimeter || y === 12) {
+            // Front baroque facade ornamentation
+            const isFacade = (z === cz - 11);
+            if (isFacade && y <= 5 && Math.abs(x - cx) <= 2) {
+              // Open Grand Baroque Portal entrance
+              continue;
+            }
+            this.setBlock(x, y, z, (y === 12) ? 'gold_block' : 'quartz_block');
           }
         }
       }
     }
-    // Cathedral Twin Bell Towers
-    for (const tx of [cx - 7, cx + 7]) {
-      for (let y = 12; y <= 20; y++) {
+    // Cathedral Twin Baroque Bell Towers (West at cx - 8, East at cx + 8)
+    for (const tx of [cx - 8, cx + 8]) {
+      // Lower tower shaft (Y = 13 to 16)
+      for (let y = 13; y <= 16; y++) {
         for (let dx = -1; dx <= 1; dx++) {
           for (let dz = -1; dz <= 1; dz++) {
-            this.setBlock(tx + dx, y, cz - 21 + dz, 'quartz_pillar');
+            this.setBlock(tx + dx, y, cz - 12 + dz, 'stone_bricks');
           }
         }
       }
-      this.setBlock(tx, 21, cz - 21, 'gold_block');
-      this.setBlock(tx, 22, cz - 21, 'glowstone');
+      // Open Belfry Chamber with bells (Y = 17 to 20)
+      for (let y = 17; y <= 20; y++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            const isCorner = Math.abs(dx) === 1 && Math.abs(dz) === 1;
+            if (isCorner) {
+              this.setBlock(tx + dx, y, cz - 12 + dz, 'quartz_pillar');
+            } else if (y === 18 && dx === 0 && dz === 0) {
+              this.setBlock(tx, y, cz - 12, 'gold_block'); // Cathedral bell
+            }
+          }
+        }
+      }
+      // Stepped Tower Domes & Golden Crosses (Y = 21 to 24)
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(tx + dx, 21, cz - 12 + dz, 'quartz_block');
+        }
+      }
+      this.setBlock(tx, 22, cz - 12, 'gold_block');
+      this.setBlock(tx, 23, cz - 12, 'gold_block'); // Cross
+      this.setBlock(tx - 1, 23, cz - 12, 'gold_block');
+      this.setBlock(tx + 1, 23, cz - 12, 'gold_block');
+      this.setBlock(tx, 24, cz - 12, 'beacon');
     }
 
-    // Palacio Nacional along West side of square
-    for (let x = cx - 22; x <= cx - 12; x++) {
-      for (let z = cz - 8; z <= cz + 12; z++) {
-        const wall = (x === cx - 22 || x === cx - 12 || z === cz - 8 || z === cz + 12);
-        for (let y = 2; y <= 6; y++) {
-          if (wall || y === 6) this.setBlock(x, y, z, y === 6 ? 'red_sandstone' : 'terracotta_adobe');
-        }
+    // Stained-Glass Rose Window on Cathedral facade (Y = 7 to 9 at z = cz - 11)
+    for (let y = 7; y <= 9; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        this.setBlock(cx + dx, y, cz - 11, (dx === 0 && y === 8) ? 'gold_block' : 'cyber_glass');
       }
     }
 
-    // Colourful Mercado Stalls with Striped Canopies on East side
-    const stallColors = ['redstone_block', 'emerald_block', 'gold_block', 'amethyst_block'];
-    for (let i = 0; i < 4; i++) {
-      const sx = cx + 12 + (i % 2) * 6;
-      const sz = cz - 8 + Math.floor(i / 2) * 10;
+    // Altar de los Reyes (Altar of the Kings) in northern interior apse at (cx, cz - 23)
+    this.setBlock(cx, 2, cz - 23, 'gold_block');
+    this.setBlock(cx, 3, cz - 23, 'gold_block');
+    this.setBlock(cx - 1, 3, cz - 23, 'gold_block');
+    this.setBlock(cx + 1, 3, cz - 23, 'gold_block');
+    this.setBlock(cx, 4, cz - 23, 'sea_lantern');
+    this.setBlock(cx - 1, 2, cz - 23, 'lantern');
+    this.setBlock(cx + 1, 2, cz - 23, 'lantern');
+
+    this.setBlock(cx, 2, cz - 9, 'quartz_block', {
+      type: 'sign',
+      title: 'Catedral Metropolitana de México ⛪',
+      text: 'Oldest and largest cathedral in the Americas, blending Renaissance, Baroque, and Neoclassical architecture over ancient Tenochtitlan.'
+    });
+
+    // 4. Palacio Nacional along West Side of Zócalo
+    // Footprint: X in [cx - 24, cx - 13], Z in [cz - 10, cz + 14]
+    for (let x = cx - 24; x <= cx - 13; x++) {
+      for (let z = cz - 10; z <= cz + 14; z++) {
+        const isWall = (x === cx - 24 || x === cx - 13 || z === cz - 10 || z === cz + 14);
+        for (let y = 2; y <= 7; y++) {
+          if (isWall || y === 7) {
+            // Tezontle red stone upper floors and cantera stone base
+            this.setBlock(x, y, z, (y <= 3) ? 'terracotta_adobe' : 'red_sandstone');
+          }
+        }
+      }
+    }
+    // Ground Floor Arched Portico along square (X = cx - 13)
+    for (let z = cz - 8; z <= cz + 12; z += 4) {
+      this.setBlock(cx - 13, 2, z, 'smooth_stone'); // Open doorway arches
+      this.setBlock(cx - 13, 3, z, 'smooth_stone');
+    }
+    // Balcón Presidencial & Campana de Dolores (Independence Bell) at center (cx - 13, cz)
+    this.setBlock(cx - 12, 4, cz, 'gold_block'); // Balcony floor
+    this.setBlock(cx - 12, 4, cz - 1, 'iron_block'); // Balcony railing
+    this.setBlock(cx - 12, 4, cz + 1, 'iron_block');
+    this.setBlock(cx - 13, 6, cz, 'gold_block'); // Campana de Dolores (Bell)
+    this.setBlock(cx - 13, 7, cz, 'lantern');
+
+    // Patio Central Inner Courtyard Fountain
+    this.setBlock(cx - 18, 2, cz + 2, 'quartz_block');
+    this.setBlock(cx - 18, 2, cz + 1, 'water');
+    this.setBlock(cx - 18, 2, cz + 3, 'water');
+
+    this.setBlock(cx - 12, 2, cz - 2, 'red_sandstone', {
+      type: 'sign',
+      title: 'Palacio Nacional · Balcón Presidencial 🔔',
+      text: 'Home to the federal government and Diego Rivera’s immortal murals! Every Sept 15, the President rings the historic Campana de Dolores: ¡Viva México!'
+    });
+
+    // 5. Colourful Mercado de Artesanías & Street Food Taquería on East Side
+    // Taquería "El Zócalo" with Trompo de Pastor at (cx + 14, cz - 6)
+    const taqX = cx + 14;
+    const taqZ = cz - 6;
+    // Taco counter & griddle
+    for (let dx = 0; dx <= 4; dx++) {
+      this.setBlock(taqX + dx, 2, taqZ, 'smooth_stone');
+      this.setBlock(taqX + dx, 4, taqZ, 'redstone_block'); // Striped awning
+      this.setBlock(taqX + dx, 4, taqZ + 1, 'quartz_block');
+    }
+    // Trompo de Pastor (Stacked spiced pork with pineapple top!)
+    this.setBlock(taqX + 1, 3, taqZ, 'red_terracotta');
+    this.setBlock(taqX + 1, 4, taqZ, 'gold_block'); // Pineapple crown!
+    this.setBlock(taqX + 3, 3, taqZ, 'cauldron'); // Salsa bowl
+    this.setBlock(taqX + 2, 2, taqZ + 2, 'oak_planks'); // Seating stool
+    this.setBlock(taqX + 4, 2, taqZ + 2, 'oak_planks');
+
+    this.setBlock(taqX, 2, taqZ + 2, 'glowstone', {
+      type: 'sign',
+      title: 'Taquería El Zócalo · Tacos al Pastor 🌮',
+      text: 'Authentic CDMX street tacos! Pork marinated in achiote and chiles, carved fresh from the vertical trompo with roasted pineapple and cilantro.'
+    });
+
+    // Mercado de Artesanías & Mariachi Stalls at (cx + 14, cz + 4)
+    const mktX = cx + 14;
+    const mktZ = cz + 4;
+    for (let i = 0; i < 3; i++) {
+      const sz = mktZ + i * 4;
       for (let dx = 0; dx <= 3; dx++) {
-        for (let dz = 0; dz <= 3; dz++) {
-          this.setBlock(sx + dx, 2, sz + dz, 'oak_fence');
-          this.setBlock(sx + dx, 4, sz + dz, stallColors[i]);
-        }
+        this.setBlock(mktX + dx, 2, sz, 'oak_fence');
+        this.setBlock(mktX + dx, 4, sz, (i === 0) ? 'emerald_block' : (i === 1) ? 'gold_block' : 'amethyst_block');
       }
-      this.setBlock(sx + 1, 3, sz + 1, 'glowstone');
+      this.setBlock(mktX + 1, 3, sz, 'lantern');
     }
+    // Talavera ceramic vase display
+    this.setBlock(mktX + 1, 2, mktZ + 1, 'lapis_block');
+    this.setBlock(mktX + 2, 2, mktZ + 1, 'quartz_block');
+
+    this.setBlock(mktX, 2, mktZ + 2, 'terracotta_adobe', {
+      type: 'sign',
+      title: 'Mercado de Artesanías & Mariachi 🎺',
+      text: 'Vibrant marketplace filled with hand-painted Talavera pottery, embroidered zarapes, silver jewelry, and live Mariachi son jalisciense folk music!'
+    });
 
     // Builder's Arena Terminal in Zócalo
     this.setBlock(cx, 2, cz + 16, 'crafting_table', { type: 'minigame' });
     this.setBlock(cx, 3, cz + 16, 'glowstone', { type: 'minigame' });
-    this.setBlock(cx, 2, cz + 11, 'glowstone', {
-      type: 'sign',
-      title: 'Mexico City · Zócalo',
-      text: 'Historic Cathedral square, Palacio Nacional, Mercado stalls, and the Builder’s Arena.'
-    });
 
-    // Chichén Itzá Mesoamerican Step Pyramid at (-140, 110)
+    // 6. Chichén Itzá Mesoamerican Step Pyramid (El Castillo) at (-140, 110)
     const pyrX = -140;
     const pyrZ = 110;
-    // Monumental Carved Stone Plinth Base at Y = 1 (Footprint 36x36)
+    // Carved Stone Plinth Base at Y = 1 (Footprint 36x36)
     for (let x = pyrX - 18; x <= pyrX + 18; x++) {
       for (let z = pyrZ - 18; z <= pyrZ + 18; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
@@ -3706,7 +4013,7 @@ export class WorldBuilder {
           this.setBlock(x, y + 1, z, isEdge ? 'stone_bricks' : 'smooth_stone');
         }
       }
-      // Central 4 Staircases ascending each facade
+      // Central 4 Symmetrical Staircases ascending each facade
       for (let yOffset = 0; yOffset <= 1; yOffset++) {
         this.setBlock(pyrX, y + yOffset, pyrZ - halfW, 'quartz_block');
         this.setBlock(pyrX, y + yOffset, pyrZ + halfW, 'quartz_block');
@@ -3714,27 +4021,75 @@ export class WorldBuilder {
         this.setBlock(pyrX + halfW, y + yOffset, pyrZ, 'quartz_block');
       }
     }
-    // Temple Sanctuary atop Step Pyramid (Y = 18 to 22)
+
+    // Carved Feathered Serpent (Kukulcán) Head Balustrades at Base of North Staircase
+    this.setBlock(pyrX - 1, 2, pyrZ - 16, 'mossy_stone_bricks');
+    this.setBlock(pyrX - 1, 3, pyrZ - 16, 'gold_block'); // Serpent eyes
+    this.setBlock(pyrX + 1, 2, pyrZ - 16, 'mossy_stone_bricks');
+    this.setBlock(pyrX + 1, 3, pyrZ - 16, 'gold_block');
+
+    // Temple Sanctuary of Kukulcán atop Step Pyramid (Y = 18 to 22)
     const topY = 2 + pyramidSteps * 2;
     for (let x = pyrX - 3; x <= pyrX + 3; x++) {
       for (let z = pyrZ - 3; z <= pyrZ + 3; z++) {
-        // Solid stone floor for sanctuary
         this.setBlock(x, topY, z, 'smooth_stone');
-        const wall = (Math.abs(x - pyrX) === 3 || Math.abs(z - pyrZ) === 3);
+        const isWall = (Math.abs(x - pyrX) === 3 || Math.abs(z - pyrZ) === 3);
         for (let y = topY + 1; y <= topY + 4; y++) {
-          if (wall || y === topY + 4) this.setBlock(x, y, z, 'stone_bricks');
+          if (isWall || y === topY + 4) {
+            // Front door opening on North
+            if (z === pyrZ - 3 && Math.abs(x - pyrX) <= 1 && y <= topY + 2) continue;
+            this.setBlock(x, y, z, 'stone_bricks');
+          }
         }
       }
     }
+    // Jaguar Altar in sanctuary
+    this.setBlock(pyrX, topY + 1, pyrZ, 'gold_block');
+    this.setBlock(pyrX, topY + 2, pyrZ, 'lantern');
     this.setBlock(pyrX, topY + 5, pyrZ, 'gold_block');
-    this.setBlock(pyrX, topY + 6, pyrZ, 'beacon');
-    this.setBlock(pyrX, topY + 1, pyrZ, 'glowstone', {
+    this.setBlock(pyrX, topY + 6, pyrZ, 'beacon'); // Skyward beam of Kukulcán
+
+    this.setBlock(pyrX, 2, pyrZ - 18, 'stone_bricks', {
       type: 'sign',
-      title: 'Chichén Itzá Pyramid',
-      text: 'Ancient Mesoamerican step pyramid temple overlooking the desert plateau.'
+      title: 'Chichén Itzá · Temple of Kukulcán 🐍',
+      text: 'Mesoamerican solar masterpiece engineered so the shadow of the feathered serpent slithers down the northern steps during each equinox!'
     });
 
-    // Grand Sandstone Canyon Arch spanning the Camino Real into Mexico
+    // 7. Natural Mayan Sacred Cenote (Cenote Sagrado) at (-120, 125)
+    const cenX = -120;
+    const cenZ = 125;
+    // Turquoise Sinkhole Pool (Radius 5)
+    for (let dx = -5; dx <= 5; dx++) {
+      for (let dz = -5; dz <= 5; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 4.5) {
+          this.setBlock(cenX + dx, 0, cenZ + dz, 'water');
+        } else if (d <= 6) {
+          // Lush limestone rocky rim
+          this.setBlock(cenX + dx, 1, cenZ + dz, (dx + dz) % 2 === 0 ? 'mossy_stone_bricks' : 'stone_bricks');
+        }
+      }
+    }
+    // Mayan Secret Offering Chest on cenote rock shelf
+    this.setBlock(cenX + 3, 1, cenZ + 3, 'chest', {
+      type: 'chest',
+      title: 'Sacred Cenote Offering Chest',
+      text: 'Sacred Mayan jade carved pendants, obsidian blades, and golden tribute cast into the deep waters of Chaac.'
+    });
+    // Hanging jungle vegetation around the cenote rim
+    this.setBlock(cenX - 3, 2, cenZ - 4, 'leaves');
+    this.setBlock(cenX - 3, 3, cenZ - 4, 'leaves');
+    this.setBlock(cenX + 4, 2, cenZ - 3, 'leaves');
+    this.buildPalmTree(cenX + 5, 1, cenZ + 4);
+    this.buildPalmTree(cenX - 5, 1, cenZ - 3);
+
+    this.setBlock(cenX, 2, cenZ - 7, 'stone_bricks', {
+      type: 'sign',
+      title: 'Cenote Sagrado · Sacred Mayan Sinkhole 💎',
+      text: 'Deep natural limestone sinkhole filled with crystal turquoise water, revered as a sacred portal to the underworld by the ancient Maya.'
+    });
+
+    // 8. Grand Sandstone Canyon Arch spanning Camino Real into Mexico
     for (let y = 1; y <= 9; y++) {
       for (let w = -1; w <= 1; w++) {
         this.setBlock(-75, y, 42 + w, 'red_sandstone');
@@ -3751,28 +4106,6 @@ export class WorldBuilder {
       type: 'sign',
       title: 'El Cañón Imperial Arch',
       text: 'Towering natural red sandstone canyon arch framing the gateway to the Mexican plateau.'
-    });
-
-    // Desert Palm Oasis at (-120, 80)
-    for (let dx = -7; dx <= 7; dx++) {
-      for (let dz = -7; dz <= 7; dz++) {
-        const d = Math.hypot(dx, dz);
-        if (d <= 3.5) {
-          this.setBlock(-120 + dx, 1, 80 + dz, 'water');
-        } else if (d <= 6.5) {
-          this.setBlock(-120 + dx, 1, 80 + dz, 'grass');
-        }
-      }
-    }
-    this.setBlock(-120, 0, 80, 'sea_lantern');
-    this.buildPalmTree(-125, 1, 82);
-    this.buildPalmTree(-115, 1, 78);
-    this.buildPalmTree(-122, 1, 74);
-    this.setBlock(-118, 2, 83, 'sandstone');
-    this.setBlock(-118, 2, 84, 'glowstone', {
-      type: 'sign',
-      title: 'Oasis de las Palmas',
-      text: 'Hidden fresh water spring amid the rolling badlands and desert dunes.'
     });
 
     // Adobe Pueblo Dwellings around perimeter
@@ -4920,7 +5253,10 @@ export class WorldBuilder {
       { x: -30, z: 76 }, { x: -20, z: 74 }, { x: -10, z: 78 },
       { x: 10, z: 76 }, { x: 26, z: 76 }, { x: -44, z: 88 }, { x: 34, z: 96 }
     ];
-    palmTrees.forEach(pt => this.buildPalmTree(pt.x, 1, pt.z));
+    // Coastal Rocks for Tuxedo Cat at (10, 82)
+    this.setBlock(10, 2, 82, 'smooth_stone');
+    this.setBlock(11, 2, 82, 'smooth_stone');
+    this.setBlock(10, 2, 83, 'stone_bricks');
   }
 
   // 12. Flora & Tree Helpers
