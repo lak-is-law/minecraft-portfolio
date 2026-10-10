@@ -284,18 +284,18 @@ export class ModalManager {
     const curZ = Math.round(playerPos?.z || 0);
 
     const atlasRegions = [
-      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', index: 0, tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
-      { number: '02', name: 'Frostpeak Range', subtitle: 'Snow, ice & altitude', detail: 'Climb the alpine ridges to the overlook and suspension bridge above the clouds.', index: 8, tone: 'frost', direction: 'NORTH · Z −95' },
-      { number: '03', name: 'Sakura Sanctuary', subtitle: 'Pagoda & quiet gardens', detail: 'Walk beneath the cherry canopy, pass the torii gates, and visit the language embassy.', index: 4, tone: 'sakura', direction: 'NORTHWEST · X −68' },
-      { number: '04', name: 'Imperial Raj', subtitle: 'Marble & reflection', detail: 'Explore the Taj Mahal, its reflecting pool, and the SRMIST honors courtyard.', index: 3, tone: 'raj', direction: 'NORTHEAST · X 55' },
-      { number: '05', name: 'Neo York', subtitle: 'Glass towers & AI labs', detail: 'Find the Times Square avenue, research labs, and the Lak Tower skyline marker.', index: 1, tone: 'neoyork', direction: 'EAST · X 80' },
-      { number: '06', name: 'Mexico City', subtitle: 'Zócalo & cathedral', detail: 'Gather in the city square, visit the cathedral, and browse the planned market streets.', index: 5, tone: 'pueblo', direction: 'WEST · X −70' },
-      { number: '07', name: 'South Coast', subtitle: 'Saloon, palms & pier', detail: 'Follow the boardwalk south to the beach bar, palm grove, and Merlion.', index: 6, tone: 'coast', direction: 'SOUTH · X 12 / Z 58' },
-      { number: '08', name: 'Civic Quarter', subtitle: 'School, care & public safety', detail: 'The school, hospital, and police station share a calm, connected southern district.', index: 11, tone: 'citadel', direction: 'SOUTHEAST · X 36 / Z 47' },
-      { number: '09', name: 'Travel Hub', subtitle: 'Station, trains & airport', detail: 'Live trains run between the central station and the compact coastal airport.', index: 10, tone: 'neoyork', direction: 'SOUTHEAST · X 58 / Z 42' },
-      { number: '10', name: 'Wildlife & Storybook Vale', subtitle: 'Zoo, gardens & castle', detail: 'Take the garden trail from the wildlife park to Rapunzel’s castle.', index: 14, tone: 'sakura', direction: 'WEST · X −44 / Z −32' },
-      { number: '11', name: 'Paris Gardens', subtitle: 'Eiffel Tower & avenue', detail: 'The Eiffel Tower anchors a quiet garden avenue on the northern approach.', index: 16, tone: 'frost', direction: 'NORTHEAST · X 30 / Z −42' },
-      { number: '12', name: 'Hollywood Hills', subtitle: 'A sign above the skyline', detail: 'Climb the contained ridge trail to the hillside sign and sunset overlook.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 78 / Z −50' },
+      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', index: 0, tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
+      { number: '02', name: 'Frostpeak Range', subtitle: 'Snow & alpine heights · 🏔️', detail: 'Climb the alpine ridges to the overlook and suspension bridge above the clouds.', index: 8, tone: 'frost', direction: 'NORTH · Z −95' },
+      { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan · 🇯🇵', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', index: 4, tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
+      { number: '04', name: 'Imperial India · Taj Mahal', subtitle: 'India · 🇮🇳', detail: 'Explore the grand white marble Taj Mahal, Yamuna reflecting pool, Varanasi Ghats, and SRMIST honors.', index: 3, tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
+      { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States · 🇺🇸', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', index: 1, tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
+      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico · 🇲🇽', detail: 'Metropolitan Cathedral, Palacio Nacional, and ancient Chichén Itzá 9-step pyramid plateau.', index: 5, tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
+      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt · 🇪🇬', detail: 'Monumental Pyramid of Khufu with torch-lit tomb, Great Sphinx, and desert camel caravan.', index: 21, tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
+      { number: '08', name: 'Dubai · Burj Khalifa', subtitle: 'United Arab Emirates · 🇦🇪', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46 and Palm Jumeirah lagoon.', index: 22, tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
+      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom · 🇬🇧', detail: 'Historic Elizabeth Tower clock, Tower Bridge pedestrian walkways, and red Routemaster bus.', index: 18, tone: 'citadel', direction: 'NORTH · X −32 / Z −65' },
+      { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France · 🇫🇷', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', index: 16, tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
+      { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China · 🇨🇳', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', index: 7, tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
+      { number: '12', name: 'Hollywood Hills & Sign', subtitle: 'United States · 🇺🇸', detail: 'Block-built 7-block HOLLYWOOD sign atop Mount Lee overlooking the Las Vegas casino skyline.', index: 17, tone: 'raj', direction: 'NORTHEAST · X 130 / Z −50' },
     ];
     const regionsHtml = atlasRegions.map((region) => `
       <article class="atlas-region-card atlas-${region.tone}">
@@ -556,17 +556,102 @@ export class ModalManager {
       ctx.fillStyle = '#22c55e';
       ctx.fillRect(cx - 210 * scale, cy - 210 * scale, 420 * scale, 420 * scale);
 
-      // Biomes follow the cultural quadrant partition
-      const mapRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
-        ctx.fillStyle = color;
-        ctx.fillRect(cx + x1 * scale, cy + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
+      // Render Authentic Country Map Silhouettes Across All 10 Realms
+      const drawCountryTerritory = (poly: [number, number][], fillColor: string, strokeColor: string, label: string, labelPos: [number, number]) => {
+        ctx.beginPath();
+        poly.forEach(([x, z], i) => {
+          const px = cx + x * scale;
+          const pz = cy + z * scale;
+          if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+        });
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 1.8 * scale;
+        ctx.stroke();
+
+        if (label) {
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `bold ${Math.max(10, Math.round(11 * scale))}px monospace`;
+          ctx.textAlign = 'center';
+          ctx.shadowColor = '#000000';
+          ctx.shadowBlur = 4;
+          ctx.fillText(label, cx + labelPos[0] * scale, cy + labelPos[1] * scale);
+          ctx.restore();
+        }
       };
-      mapRect(25, -195, 195, -40, '#c2ae78'); // NE: Imperial India
-      mapRect(-195, -195, -25, -40, '#2d7a5b'); // NW: China Realm
-      mapRect(-195, 25, -25, 195, '#b56e48'); // SW: Mexico Realm
-      mapRect(25, -40, 195, 75, '#4d7172'); // SE: USA Neo York
-      mapRect(-40, 75, 40, 195, '#d4ad64'); // South: Beach & Boardwalk
-      mapRect(-25, 120, 35, 185, '#ec4899'); // South: Grand Carnival Pier
+
+      // 1. 🇮🇳 INDIA (Subcontinent Peninsula)
+      drawCountryTerritory(
+        [[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]],
+        'rgba(249, 115, 22, 0.40)', '#f97316', '🇮🇳 INDIA', [95, -130]
+      );
+
+      // 2. 🇨🇳 CHINA (Northern Continental Arc)
+      drawCountryTerritory(
+        [[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]],
+        'rgba(220, 38, 38, 0.36)', '#dc2626', '🇨🇳 CHINA', [-115, -130]
+      );
+
+      // 3. 🇯🇵 JAPAN (Archipelago Chain)
+      drawCountryTerritory(
+        [[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]],
+        'rgba(244, 63, 94, 0.45)', '#f43f5e', '🇯🇵 JAPAN', [-155, -75]
+      );
+
+      // 4. 🇰🇷 SOUTH KOREA (Korean Peninsula)
+      drawCountryTerritory(
+        [[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]],
+        'rgba(14, 165, 233, 0.45)', '#0ea5e9', '🇰🇷 S. KOREA', [-60, -102]
+      );
+
+      // 5. 🇬🇧 UNITED KINGDOM (Great Britain)
+      drawCountryTerritory(
+        [[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]],
+        'rgba(239, 68, 68, 0.40)', '#ef4444', '🇬🇧 UK', [-32, -68]
+      );
+
+      // 6. 🇫🇷 FRANCE (L’Hexagone)
+      drawCountryTerritory(
+        [[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]],
+        'rgba(56, 189, 248, 0.42)', '#38bdf8', '🇫🇷 FRANCE', [28, -42]
+      );
+
+      // 7. 🇺🇸 USA (Las Vegas Strip, Broadway & Hollywood)
+      drawCountryTerritory(
+        [[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]],
+        'rgba(59, 130, 246, 0.38)', '#3b82f6', '🇺🇸 USA · VEGAS', [120, -10]
+      );
+
+      // 8. 🇲🇽 MEXICO (Mesoamerican Horn)
+      drawCountryTerritory(
+        [[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]],
+        'rgba(5, 150, 105, 0.38)', '#059669', '🇲🇽 MEXICO', [-125, 60]
+      );
+
+      // 9. 🇪🇬 EGYPT (Nile & Giza Plateau)
+      drawCountryTerritory(
+        [[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]],
+        'rgba(234, 179, 8, 0.38)', '#eab308', '🇪🇬 EGYPT', [-155, 40]
+      );
+
+      // 10. 🇦🇪 UAE (Dubai Waterfront & Palm)
+      drawCountryTerritory(
+        [[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]],
+        'rgba(16, 185, 129, 0.42)', '#10b981', '🇦🇪 UAE', [168, 38]
+      );
+
+      // Southern Coasts & Grand Carnival Pier
+      drawCountryTerritory(
+        [[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]],
+        'rgba(212, 173, 100, 0.25)', '#d4ad64', 'BEACH & BOARDWALK', [0, 95]
+      );
+      drawCountryTerritory(
+        [[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]],
+        'rgba(236, 72, 153, 0.40)', '#ec4899', 'CARNIVAL PIER', [5, 150]
+      );
 
       // Yamuna canal in India
       ctx.fillStyle = '#38bdf8';

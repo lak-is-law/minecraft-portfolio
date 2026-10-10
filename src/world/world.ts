@@ -32,9 +32,17 @@ export class VoxelWorld {
   private spinningIcons: THREE.Group[] = [];
   private portalParticles: THREE.Points | null = null;
   private beaconBeam: THREE.Mesh | null = null;
+  public static readonly STATIONS = [
+    { name: 'Crossroads Central Station', pos: new THREE.Vector3(58, 5.0, 33), tag: '[CENTRAL]' },
+    { name: 'Neo York Skyway Station', pos: new THREE.Vector3(116, 5.0, 28), tag: '[NEO YORK]' },
+    { name: 'Airport Terminal Skyport Station', pos: new THREE.Vector3(128, 5.0, 68), tag: '[AIRPORT]' },
+    { name: 'South Coast Beach & Pier Station', pos: new THREE.Vector3(24, 5.0, 88), tag: '[BEACH]' },
+    { name: 'Citadel Gateway Station', pos: new THREE.Vector3(8, 5.0, 22), tag: '[CITADEL]' },
+  ];
+
   public npcMesh: THREE.Group | null = null;
   private railCurve: THREE.CatmullRomCurve3 | null = null;
-  private liveTrains: THREE.Group[] = [];
+  public liveTrains: THREE.Group[] = [];
   public autoRickshawMesh: THREE.Group | null = null;
   public animatedAirplanes: THREE.Group[] = [];
   private airplaneStrobes: THREE.Mesh[] = [];
@@ -60,6 +68,7 @@ export class VoxelWorld {
     this.createAutoRickshaw();
     this.createProjectPedestalVisuals();
     this.createBigProjectWallBanners();
+    this.createCountryMapWallBanners();
     this.createBeaconBeam();
     this.createNetherPortalParticles();
     this.createLakshyaNPC();
@@ -236,6 +245,498 @@ export class VoxelWorld {
         project: proj,
         box
       });
+    });
+  }
+
+  // Create High-Definition Geographic Country Map Display Banners in All 10 Realms
+  private createCountryMapWallBanners() {
+    interface CountryMapDef {
+      id: string;
+      title: string;
+      nativeName: string;
+      code: string;
+      flag: string;
+      accentColor: string;
+      capital: string;
+      coords: { x: number; y: number; z: number; rotY?: number };
+      stats: string[];
+      cities: { name: string; x: number; y: number; isCap?: boolean }[];
+      mainPoly: [number, number][]; // normalized coords [0..1]
+      subPolys?: [number, number][][];
+    }
+
+    const countryMaps: CountryMapDef[] = [
+      {
+        id: 'usa',
+        title: 'UNITED STATES OF AMERICA',
+        nativeName: 'National Geographic Cartography',
+        code: 'USA · 🇺🇸',
+        flag: '🇺🇸',
+        accentColor: '#3b82f6',
+        capital: 'Washington, D.C.',
+        coords: { x: 95, y: 5.2, z: -4, rotY: Math.PI / 2 },
+        stats: ['Capital: Washington, D.C.', '50 States · 9.83M km²', 'Pop: 335 Million', 'District: Las Vegas Strip & Hollywood'],
+        cities: [
+          { name: 'Washington D.C. ⭐', x: 0.82, y: 0.44, isCap: true },
+          { name: 'New York', x: 0.86, y: 0.36 },
+          { name: 'Las Vegas 🎰', x: 0.22, y: 0.52 },
+          { name: 'Los Angeles', x: 0.16, y: 0.58 },
+          { name: 'Chicago', x: 0.64, y: 0.38 },
+          { name: 'Miami', x: 0.78, y: 0.82 }
+        ],
+        mainPoly: [
+          [0.12, 0.28], [0.38, 0.26], [0.65, 0.27], [0.72, 0.20], [0.78, 0.25],
+          [0.86, 0.22], [0.90, 0.28], [0.85, 0.42], [0.81, 0.58], [0.84, 0.72],
+          [0.81, 0.86], [0.75, 0.82], [0.72, 0.70], [0.58, 0.71], [0.50, 0.84],
+          [0.44, 0.82], [0.42, 0.72], [0.31, 0.71], [0.18, 0.68], [0.12, 0.54],
+          [0.14, 0.40], [0.12, 0.28]
+        ],
+        subPolys: [
+          [[0.14, 0.78], [0.18, 0.82], [0.22, 0.79], [0.18, 0.75], [0.14, 0.78]], // Baja border / insets
+          [[0.28, 0.85], [0.32, 0.88], [0.36, 0.86], [0.32, 0.83], [0.28, 0.85]]
+        ]
+      },
+      {
+        id: 'india',
+        title: 'REPUBLIC OF INDIA',
+        nativeName: 'भारत गणराज्य · Survey of India',
+        code: 'IND · 🇮🇳',
+        flag: '🇮🇳',
+        accentColor: '#f97316',
+        capital: 'New Delhi',
+        coords: { x: 80, y: 5.2, z: -120, rotY: 0 },
+        stats: ['Capital: New Delhi', '28 States & 8 UTs · 3.28M km²', 'Pop: 1.43 Billion', 'District: Imperial India & Taj Mahal'],
+        cities: [
+          { name: 'New Delhi ⭐', x: 0.44, y: 0.28, isCap: true },
+          { name: 'Chennai (SRMIST) 🎓', x: 0.54, y: 0.76 },
+          { name: 'Mumbai', x: 0.32, y: 0.56 },
+          { name: 'Varanasi', x: 0.60, y: 0.36 },
+          { name: 'Agra (Taj Mahal)', x: 0.46, y: 0.34 },
+          { name: 'Kolkata', x: 0.72, y: 0.44 }
+        ],
+        mainPoly: [
+          [0.42, 0.08], [0.50, 0.12], [0.52, 0.22], [0.65, 0.26], [0.74, 0.24],
+          [0.86, 0.28], [0.84, 0.36], [0.74, 0.38], [0.70, 0.46], [0.64, 0.58],
+          [0.58, 0.72], [0.52, 0.88], [0.48, 0.84], [0.42, 0.74], [0.32, 0.64],
+          [0.26, 0.50], [0.22, 0.44], [0.28, 0.38], [0.34, 0.24], [0.38, 0.14],
+          [0.42, 0.08]
+        ]
+      },
+      {
+        id: 'uk',
+        title: 'UNITED KINGDOM',
+        nativeName: 'Ordnance Survey of Great Britain',
+        code: 'GBR · 🇬🇧',
+        flag: '🇬🇧',
+        accentColor: '#ef4444',
+        capital: 'London',
+        coords: { x: -34, y: 5.2, z: -60, rotY: 0 },
+        stats: ['Capital: London', '4 Countries · 243K km²', 'Pop: 68 Million', 'District: Big Ben & Tower Bridge'],
+        cities: [
+          { name: 'London ⭐', x: 0.68, y: 0.74, isCap: true },
+          { name: 'Edinburgh', x: 0.52, y: 0.36 },
+          { name: 'Manchester', x: 0.56, y: 0.54 },
+          { name: 'Cardiff', x: 0.48, y: 0.76 },
+          { name: 'Belfast', x: 0.26, y: 0.46 }
+        ],
+        mainPoly: [
+          [0.48, 0.12], [0.62, 0.18], [0.66, 0.28], [0.58, 0.38], [0.68, 0.46],
+          [0.76, 0.60], [0.78, 0.74], [0.70, 0.86], [0.54, 0.84], [0.42, 0.80],
+          [0.46, 0.70], [0.50, 0.58], [0.44, 0.44], [0.42, 0.26], [0.48, 0.12]
+        ],
+        subPolys: [
+          [[0.22, 0.42], [0.32, 0.40], [0.34, 0.52], [0.26, 0.56], [0.22, 0.42]] // Northern Ireland
+        ]
+      },
+      {
+        id: 'france',
+        title: 'RÉPUBLIQUE FRANÇAISE',
+        nativeName: 'Institut Géographique National (IGN)',
+        code: 'FRA · 🇫🇷',
+        flag: '🇫🇷',
+        accentColor: '#38bdf8',
+        capital: 'Paris',
+        coords: { x: 26, y: 5.2, z: -30, rotY: 0 },
+        stats: ['Capital: Paris', '18 Regions · 643K km²', 'Pop: 68 Million', 'District: Paris Eiffel & Champ de Mars'],
+        cities: [
+          { name: 'Paris ⭐', x: 0.52, y: 0.32, isCap: true },
+          { name: 'Lyon', x: 0.66, y: 0.58 },
+          { name: 'Marseille', x: 0.68, y: 0.82 },
+          { name: 'Nice', x: 0.78, y: 0.78 },
+          { name: 'Bordeaux', x: 0.34, y: 0.66 },
+          { name: 'Strasbourg', x: 0.82, y: 0.32 }
+        ],
+        mainPoly: [
+          [0.46, 0.14], [0.62, 0.16], [0.76, 0.22], [0.82, 0.36], [0.78, 0.54],
+          [0.82, 0.72], [0.72, 0.84], [0.56, 0.84], [0.42, 0.86], [0.32, 0.72],
+          [0.30, 0.56], [0.18, 0.42], [0.28, 0.34], [0.38, 0.26], [0.46, 0.14]
+        ]
+      },
+      {
+        id: 'japan',
+        title: 'JAPAN · 日本国',
+        nativeName: '国土地理院 (GSI Cartography)',
+        code: 'JPN · 🇯🇵',
+        flag: '🇯🇵',
+        accentColor: '#f43f5e',
+        capital: 'Tokyo',
+        coords: { x: -153, y: 5.2, z: -75, rotY: Math.PI / 2 },
+        stats: ['Capital: Tokyo', '47 Prefectures · 377K km²', 'Pop: 125 Million', 'District: Tokyo Shibuya & Shinkansen'],
+        cities: [
+          { name: 'Tokyo ⭐', x: 0.68, y: 0.54, isCap: true },
+          { name: 'Kyoto', x: 0.52, y: 0.62 },
+          { name: 'Osaka', x: 0.48, y: 0.66 },
+          { name: 'Sapporo', x: 0.78, y: 0.16 },
+          { name: 'Hiroshima', x: 0.36, y: 0.70 }
+        ],
+        mainPoly: [
+          // Honshu main arc
+          [0.58, 0.38], [0.68, 0.42], [0.74, 0.52], [0.72, 0.62], [0.60, 0.66],
+          [0.50, 0.68], [0.38, 0.72], [0.32, 0.76], [0.36, 0.72], [0.46, 0.62],
+          [0.54, 0.54], [0.62, 0.44], [0.58, 0.38]
+        ],
+        subPolys: [
+          // Hokkaido
+          [[0.72, 0.12], [0.86, 0.14], [0.88, 0.24], [0.76, 0.28], [0.68, 0.22], [0.72, 0.12]],
+          // Kyushu
+          [[0.24, 0.76], [0.32, 0.78], [0.30, 0.88], [0.22, 0.86], [0.24, 0.76]]
+        ]
+      },
+      {
+        id: 'korea',
+        title: 'REPUBLIC OF KOREA',
+        nativeName: '대한민국 · 국토지리정보원',
+        code: 'KOR · 🇰🇷',
+        flag: '🇰🇷',
+        accentColor: '#0ea5e9',
+        capital: 'Seoul',
+        coords: { x: -65, y: 5.2, z: -88, rotY: 0 },
+        stats: ['Capital: Seoul', '9 Provinces · 100K km²', 'Pop: 52 Million', 'District: Seoul Gwanghwamun & N Seoul Tower'],
+        cities: [
+          { name: 'Seoul ⭐', x: 0.42, y: 0.28, isCap: true },
+          { name: 'Busan', x: 0.72, y: 0.74 },
+          { name: 'Incheon', x: 0.34, y: 0.30 },
+          { name: 'Daegu', x: 0.62, y: 0.58 },
+          { name: 'Jeju Island', x: 0.32, y: 0.90 }
+        ],
+        mainPoly: [
+          [0.34, 0.20], [0.54, 0.22], [0.68, 0.28], [0.72, 0.44], [0.78, 0.62],
+          [0.76, 0.78], [0.62, 0.82], [0.46, 0.78], [0.36, 0.66], [0.32, 0.48],
+          [0.30, 0.34], [0.34, 0.20]
+        ],
+        subPolys: [
+          [[0.28, 0.88], [0.36, 0.88], [0.34, 0.94], [0.26, 0.92], [0.28, 0.88]] // Jeju
+        ]
+      },
+      {
+        id: 'china',
+        title: "PEOPLE'S REPUBLIC OF CHINA",
+        nativeName: '中华人民共和国 · 国家测绘地理信息局',
+        code: 'CHN · 🇨🇳',
+        flag: '🇨🇳',
+        accentColor: '#dc2626',
+        capital: 'Beijing',
+        coords: { x: -108, y: 5.2, z: -100, rotY: 0 },
+        stats: ['Capital: Beijing', '23 Provinces, 5 Regions · 9.60M km²', 'Pop: 1.41 Billion', 'District: Great Wall Ramparts & Pagoda'],
+        cities: [
+          { name: 'Beijing ⭐', x: 0.68, y: 0.32, isCap: true },
+          { name: 'Shanghai', x: 0.84, y: 0.54 },
+          { name: 'Guangzhou', x: 0.72, y: 0.78 },
+          { name: 'Shenzhen', x: 0.74, y: 0.80 },
+          { name: 'Xi’an', x: 0.56, y: 0.48 }
+        ],
+        mainPoly: [
+          [0.18, 0.32], [0.36, 0.22], [0.54, 0.24], [0.68, 0.16], [0.82, 0.18],
+          [0.86, 0.30], [0.76, 0.36], [0.82, 0.46], [0.88, 0.56], [0.84, 0.68],
+          [0.76, 0.82], [0.62, 0.82], [0.50, 0.72], [0.36, 0.64], [0.22, 0.54],
+          [0.16, 0.42], [0.18, 0.32]
+        ]
+      },
+      {
+        id: 'egypt',
+        title: 'ARAB REPUBLIC OF EGYPT',
+        nativeName: 'جمهورية مصر العربية · الهيئة العامة للمساحة',
+        code: 'EGY · 🇪🇬',
+        flag: '🇪🇬',
+        accentColor: '#eab308',
+        capital: 'Cairo',
+        coords: { x: -150, y: 5.2, z: 42, rotY: -Math.PI / 2 },
+        stats: ['Capital: Cairo', '27 Governorates · 1.01M km²', 'Pop: 110 Million', 'District: Giza Pyramids Plateau & Sphinx'],
+        cities: [
+          { name: 'Cairo ⭐', x: 0.64, y: 0.28, isCap: true },
+          { name: 'Alexandria', x: 0.54, y: 0.18 },
+          { name: 'Giza (Pyramids)', x: 0.62, y: 0.32 },
+          { name: 'Luxor', x: 0.72, y: 0.62 },
+          { name: 'Aswan', x: 0.74, y: 0.78 }
+        ],
+        mainPoly: [
+          [0.24, 0.18], [0.50, 0.16], [0.64, 0.14], [0.76, 0.18], [0.84, 0.26],
+          [0.86, 0.42], [0.82, 0.58], [0.86, 0.74], [0.82, 0.84], [0.24, 0.84],
+          [0.24, 0.50], [0.24, 0.18]
+        ]
+      },
+      {
+        id: 'uae',
+        title: 'UNITED ARAB EMIRATES',
+        nativeName: 'الإمارات العربية المتحدة · المركز الوطني للمساحة',
+        code: 'ARE · 🇦🇪',
+        flag: '🇦🇪',
+        accentColor: '#10b981',
+        capital: 'Abu Dhabi',
+        coords: { x: 165, y: 5.2, z: 35, rotY: -Math.PI / 2 },
+        stats: ['Capital: Abu Dhabi', '7 Emirates · 83.6K km²', 'Pop: 10 Million', 'District: Dubai Burj Khalifa & Palm Lagoon'],
+        cities: [
+          { name: 'Abu Dhabi ⭐', x: 0.46, y: 0.58, isCap: true },
+          { name: 'Dubai', x: 0.64, y: 0.38 },
+          { name: 'Sharjah', x: 0.68, y: 0.32 },
+          { name: 'Palm Jumeirah 🏝️', x: 0.60, y: 0.42 }
+        ],
+        mainPoly: [
+          [0.28, 0.66], [0.40, 0.56], [0.56, 0.44], [0.66, 0.32], [0.76, 0.22],
+          [0.80, 0.34], [0.76, 0.48], [0.74, 0.68], [0.64, 0.78], [0.46, 0.80],
+          [0.34, 0.74], [0.28, 0.66]
+        ]
+      },
+      {
+        id: 'mexico',
+        title: 'ESTADOS UNIDOS MEXICANOS',
+        nativeName: 'Instituto Nacional de Estadística y Geografía (INEGI)',
+        code: 'MEX · 🇲🇽',
+        flag: '🇲🇽',
+        accentColor: '#059669',
+        capital: 'Mexico City',
+        coords: { x: -100, y: 5.2, z: 55, rotY: 0 },
+        stats: ['Capital: Mexico City', '31 States & CDMX · 1.97M km²', 'Pop: 130 Million', 'District: Mexico City Zócalo & Chichén Itzá'],
+        cities: [
+          { name: 'Mexico City ⭐', x: 0.54, y: 0.66, isCap: true },
+          { name: 'Guadalajara', x: 0.42, y: 0.62 },
+          { name: 'Monterrey', x: 0.50, y: 0.42 },
+          { name: 'Cancún / Chichén Itzá 🏛️', x: 0.86, y: 0.62 },
+          { name: 'Tijuana', x: 0.14, y: 0.16 }
+        ],
+        mainPoly: [
+          [0.18, 0.14], [0.34, 0.28], [0.48, 0.28], [0.54, 0.40], [0.58, 0.54],
+          [0.68, 0.58], [0.80, 0.60], [0.88, 0.56], [0.88, 0.66], [0.80, 0.72],
+          [0.66, 0.68], [0.54, 0.76], [0.44, 0.70], [0.34, 0.54], [0.26, 0.42],
+          [0.18, 0.14]
+        ],
+        subPolys: [
+          // Baja California peninsula
+          [[0.12, 0.16], [0.18, 0.28], [0.24, 0.42], [0.26, 0.50], [0.22, 0.50], [0.18, 0.36], [0.10, 0.20], [0.12, 0.16]]
+        ]
+      }
+    ];
+
+    countryMaps.forEach(cm => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 680;
+      const ctx = canvas.getContext('2d')!;
+
+      // Dark cartographic background
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, 1024, 680);
+
+      // Top title bar with country accent
+      const grad = ctx.createLinearGradient(0, 0, 1024, 0);
+      grad.addColorStop(0, cm.accentColor);
+      grad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1024, 90);
+
+      // Outer gold cartographic borders
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(4, 4, 1016, 672);
+
+      ctx.strokeStyle = cm.accentColor;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(16, 16, 992, 648);
+
+      // Header Text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px monospace';
+      ctx.fillText(cm.title, 36, 56);
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 22px monospace';
+      ctx.fillText(cm.code, 820, 56);
+
+      // Native Cartography Subtitle
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '18px monospace';
+      ctx.fillText(cm.nativeName, 36, 122);
+
+      // ==========================================
+      // CARTOGRAPHIC RADAR BOX (Left Side: 560 x 500)
+      // ==========================================
+      const mapBox = { x: 36, y: 140, w: 540, h: 490 };
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(mapBox.x, mapBox.y, mapBox.w, mapBox.h);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(mapBox.x, mapBox.y, mapBox.w, mapBox.h);
+
+      // Latitude / Longitude Grid lines
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+      ctx.lineWidth = 1;
+      for (let gx = mapBox.x + 45; gx < mapBox.x + mapBox.w; gx += 45) {
+        ctx.beginPath();
+        ctx.moveTo(gx, mapBox.y);
+        ctx.lineTo(gx, mapBox.y + mapBox.h);
+        ctx.stroke();
+      }
+      for (let gy = mapBox.y + 45; gy < mapBox.y + mapBox.h; gy += 45) {
+        ctx.beginPath();
+        ctx.moveTo(mapBox.x, gy);
+        ctx.lineTo(mapBox.x + mapBox.w, gy);
+        ctx.stroke();
+      }
+
+      // Helper to render polygon
+      const drawPoly = (poly: [number, number][]) => {
+        ctx.beginPath();
+        poly.forEach(([px, py], i) => {
+          const wx = mapBox.x + px * mapBox.w;
+          const wy = mapBox.y + py * mapBox.h;
+          if (i === 0) ctx.moveTo(wx, wy); else ctx.lineTo(wx, wy);
+        });
+        ctx.closePath();
+      };
+
+      // Draw country silhouette with glow
+      ctx.save();
+      ctx.shadowColor = cm.accentColor;
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = cm.accentColor + '33';
+      ctx.strokeStyle = cm.accentColor;
+      ctx.lineWidth = 3.5;
+
+      drawPoly(cm.mainPoly);
+      ctx.fill();
+      ctx.stroke();
+
+      if (cm.subPolys) {
+        for (const sp of cm.subPolys) {
+          drawPoly(sp);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // Plot Major Cities & Capital
+      cm.cities.forEach(c => {
+        const cx = mapBox.x + c.x * mapBox.w;
+        const cy = mapBox.y + c.y * mapBox.h;
+
+        if (c.isCap) {
+          // Capital Star Halo
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#fef08a';
+          ctx.font = 'bold 16px monospace';
+          ctx.fillText(`★ ${c.name}`, cx + 9, cy - 5);
+        } else {
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#0284c7';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = 'bold 13px monospace';
+          ctx.fillText(`• ${c.name}`, cx + 7, cy + 4);
+        }
+      });
+
+      // Compass Rose in Map Box Corner
+      const crX = mapBox.x + mapBox.w - 45;
+      const crY = mapBox.y + 45;
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(crX, crY - 20); ctx.lineTo(crX, crY + 20);
+      ctx.moveTo(crX - 20, crY); ctx.lineTo(crX + 20, crY);
+      ctx.stroke();
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText('N', crX - 4, crY - 24);
+
+      // ==========================================
+      // GEOGRAPHIC DOSSIER (Right Side: 380 x 490)
+      // ==========================================
+      const rightX = 604;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(rightX, 140, 384, 490);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(rightX, 140, 384, 490);
+
+      // Dossier Header
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 22px monospace';
+      ctx.fillText('NATIONAL GEOGRAPHIC DOSSIER', rightX + 20, 180);
+
+      ctx.strokeStyle = cm.accentColor;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(rightX + 20, 195);
+      ctx.lineTo(rightX + 364, 195);
+      ctx.stroke();
+
+      // Country Stats Badges
+      let sy = 230;
+      for (const stat of cm.stats) {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(rightX + 20, sy, 344, 44);
+        ctx.strokeStyle = cm.accentColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(rightX + 20, sy, 344, 44);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 15px monospace';
+        ctx.fillText(`[INFO] ${stat}`, rightX + 32, sy + 28);
+        sy += 58;
+      }
+
+      // Lakshya's World Integration Box
+      ctx.fillStyle = '#111827';
+      ctx.fillRect(rightX + 20, 480, 344, 130);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(rightX + 20, 480, 344, 130);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText('PORTFOLIO WORLD REALM', rightX + 32, 510);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '13px monospace';
+      ctx.fillText('Explorable authentic district modeled', rightX + 32, 540);
+      ctx.fillText('with landmark architecture, audio ambience,', rightX + 32, 565);
+      ctx.fillText('and interactive cultural exhibits.', rightX + 32, 590);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.magFilter = THREE.LinearFilter;
+      texture.colorSpace = THREE.SRGBColorSpace;
+
+      // 3D Display Mesh: 5.2 blocks wide x 3.6 blocks high
+      const mapGeo = new THREE.PlaneGeometry(5.2, 3.6);
+      const mapMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+      const mapMesh = new THREE.Mesh(mapGeo, mapMat);
+
+      mapMesh.position.set(cm.coords.x, cm.coords.y, cm.coords.z);
+      mapMesh.rotation.y = cm.coords.rotY ?? 0;
+      this.scene.add(mapMesh);
     });
   }
 
@@ -1068,57 +1569,107 @@ export class VoxelWorld {
   }
 
   private createRailway() {
-    // Dedicated collision-free scenic viaduct corridor between Central Station and Airport
+    // Grand Continental Island Express Rapid Transit Loop (Collision-Free Continuous Circuit)
     const route = [
-      new THREE.Vector3(52, 2.15, 33),  // Inside Central Station West Platform
-      new THREE.Vector3(66, 2.20, 33),  // Station East Portal
-      new THREE.Vector3(80, 2.70, 33),  // Scenic Viaduct Trestle 1 (above open waterway)
-      new THREE.Vector3(96, 3.00, 34),  // Viaduct Trestle 2 (crossing over highway)
-      new THREE.Vector3(110, 2.80, 42), // Curve across open meadow
-      new THREE.Vector3(122, 2.40, 56), // Airport approach
-      new THREE.Vector3(130, 2.15, 70)  // Airport Terminal Station Platform
+      new THREE.Vector3(58, 5.0, 33),   // Crossroads Central Station Elevated Through-Track
+      new THREE.Vector3(74, 5.0, 33),   // Station East Portal Viaduct
+      new THREE.Vector3(92, 5.0, 33),   // High Viaduct over East Highway (4+ block road clearance)
+      new THREE.Vector3(104, 5.0, 32),  // Elevated crossing south of project avenue (Z=32 > Z=20)
+      new THREE.Vector3(116, 5.0, 28),  // Neo York Skyway Station Platform (Elevated Skyway)
+      new THREE.Vector3(124, 5.0, 38),  // Eastern Bay Scenic Viaduct
+      new THREE.Vector3(128, 5.0, 52),  // Airport Northern Approach Viaduct
+      new THREE.Vector3(128, 5.0, 68),  // Crossroads Airport Terminal Skyport Station Platform
+      new THREE.Vector3(118, 5.0, 78),  // South Coast Viaduct curve
+      new THREE.Vector3(96, 5.0, 86),   // Coastal meadow mainline viaduct
+      new THREE.Vector3(68, 5.0, 90),   // Harbor bay viaduct
+      new THREE.Vector3(44, 5.0, 90),   // Grand Carnival approach viaduct
+      new THREE.Vector3(24, 5.0, 88),   // South Coast Beach & Pier Station Platform
+      new THREE.Vector3(12, 5.0, 74),   // South meadow scenic viaduct
+      new THREE.Vector3(8, 5.0, 54),    // Riverbank straightaway viaduct
+      new THREE.Vector3(6, 5.0, 36),    // Citadel south approach viaduct
+      new THREE.Vector3(8, 5.0, 22),    // Citadel Gateway Station Platform
+      new THREE.Vector3(22, 5.0, 22),   // Eastbound viaduct through park
+      new THREE.Vector3(38, 5.0, 27),   // Civic Quarter boulevard approach viaduct
+      new THREE.Vector3(48, 5.0, 32),   // Central Station West Portal
     ];
-    this.railCurve = new THREE.CatmullRomCurve3(route, false, 'centripetal');
-    const railMaterial = new THREE.MeshStandardMaterial({ color: 0x64736f, metalness: 0.72, roughness: 0.34 });
-    const tieMaterial = new THREE.MeshLambertMaterial({ color: 0x745d43 });
-    const supportMaterial = new THREE.MeshLambertMaterial({ color: 0x56635c });
-    const railRadius = 0.075;
+
+    // Closed loop CatmullRomCurve3 so trains run endlessly without turning around or colliding
+    this.railCurve = new THREE.CatmullRomCurve3(route, true, 'centripetal');
+
+    const railMaterial = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.22 });
+    const tieMaterial = new THREE.MeshLambertMaterial({ color: 0x5c4033 });
+    const supportMaterial = new THREE.MeshLambertMaterial({ color: 0x475569 });
+    const gantryMaterial = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
+    const insulatorMaterial = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+    const railRadius = 0.08;
     const railLength = this.railCurve.getLength();
 
-    for (const side of [-0.48, 0.48]) {
-      const offsetPoints = route.map((point, index) => {
-        const tangent = this.railCurve!.getTangentAt(index / (route.length - 1));
+    // 1. Dual Polished Steel Tube Rails (Closed continuous loop)
+    const numRailSamples = 360;
+    for (const side of [-0.52, 0.52]) {
+      const railPoints: THREE.Vector3[] = [];
+      for (let i = 0; i < numRailSamples; i++) {
+        const u = i / numRailSamples;
+        const pt = this.railCurve.getPointAt(u);
+        const tangent = this.railCurve.getTangentAt(u);
         const normal = new THREE.Vector3(tangent.z, 0, -tangent.x).normalize();
-        return point.clone().addScaledVector(normal, side);
-      });
-      const curve = new THREE.CatmullRomCurve3(offsetPoints, false, 'centripetal');
-      const rail = new THREE.Mesh(new THREE.TubeGeometry(curve, 220, railRadius, 8, false), railMaterial);
+        railPoints.push(pt.clone().addScaledVector(normal, side));
+      }
+      const railSubCurve = new THREE.CatmullRomCurve3(railPoints, true, 'centripetal');
+      const rail = new THREE.Mesh(new THREE.TubeGeometry(railSubCurve, 360, railRadius, 8, true), railMaterial);
       rail.castShadow = true;
       rail.receiveShadow = true;
       this.scene.add(rail);
     }
 
-    // Timber sleepers and viaduct piers
-    for (let distance = 0; distance <= railLength; distance += 1.45) {
+    // 2. Timber Sleepers, Elevated Viaduct Piers, and Overhead Electrification Gantries
+    for (let distance = 0; distance < railLength; distance += 1.4) {
       const t = this.railCurve.getUtoTmapping(0, distance);
       const point = this.railCurve.getPointAt(t);
       const tangent = this.railCurve.getTangentAt(t);
-      const sleeper = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.14, 0.26), tieMaterial);
+
+      // Authentic timber cross-ties
+      const sleeper = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.14, 0.28), tieMaterial);
       sleeper.position.copy(point);
-      sleeper.position.y -= 0.12;
+      sleeper.position.y -= 0.11;
       sleeper.rotation.y = Math.atan2(-tangent.z, tangent.x) + Math.PI / 2;
       sleeper.castShadow = true;
       this.scene.add(sleeper);
 
-      if (Math.round(distance) % 7 < 2) {
-        const support = new THREE.Mesh(new THREE.BoxGeometry(0.55, point.y + 0.5, 0.55), supportMaterial);
-        support.position.set(point.x, (point.y) / 2, point.z);
+      // Elevated viaduct support piers
+      if (point.y > 2.2 && Math.round(distance) % 7 < 2) {
+        const support = new THREE.Mesh(new THREE.BoxGeometry(0.55, point.y + 0.1, 0.55), supportMaterial);
+        support.position.set(point.x, point.y / 2, point.z);
         support.castShadow = true;
         support.receiveShadow = true;
         this.scene.add(support);
       }
+
+      // Overhead Electrification Catenary Gantry Masts every ~22m
+      if (Math.floor(distance) % 22 === 0 && distance > 2) {
+        const gantry = new THREE.Group();
+        // Steel Mast
+        const mast = new THREE.Mesh(new THREE.BoxGeometry(0.2, 4.2, 0.2), gantryMaterial);
+        mast.position.set(0, 2.1, 1.4);
+        gantry.add(mast);
+
+        // Cantilever Arm spanning across track
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 2.4), gantryMaterial);
+        arm.position.set(0, 4.0, 0.3);
+        gantry.add(arm);
+
+        // Insulator
+        const ins = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.35, 8), insulatorMaterial);
+        ins.position.set(0, 3.75, 0);
+        gantry.add(ins);
+
+        gantry.position.copy(point);
+        gantry.rotation.y = Math.atan2(-tangent.z, tangent.x);
+        this.scene.add(gantry);
+      }
     }
 
+    // 3. Two Synchronized Live Express Trains (Safe 180° Headway on Continuous Loop)
     this.liveTrains = [
       this.createTrain(0x1e3a8a, 0xf59e0b), // Crossroads Express (Royal Navy & Gold)
       this.createTrain(0x047857, 0xfbbf24)  // Airport Shuttle (Emerald & Amber)
@@ -1314,23 +1865,54 @@ export class VoxelWorld {
   private updateLiveTrains(time: number) {
     if (!this.railCurve || this.liveTrains.length === 0) return;
     const routeLength = this.railCurve.getLength();
+    const cruiseSpeed = 7.5; // Blocks per second
 
     this.liveTrains.forEach((train, index) => {
-      const phase = (time * 3.5 + index * routeLength) % (routeLength * 2);
-      const movingForward = phase <= routeLength;
-      const distance = movingForward ? phase : routeLength * 2 - phase;
-      const t = this.railCurve!.getUtoTmapping(0, distance);
+      // Both trains cruise forward in the same safe direction on the closed loop with 180° headway
+      const phase = ((time * cruiseSpeed + index * 0.5 * routeLength) % routeLength + routeLength) % routeLength;
+      const t = this.railCurve!.getUtoTmapping(0, phase);
       const position = this.railCurve!.getPointAt(t);
       const tangent = this.railCurve!.getTangentAt(t);
-      if (!movingForward) tangent.negate();
       train.position.set(position.x, position.y + 0.14, position.z);
       train.rotation.y = Math.atan2(-tangent.z, tangent.x);
     });
   }
 
+  public getLiveTrains(): THREE.Group[] {
+    return this.liveTrains;
+  }
+
+  public getRailCurve(): THREE.CatmullRomCurve3 | null {
+    return this.railCurve;
+  }
+
   public getTrainPosition(index = 0): THREE.Vector3 | null {
     if (!this.liveTrains[index]) return null;
     return this.liveTrains[index].position;
+  }
+
+  public getNearestTrain(playerPos: THREE.Vector3): { index: number; distance: number; position: THREE.Vector3 } | null {
+    if (this.liveTrains.length === 0) return null;
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    this.liveTrains.forEach((train, idx) => {
+      // Check distance to locomotive and both passenger coaches
+      const locoDist = playerPos.distanceTo(train.position);
+      const coachOffset = new THREE.Vector3(-4.0, 1.35, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
+      const coachDist = playerPos.distanceTo(train.position.clone().add(coachOffset));
+      const dinerOffset = new THREE.Vector3(-7.8, 1.35, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
+      const dinerDist = playerPos.distanceTo(train.position.clone().add(dinerOffset));
+      const effectiveDist = Math.min(locoDist, coachDist, dinerDist);
+      if (effectiveDist < minDistance) {
+        minDistance = effectiveDist;
+        closestIndex = idx;
+      }
+    });
+    return {
+      index: closestIndex,
+      distance: minDistance,
+      position: this.liveTrains[closestIndex].position
+    };
   }
 
   public getTrainRideTransform(index = 0): { position: THREE.Vector3, rotationY: number } | null {
@@ -1341,6 +1923,15 @@ export class VoxelWorld {
     coachOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
     const seatPos = train.position.clone().add(coachOffset);
     return { position: seatPos, rotationY: train.rotation.y };
+  }
+
+  public getNearestStation(pos: THREE.Vector3, threshold = 18): string | null {
+    for (const st of VoxelWorld.STATIONS) {
+      if (pos.distanceTo(st.pos) <= threshold) {
+        return st.name;
+      }
+    }
+    return null;
   }
 
   // -------------------------------------------------------------

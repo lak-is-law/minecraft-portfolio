@@ -41,6 +41,8 @@ export class Player {
 
   // Vehicle Riding State
   public ridingVehicle: 'train' | 'auto_rickshaw' | null = null;
+  public ridingTrainIndex: number = 0;
+  private lastAnnouncedStation: string | null = null;
   private rickshawSpeed: number = 0;
   private rickshawHeading: number = 0;
 
@@ -354,10 +356,10 @@ export class Player {
           this.dismountVehicle();
           return;
         }
-        // Check train boarding within 6 blocks
-        const trainPos = this.world.getTrainPosition();
-        if (trainPos && this.position.distanceTo(trainPos) < 6.5) {
-          this.startRidingTrain();
+        // Check train boarding within 7.5 blocks of any live train
+        const nearestTrain = this.world.getNearestTrain(this.position);
+        if (nearestTrain && nearestTrain.distance < 7.5) {
+          this.startRidingTrain(nearestTrain.index);
           return;
         }
         // Check auto-rickshaw boarding within 5 blocks
@@ -638,10 +640,19 @@ export class Player {
   private updateMovement(dt: number) {
     // If riding train, follow train coach seat position
     if (this.ridingVehicle === 'train') {
-      const transform = this.world.getTrainRideTransform();
+      const transform = this.world.getTrainRideTransform(this.ridingTrainIndex);
       if (transform) {
         this.position.copy(transform.position);
         this.velocity.set(0, 0, 0);
+      }
+      // Real-time station arrival announcements
+      const currentStation = this.world.getNearestStation(this.position, 16);
+      if (currentStation && currentStation !== this.lastAnnouncedStation) {
+        this.lastAnnouncedStation = currentStation;
+        sound.playTrainWhistle();
+        if (this.onWorldNotice) {
+          this.onWorldNotice(`🚆 Arriving at ${currentStation} · Press SPACE to alight`);
+        }
       }
       this.updateCameraTransform();
       return;
@@ -1005,6 +1016,21 @@ export class Player {
 
   public dismountVehicle() {
     if (!this.ridingVehicle) return;
+    if (this.ridingVehicle === 'train') {
+      const train = this.world.liveTrains[this.ridingTrainIndex];
+      if (train) {
+        // Step safely onto platform to the side of the train
+        const sideOffset = new THREE.Vector3(0, 0.4, 2.2).applyAxisAngle(new THREE.Vector3(0, 1, 0), train.rotation.y);
+        this.position.add(sideOffset);
+      }
+      this.ridingVehicle = null;
+      this.lastAnnouncedStation = null;
+      sound.playStep('stone');
+      if (this.onWorldNotice) {
+        this.onWorldNotice('Alighted from train onto station platform.');
+      }
+      return;
+    }
     this.ridingVehicle = null;
     this.position.x += Math.cos(this.yaw) * 1.5;
     this.position.z -= Math.sin(this.yaw) * 1.5;
@@ -1014,12 +1040,15 @@ export class Player {
     }
   }
 
-  public startRidingTrain() {
+  public startRidingTrain(index = 0) {
     this.ridingVehicle = 'train';
+    this.ridingTrainIndex = index;
+    this.lastAnnouncedStation = null;
     this.isFlying = false;
     sound.playTrainWhistle();
+    const trainName = (index === 0) ? 'Crossroads Express' : 'Airport Shuttle';
     if (this.onWorldNotice) {
-      this.onWorldNotice('🚆 Riding Crossroads Express! Press SPACE or SHIFT to dismount.');
+      this.onWorldNotice(`🚆 Boarded ${trainName}! Press SPACE or SHIFT to alight at any station.`);
     }
   }
 

@@ -314,11 +314,12 @@ export class HUDManager {
     `;
   }
 
-  // Update Minimap radar (with Biomes, Landmarks, and Live Dragons)
+  // Update Minimap radar (with Biomes, Landmarks, Live Dragons, and Island Express Trains)
   public updateMinimap(
     playerPos: { x: number; y: number; z: number },
     yaw: number,
-    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
+    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     const canvas = document.getElementById('minimap-canvas') as HTMLCanvasElement;
     if (!canvas) return;
@@ -387,17 +388,42 @@ export class HUDManager {
     ctx.fillStyle = '#15803d';
     ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
 
-    // Color the 4 cultural quadrants and carnival pier on radar
-    const worldRect = (x1: number, z1: number, x2: number, z2: number, color: string) => {
+    // Draw Authentic Country Territories on Minimap Radar
+    const drawMiniCountry = (poly: [number, number][], color: string) => {
+      ctx.beginPath();
+      poly.forEach(([x, z], i) => {
+        const px = originX + x * scale;
+        const pz = originZ + z * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
+      ctx.closePath();
       ctx.fillStyle = color;
-      ctx.fillRect(originX + x1 * scale, originZ + z1 * scale, (x2 - x1) * scale, (z2 - z1) * scale);
+      ctx.fill();
     };
-    worldRect(20, -210, 210, -35, '#c7a94e'); // NE: Imperial India
-    worldRect(-210, -210, -20, -35, '#2d7a5b'); // NW: China Realm
-    worldRect(-210, 20, -20, 210, '#a95e36'); // SW: Mexico Realm
-    worldRect(25, -35, 210, 95, '#47798b'); // SE: USA Neo York & Airport
-    worldRect(-40, 75, 40, 210, '#d0ad58'); // South: Beach & Boardwalk
-    worldRect(-25, 120, 35, 185, '#ec4899'); // South: Grand Carnival Pier
+
+    // 1. India (Subcontinent Peninsula)
+    drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#c7a94e');
+    // 2. China (Northern Arc)
+    drawMiniCountry([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#2d7a5b');
+    // 3. Japan (Archipelago Chain)
+    drawMiniCountry([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], '#f43f5e');
+    // 4. South Korea (Peninsula)
+    drawMiniCountry([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], '#0ea5e9');
+    // 5. UK (British Isles)
+    drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#ef4444');
+    // 6. France (L’Hexagone)
+    drawMiniCountry([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], '#38bdf8');
+    // 7. USA (Las Vegas Strip, Broadway & Hollywood)
+    drawMiniCountry([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#47798b');
+    // 8. Mexico (Mesoamerican Horn)
+    drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#a95e36');
+    // 9. Egypt (Nile & Giza)
+    drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
+    // 10. UAE (Dubai Waterfront & Palm)
+    drawMiniCountry([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], '#10b981');
+    // Pier & Beach
+    drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#d0ad58');
+    drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#ec4899');
 
     // Yamuna river in India
     ctx.fillStyle = '#0284c7';
@@ -435,6 +461,43 @@ export class HUDManager {
     ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 79 * scale, originZ + 50 * scale);
     ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 160 * scale);
     ctx.stroke();
+
+    // Island Express Railway Transit Loop
+    const railWaypoints = [
+      [58, 33], [72, 33], [86, 26], [98, 16], [106, 8], [116, 14], [124, 28],
+      [128, 46], [128, 68], [118, 78], [96, 86], [68, 90], [44, 90], [24, 88],
+      [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
+    ];
+    ctx.save();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.2;
+    ctx.setLineDash([4, 2]);
+    ctx.beginPath();
+    railWaypoints.forEach(([wx, wz], idx) => {
+      const rx = originX + wx * scale;
+      const rz = originZ + wz * scale;
+      if (idx === 0) ctx.moveTo(rx, rz); else ctx.lineTo(rx, rz);
+    });
+    ctx.closePath();
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Railway Station Markers on Minimap
+    const stations = [
+      [58, 33], [106, 8], [128, 68], [24, 88], [8, 22]
+    ];
+    stations.forEach(([sx, sz]) => {
+      const px = originX + sx * scale;
+      const pz = originZ + sz * scale;
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(px, pz, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
 
     // Central Citadel Moat & Hub
     ctx.strokeStyle = '#38bdf8';
@@ -518,6 +581,31 @@ export class HUDManager {
           ctx.lineTo(dx - 4, dz);
           ctx.closePath();
           ctx.fill();
+        }
+      }
+    }
+
+    // 3.5. Live Moving Express Trains on Minimap
+    if (trains) {
+      for (const t of trains) {
+        const tx = cx + (t.position.x - playerPos.x) * scale;
+        const tz = cz + (t.position.z - playerPos.z) * scale;
+        if (tx >= 4 && tx <= w - 4 && tz >= 4 && tz <= h - 4) {
+          ctx.save();
+          ctx.translate(tx, tz);
+          ctx.rotate(-t.rotation.y);
+          ctx.fillStyle = '#0284c7';
+          ctx.strokeStyle = '#facc15';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          if (typeof ctx.roundRect === 'function') {
+            ctx.roundRect(-2.5, -5, 5, 10, 2);
+          } else {
+            ctx.rect(-2.5, -5, 5, 10);
+          }
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
         }
       }
     }

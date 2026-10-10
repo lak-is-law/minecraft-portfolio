@@ -55,6 +55,8 @@ export class WorldBuilder {
     this.buildSunsetSaloonAndBar();
     this.buildPalmBeachAndOcean();
     this.buildNatureAndFlora();
+    this.buildCountryMapKiosks();
+    this.buildRealmCountryFlags();
   }
 
   // Deterministic Biome Topography Elevation Engine
@@ -813,6 +815,79 @@ export class WorldBuilder {
     ], 'east');
   }
 
+  // Authentic 3D Country Flags Erected in Each Specific Realm
+  private buildRealmCountryFlags() {
+    // 1. India 🇮🇳 (Imperial India & Taj Mahal Realm)
+    this.buildFlagpole(80, -118, 'Republic of India 🇮🇳 · National Flag', 'Official Tiranga: Deep Kesari Saffron (top), Silk White with single centered 24-spoke Navy Ashoka Chakra, and India Green (bottom). Erected in the Imperial India & Taj Mahal Realm.', [
+      ['indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron', 'indian_saffron'],
+      ['quartz_block', 'quartz_block', 'ashoka_chakra', 'quartz_block', 'quartz_block'],
+      ['indian_green', 'indian_green', 'indian_green', 'indian_green', 'indian_green']
+    ], 'east');
+
+    // 2. USA 🇺🇸 (Las Vegas Boulevard in front of Hollywood & LK Tower)
+    this.buildFlagpole(138, -46, 'United States of America 🇺🇸 · Stars and Stripes', 'Old Glory: 50 stars on navy canton, 13 alternating red and white stripes. Erected on the Las Vegas Boulevard in front of Hollywood & LK Tower.', [
+      ['lapis_block', 'gold_block', 'redstone_block', 'quartz_block', 'redstone_block'],
+      ['lapis_block', 'lapis_block', 'quartz_block', 'redstone_block', 'quartz_block'],
+      ['redstone_block', 'quartz_block', 'redstone_block', 'quartz_block', 'redstone_block']
+    ], 'east');
+
+    // 3. United Kingdom 🇬🇧 (London Realm near Big Ben & Tower Bridge)
+    this.buildFlagpole(-34, -58, 'United Kingdom 🇬🇧 · Union Flag', 'Union Jack: Heraldic combination of the Crosses of St. George (England), St. Andrew (Scotland), and St. Patrick (Ireland). Erected in the London Realm by Big Ben.', [
+      ['lapis_block', 'quartz_block', 'redstone_block', 'lapis_block'],
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'redstone_block', 'lapis_block']
+    ], 'west');
+
+    // 4. France 🇫🇷 (Paris District facing Eiffel Tower)
+    this.buildFlagpole(26, -28, 'French Republic 🇫🇷 · Le Drapeau Tricolore', 'Tricolour: Vertical bands of Bleu, Blanc, Rouge representing Liberty, Equality, and Fraternity. Erected in the Paris District facing the Eiffel Tower.', [
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['lapis_block', 'quartz_block', 'quartz_block', 'redstone_block']
+    ], 'east');
+
+    // 5. Japan 🇯🇵 (Tokyo Shibuya Realm near Scramble Crossing)
+    this.buildFlagpole(-153, -73, 'Japan 🇯🇵 · Nisshōki / Hinomaru', 'Land of the Rising Sun: Pure white silk field with central crimson sun disc. Erected in the Tokyo Shibuya Realm near Scramble Crossing.', [
+      ['quartz_block', 'quartz_block', 'quartz_block', 'quartz_block'],
+      ['quartz_block', 'redstone_block', 'redstone_block', 'quartz_block'],
+      ['quartz_block', 'quartz_block', 'quartz_block', 'quartz_block']
+    ], 'west');
+
+    // 6. South Korea 🇰🇷 (Seoul Realm near Gwanghwamun Palace)
+    this.buildFlagpole(-65, -86, 'Republic of Korea 🇰🇷 · Taegeukgi', 'Taegeukgi: White background of peace, central red and blue Taegeuk yin-yang circle, and four black Kwae trigrams. Erected in the Seoul Realm near Gwanghwamun Palace.', [
+      ['coal_block', 'quartz_block', 'quartz_block', 'coal_block'],
+      ['quartz_block', 'redstone_block', 'lapis_block', 'quartz_block'],
+      ['coal_block', 'quartz_block', 'quartz_block', 'coal_block']
+    ], 'west');
+
+    // 7. China 🇨🇳 (China Realm by Great Wall & Dragon Pagoda)
+    this.buildFlagpole(-108, -98, 'People\'s Republic of China 🇨🇳 · Five-Star Red Flag', 'Five-Star Red Flag: Vermilion red field with five golden stars. Erected in the China Realm by the Great Wall and Dragon Pagoda.', [
+      ['red_terracotta', 'gold_block', 'red_terracotta', 'red_terracotta'],
+      ['red_terracotta', 'gold_block', 'gold_block', 'red_terracotta'],
+      ['red_terracotta', 'red_terracotta', 'red_terracotta', 'red_terracotta']
+    ], 'west');
+
+    // 8. Egypt 🇪🇬 (Giza Pyramids Realm near Great Sphinx)
+    this.buildFlagpole(-150, 44, 'Arab Republic of Egypt 🇪🇬 · Egyptian Tricolour', 'Egyptian Tricolour: Horizontal bands of Red, White charged with the Golden Eagle of Saladin, and Black. Erected in the Giza Pyramids Realm near the Great Sphinx.', [
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block'],
+      ['quartz_block', 'gold_block', 'gold_block', 'quartz_block'],
+      ['coal_block', 'coal_block', 'coal_block', 'coal_block']
+    ], 'west');
+
+    // 9. United Arab Emirates 🇦🇪 (Dubai Realm at foot of Burj Khalifa)
+    this.buildFlagpole(165, 37, 'United Arab Emirates 🇦🇪 · UAE National Flag', 'Pan-Arab Colors: Vertical red hoist band with horizontal bands of green, white, and black. Erected in the Dubai Realm at the foot of Burj Khalifa.', [
+      ['redstone_block', 'emerald_block', 'emerald_block', 'emerald_block'],
+      ['redstone_block', 'quartz_block', 'quartz_block', 'quartz_block'],
+      ['redstone_block', 'coal_block', 'coal_block', 'coal_block']
+    ], 'east');
+
+    // 10. Mexico 🇲🇽 (Mexico Realm near Zócalo & Chichén Itzá)
+    this.buildFlagpole(-100, 57, 'United Mexican States 🇲🇽 · Bandera de México', 'Bandera de México: Vertical tricolor of Green (hope), White (unity) with golden Mexican Eagle & Serpent emblem, and Red (heroes). Erected in the Mexico Realm.', [
+      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['emerald_block', 'gold_block', 'quartz_block', 'redstone_block'],
+      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block']
+    ], 'west');
+  }
+
   private buildFlagpole(px: number, pz: number, title: string, desc: string, pattern: string[][], dir: 'east' | 'west') {
     // Flagpole plinth and shaft (Y = 1 to 8)
     this.setBlock(px, 1, pz, 'smooth_stone');
@@ -838,6 +913,92 @@ export class WorldBuilder {
       type: 'sign',
       title: title,
       text: desc
+    });
+  }
+
+  // Authentic National Cartography Kiosks Across All 10 World Realms
+  private buildCountryMapKiosks() {
+    const kiosks = [
+      {
+        x: 95, y: 1, z: -4,
+        flag: ['redstone_block', 'quartz_block', 'lapis_block'],
+        title: 'United States Geographic Map · National Cartography 🇺🇸',
+        text: 'Capital: Washington, D.C. · 50 States · Area: 9.83M km²\nMajor Centers: New York, Las Vegas Strip, Los Angeles, Chicago, San Francisco.\nDistrict: USA Metropolis, Las Vegas Mega-Casinos & Hollywood Boulevard.'
+      },
+      {
+        x: 80, y: 1, z: -120,
+        flag: ['indian_saffron', 'quartz_block', 'indian_green'],
+        title: 'Republic of India Geographic Map · Survey of India 🇮🇳',
+        text: 'Capital: New Delhi · 28 States & 8 UTs · Area: 3.28M km²\nMajor Centers: Chennai (SRMIST), Mumbai, Varanasi, Bengaluru, Hyderabad, Agra.\nDistrict: Imperial India Realm, Taj Mahal & Academic Honors Courtyard.'
+      },
+      {
+        x: -34, y: 1, z: -60,
+        flag: ['lapis_block', 'quartz_block', 'redstone_block'],
+        title: 'United Kingdom Geographic Map · Ordnance Survey 🇬🇧',
+        text: 'Capital: London · England, Scotland, Wales & Northern Ireland · Area: 243K km²\nMajor Centers: London, Edinburgh, Manchester, Oxford, Cambridge, Cardiff, Belfast.\nDistrict: London Realm, Big Ben Clocktower & Tower Bridge.'
+      },
+      {
+        x: 26, y: 1, z: -30,
+        flag: ['lapis_block', 'quartz_block', 'redstone_block'],
+        title: 'République Française Geographic Map · Cartographie Nationale 🇫🇷',
+        text: 'Capital: Paris · 18 Régions · Area: 643K km²\nMajor Centers: Paris, Lyon, Marseille, Nice, Toulouse, Bordeaux, Strasbourg.\nDistrict: Paris District, Eiffel Tower & Champ de Mars Gardens.'
+      },
+      {
+        x: -153, y: 1, z: -75,
+        flag: ['quartz_block', 'redstone_block', 'quartz_block'],
+        title: 'Japan Geographic Map · 国土地理院 🇯🇵',
+        text: 'Capital: Tokyo · 47 Prefectures · Area: 377K km²\nMajor Islands: Honshu, Hokkaido, Kyushu, Shikoku · Major Centers: Tokyo, Kyoto, Osaka.\nDistrict: Tokyo Shibuya Realm, Scramble Crossing & Bullet Train.'
+      },
+      {
+        x: -65, y: 1, z: -88,
+        flag: ['quartz_block', 'redstone_block', 'lapis_block'],
+        title: 'Republic of Korea Geographic Map · 대한민국 지도 🇰🇷',
+        text: 'Capital: Seoul · 9 Provinces · Area: 100K km²\nMajor Centers: Seoul, Busan, Incheon, Daegu, Gwangju, Jeju Island.\nDistrict: Seoul Realm, Gwanghwamun Palace & N Seoul Tower.'
+      },
+      {
+        x: -108, y: 1, z: -100,
+        flag: ['red_terracotta', 'gold_block', 'red_terracotta'],
+        title: 'People\'s Republic of China Geographic Map · 中国国家地理 🇨🇳',
+        text: 'Capital: Beijing · 23 Provinces, 5 Regions · Area: 9.60M km²\nMajor Centers: Beijing, Shanghai, Guangzhou, Shenzhen, Xi\'an, Chengdu.\nDistrict: China Realm, Great Wall Ramparts & Imperial Dragon Pagoda.'
+      },
+      {
+        x: -150, y: 1, z: 42,
+        flag: ['redstone_block', 'gold_block', 'coal_block'],
+        title: 'Arab Republic of Egypt Geographic Map · خريطة مصر 🇪🇬',
+        text: 'Capital: Cairo · 27 Governorates · Area: 1.01M km²\nKey Geography: River Nile, Delta, Sinai Peninsula, Red Sea · Major Centers: Cairo, Alexandria, Giza, Luxor.\nDistrict: Giza Plateau, Great Pyramids & Sphinx.'
+      },
+      {
+        x: 165, y: 1, z: 35,
+        flag: ['redstone_block', 'emerald_block', 'coal_block'],
+        title: 'United Arab Emirates Geographic Map · خريطة الإمارات 🇦🇪',
+        text: 'Capital: Abu Dhabi · 7 Emirates · Area: 83.6K km²\nMajor Centers: Dubai, Abu Dhabi, Sharjah, Palm Jumeirah.\nDistrict: Dubai Realm, Burj Khalifa & Palm Lagoon Waterfront.'
+      },
+      {
+        x: -100, y: 1, z: 55,
+        flag: ['emerald_block', 'quartz_block', 'redstone_block'],
+        title: 'Estados Unidos Mexicanos Geographic Map · Cartografía INEGI 🇲🇽',
+        text: 'Capital: Mexico City · 31 States & CDMX · Area: 1.97M km²\nMajor Centers: Mexico City, Guadalajara, Monterrey, Puebla, Cancún, Mérida.\nDistrict: Mexico City Zócalo, Metropolitan Cathedral & Chichén Itzá.'
+      }
+    ];
+
+    kiosks.forEach(k => {
+      // 3-wide pedestal base
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(k.x + dx, k.y, k.z + dz, 'stone_bricks');
+        }
+      }
+      this.setBlock(k.x - 1, k.y + 1, k.z, 'quartz_pillar');
+      this.setBlock(k.x + 1, k.y + 1, k.z, 'quartz_pillar');
+      this.setBlock(k.x, k.y + 1, k.z, 'gold_block');
+      this.setBlock(k.x, k.y + 2, k.z, 'sea_lantern', {
+        type: 'sign',
+        title: k.title,
+        text: k.text
+      });
+      this.setBlock(k.x, k.y + 3, k.z, 'gold_block');
+      this.setBlock(k.x - 1, k.y + 2, k.z, k.flag[0]);
+      this.setBlock(k.x + 1, k.y + 2, k.z, k.flag[2]);
     });
   }
 
@@ -3175,9 +3336,9 @@ export class WorldBuilder {
 
   // 7. USA Realm (South-East / East: Neo York, Times Square, Lak Tower, Hollywood Hills)
   private buildUSARealm() {
-    // Broadway Avenue: X in [97, 104], Z in [-32, 32]
+    // Las Vegas Strip & Broadway Boulevard: X in [97, 104], Z in [-56, 32]
     for (let x = 97; x <= 104; x++) {
-      for (let z = -32; z <= 32; z++) {
+      for (let z = -56; z <= 32; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
         if (x === 100 && Math.abs(z) % 4 <= 1) {
           this.setBlock(x, 1, z, 'smooth_stone');
@@ -3185,8 +3346,8 @@ export class WorldBuilder {
       }
     }
 
-    // Sidewalks along Broadway: West [94, 96], East [105, 108]
-    for (let z = -32; z <= 32; z++) {
+    // Sidewalks along Vegas Strip & Broadway: West [94, 96], East [105, 108]
+    for (let z = -56; z <= 32; z++) {
       for (let x = 94; x <= 96; x++) this.setBlock(x, 1, z, 'stone_bricks');
       for (let x = 105; x <= 108; x++) this.setBlock(x, 1, z, 'stone_bricks');
       if (Math.abs(z) % 8 === 0) {
@@ -3200,6 +3361,22 @@ export class WorldBuilder {
       }
     }
 
+    // Connecting Boulevard directly into Hollywood Plaza (Z in [-54, -48], X in [104, 128])
+    for (let x = 104; x <= 128; x++) {
+      for (let z = -52; z <= -48; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (z === -50 && x % 4 <= 1) this.setBlock(x, 1, z, 'gold_block');
+      }
+      this.setBlock(x, 1, -53, 'stone_bricks');
+      this.setBlock(x, 1, -47, 'stone_bricks');
+      if (x % 6 === 0) {
+        this.setBlock(x, 2, -53, 'iron_block');
+        this.setBlock(x, 3, -53, 'glowstone');
+        this.setBlock(x, 2, -47, 'iron_block');
+        this.setBlock(x, 3, -47, 'glowstone');
+      }
+    }
+
     // Cross Street at Z in [-2, 2], X in [90, 155]
     for (let x = 90; x <= 155; x++) {
       for (let z = -2; z <= 2; z++) {
@@ -3208,7 +3385,7 @@ export class WorldBuilder {
     }
 
     // Crosswalk Zebra Striping across Broadway
-    for (const cz of [-30, -3, 3, 30]) {
+    for (const cz of [-52, -30, -3, 3, 30]) {
       for (let x = 97; x <= 104; x++) {
         if (x % 2 === 0) {
           this.setBlock(x, 1, cz, 'smooth_stone');
@@ -3217,77 +3394,336 @@ export class WorldBuilder {
     }
 
     // Traffic Light Signals at Intersection
-    for (const [tx, tz] of [[96, -3], [105, 3]]) {
+    for (const [tx, tz] of [[96, -3], [105, 3], [96, -30], [105, -30]]) {
       for (let y = 2; y <= 5; y++) this.setBlock(tx, y, tz, 'iron_block');
       this.setBlock(tx + (tx === 96 ? 1 : -1), 5, tz, 'iron_block');
       this.setBlock(tx + (tx === 96 ? 1 : -1), 6, tz, 'redstone_block');
       this.setBlock(tx + (tx === 96 ? 1 : -1), 4, tz, 'emerald_block');
     }
 
-    // Manhattan Subway Station Entrance at (95, 6)
+    // Manhattan Subway Station Entrance at (95, -36) outside project promenade
     for (let x = 94; x <= 96; x++) {
-      for (let z = 5; z <= 9; z++) {
-        if (x === 94 || z === 5 || z === 9) {
+      for (let z = -38; z <= -34; z++) {
+        if (x === 94 || z === -38 || z === -34) {
           this.setBlock(x, 2, z, 'iron_block');
         }
       }
     }
-    this.setBlock(94, 3, 5, 'sea_lantern');
-    this.setBlock(94, 3, 9, 'sea_lantern');
-    this.setBlock(95, 1, 6, 'smooth_stone');
-    this.setBlock(95, 0, 7, 'smooth_stone');
-    this.setBlock(95, -1, 8, 'stone_bricks');
-    this.setBlock(95, 2, 5, 'glowstone', {
+    this.setBlock(94, 3, -38, 'sea_lantern');
+    this.setBlock(94, 3, -34, 'sea_lantern');
+    this.setBlock(95, 1, -37, 'smooth_stone');
+    this.setBlock(95, 0, -36, 'smooth_stone');
+    this.setBlock(95, -1, -35, 'stone_bricks');
+    this.setBlock(95, 2, -38, 'glowstone', {
       type: 'sign',
       title: 'Broadway Subway Station',
       text: 'Metropolitan Transit Authority · Lines 1, 2, 3 Neo York Central Subway.'
     });
 
-    // Modern Glass Bus Shelter at (106, -6)
-    for (let z = -8; z <= -4; z++) {
-      this.setBlock(106, 2, z, 'cyber_glass');
-      this.setBlock(106, 3, z, 'cyber_glass');
-      this.setBlock(105, 4, z, 'cyber_glass');
-      this.setBlock(106, 4, z, 'cyber_glass');
-      if (z >= -7 && z <= -5) {
-        this.setBlock(106, 2, z, 'oak_planks'); // Bench
-      }
-    }
-    this.setBlock(105, 3, -6, 'glowstone');
+    // =========================================================================
+    // 🎰 LAS VEGAS STRIP CASINO MEGA-SKYSCRAPERS FACING HOLLYWOOD 🎰
+    // =========================================================================
 
-    // Skyscraper 1: AI & Applied Research Tower (X in [78, 92], Z in [-26, -8])
-    const h1 = 32;
-    for (let x = 78; x <= 92; x++) {
-      for (let z = -26; z <= -8; z++) {
-        const isPerimeter = (x === 78 || x === 92 || z === -26 || z === -8);
-        const isCorner = (x === 78 || x === 92) && (z === -26 || z === -8);
-        for (let y = 1; y <= h1; y++) {
+    // 1. THE BELLAGIO RESORT & CASINO (West side of the Strip: X in [74, 93], Z in [-25, -7])
+    // Soaring 48-block Italianate luxury resort tower with dancing fountain lake & high-roller casino
+    const bellagioH = 48;
+    for (let x = 74; x <= 93; x++) {
+      for (let z = -25; z <= -7; z++) {
+        const isPerimeter = (x === 74 || x === 93 || z === -25 || z === -7);
+        const isCorner = (x === 74 || x === 93) && (z === -25 || z === -7);
+
+        for (let y = 1; y <= bellagioH; y++) {
           if (isCorner) {
-            this.setBlock(x, y, z, 'stone_bricks');
+            this.setBlock(x, y, z, (y % 6 === 0) ? 'gold_block' : 'quartz_pillar');
           } else if (isPerimeter) {
-            if (y === 1 && x === 92 && (z === -17 || z === -16)) {
-              this.setBlock(x, y, z, 'cyber_glass');
+            if (x === 93 && y >= 2 && y <= 5 && z >= -18 && z <= -14) {
+              // Grand arched hotel lobby portal facing the Strip
+              this.setBlock(x, y, z, (y === 5) ? 'gold_block' : 'cyber_glass');
             } else if (y % 4 === 0) {
-              this.setBlock(x, y, z, 'stone_bricks');
+              this.setBlock(x, y, z, 'quartz_block');
+            } else if (y % 8 === 0) {
+              this.setBlock(x, y, z, 'lapis_block'); // Signature Bellagio royal blue belt
             } else {
               this.setBlock(x, y, z, 'cyber_glass');
             }
           }
         }
         this.setBlock(x, 1, z, 'smooth_stone');
-        this.setBlock(x, h1, z, 'smooth_stone');
+        this.setBlock(x, bellagioH, z, 'smooth_stone');
       }
     }
-    this.setBlock(85, 2, -17, 'crafting_table', { type: 'research', id: 'res-ai' });
-    this.setBlock(85, 3, -17, 'bookshelf', { type: 'research', id: 'res-ai' });
-    for (let y = h1 + 1; y <= h1 + 8; y++) this.setBlock(85, y, -17, 'iron_block');
-    this.setBlock(85, h1 + 9, -17, 'glowstone');
+
+    // Bellagio Dancing Fountain Lake in front (X in [88, 93], Z in [-24, -8])
+    for (let x = 88; x <= 93; x++) {
+      for (let z = -24; z <= -8; z++) {
+        if (x === 93 && z >= -18 && z <= -14) continue; // Entrance walk
+        this.setBlock(x, 1, z, 'prismarine_bricks');
+        this.setBlock(x, 2, z, 'water');
+        // Illuminated Fountain Jets shooting skyward
+        if ((x + z) % 4 === 0) {
+          this.setBlock(x, 2, z, 'sea_lantern');
+          this.setBlock(x, 3, z, 'water');
+          this.setBlock(x, 4, z, 'sea_lantern');
+        }
+      }
+    }
+
+    // Bellagio Grand Marquee Arch & Golden Chandeliers
+    for (let z = -19; z <= -13; z++) {
+      this.setBlock(94, 6, z, 'gold_block');
+      this.setBlock(94, 7, z, (Math.abs(z - (-16)) <= 1) ? 'sea_lantern' : 'gold_block');
+    }
+    this.setBlock(94, 4, -16, 'sea_lantern', {
+      type: 'sign',
+      title: 'The Bellagio Resort & Casino ⭐',
+      text: 'Premier Las Vegas Strip luxury casino resort featuring the legendary dancing fountain lake, marble conservatory, and high-roller roulette & blackjack salons.'
+    });
+
+    // Bellagio High-Roller Casino Salon inside (X = 84, Z = -16)
+    // Emerald felt blackjack tables & gold chip stacks
+    for (const [bx, bz] of [[82, -18], [82, -14], [86, -18], [86, -14]]) {
+      this.setBlock(bx, 2, bz, 'emerald_block');
+      this.setBlock(bx, 3, bz, 'gold_block');
+    }
+    // Center Roulette Wheel
+    this.setBlock(84, 2, -16, 'coal_block');
+    this.setBlock(84, 3, -16, 'redstone_block');
+    this.setBlock(84, 4, -16, 'gold_block');
+    // Research desk preserved inside Bellagio executive suite
+    this.setBlock(84, 2, -22, 'crafting_table', { type: 'research', id: 'res-ai' });
+    this.setBlock(84, 3, -22, 'bookshelf', { type: 'research', id: 'res-ai' });
+    // Soaring Italianate Roof Crown with Golden Pinnacles
+    for (let x = 76; x <= 91; x++) {
+      for (let z = -23; z <= -9; z++) {
+        if ((x + z) % 4 === 0) {
+          this.setBlock(x, bellagioH + 1, z, 'quartz_pillar');
+          this.setBlock(x, bellagioH + 2, z, 'gold_block');
+        }
+      }
+    }
+    this.setBlock(83, bellagioH + 3, -16, 'sea_lantern');
+    this.setBlock(84, bellagioH + 3, -16, 'beacon');
+    this.setBlock(85, bellagioH + 3, -16, 'sea_lantern');
+
+    // 2. CAESARS PALACE GRAND CASINO & COLOSSEUM (West side facing Hollywood: X in [74, 93], Z in [-52, -28])
+    // Classical Roman monumental palace soaring 46 blocks tall with marble colonnades & triumphal arch
+    const caesarsH = 46;
+    for (let x = 74; x <= 93; x++) {
+      for (let z = -52; z <= -28; z++) {
+        const isPerimeter = (x === 74 || x === 93 || z === -52 || z === -28);
+        const isCorner = (x === 74 || x === 93) && (z === -52 || z === -28);
+
+        for (let y = 1; y <= caesarsH; y++) {
+          if (isCorner) {
+            this.setBlock(x, y, z, 'quartz_pillar');
+          } else if (isPerimeter) {
+            if (x === 93 && y <= 6 && z >= -42 && z <= -38) {
+              // Grand Roman Triumphal Archway Entrance
+              this.setBlock(x, y, z, (y === 6) ? 'gold_block' : 'smooth_stone');
+            } else if (x === 93 && (z % 3 === 0)) {
+              // Fluted classical facade pillars facing the Strip
+              this.setBlock(x, y, z, 'quartz_pillar');
+            } else if (y % 4 === 0) {
+              this.setBlock(x, y, z, 'quartz_block');
+            } else {
+              this.setBlock(x, y, z, 'cyber_glass');
+            }
+          }
+        }
+        this.setBlock(x, 1, z, 'smooth_stone');
+        this.setBlock(x, caesarsH, z, 'smooth_stone');
+      }
+    }
+
+    // Caesars Palace Colosseum Grand Entrance Marquee & Golden Statues
+    for (let z = -43; z <= -37; z++) {
+      this.setBlock(94, 7, z, 'gold_block');
+      this.setBlock(94, 8, z, ((z + 40) % 2 === 0) ? 'sea_lantern' : 'gold_block');
+    }
+    this.setBlock(94, 4, -40, 'sea_lantern', {
+      type: 'sign',
+      title: 'Caesars Palace · Grand Casino & Colosseum 🏛️',
+      text: 'Iconic Roman-themed Las Vegas mega-resort! Marble colonnades, Colosseum entertainment arena, royal craps tables, and empire casino gaming.'
+    });
+
+    // Roman Royal Gaming Arena inside Caesars Palace (X = 84, Z = -40)
+    for (const [cx, cz] of [[81, -43], [81, -37], [87, -43], [87, -37]]) {
+      this.setBlock(cx, 2, cz, 'quartz_pillar');
+      this.setBlock(cx, 3, cz, 'gold_block');
+      this.setBlock(cx, 4, cz, 'sea_lantern');
+    }
+    // Craps dice table & golden jackpot chest
+    this.setBlock(84, 2, -40, 'redstone_block');
+    this.setBlock(84, 3, -40, 'gold_block');
+    this.setBlock(84, 2, -39, 'chest', {
+      type: 'chest',
+      title: 'Caesars Imperial Fortune Vault',
+      text: 'High-roller jackpot tokens, gold coins, and VIP casino chips.'
+    });
+    // Caesars Palace Tiered Imperial Pediment Crown
+    for (let y = caesarsH + 1; y <= caesarsH + 5; y++) {
+      const inset = (y - caesarsH);
+      for (let x = 74 + inset; x <= 93 - inset; x++) {
+        this.setBlock(x, y, -52 + inset, 'gold_block');
+        this.setBlock(x, y, -28 - inset, 'gold_block');
+      }
+    }
+    this.setBlock(83, caesarsH + 6, -40, 'beacon');
+
+    // 3. THE VENETIAN RESORT, CASINO & ST. MARK'S CAMPANILE (East side: X in [112, 128], Z in [-25, -7])
+    // Soaring 54-block Venetian Gothic marvel with outdoor canal, arched bridges, and replica St. Mark's Campanile
+    const venetianH = 38;
+    for (let x = 112; x <= 128; x++) {
+      for (let z = -25; z <= -7; z++) {
+        const isPerimeter = (x === 112 || x === 128 || z === -25 || z === -7);
+        const isCorner = (x === 112 || x === 128) && (z === -25 || z === -7);
+
+        for (let y = 1; y <= venetianH; y++) {
+          if (isCorner) {
+            this.setBlock(x, y, z, 'sandstone');
+          } else if (isPerimeter) {
+            if (x === 112 && (z % 3 === 0)) {
+              this.setBlock(x, y, z, (y % 4 === 0) ? 'emerald_block' : 'sandstone');
+            } else if (y % 3 === 0) {
+              this.setBlock(x, y, z, 'quartz_block');
+            } else {
+              this.setBlock(x, y, z, 'cyber_glass');
+            }
+          }
+        }
+        this.setBlock(x, 1, z, 'smooth_stone');
+        this.setBlock(x, venetianH, z, 'smooth_stone');
+      }
+    }
+
+    // St. Mark's Campanile Tower (X in [113, 117], Z in [-10, -6], Soaring to Y = 54!)
+    for (let x = 113; x <= 117; x++) {
+      for (let z = -10; z <= -6; z++) {
+        for (let y = 1; y <= 50; y++) {
+          const isCampCorner = (x === 113 || x === 117) && (z === -10 || z === -6);
+          this.setBlock(x, y, z, isCampCorner ? 'sandstone' : 'terracotta_adobe');
+        }
+      }
+    }
+    // Campanile Open Bell Loggia at Y = 46 to 50
+    for (let y = 46; y <= 50; y++) {
+      this.setBlock(115, y, -8, (y === 48) ? 'gold_block' : 'sea_lantern');
+    }
+    // Campanile Pyramidal Roof with Golden Angel Beacon
+    for (let py = 51; py <= 54; py++) {
+      const pinset = (py - 51);
+      for (let x = 113 + pinset; x <= 117 - pinset; x++) {
+        for (let z = -10 + pinset; z <= -6 - pinset; z++) {
+          this.setBlock(x, py, z, 'prismarine_bricks');
+        }
+      }
+    }
+    this.setBlock(115, 55, -8, 'beacon');
+
+    // Venetian Grand Canal Basin facing the sidewalk
+    for (let z = -24; z <= -12; z++) {
+      this.setBlock(110, 1, z, 'prismarine_bricks');
+      this.setBlock(110, 2, z, 'water');
+      if (z === -18) {
+        // Arched Rialto Stone Bridge
+        this.setBlock(110, 3, z, 'smooth_stone');
+      }
+    }
+
+    this.setBlock(111, 4, -16, 'sea_lantern', {
+      type: 'sign',
+      title: 'The Venetian Resort & Casino · Las Vegas 🎭',
+      text: 'Opulent Renaissance Italian resort featuring the Grand Canal gondolas, replica St. Mark\'s Campanile belltower, and lavish casino salons.'
+    });
+
+    // 4. THE LUXOR PYRAMID & SKY BEAM CASINO (East side facing Hollywood: X in [110, 128], Z in [-52, -28])
+    // 42-block stepped obsidian & black glass pyramid with sky-piercing apex beacon shooting into outer space
+    const luxorBaseX1 = 110;
+    const luxorBaseX2 = 128;
+    const luxorBaseZ1 = -52;
+    const luxorBaseZ2 = -28;
+    const luxorApexY = 42;
+
+    for (let ly = 1; ly <= luxorApexY; ly++) {
+      const inset = Math.floor((ly - 1) * 0.22);
+      const xMin = luxorBaseX1 + inset;
+      const xMax = luxorBaseX2 - inset;
+      const zMin = luxorBaseZ1 + inset;
+      const zMax = luxorBaseZ2 - inset;
+
+      if (xMin > xMax || zMin > zMax) break;
+
+      for (let x = xMin; x <= xMax; x++) {
+        for (let z = zMin; z <= zMax; z++) {
+          const isEdge = (x === xMin || x === xMax || z === zMin || z === zMax);
+          if (isEdge) {
+            if ((x + z + ly) % 7 === 0) {
+              this.setBlock(x, ly, z, 'gold_block');
+            } else if ((x + z) % 5 === 0) {
+              this.setBlock(x, ly, z, 'sea_lantern');
+            } else {
+              this.setBlock(x, ly, z, 'obsidian');
+            }
+          }
+        }
+      }
+    }
+
+    // Luxor Apex Sky Beam: Pillar of Light Piercing the Stratosphere at (119, -40)
+    for (let y = luxorApexY; y <= luxorApexY + 8; y++) {
+      this.setBlock(119, y, -40, (y % 2 === 0) ? 'beacon' : 'sea_lantern');
+    }
+
+    // Luxor Sphinx Portal Entrance facing the avenue
+    this.setBlock(109, 2, -41, 'sandstone');
+    this.setBlock(109, 3, -41, 'gold_block');
+    this.setBlock(109, 2, -39, 'sandstone');
+    this.setBlock(109, 3, -39, 'gold_block');
+    this.setBlock(109, 4, -40, 'sea_lantern', {
+      type: 'sign',
+      title: 'The Luxor Pyramid Resort & Casino 🌌',
+      text: 'Massive 30-story obsidian pyramid crowned with the most powerful beam of light on Earth! Egyptian pharaoh tomb casino, sarcophagus vaults, and ancient gaming oasis.'
+    });
+
+    // 5. THE GOLDEN NUGGET & FREMONT STREET NEON CANOPY (North Intersection: X in [96, 105], Z in [-58, -53])
+    // Shimmering 44-block solid gold tower with flashing neon border strips overlooking the Hollywood turn-out
+    const nuggetH = 44;
+    for (let x = 96; x <= 105; x++) {
+      for (let z = -58; z <= -53; z++) {
+        const isPerimeter = (x === 96 || x === 105 || z === -58 || z === -53);
+        for (let y = 1; y <= nuggetH; y++) {
+          if (isPerimeter) {
+            if (y % 4 === 0) {
+              this.setBlock(x, y, z, 'sea_lantern');
+            } else if (y % 6 === 0) {
+              this.setBlock(x, y, z, 'redstone_block');
+            } else {
+              this.setBlock(x, y, z, 'gold_block');
+            }
+          }
+        }
+        this.setBlock(x, 1, z, 'gold_block');
+        this.setBlock(x, nuggetH, z, 'gold_block');
+      }
+    }
+
+    // Golden Nugget Fremont Street Arch Canopy across Broadway
+    for (let x = 96; x <= 105; x++) {
+      this.setBlock(x, 6, -53, ((x % 2 === 0) ? 'sea_lantern' : 'redstone_block'));
+      this.setBlock(x, 7, -53, 'gold_block');
+    }
+    this.setBlock(100, 3, -52, 'sea_lantern', {
+      type: 'sign',
+      title: 'Golden Nugget Hotel & Casino · Vegas Glory 💰',
+      text: 'Historic Las Vegas casino legend famous for the world-record Hand of Faith gold nugget (61 lbs) and electric Fremont Street neon canopy action!'
+    });
 
     // Skyscraper 2: High-Tech Corporate Tower (X in [78, 92], Z in [8, 26])
     const h2 = 28;
     for (let x = 78; x <= 92; x++) {
       for (let z = 8; z <= 26; z++) {
         const isPerimeter = (x === 78 || x === 92 || z === 8 || z === 26);
+
         const isCorner = (x === 78 || x === 92) && (z === 8 || z === 26);
         for (let y = 1; y <= h2; y++) {
           if (isCorner) {
@@ -3305,11 +3741,11 @@ export class WorldBuilder {
     this.setBlock(87, 2, 17, 'bookshelf', { type: 'experience', id: 'exp-daa' });
     this.setBlock(87, 3, 17, 'gold_block', { type: 'experience', id: 'exp-daa' });
 
-    // Skyscraper 3: Times Square Media Wall (X in [109, 114], Z in [-26, 26])
+    // Skyscraper 3: Times Square Media Wall South (X in [109, 114], Z in [2, 26])
     const h3 = 18;
     for (let x = 109; x <= 114; x++) {
-      for (let z = -26; z <= 26; z++) {
-        const isPerimeter = (x === 109 || x === 114 || z === -26 || z === 26);
+      for (let z = 2; z <= 26; z++) {
+        const isPerimeter = (x === 109 || x === 114 || z === 2 || z === 26);
         for (let y = 1; y <= h3; y++) {
           if (isPerimeter) {
             this.setBlock(x, y, z, (y % 4 === 0) ? 'stone_bricks' : 'cyber_glass');
@@ -3320,101 +3756,78 @@ export class WorldBuilder {
       }
     }
 
-    // Interactive Project Pedestals along Broadway East Sidewalk at X = 107
+    // =========================================================================
+    // 🌟 PROJECT INNOVATION PROMENADE: CLEAR, WIDE & UNOBSTRUCTED ACCESS 🌟
+    // =========================================================================
+    // Completely empty concourse across X in [94, 110], Z in [-28, 28] with zero vehicles, clutter, or roadblocks
+    for (let x = 94; x <= 110; x++) {
+      for (let z = -28; z <= 28; z++) {
+        // Pristine smooth stone walking concourse
+        this.setBlock(x, 1, z, 'smooth_stone');
+        // Architectural stone brick borders and glowing ground navigation lines
+        if (x === 94 || x === 110 || z === -28 || z === 28) {
+          this.setBlock(x, 1, z, 'stone_bricks');
+        } else if (x === 96 && Math.abs(z) % 4 === 0) {
+          this.setBlock(x, 1, z, 'sea_lantern');
+        }
+      }
+    }
+
+    // Grand Illuminated Entrance Archways at North (Z = -28) and South (Z = 28)
+    for (const az of [-28, 28]) {
+      for (const px of [97, 104]) {
+        for (let y = 2; y <= 5; y++) {
+          this.setBlock(px, y, az, 'quartz_pillar');
+        }
+        this.setBlock(px, 6, az, 'sea_lantern');
+      }
+      for (let x = 97; x <= 104; x++) {
+        this.setBlock(x, 6, az, (x % 2 === 0) ? 'gold_block' : 'quartz_block');
+      }
+      this.setBlock(100, 6, az, 'glowstone', {
+        type: 'sign',
+        title: 'Project Innovation Promenade ⭐',
+        text: 'Lakshya\'s Featured Software Engineering Showcase · Direct Unobstructed Access · Walk up to any Pedestal and press [E] to launch interactive showcase.'
+      });
+    }
+
+    // 5 Interactive Project Showcases with Dedicated Red Carpet Approaches at X = 107
     const projectPedestals = [
-      { id: 'todar', z: -20, block: 'emerald_block' },
-      { id: 'trackyourflight', z: -10, block: 'diamond_block' },
-      { id: 'locateart', z: 0, block: 'gold_block' },
-      { id: 'redgambit', z: 10, block: 'redstone_block' },
-      { id: 'spiderverse', z: 20, block: 'amethyst_block' }
+      { id: 'todar', z: -20, block: 'emerald_block', title: 'Todar AI Autonomous Agent Platform', desc: 'Multi-agent autonomous coding system and intelligence framework.' },
+      { id: 'trackyourflight', z: -10, block: 'diamond_block', title: 'Track Your Flight 3D Global Radar', desc: 'Live aircraft tracking with real-time 3D flight telemetry.' },
+      { id: 'locateart', z: 0, block: 'gold_block', title: 'LocateArt High-Resolution Visual Discovery', desc: 'Art exploration and cultural artifact curation engine.' },
+      { id: 'redgambit', z: 10, block: 'redstone_block', title: 'Red Gambit Autonomous Strategy Network', desc: 'High-frequency strategic simulation and autonomous decision agents.' },
+      { id: 'spiderverse', z: 20, block: 'amethyst_block', title: 'Spider-Verse Multiverse Interactive Web Experience', desc: 'Interactive three-dimensional comic experience with physics & audio.' }
     ];
+
     projectPedestals.forEach(p => {
-      this.setBlock(107, 1, p.z, 'smooth_stone');
+      // 2-wide Red Carpet Runner connecting from main promenade walk (X = 98) across to pedestal (X = 106)
+      for (let x = 98; x <= 106; x++) {
+        this.setBlock(x, 1, p.z - 1, 'gold_block');
+        this.setBlock(x, 1, p.z, 'red_terracotta');
+        this.setBlock(x, 1, p.z + 1, 'gold_block');
+      }
+
+      // 3x3 Polished Quartz Display Plinth with glowing trim
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const isEdge = (Math.abs(dx) === 1 || Math.abs(dz) === 1);
+          this.setBlock(107 + dx, 1, p.z + dz, isEdge ? 'quartz_pillar' : 'gold_block');
+        }
+      }
+
+      // Interactive Project Pedestal Pillar (360-degree clear walking clearance on all sides)
       this.setBlock(107, 2, p.z, p.block, { type: 'project', id: p.id });
       this.setBlock(107, 3, p.z, 'glowstone', { type: 'project', id: p.id });
+
+      // Holographic Terminal Information Sign Plaque in front of Pedestal
+      this.setBlock(105, 2, p.z, 'quartz_pillar');
+      this.setBlock(105, 3, p.z, 'sea_lantern', {
+        type: 'sign',
+        title: `${p.title} 🚀`,
+        text: `${p.desc} Press [E] on the pedestal to open full project details and live demo.`
+      });
     });
-
-    // Times Square Red Glass Steps (TKTS Bleachers) at X in [99, 103], Z in [-14, -8]
-    for (let z = -14; z <= -8; z++) {
-      const stepY = 2 + (z - (-14));
-      for (let x = 99; x <= 103; x++) {
-        for (let y = 1; y <= stepY; y++) {
-          this.setBlock(x, y, z, (y === stepY) ? 'redstone_block' : 'red_terracotta');
-        }
-        this.setBlock(x, stepY + 1, z, 'cyber_glass'); // Glowing illuminated glass treads
-      }
-    }
-    this.setBlock(101, 8, -8, 'glowstone', {
-      type: 'sign',
-      title: 'Times Square Red Glass Steps · TKTS Bleachers',
-      text: 'Climb up to take in the breathtaking panoramic view of the Broadway neon billboard canyon!'
-    });
-
-    // Classic Yellow NYC Cabs parked along Broadway / Cross Street
-    const taxis: [number, number, boolean][] = [[102, 14, false], [98, -18, true]];
-    for (const [txX, txZ, isNorthSouth] of taxis) {
-      if (isNorthSouth) {
-        // Taxi wheels
-        this.setBlock(txX - 1, 1, txZ - 2, 'coal_block');
-        this.setBlock(txX + 1, 1, txZ - 2, 'coal_block');
-        this.setBlock(txX - 1, 1, txZ + 2, 'coal_block');
-        this.setBlock(txX + 1, 1, txZ + 2, 'coal_block');
-        // Yellow Body
-        for (let x = txX - 1; x <= txX + 1; x++) {
-          for (let z = txZ - 2; z <= txZ + 2; z++) {
-            this.setBlock(x, 2, z, 'gold_block');
-            const isWindow = (Math.abs(z - txZ) <= 1);
-            this.setBlock(x, 3, z, isWindow ? 'cyber_glass' : 'gold_block');
-          }
-        }
-        // Black and white taxi checkered stripe
-        this.setBlock(txX - 1, 2, txZ, 'coal_block');
-        this.setBlock(txX + 1, 2, txZ, 'coal_block');
-        // Roof Medallion light
-        this.setBlock(txX, 4, txZ, 'lantern');
-      } else {
-        // East-West taxi
-        this.setBlock(txX - 2, 1, txZ - 1, 'coal_block');
-        this.setBlock(txX + 2, 1, txZ - 1, 'coal_block');
-        this.setBlock(txX - 2, 1, txZ + 1, 'coal_block');
-        this.setBlock(txX + 2, 1, txZ + 1, 'coal_block');
-        for (let x = txX - 2; x <= txX + 2; x++) {
-          for (let z = txZ - 1; z <= txZ + 1; z++) {
-            this.setBlock(x, 2, z, 'gold_block');
-            const isWindow = (Math.abs(x - txX) <= 1);
-            this.setBlock(x, 3, z, isWindow ? 'cyber_glass' : 'gold_block');
-          }
-        }
-        this.setBlock(txX, 2, txZ - 1, 'coal_block');
-        this.setBlock(txX, 2, txZ + 1, 'coal_block');
-        this.setBlock(txX, 4, txZ, 'lantern');
-      }
-    }
-
-    // Times Square Street Hot Dog & Pretzel Cart at (95, 1, -12)
-    this.setBlock(95, 1, -12, 'coal_block');
-    this.setBlock(95, 2, -12, 'iron_block');
-    this.setBlock(95, 3, -12, 'iron_block'); // Warming steamer
-    this.setBlock(95, 3, -13, 'redstone_block'); // Ketchup
-    this.setBlock(95, 3, -11, 'gold_block'); // Mustard
-    // Umbrella Awning
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dz = -1; dz <= 1; dz++) {
-        this.setBlock(95 + dx, 5, -12 + dz, ((dx + dz) % 2 === 0) ? 'gold_block' : 'lapis_block');
-      }
-    }
-    this.setBlock(95, 4, -12, 'iron_block');
-    this.setBlock(95, 2, -13, 'smooth_stone', {
-      type: 'sign',
-      title: 'Sabrett NYC Hot Dog & Pretzel Stand',
-      text: 'Original New York City dirty water dogs, hot salted jumbo pretzels, and knishes!'
-    });
-
-    // Hollywood Walk of Fame brass stars along Broadway sidewalks
-    for (let z = -30; z <= 30; z += 3) {
-      this.setBlock(95, 1, z, 'gold_block'); // West sidewalk star
-      this.setBlock(106, 1, z, 'gold_block'); // East sidewalk star
-    }
 
     // TCL Chinese Theatre Cinema Facade at (118, 1, -18)
     const chinX = 118;
@@ -3451,6 +3864,215 @@ export class WorldBuilder {
 
     // Hollywood Mountain & Illuminated Block-Built Sign at (130, -50)
     this.buildHollywoodMountain(130, -50);
+
+    // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
+    this.buildVegasStripInFrontOfHollywoodAndLKTower();
+  }
+
+  // 7B. Dazzling Las Vegas Boulevard in front of Hollywood and LK Tower
+  private buildVegasStripInFrontOfHollywoodAndLKTower() {
+    // 1. The Grand Boulevard Avenue connecting Hollywood (130, -50) to Lak Tower (150, 0)
+    // Roadway: X in [136, 144], Z in [-54, 4]
+    for (let x = 136; x <= 144; x++) {
+      for (let z = -54; z <= 4; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        // Double-yellow highway divider lines in center
+        if (x === 140 && Math.abs(z) % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+    }
+
+    // Zebra Crosswalks at Hollywood Entrance (Z = -52) and Lak Tower Plaza (Z = 2)
+    for (const cz of [-52, -26, 2]) {
+      for (let x = 136; x <= 144; x++) {
+        if (x % 2 === 0) {
+          this.setBlock(x, 1, cz, 'smooth_stone');
+        }
+      }
+    }
+
+    // 2. Wide Promenade Sidewalks with Walk of Fame Stars
+    for (let z = -54; z <= 4; z++) {
+      for (let x = 133; x <= 135; x++) this.setBlock(x, 1, z, 'stone_bricks');
+      for (let x = 145; x <= 147; x++) this.setBlock(x, 1, z, 'stone_bricks');
+      // Walk of Fame brass stars embedded along both sidewalks
+      if (Math.abs(z) % 3 === 0) {
+        this.setBlock(134, 1, z, 'gold_block');
+        this.setBlock(146, 1, z, 'gold_block');
+      }
+      // Pulsing neon light pylons every 8 blocks
+      if (Math.abs(z) % 8 === 0) {
+        this.setBlock(133, 2, z, 'iron_block');
+        this.setBlock(133, 3, z, (z % 16 === 0) ? 'redstone_block' : 'lapis_block');
+        this.setBlock(133, 4, z, 'sea_lantern');
+
+        this.setBlock(147, 2, z, 'iron_block');
+        this.setBlock(147, 3, z, (z % 16 === 0) ? 'lapis_block' : 'redstone_block');
+        this.setBlock(147, 4, z, 'sea_lantern');
+      }
+    }
+
+    // 3. Tall Royal Palm Trees Lining the Vegas Strip on Both Sides
+    const palmZCoords = [-50, -42, -34, -26, -18, -10, -2];
+    for (const pz of palmZCoords) {
+      // West Sidewalk Palms (X = 133)
+      for (let y = 1; y <= 5; y++) this.setBlock(133, y, pz, 'jungle_log');
+      this.setBlock(133, 5, pz, 'sea_lantern'); // Ambient glow under crown
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(133 + dx, 6, pz + dz, 'oak_leaves');
+        }
+      }
+
+      // East Sidewalk Palms (X = 147)
+      for (let y = 1; y <= 5; y++) this.setBlock(147, y, pz, 'jungle_log');
+      this.setBlock(147, 5, pz, 'sea_lantern');
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(147 + dx, 6, pz + dz, 'oak_leaves');
+        }
+      }
+    }
+
+    // 4. Iconic "Welcome to Fabulous Las Vegas" Landmark Neon Sign at (140, -52)
+    for (const px of [138, 142]) {
+      for (let y = 1; y <= 5; y++) {
+        this.setBlock(px, y, -52, 'gold_block');
+      }
+    }
+    // Diamond Lozenge Neon Arch
+    for (let x = 137; x <= 143; x++) {
+      for (let y = 6; y <= 8; y++) {
+        const isFrame = (x === 137 || x === 143 || y === 6 || y === 8);
+        this.setBlock(x, y, -52, isFrame ? 'sea_lantern' : 'gold_block');
+      }
+    }
+    this.setBlock(140, 9, -52, 'beacon');
+    this.setBlock(140, 7, -52, 'glowstone', {
+      type: 'sign',
+      title: 'WELCOME TO Fabulous LAS VEGAS NEVADA ⭐',
+      text: 'The Entertainment Capital of the World · Connecting Hollywood Boulevard to LK Tower. High-roller casinos, world-class shows & dancing fountains.'
+    });
+
+    // 5. The Bellagio Dancing Fountain Lake (West Side: X in [122, 132], Z in [-38, -18])
+    for (let x = 122; x <= 132; x++) {
+      for (let z = -38; z <= -18; z++) {
+        const isPerimeter = (x === 122 || x === 132 || z === -38 || z === -18);
+        this.setBlock(x, 1, z, isPerimeter ? 'prismarine_bricks' : 'water');
+      }
+    }
+    // High-Pressure Illuminated Fountain Water Jets shooting up to Y = 5
+    const fountainJets = [
+      [127, -28], [125, -23], [129, -33], [127, -20], [125, -34], [129, -23]
+    ];
+    for (const [fx, fz] of fountainJets) {
+      this.setBlock(fx, 1, fz, 'sea_lantern');
+      this.setBlock(fx, 2, fz, 'water');
+      this.setBlock(fx, 3, fz, 'water');
+      this.setBlock(fx, 4, fz, 'sea_lantern');
+    }
+    // Bellagio Luxury Resort Frontage & Arched Colonnade behind the lake
+    for (let z = -36; z <= -20; z++) {
+      for (let y = 1; y <= 12; y++) {
+        if (z % 3 === 0) {
+          this.setBlock(121, y, z, 'quartz_pillar');
+        } else {
+          this.setBlock(121, y, z, (y % 4 === 0) ? 'gold_block' : 'cyber_glass');
+        }
+      }
+    }
+    this.setBlock(132, 2, -28, 'gold_block', {
+      type: 'sign',
+      title: 'The Bellagio Resort & Casino ⭐',
+      text: 'Premier Las Vegas Strip luxury resort featuring the legendary dancing fountain lake, marble conservatory, and high-roller roulette & blackjack salons.'
+    });
+
+    // 6. Caesars Palace Roman Colosseum & Colonnade (West Side: X in [122, 132], Z in [-16, -2])
+    for (let z = -16; z <= -2; z += 4) {
+      for (let y = 1; y <= 8; y++) {
+        this.setBlock(132, y, z, 'quartz_pillar');
+      }
+      this.setBlock(132, 9, z, 'gold_block');
+    }
+    for (let z = -16; z <= -2; z++) {
+      this.setBlock(132, 9, z, 'smooth_stone');
+      this.setBlock(131, 9, z, 'smooth_stone');
+    }
+    this.setBlock(132, 2, -9, 'sea_lantern', {
+      type: 'sign',
+      title: 'Caesars Palace Grand Casino & Colosseum 🏛️',
+      text: 'Imperial Roman palace resort with lavish marble colonnades, high-stakes casino tables, and the world-renowned Colosseum theatre.'
+    });
+
+    // 7. The Luxor Obsidian Pyramid & Sky Beam (East Side: X in [148, 162], Z in [-45, -25])
+    const luxorApexY = 22;
+    for (let ly = 1; ly <= luxorApexY; ly++) {
+      const inset = Math.floor((ly - 1) * 0.45);
+      const xMin = 148 + inset;
+      const xMax = 162 - inset;
+      const zMin = -45 + inset;
+      const zMax = -25 - inset;
+      if (xMin > xMax || zMin > zMax) break;
+      for (let x = xMin; x <= xMax; x++) {
+        for (let z = zMin; z <= zMax; z++) {
+          if (x === xMin || x === xMax || z === zMin || z === zMax) {
+            this.setBlock(x, ly, z, ((x + z + ly) % 5 === 0) ? 'gold_block' : 'obsidian');
+          }
+        }
+      }
+    }
+    // Luxor Sky Beam shooting into the stratosphere at (155, -35)
+    for (let y = luxorApexY; y <= luxorApexY + 12; y++) {
+      this.setBlock(155, y, -35, (y % 2 === 0) ? 'beacon' : 'sea_lantern');
+    }
+    this.setBlock(148, 2, -35, 'gold_block', {
+      type: 'sign',
+      title: 'The Luxor Pyramid Resort & Casino 🌌',
+      text: 'Massive obsidian pyramid crowned with the most powerful beam of light on Earth! Egyptian pharaoh tomb casino and ancient gaming oasis.'
+    });
+
+    // 8. The Venetian St. Mark's Campanile & Grand Canal (East Side: X in [148, 158], Z in [-22, -6])
+    // Turquoise Gondola Canal Basin
+    for (let z = -22; z <= -8; z++) {
+      this.setBlock(148, 1, z, 'prismarine_bricks');
+      this.setBlock(148, 2, z, 'water');
+      if (z === -15) this.setBlock(148, 3, z, 'smooth_stone'); // Arched Rialto bridge
+    }
+    // St. Mark's Campanile Bell Tower
+    for (let x = 152; x <= 155; x++) {
+      for (let z = -16; z <= -13; z++) {
+        for (let y = 1; y <= 24; y++) {
+          this.setBlock(x, y, z, (y > 20) ? 'quartz_pillar' : 'red_terracotta');
+        }
+      }
+    }
+    this.setBlock(153, 25, -15, 'gold_block');
+    this.setBlock(153, 26, -15, 'beacon');
+    this.setBlock(148, 2, -15, 'sea_lantern', {
+      type: 'sign',
+      title: 'The Venetian Resort & Casino · Las Vegas 🎭',
+      text: 'Opulent Renaissance Italian resort featuring the Grand Canal gondolas, replica St. Mark\'s Campanile belltower, and lavish casino salons.'
+    });
+
+    // 9. Golden Nugget & Flamingo Vintage Neon Marquees (138, -48)
+    this.setBlock(137, 2, -48, 'emerald_block'); // Blackjack table
+    this.setBlock(137, 3, -48, 'gold_block'); // Chip stack
+    this.setBlock(143, 2, -48, 'emerald_block');
+    this.setBlock(143, 3, -48, 'gold_block');
+    this.setBlock(140, 2, -48, 'redstone_block'); // Center roulette wheel
+    this.setBlock(140, 3, -48, 'gold_block');
+    this.setBlock(140, 4, -48, 'sea_lantern', {
+      type: 'sign',
+      title: 'Golden Nugget & Flamingo Vintage Casino 🎰',
+      text: 'Classic downtown Las Vegas vintage neon casino! High payout slot machines, lucky roulette, and 24/7 blackjack salons.'
+    });
+
+    // 10. Hollywood & Premiere Sky Searchlights
+    for (const [sx, sz] of [[133, -52], [147, -52], [133, 2], [147, 2]]) {
+      this.setBlock(sx, 2, sz, 'beacon');
+      this.setBlock(sx, 3, sz, 'sea_lantern');
+    }
   }
 
   // 8. Grand Carnival & Amusement Pier (South Ocean Pier: Ferris Wheel, Carousel, Coaster)
@@ -3711,6 +4333,9 @@ export class WorldBuilder {
     this.buildPoliceStation(76, 52);
     this.buildRailwayStation(58, 33);
     this.buildRailwayViaduct();
+    this.buildNeoYorkStation(116, 28);
+    this.buildSouthCoastStation(24, 88);
+    this.buildCitadelStation(8, 22);
     this.buildAirport(125, 75);
     this.buildCityZoo(-38, -32);
     this.buildRapunzelCastle(-70, -34);
@@ -4409,22 +5034,6 @@ export class WorldBuilder {
       }
     }
 
-    // Hollywood Times Square Red Tiered Glass Bleachers (X in [cx - 6, cx + 6], Z in [cz + 26, cz + 30])
-    for (let z = cz + 26; z <= cz + 30; z++) {
-      const stepY = 2 + (z - (cz + 26));
-      for (let x = cx - 6; x <= cx + 6; x++) {
-        for (let y = 1; y <= stepY; y++) {
-          this.setBlock(x, y, z, (y === stepY) ? 'redstone_block' : 'red_terracotta');
-        }
-        this.setBlock(x, stepY + 1, z, 'cyber_glass'); // Glowing illuminated glass treads
-      }
-    }
-    this.setBlock(cx, 8, cz + 30, 'sea_lantern', {
-      type: 'sign',
-      title: 'Hollywood Red Viewing Steps · Sunset Bleachers',
-      text: 'Take a seat on the glowing red bleachers to view the neon billboards and the illuminated Hollywood Sign above!'
-    });
-
     // Twin Soaring Neon Billboard Towers (West at cx - 16, East at cx + 16)
     for (const bbx of [cx - 16, cx + 16]) {
       // Structural Steel Lattice Pylon
@@ -4940,96 +5549,265 @@ export class WorldBuilder {
   }
 
   private buildRailwayViaduct() {
-    const trestles = [
-      { x: 72, z: 34 },
-      { x: 82, z: 36 },
-      { x: 92, z: 42 },
-      { x: 102, z: 48 },
-      { x: 112, z: 56 },
-      { x: 122, z: 66 }
+    // 1. Viaduct Piers & Elevated Arches along the Island Express Route (Y = 5.0)
+    const viaductPillars = [
+      { x: 74, z: 33, h: 5 },
+      { x: 92, z: 33, h: 5 },
+      { x: 104, z: 32, h: 5 },
+      { x: 124, z: 38, h: 5 },
+      { x: 128, z: 52, h: 5 },
+      { x: 128, z: 68, h: 5 },
+      { x: 118, z: 78, h: 5 },
+      { x: 96, z: 86, h: 5 },
+      { x: 68, z: 90, h: 5 },
+      { x: 44, z: 90, h: 5 },
+      { x: 24, z: 88, h: 5 },
+      { x: 12, z: 74, h: 5 },
+      { x: 8, z: 54, h: 5 },
+      { x: 6, z: 36, h: 5 },
+      { x: 8, z: 22, h: 5 },
+      { x: 22, z: 22, h: 5 },
+      { x: 38, z: 27, h: 5 },
+      { x: 48, z: 32, h: 5 }
     ];
-    for (const t of trestles) {
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dz = -1; dz <= 1; dz++) {
-          this.setBlock(t.x + dx, 1, t.z + dz, 'stone_bricks');
+
+    for (const p of viaductPillars) {
+      // Pier Base (2x2 stone bricks)
+      for (let dx = 0; dx <= 1; dx++) {
+        for (let dz = 0; dz <= 1; dz++) {
+          for (let y = 1; y <= p.h; y++) {
+            this.setBlock(p.x + dx, y, p.z + dz, 'stone_bricks');
+          }
         }
       }
-      this.setBlock(t.x, 2, t.z, 'stone_bricks');
-      this.setBlock(t.x - 1, 2, t.z, 'quartz_pillar');
-      this.setBlock(t.x + 1, 2, t.z, 'quartz_pillar');
-      this.setBlock(t.x, 3, t.z + 1, 'glowstone');
+      // Arch Cap & Lantern
+      this.setBlock(p.x, p.h + 1, p.z, 'quartz_pillar');
+      this.setBlock(p.x + 1, p.h + 1, p.z + 1, 'quartz_pillar');
+      this.setBlock(p.x, p.h + 1, p.z + 1, 'glowstone');
+    }
+
+    // 2. High-Clearance Elevated Viaduct over East Highway (X: 84 to 98, Z: 31 to 35)
+    for (let x = 84; x <= 98; x++) {
+      for (let z = 31; z <= 35; z++) {
+        // Deck structure at Y = 5 allowing vehicles/players to walk underneath at Y = 1 to 4
+        this.setBlock(x, 5, z, 'stone_bricks');
+        if (z === 31 || z === 35) {
+          this.setBlock(x, 6, z, 'iron_block'); // Safety guardrail
+        }
+      }
     }
   }
 
   private buildRailwayStation(cx: number, cz: number) {
-    // Crossroads Central Station Train Hall (Footprint: X in [cx - 10, cx + 10], Z in [cz - 7, cz + 7])
-    // 1. Dual Track Bed in center (Z in [cz - 1, cz + 1], Y = 1)
-    for (let x = cx - 10; x <= cx + 10; x++) {
+    // Crossroads Central Station Train Hall (Footprint: X in [cx - 12, cx + 12], Z in [cz - 7, cz + 7])
+    // 1. Through-Track Bed at Y = 5 for continuous elevated loop trains
+    for (let x = cx - 12; x <= cx + 12; x++) {
       for (let z = cz - 1; z <= cz + 1; z++) {
-        this.setBlock(x, 1, z, 'smooth_stone');
+        this.setBlock(x, 5, z, 'smooth_stone');
       }
-      // Oak sleepers and iron rails on track beds
-      this.setBlock(x, 1, cz, (x % 2 === 0) ? 'oak_planks' : 'iron_block');
-    }
-    // Buffer stops at West end of Central Station (cx - 10)
-    for (let z = cz - 1; z <= cz + 1; z++) {
-      this.setBlock(cx - 10, 2, z, 'stone_bricks');
-      this.setBlock(cx - 10, 3, z, 'redstone_block');
+      this.setBlock(x, 5, cz, (x % 2 === 0) ? 'oak_planks' : 'iron_block');
     }
 
-    // 2. North & South Raised Passenger Platforms (Y = 2)
+    // 2. North & South Raised Passenger Platforms (Y = 5)
     // North Platform (Z in [cz - 7, cz - 2])
-    for (let x = cx - 10; x <= cx + 10; x++) {
+    for (let x = cx - 11; x <= cx + 11; x++) {
       for (let z = cz - 7; z <= cz - 2; z++) {
-        this.setBlock(x, 1, z, 'stone_bricks');
-        this.setBlock(x, 2, z, 'smooth_stone');
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
+        this.setBlock(x, 5, z, 'smooth_stone');
       }
+      this.setBlock(x, 5, cz - 2, 'gold_block');
     }
+
     // South Platform (Z in [cz + 2, cz + 7])
-    for (let x = cx - 10; x <= cx + 10; x++) {
+    for (let x = cx - 11; x <= cx + 11; x++) {
       for (let z = cz + 2; z <= cz + 7; z++) {
-        this.setBlock(x, 1, z, 'stone_bricks');
-        this.setBlock(x, 2, z, 'smooth_stone');
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
+        this.setBlock(x, 5, z, 'smooth_stone');
+      }
+      this.setBlock(x, 5, cz + 2, 'gold_block');
+    }
+
+    // 3. Accessible Stairs at Both Ends from ground Y = 1 to Y = 5
+    for (const endX of [cx - 12, cx + 12]) {
+      for (let step = 0; step <= 4; step++) {
+        const sz = cz - 5 - (endX < cx ? step : -step);
+        if (sz >= cz - 7 && sz <= cz + 7) {
+          for (let y = 1; y <= 5 - step; y++) {
+            this.setBlock(endX, y, sz, 'smooth_stone');
+          }
+        }
       }
     }
 
-    // Platform edge warning tactile lines (quartz)
-    for (let x = cx - 10; x <= cx + 10; x++) {
-      this.setBlock(x, 2, cz - 2, 'quartz_block');
-      this.setBlock(x, 2, cz + 2, 'quartz_block');
-    }
-
-    // 3. Arched Vaulted Glass Train Shed Canopy
-    for (const px of [cx - 8, cx - 2, cx + 4, cx + 10]) {
-      for (let y = 2; y <= 7; y++) {
+    // 4. Arched Vaulted Glass Train Shed Canopy
+    for (const px of [cx - 9, cx - 3, cx + 3, cx + 9]) {
+      for (let y = 5; y <= 10; y++) {
         this.setBlock(px, y, cz - 7, 'quartz_pillar');
         this.setBlock(px, y, cz + 7, 'quartz_pillar');
       }
     }
-    // Curved roof ribs spanning across
-    for (let x = cx - 10; x <= cx + 10; x++) {
+    for (let x = cx - 11; x <= cx + 11; x++) {
       for (let z = cz - 7; z <= cz + 7; z++) {
         const dist = Math.abs(z - cz);
-        const roofY = Math.round(8 + (1 - dist / 7) * 2);
+        const roofY = Math.round(11 + (1 - dist / 7) * 2);
         if (x % 3 === 0 || dist === 7) {
           this.setBlock(x, roofY, z, 'quartz_block');
         } else {
           this.setBlock(x, roofY, z, 'cyber_glass');
         }
       }
-      if (x % 5 === 0) {
-        this.setBlock(x, 7, cz, 'glowstone');
+      if (x % 4 === 0) {
+        this.setBlock(x, 10, cz, 'glowstone');
       }
     }
 
-    // 4. Station Passenger Amenities: ticket machines, benches, departure board
-    this.setBlock(cx - 4, 3, cz - 5, 'bookshelf');
-    this.setBlock(cx - 3, 3, cz - 5, 'bookshelf');
-    this.setBlock(cx + 4, 3, cz + 5, 'gold_block');
-    this.setBlock(cx, 3, cz - 4, 'glowstone', {
+    // 5. Station Passenger Amenities
+    this.setBlock(cx - 4, 6, cz - 5, 'bookshelf');
+    this.setBlock(cx - 3, 6, cz - 5, 'bookshelf');
+    this.setBlock(cx + 4, 6, cz + 5, 'gold_block');
+    this.setBlock(cx, 6, cz - 4, 'glowstone', {
       type: 'sign',
-      title: 'Crossroads Central Station',
-      text: 'Platform 1 · Express Rail Line to Crossroads International Airport.'
+      title: 'Crossroads Central Station · Island Express',
+      text: 'Platform 1 · Route: Neo York Skyway ➔ Airport ➔ South Coast ➔ Citadel. Press [E] to Board · [SPACE] to Alight.'
+    });
+    this.setBlock(cx, 6, cz + 4, 'glowstone', {
+      type: 'sign',
+      title: 'Island Express Timetable',
+      text: 'Live Continuous Loop · Dual Express Trains In Service · Synchronized Safe Headway'
+    });
+  }
+
+  // 10. Neo York Skyway Elevated Railway Station (116, 28)
+  private buildNeoYorkStation(cx: number, cz: number) {
+    // Raised Commuter Platform at Y = 5 (Matching elevated viaduct track level Y = 5.0)
+    // Footprint: X in [cx - 6, cx + 6], Z in [cz + 2, cz + 6]
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      for (let z = cz + 2; z <= cz + 6; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
+        this.setBlock(x, 5, z, 'smooth_stone'); // Platform floor at Y = 5
+      }
+      this.setBlock(x, 5, cz + 2, 'gold_block'); // Caution edge line
+      this.setBlock(x, 6, cz + 6, 'iron_block'); // Back safety railing
+    }
+
+    // Passenger Access Stairs connecting street level (Y = 1) up to platform (Y = 5)
+    for (let step = 0; step <= 4; step++) {
+      const sx = cx - 7 - step;
+      for (let z = cz + 3; z <= cz + 5; z++) {
+        for (let y = 1; y <= 5 - step; y++) {
+          this.setBlock(sx, y, z, 'stone_bricks');
+        }
+      }
+    }
+
+    // Modernist Glass & Quartz Canopy Roof at Y = 8
+    for (const px of [cx - 5, cx + 5]) {
+      for (let y = 6; y <= 8; y++) {
+        this.setBlock(px, y, cz + 6, 'quartz_pillar');
+      }
+    }
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      for (let z = cz + 2; z <= cz + 6; z++) {
+        this.setBlock(x, 9, z, (x % 2 === 0) ? 'quartz_block' : 'cyber_glass');
+      }
+    }
+
+    // Station Sign & Passenger Amenities
+    this.setBlock(cx, 6, cz + 5, 'glowstone', {
+      type: 'sign',
+      title: 'Neo York Skyway Station · Elevated Rapid Transit',
+      text: 'Island Express Transit · Elevated Viaduct Concourse. Transfers to Broadway & Lak Tower. Press [E] to Board.'
+    });
+    this.setBlock(cx - 2, 6, cz + 4, 'oak_planks'); // Bench
+    this.setBlock(cx + 2, 6, cz + 4, 'oak_planks');
+  }
+
+  // 11. South Coast Beach & Pier Boardwalk Station (24, 88)
+  private buildSouthCoastStation(cx: number, cz: number) {
+    // Seaside Timber Boardwalk Platform at Y = 5 (Matching viaduct track level Y = 5.0)
+    // Footprint: X in [cx - 6, cx + 6], Z in [cz + 2, cz + 6]
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      for (let z = cz + 2; z <= cz + 6; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'spruce_log');
+        }
+        this.setBlock(x, 5, z, 'oak_planks');
+      }
+      this.setBlock(x, 5, cz + 2, 'gold_block'); // Warning edge
+      this.setBlock(x, 6, cz + 6, 'oak_fence'); // Maritime railing
+    }
+
+    // Access Stairs connecting beach boardwalk (Y = 1) up to platform (Y = 5)
+    for (let step = 0; step <= 4; step++) {
+      const sx = cx - 7 - step;
+      for (let z = cz + 3; z <= cz + 5; z++) {
+        for (let y = 1; y <= 5 - step; y++) {
+          this.setBlock(sx, y, z, 'oak_planks');
+        }
+      }
+    }
+
+    // Seaside Striped Sun Canopy
+    for (const px of [cx - 5, cx + 5]) {
+      this.setBlock(px, 6, cz + 5, 'spruce_log');
+      this.setBlock(px, 7, cz + 5, 'spruce_log');
+      this.setBlock(px, 8, cz + 5, 'sea_lantern');
+    }
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      this.setBlock(x, 8, cz + 4, (x % 2 === 0) ? 'red_terracotta' : 'quartz_block');
+      this.setBlock(x, 8, cz + 5, (x % 2 === 0) ? 'quartz_block' : 'red_terracotta');
+    }
+
+    // Station Sign & Benches
+    this.setBlock(cx, 6, cz + 4, 'glowstone', {
+      type: 'sign',
+      title: 'South Coast Beach & Pier Station',
+      text: 'Gateway to Grand Carnival, Sunset Saloon & Ocean Beach. Press [E] to Board.'
+    });
+  }
+
+  // 12. Crossroads Citadel Gateway Station (8, 22)
+  private buildCitadelStation(cx: number, cz: number) {
+    // Citadel Stone Platform at Y = 5 (Directly overlooking South Moat Bridge)
+    // Footprint: X in [cx - 5, cx + 5], Z in [cz + 2, cz + 6]
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      for (let z = cz + 2; z <= cz + 6; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
+        this.setBlock(x, 5, z, 'smooth_stone');
+      }
+      this.setBlock(x, 5, cz + 2, 'gold_block');
+      this.setBlock(x, 6, cz + 6, 'stone_bricks');
+    }
+
+    // Direct Stone Steps from Citadel Moat Walkway (Y = 2) up to Platform (Y = 5)
+    for (let step = 0; step <= 3; step++) {
+      const sx = cx - 6 - step;
+      for (let z = cz + 3; z <= cz + 5; z++) {
+        for (let y = 2; y <= 5 - step; y++) {
+          this.setBlock(sx, y, z, 'stone_bricks');
+        }
+      }
+    }
+
+    // Marble Pillars & Lanterns
+    for (const px of [cx - 4, cx + 4]) {
+      this.setBlock(px, 6, cz + 5, 'quartz_pillar');
+      this.setBlock(px, 7, cz + 5, 'sea_lantern');
+    }
+
+    // Station Sign
+    this.setBlock(cx, 6, cz + 4, 'glowstone', {
+      type: 'sign',
+      title: 'Citadel Gateway Station',
+      text: 'Spawn Nexus Station · Island Express Rapid Transit Loop. Press [E] to Board.'
     });
   }
 
@@ -5181,16 +5959,32 @@ export class WorldBuilder {
     this.setBlock(atcX, 23, atcZ, 'beacon');
     this.setBlock(atcX, 24, atcZ, 'glowstone');
 
-    // 8. Airport Railway Station Platform (X in [124, 136], Z in [70, 74])
-    for (let x = 124; x <= 136; x++) {
-      for (let z = 70; z <= 74; z++) {
+    // 8. Airport Railway Station Platform (X in [122, 136], Z in [68, 73])
+    for (let x = 122; x <= 136; x++) {
+      for (let z = 68; z <= 73; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
         this.setBlock(x, 2, z, 'smooth_stone');
-        if (x % 4 === 0) {
-          this.setBlock(x, 3, 74, 'quartz_pillar');
-          this.setBlock(x, 4, 74, 'glowstone');
-        }
+      }
+      this.setBlock(x, 2, 68, 'gold_block'); // Platform caution tactile line
+      if (x % 4 === 0) {
+        this.setBlock(x, 3, 73, 'quartz_pillar');
+        this.setBlock(x, 4, 73, 'glowstone');
       }
     }
+    // Direct Covered Walkway connecting Platform to Airport Terminal Concourse (X = 126 to 128, Z = 65 to 68)
+    for (let z = 65; z <= 68; z++) {
+      for (let x = 126; x <= 128; x++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+        this.setBlock(x, 2, z, 'smooth_stone');
+      }
+    }
+    this.setBlock(129, 3, 72, 'glowstone', {
+      type: 'sign',
+      title: 'Airport Terminal Skyport Station',
+      text: 'Island Express Rapid Transit · Transfer to Flight AG-2026 Concourse. Press [E] to Board.'
+    });
+    this.setBlock(124, 3, 72, 'oak_planks'); // Bench
+    this.setBlock(125, 3, 72, 'oak_planks');
 
     // 9. Second Commercial Airliner on Runway Threshold 09 Lined Up for Takeoff (Facing East)
     const runPlaneX = 98;

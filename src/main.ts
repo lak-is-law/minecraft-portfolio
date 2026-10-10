@@ -665,7 +665,7 @@ class Game {
     // 5. Update HUD elements
     this.hud.updatePrompt(this.player.currentTarget);
     this.hud.updateF3(this.player.position, this.player.yaw, this.player.pitch, this.fps);
-    this.hud.updateMinimap(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+    this.hud.updateMinimap(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     this.hud.updateFlyStatus(this.player.isFlying);
 
     // 6. Render

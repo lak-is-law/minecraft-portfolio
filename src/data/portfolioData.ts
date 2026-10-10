@@ -425,7 +425,7 @@ export const PORTFOLIO_DATA = {
     { name: "The Sunset Saloon & Beach Bar", coords: [12, 2, 58], tag: "[SALOON]", desc: "Beachfront timber tavern with glowing stone hearth, outdoor deck, and Lakshya's passions hub" },
     { name: "Palm Paradise Beach & Merlion", coords: [15, 2, 100], tag: "[BEACH]", desc: "Tropical coconut palm beach, ocean surf, boardwalk pier, and the iconic Singapore Merlion" },
     { name: "Crossroads International Airport", coords: [130, 2, 80], tag: "[AIRPORT]", desc: "Dedicated coastal airport with a lit runway, glass terminal concourse, and air-traffic tower" },
-    { name: "Crossroads Central Station", coords: [58, 2, 33], tag: "[RAILWAY]", desc: "A covered rail station with live train service linking the civic quarter directly to the airport" },
+    { name: "Crossroads Central Station", coords: [58, 2, 33], tag: "[RAILWAY]", desc: "Central passenger terminal of the Island Express Railway, linking Spawn Citadel, Neo York, Airport, and South Coast Pier" },
     { name: "Crossroads General Hospital", coords: [43, 2, 58], tag: "[HOSPITAL]", desc: "Quartz-and-glass community hospital with a red cross and emergency ambulance bay" },
     { name: "Crossroads Police Station", coords: [51, 2, 60], tag: "[POLICE]", desc: "A blue-striped public safety station serving the southern districts" },
     { name: "Crossroads Public School", coords: [43, 2, 36], tag: "[SCHOOL]", desc: "A neighborhood school with a library, bright windows, and bell tower" },
