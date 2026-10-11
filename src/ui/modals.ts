@@ -18,10 +18,18 @@ export interface NPCDialogData {
   subtitle?: string;
   badge?: string;
   badgeColor?: string;
+  locationBadge?: string;
   avatarHtml: string;
   text: string;
   options: NPCDialogOption[];
   onDone?: () => void;
+  onOptionSelect?: (option: NPCDialogOption, data: NPCDialogData) => void;
+}
+
+export function getCitizenAvatarHtml(emoji: string = '👤', bgColor: string = '#1e293b'): string {
+  return `<div class="mc-npc-animal-avatar" style="background: ${bgColor}; font-size: 26px;">
+    <span>${emoji}</span>
+  </div>`;
 }
 
 export function getLakshyaAvatarHtml(): string {
@@ -62,9 +70,33 @@ export function getAnimalAvatarHtml(emoji: string, bgColor: string = '#1e293b'):
   </div>`;
 }
 
+export function getLightningMcQueenAvatarHtml(): string {
+  return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
+    <rect width="32" height="32" fill="#1e1b18"/>
+    <rect x="3" y="10" width="26" height="16" rx="3" fill="#cf1017"/>
+    <rect x="5" y="6" width="22" height="6" fill="#b91c1c"/>
+    <rect x="7" y="7" width="18" height="6" fill="#ffffff"/>
+    <rect x="10" y="8" width="4" height="4" fill="#0284c7"/>
+    <rect x="11" y="9" width="2" height="2" fill="#0f172a"/>
+    <rect x="18" y="8" width="4" height="4" fill="#0284c7"/>
+    <rect x="19" y="9" width="2" height="2" fill="#0f172a"/>
+    <rect x="9" y="6" width="6" height="2" fill="#cf1017"/>
+    <rect x="17" y="6" width="6" height="2" fill="#cf1017"/>
+    <rect x="10" y="21" width="12" height="3" fill="#18181b"/>
+    <rect x="11" y="21" width="10" height="2" fill="#f8fafc"/>
+    <rect x="4" y="14" width="4" height="4" fill="#facc15"/>
+    <rect x="24" y="14" width="4" height="4" fill="#facc15"/>
+    <polygon points="4,19 8,18 6,22" fill="#facc15"/>
+    <polygon points="28,19 24,18 26,22" fill="#facc15"/>
+    <rect x="1" y="19" width="3" height="6" fill="#171717"/>
+    <rect x="28" y="19" width="3" height="6" fill="#171717"/>
+  </svg>`;
+}
+
 export class ModalManager {
   private modalContainer: HTMLElement;
   public isOpen: boolean = false;
+  private openTime: number = 0;
   public onTeleportRequest?: (coords: [number, number, number]) => void;
   public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[] };
 
@@ -76,7 +108,7 @@ export class ModalManager {
   private setupListeners() {
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Escape' || e.code === 'KeyE') {
-        if (this.isOpen) {
+        if (this.isOpen && performance.now() - this.openTime > 250) {
           this.close();
           e.stopPropagation();
         }
@@ -86,12 +118,22 @@ export class ModalManager {
         this.openFastTravelModal(info?.position, info?.yaw, info?.dragons);
       }
     });
+
+    const handleBackdropClose = (e: MouseEvent | PointerEvent) => {
+      if (e.target === this.modalContainer && performance.now() - this.openTime > 250) {
+        this.close();
+      }
+    };
+
+    this.modalContainer.addEventListener('click', handleBackdropClose);
+    this.modalContainer.addEventListener('pointerup', handleBackdropClose);
   }
 
   public close() {
     this.isOpen = false;
     this.modalContainer.innerHTML = '';
     this.modalContainer.style.display = 'none';
+    document.body.classList.remove('modal-open');
     sound.playClick();
 
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
@@ -103,6 +145,9 @@ export class ModalManager {
 
   private onModalOpen() {
     this.isOpen = true;
+    this.openTime = performance.now();
+    this.modalContainer.style.display = 'flex';
+    document.body.classList.add('modal-open');
     if (document.pointerLockElement) {
       document.exitPointerLock();
     }
@@ -356,6 +401,7 @@ export class ModalManager {
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
       { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
+      { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 168 / Z −24' },
     ];
     const regionsHtml = atlasRegions.map((region) => {
       const targetIdx = PORTFOLIO_DATA.landmarks.findIndex(lm => lm.tag === region.tag);
@@ -1101,17 +1147,29 @@ export class ModalManager {
 
       options.forEach((opt) => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         const styleClass = opt.styleClass || 'mc-btn-stone';
         btn.className = `mc-btn ${styleClass} mc-npc-option-btn`;
         btn.innerHTML = `
           <span>${opt.label}</span>
           <span class="mc-npc-option-arrow">➔</span>
         `;
-        btn.addEventListener('click', () => {
+
+        let actionExecutedTime = 0;
+        const executeOption = (e: Event) => {
+          const now = performance.now();
+          if (now - actionExecutedTime < 280) return;
+          actionExecutedTime = now;
+          e.preventDefault();
+          e.stopPropagation();
+
           sound.playClick();
+          data.onOptionSelect?.(opt, data);
+
           if (opt.action) {
             opt.action();
           }
+
           if (opt.response) {
             const speechEl = document.getElementById('mc-npc-speech-text');
             if (speechEl) {
@@ -1136,21 +1194,35 @@ export class ModalManager {
               ], true);
             }
           }
-        });
+        };
+
+        btn.addEventListener('pointerup', executeOption);
+        btn.addEventListener('click', executeOption);
         optionsContainer.appendChild(btn);
       });
 
       if (isSubMenu) {
         const backBtn = document.createElement('button');
+        backBtn.type = 'button';
         backBtn.className = 'mc-btn mc-btn-stone mc-npc-option-btn';
         backBtn.style.marginTop = '4px';
         backBtn.innerHTML = `<span>↩️ Return to questions</span><span class="mc-npc-option-arrow">⤴</span>`;
-        backBtn.addEventListener('click', () => {
+
+        let backHandledTime = 0;
+        const handleBack = (e: Event) => {
+          const now = performance.now();
+          if (now - backHandledTime < 280) return;
+          backHandledTime = now;
+          e.preventDefault();
+          e.stopPropagation();
           sound.playClick();
           const speechEl = document.getElementById('mc-npc-speech-text');
           if (speechEl) speechEl.textContent = data.text;
           renderOptions(data.options, false);
-        });
+        };
+
+        backBtn.addEventListener('pointerup', handleBack);
+        backBtn.addEventListener('click', handleBack);
         optionsContainer.appendChild(backBtn);
       }
     };
@@ -1166,11 +1238,12 @@ export class ModalManager {
               <div class="mc-npc-name-badge-row">
                 <h2 class="mc-dialog-title mc-npc-title">${data.name}</h2>
                 ${data.badge ? `<span class="mc-npc-level-badge" style="background: ${data.badgeColor || '#ca8a04'};">${data.badge}</span>` : ''}
+                ${data.locationBadge ? `<span class="mc-npc-location-badge">📍 ${data.locationBadge}</span>` : ''}
               </div>
               <span class="mc-dialog-subtitle mc-npc-subtitle">${data.subtitle || data.title}</span>
             </div>
           </div>
-          <button class="mc-close-btn" id="mc-modal-close" title="Close (ESC)">✕</button>
+          <button class="mc-close-btn" id="mc-modal-close" title="Close (ESC)" type="button">✕</button>
         </div>
 
         <div class="mc-dialog-body mc-npc-dialog-body">
@@ -1180,20 +1253,30 @@ export class ModalManager {
 
         <div class="mc-dialog-footer mc-npc-dialog-footer">
           <span class="mc-npc-footer-hint">[ESC] or [E] to exit</span>
-          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Leave</button>
+          <button class="mc-btn mc-btn-stone" id="mc-modal-done" type="button">Leave</button>
         </div>
       </div>
     `;
 
     this.modalContainer.style.display = 'flex';
-    document.getElementById('mc-modal-close')?.addEventListener('click', () => {
+
+    let closeExecutedTime = 0;
+    const handleModalClose = (e: Event) => {
+      const now = performance.now();
+      if (now - closeExecutedTime < 280) return;
+      closeExecutedTime = now;
+      e.preventDefault();
+      e.stopPropagation();
       data.onDone?.();
       this.close();
-    });
-    document.getElementById('mc-modal-done')?.addEventListener('click', () => {
-      data.onDone?.();
-      this.close();
-    });
+    };
+
+    const closeBtn = document.getElementById('mc-modal-close');
+    const doneBtn = document.getElementById('mc-modal-done');
+    closeBtn?.addEventListener('pointerup', handleModalClose);
+    closeBtn?.addEventListener('click', handleModalClose);
+    doneBtn?.addEventListener('pointerup', handleModalClose);
+    doneBtn?.addEventListener('click', handleModalClose);
 
     renderOptions(data.options, false);
   }

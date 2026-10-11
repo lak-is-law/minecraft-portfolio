@@ -50,6 +50,7 @@ export class WorldBuilder {
     this.buildDubaiRealm();
     this.buildMexicoRealm();
     this.buildUSARealm();
+    this.buildLightningMcQueenStreet();
     this.buildGrandCarnivalPier();
     this.buildCivicAndAdventureDistricts();
     this.buildSunsetSaloonAndBar();
@@ -101,8 +102,9 @@ export class WorldBuilder {
     }
 
     // 3.5 North Alpine Snow Mountain Realm (Frostpeak Alps)
-    // Bounds: X in [-44, 36], Z <= -68 (rising up to northern shoreline)
-    if (x >= -44 && x <= 36 && z <= -68) {
+    // Organic curved boundary starting north of Z = -76 (valley stays at Y=1)
+    const foothillLine = -76 + Math.sin(x * 0.14) * 4 + Math.cos(x * 0.28) * 2;
+    if (x >= -48 && x <= 40 && z <= foothillLine) {
       // Respect London Realm at south-west corner of this zone
       if (x <= -20 && z >= -80) {
         if (z >= -54 && z <= -48 && x <= -22 && x >= -44) {
@@ -111,15 +113,16 @@ export class WorldBuilder {
         return 1;
       }
 
-      // Smooth southern foothills connecting to Citadel North Road
-      if (z >= -72) {
-        return (Math.abs(x) <= 3) ? 1 : 2;
+      // Smooth buffer zone: ground stays at level Y = 1 near the valley intersection
+      if (z > foothillLine - 6) {
+        return 1;
       }
 
-      // Walkable switchback pass between North Road (Z=-68) and Chalet / Lake Serenity (Z=-105)
-      if (Math.abs(x) <= 3 && z >= -105 && z <= -70) {
-        const passProgress = (-z - 70) / 35;
-        return Math.max(1, Math.round(1 + passProgress * 7));
+      // Walkable gently ascending mountain pass along the central road corridor (X in [-4, 4])
+      if (Math.abs(x) <= 4 && z >= -108) {
+        // Very smooth slope ascending from Y = 1 at Z = -80 up to Y = 8 at Z = -108
+        const u = Math.min(1, Math.max(0, (-z - 80) / 28));
+        return Math.max(1, Math.round(1 + u * 7));
       }
 
       // Lake Serenity Glacial Ice Basin at (-2, -115)
@@ -152,23 +155,22 @@ export class WorldBuilder {
         peak2H = Math.round(24 * Math.pow(1 - dPeak2, 1.2));
       }
 
-      // High Mountain Massif base elevation rising to the north
-      const zMassif = Math.min(1, Math.max(0, (-z - 72) / 70));
-      const xProfile = Math.max(0, 1 - Math.abs(x) / 42);
-      const crags = Math.sin((x + 10) * 0.18) * 1.8 + Math.cos(z * 0.15) * 1.6;
-      let massifH = 2 + Math.round(zMassif * (10 + xProfile * 6) + crags);
+      // Natural mountain massif rising gently from Z = -82 northwards
+      const zMassif = Math.min(1, Math.max(0, (-z - 82) / 60));
+      const xProfile = Math.max(0, 1 - Math.abs(x) / 44);
+      const crags = Math.sin((x + 10) * 0.18) * 1.5 + Math.cos(z * 0.15) * 1.5;
+      let massifH = 1 + Math.round(zMassif * (11 + xProfile * 6) + crags);
 
       let h = Math.max(massifH, Math.max(peak1H, peak2H));
 
-      // Smooth blend towards eastern border (India plains at X >= 28)
-      if (x >= 28) {
-        const blendE = Math.max(0, (36 - x) / 8);
-        h = Math.round(2 + (h - 2) * blendE);
+      // Organic side-slopes blending seamlessly into eastern & western borders
+      if (x >= 24) {
+        const blendE = Math.max(0, (40 - x) / 16);
+        h = Math.round(1 + (h - 1) * Math.pow(blendE, 1.2));
       }
-      // Smooth blend towards western border (Seoul / China at X <= -36)
-      if (x <= -36) {
-        const blendW = Math.max(0, (x - (-44)) / 8);
-        h = Math.round(2 + (h - 2) * blendW);
+      if (x <= -32) {
+        const blendW = Math.max(0, (x - (-48)) / 16);
+        h = Math.round(1 + (h - 1) * Math.pow(blendW, 1.2));
       }
 
       return Math.max(1, Math.min(28, h));
@@ -345,15 +347,20 @@ export class WorldBuilder {
 
         for (let y = bottomY; y < h; y++) {
           let subType = 'dirt';
-          const isAlpineMountain = (x >= -44 && x <= 36 && z <= -68);
+          const foothillLine = -76 + Math.sin(x * 0.14) * 4 + Math.cos(x * 0.28) * 2;
+          const isAlpineMountain = (x >= -48 && x <= 40 && z <= foothillLine);
           const isSunflowerValley = (x >= -68 && x <= -25 && z >= 24 && z <= 76);
 
           if (isAlpineMountain) {
             const isLake = (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85);
             if (isLake && y === h - 1) {
               subType = 'prismarine_bricks';
+            } else if (h >= 11 && y >= h - 2) {
+              subType = 'snow';
+            } else if (h >= 6) {
+              subType = (y >= 5) ? 'cobblestone' : 'stone_bricks';
             } else {
-              subType = (y >= h - 2 && h >= 10) ? 'snow' : (y >= 6) ? 'cobblestone' : (h >= 4) ? 'stone_bricks' : 'dirt';
+              subType = 'dirt';
             }
           } else if (isSunflowerValley) {
             subType = 'dirt';
@@ -375,19 +382,26 @@ export class WorldBuilder {
         // Top surface block at Y = h
         let topType = 'grass';
         const dist = Math.hypot(x, z);
-        const isAlpineMountain = (x >= -44 && x <= 36 && z <= -68);
+        const foothillLine = -76 + Math.sin(x * 0.14) * 4 + Math.cos(x * 0.28) * 2;
+        const isAlpineMountain = (x >= -48 && x <= 40 && z <= foothillLine);
         const isSunflowerValley = (x >= -68 && x <= -25 && z >= 24 && z <= 76);
 
         if (isAlpineMountain) {
           const isLake = (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85);
           if (isLake) {
             topType = 'ice';
-          } else if (h >= 10) {
+          } else if (h >= 11) {
+            // High summits and ridges: pure glistening snow cap
             topType = 'snow';
-          } else if (h >= 4) {
-            topType = ((x + z) % 3 === 0) ? 'mossy_stone_bricks' : 'snow_grass';
+          } else if (h >= 8 && z <= -90) {
+            // Cold mountain highlands & Lake Serenity rim: frosted snow grass & mossy rocks
+            topType = ((x + z) % 3 === 0) ? 'mossy_stone_bricks' : ((x + z) % 5 === 0) ? 'cobblestone' : 'snow_grass';
+          } else if (h >= 5 && z <= -84) {
+            // Subalpine rocky foothills: natural mountain grass with weathered rocks & gravel
+            topType = ((x + z) % 4 === 0) ? 'cobblestone' : ((x + z) % 6 === 0) ? 'mossy_stone_bricks' : 'grass';
           } else {
-            topType = ((x + z) % 4 === 0) ? 'snow_grass' : 'grass';
+            // Lower foothills and intersection valley (Z > -84 or H < 5): 100% natural lush green grass!
+            topType = 'grass';
           }
         } else if (isSunflowerValley) {
           topType = 'grass';
@@ -488,8 +502,8 @@ export class WorldBuilder {
       }
     }
 
-    // North Road (Z = -24 to -65, X in [-2, 2])
-    for (let z = -24; z >= -65; z--) {
+    // North Road approaching Grand Nexus Plaza (Z = -24 to -48, X in [-2, 2])
+    for (let z = -24; z >= -48; z--) {
       for (let x = -2; x <= 2; x++) {
         this.setBlock(x, 1, z, 'cobblestone');
       }
@@ -502,6 +516,114 @@ export class WorldBuilder {
         this.setBlock(3, 3, z, 'glowstone');
       }
     }
+
+    // Grand North Nexus Plaza (Carrefour du Nord): X in [-9, 9], Z in [-48, -66]
+    for (let x = -9; x <= 9; x++) {
+      for (let z = -48; z >= -66; z--) {
+        const d = Math.hypot(x, z - (-57));
+        if (d <= 9) {
+          const blk = (d <= 2) ? 'quartz_block' : (d <= 5) ? 'smooth_stone' : (d <= 8) ? 'stone_bricks' : 'cobblestone';
+          this.setBlock(x, 1, z, blk);
+        }
+      }
+    }
+
+    // Central Monumental Compass Obelisk at (0, 1, -57)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(dx, 1, -57 + dz, 'quartz_block');
+      }
+    }
+    this.setBlock(0, 2, -57, 'quartz_pillar');
+    this.setBlock(0, 3, -57, 'sea_lantern');
+    this.setBlock(0, 4, -57, 'glowstone');
+
+    // 4 Directional Milestone Waymarker signs on the obelisk
+    this.setBlock(0, 2, -58, 'smooth_stone', {
+      type: 'sign',
+      title: 'North: Frostpeak Alps ➔ 🏔️',
+      text: 'Scenic Pine Foothills ➔ Mountain Trail ➔ Chalet de Lakshya ➔ Lake Serenity ➔ Summit Observatory.'
+    });
+    this.setBlock(1, 2, -57, 'smooth_stone', {
+      type: 'sign',
+      title: 'East: Paris & Imperial India ➔ 🇫🇷🇮🇳',
+      text: 'Avenue des Champs-Élysées ➔ Eiffel Tower ➔ Grand Causeway ➔ Taj Mahal & Yamuna River Plains.'
+    });
+    this.setBlock(-1, 2, -57, 'smooth_stone', {
+      type: 'sign',
+      title: 'West: London & Imperial China ➔ 🇬🇧🇨🇳',
+      text: 'Westminster Avenue ➔ Big Ben ➔ Tower Bridge ➔ Imperial Road ➔ Great Wall & Dragon Pagoda.'
+    });
+    this.setBlock(0, 2, -56, 'smooth_stone', {
+      type: 'sign',
+      title: 'South: Crossroads Citadel ➔ 🏰',
+      text: 'Central Nexus Plaza ➔ Spawn Beacon ➔ South Coast Beach Pier ➔ Neo York & International Airport.'
+    });
+
+    // Plaza Perimeter Victorian streetlamps & boxwood planters
+    for (const [lx, lz] of [[-7, -51], [7, -51], [-7, -63], [7, -63]]) {
+      this.setBlock(lx, 1, lz, 'stone_bricks');
+      this.setBlock(lx, 2, lz, 'iron_block');
+      this.setBlock(lx, 3, lz, 'lantern');
+      this.setBlock(lx + 1, 1, lz, 'oak_leaves');
+      this.setBlock(lx - 1, 1, lz, 'oak_leaves');
+    }
+
+    // Mountain Meltwater Brook flowing along eastern flank (X = 6 to 8)
+    for (let z = -48; z >= -78; z--) {
+      this.setBlock(7, 0, z, 'cobblestone');
+      this.setBlock(7, 1, z, 'water');
+      this.setBlock(6, 1, z, 'stone_bricks');
+      this.setBlock(8, 1, z, 'mossy_stone_bricks');
+    }
+    // Arched stone footbridge crossing the brook at Z in [-55, -59]
+    for (let z = -55; z >= -59; z--) {
+      for (let x = 6; x <= 8; x++) {
+        this.setBlock(x, 2, z, 'stone_bricks');
+      }
+      this.setBlock(6, 3, z, 'oak_fence');
+      this.setBlock(8, 3, z, 'oak_fence');
+    }
+
+    // Grand Pine Avenue continuing north from the Plaza into the foothills (Z = -66 to -82, X in [-3, 3])
+    for (let z = -66; z >= -82; z--) {
+      for (let x = -3; x <= 3; x++) {
+        const blk = (Math.abs(x) === 3) ? 'stone_bricks' : (z % 2 === 0) ? 'cobblestone' : 'smooth_stone';
+        this.setBlock(x, 1, z, blk);
+      }
+      if (Math.abs(z) % 6 === 0) {
+        this.setBlock(-4, 1, z, 'stone_bricks');
+        this.setBlock(-4, 2, z, 'spruce_log');
+        this.setBlock(-4, 3, z, 'lantern');
+        this.setBlock(4, 1, z, 'stone_bricks');
+        this.setBlock(4, 2, z, 'spruce_log');
+        this.setBlock(4, 3, z, 'lantern');
+      }
+    }
+
+    // Alpine Trailhead Waystation & Ranger Outpost at (9, 1, -72)
+    const wsX = 9;
+    const wsZ = -72;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(wsX + dx, 1, wsZ + dz, 'spruce_log');
+        const isWall = (Math.abs(dx) === 2 || Math.abs(dz) === 2);
+        if (isWall) {
+          this.setBlock(wsX + dx, 2, wsZ + dz, (dx === -2 && dz === 0) ? 'oak_planks' : 'spruce_log');
+          this.setBlock(wsX + dx, 3, wsZ + dz, 'spruce_log');
+        }
+        this.setBlock(wsX + dx, 4, wsZ + dz, 'oak_planks'); // Roof
+      }
+    }
+    this.setBlock(wsX, 2, wsZ, 'bookshelf');
+    this.setBlock(wsX, 3, wsZ, 'lantern');
+    this.setBlock(wsX - 2, 2, wsZ + 1, 'oak_planks'); // Bench
+    this.setBlock(wsX - 2, 2, wsZ - 1, 'oak_planks');
+    this.setBlock(wsX - 3, 2, wsZ, 'glowstone', {
+      type: 'sign',
+      title: 'Frostpeak Alps · Trailhead Waystation 🌲',
+      text: 'Official trailhead of the Northern Alpine Reserve. Altitude 1m. Follow the stone path north into the subalpine pine woods and mountain peaks.'
+    });
 
     // Grand Northeast Causeway to India & Taj Mahal (From (2, -60) to (74, -106))
     for (let step = 0; step <= 32; step++) {
@@ -7964,12 +8086,12 @@ export class WorldBuilder {
   // 13. Frostpeak Alps · Alpine Snow & Mountain Biome Realm
   // =========================================================================
   private buildAlpineSnowMountainRealm() {
-    // 1. Alpine Mountain Portal Entrance (0, 1, -68)
-    const gateZ = -68;
+    // 1. Timberline Mountain Portal Gate (0, 1, -82)
+    const gateZ = -82;
     for (let x = -3; x <= 3; x++) {
       this.setBlock(x, 1, gateZ, 'stone_bricks');
     }
-    // Twin stone archway pillars
+    // Twin dark spruce timber pillars
     for (let y = 1; y <= 4; y++) {
       this.setBlock(-3, y, gateZ, 'spruce_log');
       this.setBlock(3, y, gateZ, 'spruce_log');
@@ -7979,17 +8101,17 @@ export class WorldBuilder {
       this.setBlock(x, 5, gateZ, 'spruce_log');
     }
     this.setBlock(0, 4, gateZ, 'lantern');
-    this.setBlock(-3, 6, gateZ, 'snow');
-    this.setBlock(3, 6, gateZ, 'snow');
+    this.setBlock(-3, 6, gateZ, 'stone_bricks');
+    this.setBlock(3, 6, gateZ, 'stone_bricks');
 
-    this.setBlock(0, 2, gateZ + 1, 'glowstone', {
+    this.setBlock(0, 2, gateZ - 1, 'glowstone', {
       type: 'sign',
-      title: 'Frostpeak Alps · Mountain Sanctuary 🏔️❄️',
-      text: 'Ascend into the alpine peaks! Discover the Chalet de Lakshya, Lake Serenity ice rink, high summit observatory, and cable car aerial lift.'
+      title: 'Frostpeak Alps · Alpine Mountain Trail 🌲🏔️',
+      text: 'Scenic subalpine pass into the high peaks. Chalet de Lakshya (60m) · Lake Serenity (100m) · Summit Observatory (160m).'
     });
 
-    // 2. Winding Alpine Switchback Mountain Trail (Z = -68 to -105)
-    for (let z = -68; z >= -105; z--) {
+    // 2. Winding Alpine Switchback Mountain Trail (Z = -82 to -108)
+    for (let z = -82; z >= -108; z--) {
       const gy = this.getTerrainHeight(0, z);
       for (let dx = -2; dx <= 2; dx++) {
         const blk = (Math.abs(dx) === 2) ? 'mossy_stone_bricks' : (z % 2 === 0) ? 'cobblestone' : 'smooth_stone';
@@ -8368,12 +8490,27 @@ export class WorldBuilder {
       text: 'You discovered the hidden crystal cavern deep beneath Glacier Horn! Resonating amethyst crystals and ancient glacial relics.'
     });
 
-    // 8. Alpine Spruce Pine Forests
-    const spruceSites = [
+    // 8. Alpine Spruce Pine Forests (Green Foothills -> Snow-capped Upper Slopes)
+    const greenSpruceSites = [
+      { x: -9, z: -68, h: 6 },
+      { x: 10, z: -66, h: 6 },
+      { x: -11, z: -74, h: 7 },
+      { x: 12, z: -76, h: 7 },
+      { x: -8, z: -80, h: 6 },
+      { x: 8, z: -84, h: 6 },
+      { x: -14, z: -86, h: 7 },
+      { x: 14, z: -86, h: 7 },
       { x: -12, z: -80, h: 6 },
-      { x: -8, z: -86, h: 7 },
-      { x: 12, z: -82, h: 6 },
-      { x: 14, z: -90, h: 7 },
+      { x: 12, z: -82, h: 6 }
+    ];
+
+    for (const site of greenSpruceSites) {
+      this.buildGreenSpruceTree(site.x, this.getTerrainHeight(site.x, site.z), site.z, site.h);
+    }
+
+    const snowSpruceSites = [
+      { x: 14, z: -92, h: 7 },
+      { x: -14, z: -94, h: 7 },
       { x: -28, z: -98, h: 8 },
       { x: -25, z: -108, h: 7 },
       { x: -18, z: -116, h: 8 },
@@ -8388,13 +8525,13 @@ export class WorldBuilder {
       { x: -14, z: -165, h: 6 }
     ];
 
-    for (const site of spruceSites) {
+    for (const site of snowSpruceSites) {
       this.buildSnowSpruceTree(site.x, this.getTerrainHeight(site.x, site.z), site.z, site.h);
     }
 
-    // 9. Snowmen
-    this.buildSnowman(-14, this.getTerrainHeight(-14, -92), -92);
-    this.buildSnowman(-22, this.getTerrainHeight(-22, -92), -92);
+    // 9. Snowmen (Deep snowy upper mountains)
+    this.buildSnowman(-14, this.getTerrainHeight(-14, -95), -95);
+    this.buildSnowman(-22, this.getTerrainHeight(-22, -95), -95);
     this.buildSnowman(-4, this.getTerrainHeight(-4, -107), -107);
     this.buildSnowman(4, this.getTerrainHeight(4, -107), -107);
   }
@@ -8665,6 +8802,51 @@ export class WorldBuilder {
     }
   }
 
+  private buildGreenSpruceTree(cx: number, baseY: number, cz: number, height: number = 6) {
+    const gy = this.getTerrainHeight(cx, cz);
+    const startY = Math.max(baseY, gy + 1);
+
+    // Trunk
+    for (let y = startY; y < startY + height; y++) {
+      this.setBlock(cx, y, cz, 'spruce_log');
+    }
+
+    // Tiered green spruce foliage (clean, no snow)
+    const topY = startY + height;
+
+    // Apex
+    this.setBlock(cx, topY, cz, 'spruce_leaves');
+
+    // Tier 1 (top - 1): plus shape
+    for (const [dx, dz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+      this.setBlock(cx + dx, topY - 1, cz + dz, 'spruce_leaves');
+    }
+
+    // Tier 2 (top - 2): 3x3 with corners
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        if (dx === 0 && dz === 0) continue;
+        this.setBlock(cx + dx, topY - 2, cz + dz, 'spruce_leaves');
+      }
+    }
+
+    // Tier 3 (top - 3): plus shape r=2
+    for (const [dx, dz] of [[0, 2], [0, -2], [2, 0], [-2, 0]]) {
+      this.setBlock(cx + dx, topY - 3, cz + dz, 'spruce_leaves');
+    }
+
+    // Tier 4 (top - 4): 5x5 rounded
+    if (height >= 6) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue;
+          if (dx === 0 && dz === 0) continue;
+          this.setBlock(cx + dx, topY - 4, cz + dz, 'spruce_leaves');
+        }
+      }
+    }
+  }
+
   private buildSnowman(cx: number, baseY: number, cz: number) {
     const gy = this.getTerrainHeight(cx, cz);
     const startY = Math.max(baseY, gy + 1);
@@ -8674,5 +8856,327 @@ export class WorldBuilder {
     this.setBlock(cx - 1, startY + 1, cz, 'oak_fence');
     this.setBlock(cx + 1, startY + 1, cz, 'oak_fence');
   }
+
+  // -------------------------------------------------------------
+  // ⚡ LIGHTNING McQUEEN STREET & RADIATOR SPRINGS PISTON CUP RACEWAY ⚡
+  // -------------------------------------------------------------
+  private buildLightningMcQueenStreet() {
+    // 1. Feeder Avenue from Hollywood Blvd (161, -54) & Vegas Blvd (144, -54) into Raceway Grid
+    for (let x = 144; x <= 162; x++) {
+      for (let z = -56; z <= -52; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (z === -54 && x % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block'); // Yellow center divider
+        }
+      }
+      this.setBlock(x, 1, -57, 'stone_bricks'); // Curb
+      this.setBlock(x, 1, -51, 'stone_bricks'); // Curb
+      if (x % 6 === 0) {
+        this.setBlock(x, 2, -57, 'iron_block');
+        this.setBlock(x, 3, -57, 'sea_lantern');
+        this.setBlock(x, 2, -51, 'iron_block');
+        this.setBlock(x, 3, -51, 'sea_lantern');
+      }
+    }
+
+    // 2. High-Speed Raceway Circuit (Continuous Loop: Main Straight, East Hairpin, Canyon Back Straight, West S-Curve)
+    // A. Main Start/Finish Straight: X in [160, 192], Z in [-26, -22]
+    for (let x = 160; x <= 192; x++) {
+      for (let z = -26; z <= -22; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        // Yellow dashed center line
+        if (z === -24 && x % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+      // North and South Curbs / Kerbs
+      this.setBlock(x, 1, -27, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 1, -21, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+    }
+
+    // Checkered Start/Finish Line at X = 168 (spanning Z in [-26, -22])
+    for (let z = -26; z <= -22; z++) {
+      for (let x = 168; x <= 169; x++) {
+        const isWhite = (x + z) % 2 === 0;
+        this.setBlock(x, 1, z, isWhite ? 'quartz_block' : 'coal_block');
+      }
+    }
+
+    // B. East Turn & Willy's Butte Hairpin Bank: X in [190, 196], Z in [-68, -24]
+    for (let z = -68; z <= -24; z++) {
+      for (let x = 191; x <= 195; x++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (x === 193 && Math.abs(z) % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+      // Red & White racing kerbs on East apex
+      this.setBlock(196, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(190, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      // Protective outer tire barriers along the sharp bank
+      this.setBlock(197, 2, z, 'coal_block');
+      if (Math.abs(z) % 3 === 0) {
+        this.setBlock(197, 3, z, 'coal_block');
+      }
+    }
+
+    // Curved turn blend corners (South-East and North-East)
+    for (let x = 188; x <= 194; x++) {
+      for (let z = -28; z <= -22; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+      }
+      for (let z = -70; z <= -64; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+      }
+    }
+
+    // C. Canyon Back Straight: X in [162, 192], Z in [-70, -66]
+    for (let x = 162; x <= 192; x++) {
+      for (let z = -70; z <= -66; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (z === -68 && x % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+      this.setBlock(x, 1, -71, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 1, -65, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+    }
+
+    // D. West S-Curve / Chicane connecting back straight to front straight: X in [158, 164], Z in [-68, -26]
+    for (let z = -68; z <= -26; z++) {
+      for (let x = 159; x <= 163; x++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+        if (x === 161 && Math.abs(z) % 4 <= 1) {
+          this.setBlock(x, 1, z, 'gold_block');
+        }
+      }
+      this.setBlock(158, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(164, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+    }
+
+    // 3. Grand Start/Finish Gantry & Triumphal Neon Arch (X = 168, Z in [-29, -19])
+    for (const pz of [-28, -20]) {
+      for (let y = 1; y <= 7; y++) {
+        this.setBlock(168, y, pz, (y % 2 === 0) ? 'redstone_block' : 'gold_block');
+        this.setBlock(169, y, pz, 'iron_block');
+      }
+    }
+    // Overhead bridge span at Y = 7 and Y = 8
+    for (let z = -28; z <= -20; z++) {
+      this.setBlock(168, 7, z, 'gold_block');
+      this.setBlock(169, 7, z, 'iron_block');
+      this.setBlock(168, 8, z, (Math.abs(z - (-24)) <= 1) ? 'sea_lantern' : 'redstone_block');
+    }
+    // Center Piston Cup Golden Trophy atop the arch
+    this.setBlock(168, 9, -24, 'gold_block');
+    this.setBlock(168, 10, -24, 'beacon');
+    this.setBlock(167, 9, -24, 'gold_block');
+    this.setBlock(169, 9, -24, 'gold_block');
+
+    // Starting Signal Lights (Red -> Red -> Red -> Green!)
+    this.setBlock(168, 6, -26, 'redstone_block');
+    this.setBlock(168, 6, -25, 'redstone_block');
+    this.setBlock(168, 6, -23, 'gold_block');
+    this.setBlock(168, 6, -22, 'emerald_block');
+
+    // Official Landmark Sign at Start/Finish Gantry
+    this.setBlock(168, 2, -19, 'gold_block', {
+      type: 'sign',
+      title: '⚡ LIGHTNING McQUEEN STREET · PISTON CUP SPEEDWAY #95 ⚡',
+      text: '"Ka-Chow!" Welcome to Lightning McQueen Way! World-famous Radiator Springs Piston Cup Championship Raceway.\n\n"I am speed! Faster than fast, quicker than quick! Float like a Cadillac, sting like a Beemer!"\n\n• Press [E] to jump into Lightning McQueen and race in 3D!\n• Press [H] for Ka-Chow! horn · Hold [Shift] for Nitro Boost!'
+    });
+
+    // 4. Flo's V8 Café (Retro Neon Drive-In Diner & Gas Pumps) at X in [173, 181], Z in [-18, -11]
+    // Diner Checkered Foundation & Interior
+    for (let x = 173; x <= 181; x++) {
+      for (let z = -18; z <= -11; z++) {
+        const isChecker = (x + z) % 2 === 0;
+        this.setBlock(x, 1, z, isChecker ? 'quartz_block' : 'coal_block');
+        // Back and side walls
+        if (x === 173 || x === 181 || z === -11) {
+          for (let y = 2; y <= 4; y++) {
+            this.setBlock(x, y, z, (y === 3 && z === -11) ? 'cyber_glass' : 'red_terracotta');
+          }
+        }
+        // Streamline Diner Canopy Roof
+        this.setBlock(x, 5, z, 'smooth_stone');
+      }
+    }
+
+    // Monumental Giant "V8" Illuminated Neon Engine Sign on Flo's Roof (X = 177, Z = -14)
+    // Left diagonal of 'V'
+    this.setBlock(175, 6, -14, 'sea_lantern');
+    this.setBlock(175, 7, -14, 'sea_lantern');
+    this.setBlock(176, 5, -14, 'sea_lantern');
+    // Bottom point of 'V'
+    this.setBlock(177, 4, -14, 'sea_lantern');
+    // Right diagonal of 'V'
+    this.setBlock(178, 5, -14, 'sea_lantern');
+    this.setBlock(179, 6, -14, 'sea_lantern');
+    this.setBlock(179, 7, -14, 'sea_lantern');
+    // Figure '8' loops beside 'V'
+    for (let y = 5; y <= 8; y++) {
+      this.setBlock(181, y, -14, (y === 5 || y === 8 || y === 6.5) ? 'gold_block' : 'sea_lantern');
+    }
+
+    // Vintage Drive-In Gasoline Pumps in front of Flo's
+    for (const px of [175, 179]) {
+      this.setBlock(px, 1, -19, 'iron_block');
+      this.setBlock(px, 2, -19, 'redstone_block'); // Pump housing
+      this.setBlock(px, 3, -19, 'glowstone');      // Lit fuel octane dial
+    }
+
+    this.setBlock(177, 2, -18, 'gold_block', {
+      type: 'sign',
+      title: "Flo's V8 Café · Radiator Springs ⛽",
+      text: "Finest fuel in the whole Mother Road! Grab a can of high-octane blend and watch Lightning McQueen tear down the main straight!\n\n\"Float like a Cadillac, sting like a Beemer!\""
+    });
+
+    // 5. Luigi's Casa Della Tires & Guido's Pit Stop (X in [183, 189], Z in [-18, -12])
+    for (let x = 183; x <= 189; x++) {
+      for (let z = -18; z <= -12; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+      }
+    }
+    // The Iconic Leaning Tower of Tires (Stacked coal tire blocks tilted upwards to Y = 9)
+    const tireX = 186;
+    const tireZ = -15;
+    this.setBlock(tireX, 2, tireZ, 'coal_block');
+    this.setBlock(tireX, 3, tireZ, 'coal_block');
+    this.setBlock(tireX + 1, 4, tireZ, 'coal_block');
+    this.setBlock(tireX + 1, 5, tireZ, 'coal_block');
+    this.setBlock(tireX + 2, 6, tireZ, 'coal_block');
+    this.setBlock(tireX + 2, 7, tireZ, 'coal_block');
+    this.setBlock(tireX + 3, 8, tireZ, 'coal_block');
+    this.setBlock(tireX + 3, 9, tireZ, 'beacon'); // Shimmering beacon atop tire tower!
+
+    // Italian Tricolore Ribbon on Luigi's Shop
+    this.setBlock(183, 3, -18, 'emerald_block');
+    this.setBlock(184, 3, -18, 'quartz_block');
+    this.setBlock(185, 3, -18, 'redstone_block');
+
+    this.setBlock(186, 2, -18, 'gold_block', {
+      type: 'sign',
+      title: "Luigi's Casa Della Tires · Guido's Pit Stop 🛞",
+      text: "Home of the famous Leaning Tower of Tires! Guido holds the all-time world record pit stop: four Lightyear racing tires changed in under 2.5 seconds!\n\n\"Peet stop!\""
+    });
+
+    // 6. Tow Mater's Towing & Salvage Yard at (171, -34)
+    for (let x = 169; x <= 174; x++) {
+      for (let z = -36; z <= -31; z++) {
+        this.setBlock(x, 1, z, 'terracotta_adobe');
+      }
+    }
+    // Mater's rustic salvage workshop shed & wooden crane boom
+    this.setBlock(169, 2, -35, 'log');
+    this.setBlock(169, 3, -35, 'log');
+    this.setBlock(169, 4, -35, 'log');
+    this.setBlock(170, 5, -34, 'oak_planks');
+    this.setBlock(171, 6, -33, 'iron_block'); // Crane hook
+    this.setBlock(171, 5, -33, 'iron_block');
+    // Scrap tire piles
+    this.setBlock(173, 2, -35, 'coal_block');
+    this.setBlock(174, 2, -35, 'coal_block');
+    this.setBlock(173, 3, -35, 'coal_block');
+
+    this.setBlock(172, 2, -31, 'terracotta_adobe', {
+      type: 'sign',
+      title: 'Tow Mater Towing & Salvage 🛻',
+      text: '"Dad gum! I\'m the world\'s best backward driver! Just ask Lightning McQueen—we\'re best friends! Ain\'t no need to see where I\'m goin\', I just need to know where I\'ve been!"\n\nRadiator Springs Official Towing & Recovery.'
+    });
+
+    // 7. Doc Hudson #51 Fabulous Hudson Hornet Pit Crew Chief Box (178, -33)
+    for (let x = 176; x <= 181; x++) {
+      for (let z = -35; z <= -31; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+      }
+    }
+    // Doc's Midnight Blue and Gold Command Pit Box
+    for (let x = 176; x <= 181; x++) {
+      this.setBlock(x, 2, -35, 'lapis_block');
+      this.setBlock(x, 3, -35, 'gold_block');
+      this.setBlock(x, 4, -35, 'lapis_block');
+    }
+    // Piston Cup Championship Trophy & Strategy Radio Antenna
+    this.setBlock(178, 5, -35, 'beacon');
+    this.setBlock(179, 5, -35, 'iron_block');
+    this.setBlock(179, 6, -35, 'iron_block');
+    this.setBlock(179, 7, -35, 'sea_lantern');
+
+    this.setBlock(178, 2, -31, 'gold_block', {
+      type: 'sign',
+      title: 'Doc Hudson #51 Pit Crew Box 🏁',
+      text: 'Crew Chief Doc Hudson (The Fabulous Hudson Hornet):\n"When you\'re turning hard into the dirt, turn right to go left! Give it too much throttle, you lose the rear."\n\n3-Time Piston Cup Champion (1951, 1952, 1953).'
+    });
+
+    // 8. Trackside Sponsorship Billboards along Canyon Back Straight
+    // A. Rust-eze Bumper Ointment #95 Billboard at (182, -73)
+    for (let x = 180; x <= 186; x++) {
+      this.setBlock(x, 2, -73, 'iron_block');
+      for (let y = 3; y <= 5; y++) {
+        const isFrame = (x === 180 || x === 186 || y === 3 || y === 5);
+        this.setBlock(x, y, -73, isFrame ? 'gold_block' : 'red_terracotta');
+      }
+    }
+    this.setBlock(183, 4, -73, 'sea_lantern');
+    this.setBlock(183, 2, -72, 'gold_block', {
+      type: 'sign',
+      title: 'Rust-eze Medicated Bumper Ointment #95 🌟',
+      text: '"With a little Rust-eze, you can look like Lightning!"\n\nOfficial primary sponsor of Lightning McQueen and the Rust-eze Racing Center.'
+    });
+
+    // B. Dinoco 400 Championship Billboard at (166, -73)
+    for (let x = 164; x <= 170; x++) {
+      this.setBlock(x, 2, -73, 'iron_block');
+      for (let y = 3; y <= 5; y++) {
+        const isFrame = (x === 164 || x === 170 || y === 3 || y === 5);
+        this.setBlock(x, y, -73, isFrame ? 'quartz_block' : 'lapis_block');
+      }
+    }
+    this.setBlock(167, 4, -73, 'diamond_block');
+    this.setBlock(167, 2, -72, 'diamond_block', {
+      type: 'sign',
+      title: 'The Dinoco 400 · Piston Cup Championship 🏆',
+      text: 'The premier event of the racing season at the Los Angeles International Speedway! May the best racer win the legendary Piston Cup.'
+    });
+
+    // 9. Spectator Grandstand Bleachers along Start/Finish Straight (X in [160, 178], Z in [-33, -29])
+    for (let x = 160; x <= 178; x++) {
+      // Row 1
+      this.setBlock(x, 2, -28, 'stone_bricks');
+      this.setBlock(x, 2, -29, 'smooth_stone');
+      // Row 2
+      this.setBlock(x, 3, -30, 'stone_bricks');
+      this.setBlock(x, 3, -31, 'smooth_stone');
+      // Row 3
+      this.setBlock(x, 4, -32, 'stone_bricks');
+      this.setBlock(x, 4, -33, 'smooth_stone');
+      // Cheering fans holding #95 flags
+      if (x % 3 === 0) {
+        this.setBlock(x, 5, -33, 'redstone_block');
+        this.setBlock(x, 6, -33, 'gold_block'); // #95 banners
+      }
+    }
+
+    // 10. High-Intensity Stadium Floodlight Towers for Night Races (4 Corners)
+    const floodlights = [
+      [160, -20],
+      [194, -20],
+      [194, -74],
+      [160, -74]
+    ];
+    for (const [fx, fz] of floodlights) {
+      for (let y = 1; y <= 11; y++) {
+        this.setBlock(fx, y, fz, 'iron_block');
+      }
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(fx + dx, 12, fz + dz, 'sea_lantern');
+        }
+      }
+      this.setBlock(fx, 13, fz, 'beacon');
+    }
+  }
 }
+
 

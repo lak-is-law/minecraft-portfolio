@@ -108,7 +108,7 @@ export class ClimateEffects {
 
   public update(dt: number, playerPosition: THREE.Vector3, yaw: number, isNightTime: boolean = false) {
     const raining = this.weather === 'rain' || this.weather === 'thunderstorm';
-    const isAlpine = (playerPosition.z <= -70 && Math.abs(playerPosition.x) <= 55 && playerPosition.y >= 3);
+    const isAlpine = (playerPosition.z <= -90 && Math.abs(playerPosition.x) <= 40 && playerPosition.y >= 6);
     const snowing = this.weather === 'snowfall' || (this.season === 'winter' && this.weather === 'clear') || isAlpine;
     const seasonActive = (this.season === 'spring' || this.season === 'summer' || this.season === 'autumn') && !isAlpine;
 

@@ -417,6 +417,7 @@ export const PORTFOLIO_DATA = {
     { name: "Hollywood Hills & Sign", coords: [165, 26, -100], tag: "[HOLLYWOOD]", desc: "Scenic mountain ridge and illuminated block-built HOLLYWOOD sign overlooking the American tech hub" },
     { name: "The Hollywood Bowl & Amphitheatre", coords: [178, 3, -76], tag: "[HOLLYWOOD]", desc: "Iconic acoustic shell nested in the foothills, stage piano, tiered benches, and symphonic concert grounds" },
     { name: "Hollywood Pictures Studios & Walk of Fame", coords: [151, 2, -61], tag: "[HOLLYWOOD]", desc: "Historic studio soundstage lot, 22-block water tower, Walk of Fame brass stars, and red carpet Oscar premiere" },
+    { name: "Lightning McQueen Street · Radiator Springs Raceway", coords: [168, 2, -24], tag: "[McQUEEN]", desc: "3D Lightning McQueen racing track with Flo's V8 Café, Luigi's tire tower, Mater's shop, and high-speed racecar driving" },
     { name: "Imperial India · Taj Mahal", coords: [80, 4, -135], tag: "[TAJ MAHAL]", desc: "Grand white marble Taj Mahal with 4 minarets, Yamuna reflecting canal, and SRMIST academic honors" },
     { name: "Varanasi Ghats & Haveli", coords: [45, 2, -120], tag: "[VARANASI]", desc: "Historic riverfront stone steps, sacred banyan trees, and ornate Rajasthani Haveli chhatris" },
     { name: "China · Great Wall & Pagoda", coords: [-110, 2, -110], tag: "[GREAT WALL]", desc: "Mighty stone ramparts, watchtowers, 5-tier dragon pagoda, bamboo groves, and Foreign Languages embassy" },

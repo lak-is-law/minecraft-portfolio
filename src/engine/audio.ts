@@ -812,6 +812,126 @@ export class SoundEngine {
     osc.start(t);
     osc.stop(t + 0.16);
   }
+
+  // Lightning McQueen signature "Ka-Chow! ⚡" energetic chime & racing fanfare
+  public playKaChow() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+
+    // 1. "Ka-" punch (quick sharp rev burst)
+    const osc1 = this.ctx.createOscillator();
+    const gain1 = this.ctx.createGain();
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(320, t);
+    osc1.frequency.exponentialRampToValueAtTime(560, t + 0.1);
+    gain1.gain.setValueAtTime(0.25, t);
+    gain1.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+    osc1.connect(gain1);
+    gain1.connect(this.ctx.destination);
+    osc1.start(t);
+    osc1.stop(t + 0.12);
+
+    // 2. "-CHOW!" electric lightning spark & twin ascending power chord
+    const osc2 = this.ctx.createOscillator();
+    const osc3 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc2.type = 'triangle';
+    osc3.type = 'sine';
+    osc2.frequency.setValueAtTime(659, t + 0.1); // E5
+    osc2.frequency.exponentialRampToValueAtTime(1318, t + 0.35); // E6
+    osc3.frequency.setValueAtTime(880, t + 0.1); // A5
+    osc3.frequency.exponentialRampToValueAtTime(1760, t + 0.35); // A6
+
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(400, t + 0.1);
+
+    gain2.gain.setValueAtTime(0.001, t);
+    gain2.gain.setValueAtTime(0.3, t + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+    osc2.connect(filter);
+    osc3.connect(filter);
+    filter.connect(gain2);
+    gain2.connect(this.ctx.destination);
+
+    osc2.start(t + 0.1);
+    osc3.start(t + 0.1);
+    osc2.stop(t + 0.45);
+    osc3.stop(t + 0.45);
+  }
+
+  // High-performance racecar engine roar and throttle rev
+  public playRaceCarEngine(rev: number = 1.0) {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const subOsc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    const baseFreq = 95 * Math.max(0.7, Math.min(2.5, rev));
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(baseFreq, t);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, t + 0.18);
+
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(baseFreq * 0.5, t);
+    subOsc.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, t + 0.18);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(650 * rev, t);
+
+    gain.gain.setValueAtTime(0.18, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+
+    osc.connect(filter);
+    subOsc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    subOsc.start(t);
+    osc.stop(t + 0.22);
+    subOsc.stop(t + 0.22);
+  }
+
+  // Drift tire screech on pavement
+  public playTireDrift() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(840, t);
+    osc.frequency.linearRampToValueAtTime(620, t + 0.15);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1200, t);
+    filter.Q.value = 3.0;
+
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.15);
+  }
 }
 
 export const sound = new SoundEngine();

@@ -5,9 +5,10 @@ import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
 import { Player, TargetInfo } from './engine/player';
 import { HUDManager } from './ui/hud';
-import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml } from './ui/modals';
+import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml } from './ui/modals';
 import { PORTFOLIO_DATA, Project } from './data/portfolioData';
 import { sound } from './engine/audio';
+import { npcChatManager } from './engine/npcChat';
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
@@ -94,6 +95,11 @@ class Game {
 
     this.hud = new HUDManager();
     this.modals = new ModalManager();
+
+    // 4.5. Initialize NPC Chat system (Proximity greetings & periodic world lore)
+    npcChatManager.init((sender, text) => {
+      this.hud.pushChatMessage(sender, text);
+    });
 
     // 5. Sky, Celestial Bodies (Sun, Moon, Stars) & Clouds
     this.celestial = new CelestialSky(this.scene);
@@ -573,7 +579,66 @@ class Game {
     } else if (inter.type === 'teleport') {
       this.modals.openFastTravelModal();
     } else if (inter.type === 'npc') {
-      if (inter.id === 'roger') {
+      npcChatManager.handleNPCInteract(inter.id || '', inter.title);
+      if (inter.id === 'lightning_mcqueen') {
+        sound.playKaChow();
+        const qPos = this.world.getMcQueenPosition();
+        if (qPos) {
+          this.world.spawnHammerSparkles(qPos.x, qPos.y + 1.2, qPos.z);
+        }
+        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! "I am speed! Faster than fast, quicker than quick!"');
+        this.modals.openNPCDialogModal({
+          id: 'lightning_mcqueen',
+          name: 'Lightning McQueen #95',
+          title: '7-Time Piston Cup Champion · Rust-eze Racing',
+          badge: '[CHAMPION #95]',
+          badgeColor: '#dc2626',
+          avatarHtml: getLightningMcQueenAvatarHtml(),
+          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
+          options: [
+            {
+              label: '🏎️ Jump in & Drive Lightning McQueen! [E]',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.player.startDrivingMcQueen();
+                this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SHIFT for Nitro Boost, H for Ka-Chow!, SPACE to exit.');
+              }
+            },
+            {
+              label: '🏁 Hear Racing Wisdom (Doc Hudson)',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                sound.playRaceCarEngine(1.4);
+              },
+              response: '"Doc Hudson taught me everything I know out at Willy\'s Butte. When you\'re entering a slide on dirt or pavement, turn right to go left! Give it too much throttle, you lose the rear; balance the slide with counter-steer, and you blast past the pack!"\n\n— The Fabulous Hudson Hornet #51 Racing Academy'
+            },
+            {
+              label: '⚡ Shout "Ka-Chow!" with McQueen',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                sound.playKaChow();
+                sound.playLevelUp();
+                const pos = this.world.getMcQueenPosition();
+                if (pos) this.world.spawnHammerSparkles(pos.x, pos.y + 1.5, pos.z);
+                this.hud.pushChatMessage('Lightning McQueen', '⚡ KA-CHOW! Lightning spark fanfare active!');
+              },
+              response: '⚡ "KA-CHOW!!" Twin sparks burst from McQueen\'s front fenders and high-octane flame pops from his dual side exhausts! Cheering erupts from the spectator grandstands!\n\nPiston Cup Championship Energy at 100%!'
+            },
+            {
+              label: '🛞 Learn about Guido\'s World Record Pit Stop',
+              styleClass: 'mc-btn-stone',
+              response: '"At the Piston Cup tiebreaker, Chick Hicks\' crew laughed when Luigi and Guido rolled out. Then Guido performed the legendary sub-2.5-second 4-tire change! Luigi yelled \'Peet stop!\' and I rejoined in 1st place! Never underestimate the Radiator Springs crew!"'
+            }
+          ]
+        });
+      } else if (inter.id === 'roger') {
         sound.playDogBark();
         if (this.world.dogMesh) {
           this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
@@ -587,6 +652,13 @@ class Game {
           badgeColor: '#16a34a',
           avatarHtml: getRogerAvatarHtml(),
           text: '*Pant pant!* Roger gazes up with bright, warm eyes. His golden tail swishes rhythmically across the green grass!\n\n*Woof!* (He gently bumps his wet nose against your hand, waiting for pats)',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
           options: [
             {
               label: '🐾 Pet Roger gently',
@@ -631,6 +703,46 @@ class Game {
             }
           ]
         });
+      } else if (inter.id === 'oreo_cat') {
+        sound.playLevelUp();
+        if (this.world.catMesh) {
+          this.world.spawnHammerSparkles(this.world.catMesh.position.x, this.world.catMesh.position.y + 0.6, this.world.catMesh.position.z);
+        }
+        this.hud.pushChatMessage('Oreo', '*Purrrrr!* (Black & white tuxedo cat basking on coastal boulders)');
+        this.modals.openNPCDialogModal({
+          id: 'oreo_cat',
+          name: 'Oreo',
+          title: 'Tuxedo Beach Cat · Coastal Sunbather 🐾',
+          badge: '[MEOW]',
+          badgeColor: '#18181b',
+          avatarHtml: getAnimalAvatarHtml('🐱', '#18181b'),
+          text: '*Prrrr...* Oreo the black & white tuxedo cat lounges serenely on the warm coastal boulders, watching the ocean waves and twitching her tail contently.\n\nShe blinks slowly at you with bright emerald eyes.',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
+          options: [
+            {
+              label: '🐟 Feed Fresh Raw Salmon',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                sound.playLevelUp();
+                if (this.world.catMesh) {
+                  this.world.spawnHammerSparkles(this.world.catMesh.position.x, this.world.catMesh.position.y + 0.6, this.world.catMesh.position.z);
+                }
+              },
+              response: '*Crunch munch!* Oreo devours the fresh fish delicately, licks her whiskers with deep satisfaction, and gives you a soft, raspy head-butt!\n\n(+100 Feline Friendship)'
+            },
+            {
+              label: '🐾 Scratch behind ears',
+              styleClass: 'mc-btn-gold',
+              response: '*Loud motorboat purring!* Oreo stretches out her paws and rolls onto her back in complete sunlit ecstasy.'
+            }
+          ]
+        });
       } else if (inter.id?.startsWith('animal_') || inter.meta?.type === 'animal') {
         const aMeta = inter.meta;
         const aType = aMeta?.animalType || 'animal';
@@ -670,6 +782,13 @@ class Game {
           badgeColor: '#059669',
           avatarHtml: getAnimalAvatarHtml(info.emoji, info.bg),
           text: `You approach ${aTitle}! They tilt their head inquisitively, observing you in the gentle island breeze.\n\nHabitat: ${info.habit}\nSpecies: ${aSpecies}`,
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
           options: [
             {
               label: `${info.treat} Feed ${info.treatName}`,
@@ -717,6 +836,13 @@ class Game {
           badgeColor: '#ca8a04',
           avatarHtml: getLakshyaAvatarHtml(),
           text: 'Hey explorer! Welcome to my interactive 3D voxel portfolio island. I built this realm with TypeScript, Three.js, and custom WebGL shaders to showcase my engineering projects, experience, and skills in a playable Minecraft format!\n\nBeside me is my loyal companion dog Roger. What would you like to explore today?',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
           options: [
             {
               label: '💼 View My Engineering Projects',
@@ -843,6 +969,11 @@ class Game {
 
     // 2. Update World effects (spinning gems, portal particles, NPC)
     this.world.update(now * 0.001, this.player.position);
+
+    // 2.5. Update NPC Chat Manager (proximity greetings & periodic ambient world chat)
+    if (!isPaused) {
+      npcChatManager.update(now * 0.001, this.player.position);
+    }
 
     // 3. Drift blocky clouds slowly & tint dynamically during stormy weather
     if (this.cloudsMesh) {

@@ -41,11 +41,15 @@ export class Player {
   private fallbackMousePosition: { x: number; y: number } | null = null;
 
   // Vehicle Riding State
-  public ridingVehicle: 'train' | 'auto_rickshaw' | null = null;
+  public ridingVehicle: 'train' | 'auto_rickshaw' | 'lightning_mcqueen' | null = null;
   public ridingTrainIndex: number = 0;
   private lastAnnouncedStation: string | null = null;
   private rickshawSpeed: number = 0;
   private rickshawHeading: number = 0;
+  private mcQueenSpeed: number = 0;
+  private mcQueenHeading: number = 0;
+  private mcQueenDriftSoundTimer: number = 0;
+  private mcQueenEngineSoundTimer: number = 0;
 
   // Dimensions
   public height: number = 1.8;
@@ -319,7 +323,7 @@ export class Player {
       }
 
       // Space / Shift vehicle dismount
-      if (this.ridingVehicle && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) {
+      if (this.ridingVehicle && (e.code === 'Space' || ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && this.ridingVehicle !== 'lightning_mcqueen'))) {
         this.dismountVehicle();
         return;
       }
@@ -365,6 +369,12 @@ export class Player {
           this.dismountVehicle();
           return;
         }
+        // Check Lightning McQueen boarding within 6.5 blocks
+        const mcQueenPos = this.world.getMcQueenPosition();
+        if (mcQueenPos && this.position.distanceTo(mcQueenPos) < 6.5) {
+          this.startDrivingMcQueen();
+          return;
+        }
         // Check train boarding within 7.5 blocks of any live train
         const nearestTrain = this.world.getNearestTrain(this.position);
         if (nearestTrain && nearestTrain.distance < 7.5) {
@@ -385,9 +395,14 @@ export class Player {
         }
       }
 
-      // 'KeyH' for Auto-Rickshaw horn ("Pee-Pee!")
+      // 'KeyH' for vehicle horn / Ka-Chow!
       if (e.code === 'KeyH') {
-        if (this.ridingVehicle === 'auto_rickshaw') {
+        if (this.ridingVehicle === 'lightning_mcqueen') {
+          sound.playKaChow();
+          if (this.onWorldNotice) {
+            this.onWorldNotice('⚡ *KA-CHOW!* (Lightning McQueen #95)');
+          }
+        } else if (this.ridingVehicle === 'auto_rickshaw') {
           sound.playHorn();
           if (this.onWorldNotice) {
             this.onWorldNotice('📢 *PEE-PEE!* (Horn OK Please)');
@@ -664,6 +679,13 @@ export class Player {
           this.onWorldNotice(`🚆 Arriving at ${currentStation} · Press SPACE to alight`);
         }
       }
+      this.updateCameraTransform();
+      return;
+    }
+
+    // If driving Lightning McQueen, handle high-speed 3D racing physics
+    if (this.ridingVehicle === 'lightning_mcqueen') {
+      this.updateMcQueenDriving(dt);
       this.updateCameraTransform();
       return;
     }
@@ -1041,6 +1063,20 @@ export class Player {
       }
       return;
     }
+    if (this.ridingVehicle === 'lightning_mcqueen') {
+      if (this.world.mcQueenManager) {
+        this.world.mcQueenManager.isPlayerDriving = false;
+      }
+      this.ridingVehicle = null;
+      this.position.x += Math.cos(this.yaw) * 1.8;
+      this.position.z -= Math.sin(this.yaw) * 1.8;
+      this.position.y += 0.5;
+      sound.playStep('stone');
+      if (this.onWorldNotice) {
+        this.onWorldNotice('🏁 Alighted from Lightning McQueen #95.');
+      }
+      return;
+    }
     this.ridingVehicle = null;
     this.position.x += Math.cos(this.yaw) * 1.5;
     this.position.z -= Math.sin(this.yaw) * 1.5;
@@ -1121,6 +1157,101 @@ export class Player {
     this.world.updateAutoRickshaw(this.position, this.rickshawHeading);
   }
 
+  public startDrivingMcQueen() {
+    this.ridingVehicle = 'lightning_mcqueen';
+    if (this.world.mcQueenManager) {
+      this.world.mcQueenManager.isPlayerDriving = true;
+    }
+    this.isFlying = false;
+    this.mcQueenHeading = this.yaw;
+    this.mcQueenSpeed = 0;
+    this.mcQueenDriftSoundTimer = 0;
+    this.mcQueenEngineSoundTimer = 0;
+    sound.playKaChow();
+    sound.playRaceCarEngine(1.2);
+    if (this.onWorldNotice) {
+      this.onWorldNotice('⚡ Driving Lightning McQueen #95! WASD to race, hold SHIFT for Nitro Boost, H for Ka-Chow!, SPACE to exit.');
+    }
+  }
+
+  private updateMcQueenDriving(dt: number) {
+    if (!this.world.mcQueenManager) return;
+
+    const isShift = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
+    const maxSpeed = isShift ? 34.0 : 25.0; // blocks/sec (Nitro Boost up to 34!)
+    const accel = isShift ? 48.0 : 30.0;
+    const brake = 42.0;
+    const steerSpeed = 3.2;
+
+    const isW = !!this.keys['KeyW'] || this.touchMove.forward;
+    const isS = !!this.keys['KeyS'] || this.touchMove.backward;
+    const isA = !!this.keys['KeyA'] || this.touchMove.left;
+    const isD = !!this.keys['KeyD'] || this.touchMove.right;
+
+    if (isW) {
+      this.mcQueenSpeed = Math.min(maxSpeed, this.mcQueenSpeed + accel * dt);
+    } else if (isS) {
+      this.mcQueenSpeed = Math.max(-7.0, this.mcQueenSpeed - brake * dt);
+    } else {
+      if (this.mcQueenSpeed > 0) {
+        this.mcQueenSpeed = Math.max(0, this.mcQueenSpeed - 9.5 * dt);
+      } else if (this.mcQueenSpeed < 0) {
+        this.mcQueenSpeed = Math.min(0, this.mcQueenSpeed + 9.5 * dt);
+      }
+    }
+
+    let steerInput = 0;
+    if (isA) steerInput += 1;
+    if (isD) steerInput -= 1;
+
+    const isMoving = Math.abs(this.mcQueenSpeed) > 0.1;
+    const isDrifting = isMoving && Math.abs(steerInput) > 0 && Math.abs(this.mcQueenSpeed) > 14.0;
+
+    if (isMoving) {
+      const dir = this.mcQueenSpeed > 0 ? 1 : -1;
+      this.mcQueenHeading += steerInput * steerSpeed * dt * dir;
+      // Smoothly sync player camera yaw with racecar heading
+      this.yaw = THREE.MathUtils.lerp(this.yaw, this.mcQueenHeading, dt * 6.0);
+    }
+
+    const forwardX = Math.sin(this.mcQueenHeading);
+    const forwardZ = Math.cos(this.mcQueenHeading);
+    const proposedX = this.position.x + forwardX * this.mcQueenSpeed * dt;
+    const proposedZ = this.position.z + forwardZ * this.mcQueenSpeed * dt;
+
+    if (!this.checkHorizontalObstacle(proposedX, this.position.y, proposedZ)) {
+      this.position.x = proposedX;
+      this.position.z = proposedZ;
+    } else {
+      this.mcQueenSpeed = 0;
+      sound.playBlockBreak();
+    }
+
+    const gy = this.world.builder.getTerrainHeight(this.position.x, this.position.z);
+    this.position.y = Math.max(1.2, gy + 1.1);
+
+    this.world.updateMcQueen(this.position, this.mcQueenHeading, this.mcQueenSpeed, isDrifting, isShift, steerInput);
+
+    // Dynamic racing engine audio
+    if (isMoving) {
+      this.mcQueenEngineSoundTimer += dt;
+      if (this.mcQueenEngineSoundTimer > 0.28) {
+        const rev = Math.min(2.2, Math.abs(this.mcQueenSpeed) / 14.0);
+        sound.playRaceCarEngine(rev);
+        this.mcQueenEngineSoundTimer = 0;
+      }
+    }
+
+    // Drift screech audio
+    if (isDrifting) {
+      this.mcQueenDriftSoundTimer += dt;
+      if (this.mcQueenDriftSoundTimer > 0.2) {
+        sound.playTireDrift();
+        this.mcQueenDriftSoundTimer = 0;
+      }
+    }
+  }
+
   // Check if there is an obstacle block at the player's body level (feet + 0.1 to head - 0.1)
   private checkHorizontalObstacle(x: number, y: number, z: number): boolean {
     const r = this.radius * 0.9;
@@ -1167,17 +1298,18 @@ export class Player {
       if (this.firstPersonLegs) this.firstPersonLegs.visible = this.isSitting;
     } else {
       // Third Person (3P)
-      if (this.playerAvatar) this.playerAvatar.visible = true;
+      if (this.playerAvatar) this.playerAvatar.visible = (this.ridingVehicle !== 'lightning_mcqueen');
       if (this.handGroup) this.handGroup.visible = false;
       if (this.firstPersonLegs) this.firstPersonLegs.visible = false;
 
-      const dist = 3.6;
+      const dist = (this.ridingVehicle === 'lightning_mcqueen') ? 5.2 : 3.6;
+      const heightOffset = (this.ridingVehicle === 'lightning_mcqueen') ? 0.75 : 0.45;
       const dir = new THREE.Vector3(0, 0, -1).applyEuler(euler);
 
       if (this.cameraMode === 1) {
         // Third Person Behind
         this.camera.position.copy(targetPos).addScaledVector(dir, -dist);
-        this.camera.position.y += 0.45;
+        this.camera.position.y += heightOffset;
         this.camera.quaternion.setFromEuler(euler);
       } else {
         // Third Person Front (looking at Lakshya)
@@ -1212,8 +1344,8 @@ export class Player {
       return;
     }
 
-    // 2. Check if looking at Lakshya NPC, Roger the dog, or Animals
-    const npcHit = this.world.checkNPCHit(origin, this.scratchRayDir, maxReach);
+    // 2. Check if looking at Lakshya NPC, Roger the dog, or Animals (generous 14.0 block reach)
+    const npcHit = this.world.checkNPCHit(origin, this.scratchRayDir, 14.0);
     if (npcHit) {
       this.currentTarget = {
         blockPos: new THREE.Vector3(Math.floor(npcHit.position.x), Math.floor(npcHit.position.y), Math.floor(npcHit.position.z)),
@@ -1608,6 +1740,40 @@ export class Player {
     document.body.classList.add('game-active');
   }
 
+  private lastInteractTime: number = 0;
+
+  // Universal Screen-Coordinate NPC Raycasting
+  public tryInteractAtScreenCoords(clientX: number, clientY: number): boolean {
+    const now = performance.now();
+    if (now - this.lastInteractTime < 350) return false;
+    const modalContainer = document.getElementById('modal-container');
+    if (modalContainer && modalContainer.style.display === 'flex') return false;
+    if (document.body.classList.contains('modal-open')) return false;
+
+    const ndcX = (clientX / window.innerWidth) * 2 - 1;
+    const ndcY = -(clientY / window.innerHeight) * 2 + 1;
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.camera);
+    const hit = this.world.checkNPCHit(raycaster.ray.origin, raycaster.ray.direction, 35.0);
+    if (hit && this.onInteract) {
+      this.lastInteractTime = now;
+      this.triggerSwing();
+      this.onInteract({
+        blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
+        faceNormal: new THREE.Vector3(0, 1, 0),
+        distance: raycaster.ray.origin.distanceTo(hit.position),
+        interactable: {
+          type: 'npc',
+          id: hit.id,
+          title: hit.title,
+          meta: hit
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
   // Swipe-to-Look Camera on Right Half of Screen & Direct NPC Tap Raycasting
   private setupTouchLook() {
     let touchDownPos = { x: 0, y: 0 };
@@ -1646,28 +1812,10 @@ export class Player {
       this.touchLookId = null;
       if (this.domElement.hasPointerCapture(e.pointerId)) this.domElement.releasePointerCapture(e.pointerId);
 
-      // Check if this was a quick tap (< 320ms, < 18px movement) directly on an NPC
       const elapsed = performance.now() - touchDownTime;
       const dist = Math.hypot(e.clientX - touchDownPos.x, e.clientY - touchDownPos.y);
-      if (elapsed < 320 && dist < 18) {
-        const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
-        const ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.camera);
-        const hit = this.world.checkNPCHit(raycaster.ray.origin, raycaster.ray.direction, 22.0);
-        if (hit && this.onInteract) {
-          this.triggerSwing();
-          this.onInteract({
-            blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
-            faceNormal: new THREE.Vector3(0, 1, 0),
-            distance: raycaster.ray.origin.distanceTo(hit.position),
-            interactable: {
-              type: 'npc',
-              id: hit.id,
-              title: hit.title,
-              meta: hit
-            }
-          });
+      if (elapsed < 450 && dist < 24) {
+        if (this.tryInteractAtScreenCoords(e.clientX, e.clientY)) {
           return;
         }
       }
@@ -1682,30 +1830,33 @@ export class Player {
       this.touchMove.jump = false;
     });
 
-    // Desktop direct tap / click raycast when pointer is not locked
+    // Universal mobile direct touch tap listener
+    let globalTouchStart = { x: 0, y: 0, time: 0 };
+    window.addEventListener('touchstart', (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        globalTouchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, time: performance.now() };
+      }
+    }, { passive: true });
+    window.addEventListener('touchend', (e: TouchEvent) => {
+      if (document.body.classList.contains('modal-open')) return;
+      if (e.changedTouches.length === 1) {
+        const touch = e.changedTouches[0];
+        const elapsed = performance.now() - globalTouchStart.time;
+        const dist = Math.hypot(touch.clientX - globalTouchStart.x, touch.clientY - globalTouchStart.y);
+        const target = e.target instanceof Element ? e.target : null;
+        if (target?.closest('#mc-touch-controls, #mc-hotbar, #mc-quick-nav, #mc-minimap, #modal-container, #pause-overlay')) return;
+        if (elapsed < 450 && dist < 24) {
+          this.tryInteractAtScreenCoords(touch.clientX, touch.clientY);
+        }
+      }
+    }, { passive: true });
+
+    // Desktop direct tap / click raycast when clicking on 3D scene
     window.addEventListener('click', (e: MouseEvent) => {
-      if (this.isLocked || this.isMobileActive) return;
+      if (document.body.classList.contains('modal-open')) return;
       const target = e.target instanceof Element ? e.target : null;
       if (target?.closest('#mc-touch-controls, #mc-hotbar, #mc-quick-nav, #mc-minimap, #modal-container, #pause-overlay')) return;
-      const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
-      const ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.camera);
-      const hit = this.world.checkNPCHit(raycaster.ray.origin, raycaster.ray.direction, 22.0);
-      if (hit && this.onInteract) {
-        this.triggerSwing();
-        this.onInteract({
-          blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
-          faceNormal: new THREE.Vector3(0, 1, 0),
-          distance: raycaster.ray.origin.distanceTo(hit.position),
-          interactable: {
-            type: 'npc',
-            id: hit.id,
-            title: hit.title,
-            meta: hit
-          }
-        });
-      }
+      this.tryInteractAtScreenCoords(e.clientX, e.clientY);
     });
   }
 
@@ -1783,6 +1934,26 @@ export class Player {
   public handleTouchUse() {
     if (this.currentTarget && this.onInteract) {
       this.onInteract(this.currentTarget);
+      return;
+    }
+    // Proximity fallback: check if player is facing an NPC within 8.0 blocks
+    const origin = this.camera.position.clone();
+    const dir = new THREE.Vector3();
+    this.camera.getWorldDirection(dir);
+    const hit = this.world.checkNPCHit(origin, dir, 8.0);
+    if (hit && this.onInteract) {
+      this.triggerSwing();
+      this.onInteract({
+        blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
+        faceNormal: new THREE.Vector3(0, 1, 0),
+        distance: origin.distanceTo(hit.position),
+        interactable: {
+          type: 'npc',
+          id: hit.id,
+          title: hit.title,
+          meta: hit
+        }
+      });
     }
   }
 

@@ -280,7 +280,8 @@ export class HUDManager {
       } else if (inter.type === 'npc') {
         const isDog = inter.id === 'roger';
         const isAnimal = inter.id?.startsWith('animal_');
-        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : 'Talk');
+        const isCitizen = inter.id?.startsWith('citizen_');
+        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with'));
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {
@@ -683,9 +684,14 @@ export class HUDManager {
     const chatContainer = document.getElementById('mc-chat-log');
     if (!chatContainer) return;
 
+    // Highlight Minecraft coordinate tokens like [X: 4, Y: 2, Z: 8] or [X: -54, Z: -12]
+    const formattedText = text.replace(/\[X:\s*([-\d.]+)(?:,\s*Y:\s*([-\d.]+))?,\s*Z:\s*([-\d.]+)\]/g, (match) => {
+      return `<span class="mc-chat-coords">${match}</span>`;
+    });
+
     const msgEl = document.createElement('div');
     msgEl.className = 'mc-chat-msg';
-    msgEl.innerHTML = `<span class="mc-chat-sender">&lt;${sender}&gt;</span> ${text}`;
+    msgEl.innerHTML = `<span class="mc-chat-sender">&lt;${sender}&gt;</span> ${formattedText}`;
     chatContainer.appendChild(msgEl);
 
     chatContainer.scrollTop = chatContainer.scrollHeight;

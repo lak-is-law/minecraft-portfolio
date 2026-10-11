@@ -1,6 +1,7 @@
 import { DragonManager } from './dragons';
 import { FlagManager } from './flags';
 import { AnimalManager } from './animals';
+import { LightningMcQueenManager } from './lightningMcQueen';
 import * as THREE from 'three';
 import { TextureManager } from '../engine/textures';
 import { WorldBuilder, VoxelBlock } from './buildings';
@@ -36,7 +37,8 @@ export class VoxelWorld {
   public dragonManager!: DragonManager;
   public flagManager!: FlagManager;
   public animalManager!: AnimalManager;
-  private catMesh: THREE.Group | null = null;
+  public mcQueenManager!: LightningMcQueenManager;
+  public catMesh: THREE.Group | null = null;
   public dogMesh: THREE.Group | null = null;
   private dogTailMesh: THREE.Mesh | null = null;
   private dogHeadMesh: THREE.Group | null = null;
@@ -61,7 +63,17 @@ export class VoxelWorld {
   public animatedAirplanes: THREE.Group[] = [];
   private airplaneStrobes: THREE.Mesh[] = [];
   private airplaneWheels: THREE.Group[] = [];
-  public worldCitizens: { mesh: THREE.Group; basePos: THREE.Vector3; initialHeading: number; armL: THREE.Group; armR: THREE.Group; head: THREE.Group }[] = [];
+  public worldCitizens: {
+    name: string;
+    role: string;
+    tagColor: string;
+    mesh: THREE.Group;
+    basePos: THREE.Vector3;
+    initialHeading: number;
+    armL: THREE.Group;
+    armR: THREE.Group;
+    head: THREE.Group;
+  }[] = [];
 
   // Hammerable Project Banners
   public projectBanners: ProjectBanner[] = [];
@@ -100,6 +112,7 @@ export class VoxelWorld {
     this.flagManager = new FlagManager(this.scene);
     this.animalManager = new AnimalManager(this.scene, this);
     this.createAllWorldFlags();
+    this.mcQueenManager = new LightningMcQueenManager(this.scene);
   }
 
   // Efficient batching using InstancedMesh
@@ -340,68 +353,127 @@ export class VoxelWorld {
     let closestDist = reach;
     let hit: NPCHitInfo | null = null;
 
-    if (this.npcMesh) {
-      this.scratchBoxCenter.set(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z);
-      this.scratchBoxSize.set(1.2, 2.3, 1.2);
+    const testTarget = (
+      center: THREE.Vector3,
+      boxW: number,
+      boxH: number,
+      boxD: number,
+      createHit: () => NPCHitInfo
+    ) => {
+      // 1. Precise box intersection
+      this.scratchBoxCenter.copy(center);
+      this.scratchBoxSize.set(boxW, boxH, boxD);
       this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
       if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
         const dist = rayOrigin.distanceTo(this.scratchHitPoint);
         if (dist < closestDist) {
           closestDist = dist;
-          hit = { type: 'npc', id: 'lakshya_guide', position: this.npcMesh.position.clone(), title: 'Lakshya' };
+          hit = createHit();
+          return;
         }
       }
+      // 2. Proximity check for touch screens (forgiving tap radius)
+      const toTarget = center.clone().sub(rayOrigin);
+      const proj = toTarget.dot(this.scratchRay.direction);
+      if (proj > 0.3 && proj < closestDist) {
+        const perpDist = this.scratchRay.distanceToPoint(center);
+        const touchRadius = Math.max(boxW, boxD) * 1.35;
+        if (perpDist < touchRadius) {
+          closestDist = proj;
+          hit = createHit();
+        }
+      }
+    };
+
+    if (this.npcMesh) {
+      const center = new THREE.Vector3(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z);
+      testTarget(center, 1.6, 2.4, 1.6, () => ({
+        type: 'npc',
+        id: 'lakshya_guide',
+        position: this.npcMesh!.position.clone(),
+        title: 'Lakshya'
+      }));
     }
 
     if (this.dogMesh) {
-      this.scratchBoxCenter.set(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z);
-      this.scratchBoxSize.set(1.0, 1.1, 1.0);
-      this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
-      if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
-        const dist = rayOrigin.distanceTo(this.scratchHitPoint);
-        if (dist < closestDist) {
-          closestDist = dist;
-          hit = { type: 'dog', id: 'roger', position: this.dogMesh.position.clone(), title: 'Roger' };
-        }
-      }
+      const center = new THREE.Vector3(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z);
+      testTarget(center, 1.4, 1.2, 1.4, () => ({
+        type: 'dog',
+        id: 'roger',
+        position: this.dogMesh!.position.clone(),
+        title: 'Roger'
+      }));
+    }
+
+    if (this.catMesh) {
+      const center = new THREE.Vector3(this.catMesh.position.x, this.catMesh.position.y + 0.35, this.catMesh.position.z);
+      testTarget(center, 1.2, 1.0, 1.2, () => ({
+        type: 'npc',
+        id: 'oreo_cat',
+        position: this.catMesh!.position.clone(),
+        title: 'Oreo the Tuxedo Cat'
+      }));
+    }
+
+    if (this.mcQueenManager && this.mcQueenManager.group) {
+      const qPos = this.mcQueenManager.getPosition();
+      const center = new THREE.Vector3(qPos.x, qPos.y + 0.6, qPos.z);
+      testTarget(center, 2.4, 1.8, 3.6, () => ({
+        type: 'npc',
+        id: 'lightning_mcqueen',
+        position: qPos.clone(),
+        title: 'Lightning McQueen #95'
+      }));
     }
 
     if (this.animalManager && this.animalManager.animals) {
       for (const animal of this.animalManager.animals) {
         const aPos = animal.group.position;
-        if (rayOrigin.distanceTo(aPos) > reach + 5.0) continue;
+        if (rayOrigin.distanceTo(aPos) > reach + 8.0) continue;
 
-        let h = 1.6;
-        let w = 1.6;
+        let h = 1.8;
+        let w = 1.8;
         if (animal.type === 'giraffe' || animal.type === 'elephant' || animal.type === 'temple_elephant') {
-          h = 3.2;
-          w = 2.6;
+          h = 3.4;
+          w = 2.8;
         } else if (animal.type === 'lion' || animal.type === 'tiger' || animal.type === 'polar_bear' || animal.type === 'panda') {
-          h = 2.0;
-          w = 1.8;
+          h = 2.2;
+          w = 2.0;
         } else if (animal.type === 'penguin' || animal.type === 'peacock' || animal.type === 'flamingo') {
-          h = 1.4;
-          w = 1.2;
+          h = 1.5;
+          w = 1.4;
         }
 
-        this.scratchBoxCenter.set(aPos.x, aPos.y + h * 0.5, aPos.z);
-        this.scratchBoxSize.set(w, h, w);
-        this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
-        if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
-          const dist = rayOrigin.distanceTo(this.scratchHitPoint);
-          if (dist < closestDist) {
-            closestDist = dist;
-            hit = {
-              type: 'animal',
-              id: `animal_${animal.type}_${animal.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
-              position: aPos.clone(),
-              title: animal.name,
-              animalType: animal.type,
-              animalSpecies: animal.species,
-              animalEntity: animal
-            };
+        const center = new THREE.Vector3(aPos.x, aPos.y + h * 0.5, aPos.z);
+        testTarget(center, w, h, w, () => ({
+          type: 'animal',
+          id: `animal_${animal.type}_${animal.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
+          position: aPos.clone(),
+          title: animal.name,
+          animalType: animal.type,
+          animalSpecies: animal.species,
+          animalEntity: animal
+        }));
+      }
+    }
+
+    if (this.worldCitizens) {
+      for (const citizen of this.worldCitizens) {
+        const cPos = citizen.mesh.position;
+        if (rayOrigin.distanceTo(cPos) > reach + 8.0) continue;
+        const center = new THREE.Vector3(cPos.x, cPos.y + 1.0, cPos.z);
+        testTarget(center, 1.4, 2.2, 1.4, () => ({
+          type: 'npc',
+          id: `citizen_${citizen.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
+          position: cPos.clone(),
+          title: citizen.name,
+          meta: {
+            type: 'citizen',
+            role: citizen.role,
+            tagColor: citizen.tagColor,
+            position: cPos.clone()
           }
-        }
+        }));
       }
     }
 
@@ -1142,6 +1214,10 @@ export class VoxelWorld {
 
     if (this.animalManager) {
       this.animalManager.update(time, playerPos);
+    }
+
+    if (this.mcQueenManager) {
+      this.mcQueenManager.update(0.016, playerPos);
     }
 
     if (this.volcanoSmoke) {
@@ -1933,6 +2009,22 @@ export class VoxelWorld {
     return { position: seatPos, rotationY: this.autoRickshawMesh.rotation.y };
   }
 
+  // Lightning McQueen Driving Helpers
+  public getMcQueenPosition(): THREE.Vector3 | null {
+    if (!this.mcQueenManager) return null;
+    return this.mcQueenManager.getPosition();
+  }
+
+  public updateMcQueen(pos: THREE.Vector3, heading: number, speed: number, isDrifting: boolean, isBoost: boolean, steerInput: number) {
+    if (!this.mcQueenManager) return;
+    this.mcQueenManager.setManualTransform(pos, heading, speed, isDrifting, isBoost, steerInput);
+  }
+
+  public getMcQueenRideTransform(): { position: THREE.Vector3, rotationY: number } | null {
+    if (!this.mcQueenManager) return null;
+    return this.mcQueenManager.getRideTransform();
+  }
+
   // -------------------------------------------------------------
   // LIVING WORLD CITIZENS: CULTURALLY AUTHENTIC RESIDENTS
   // -------------------------------------------------------------
@@ -2156,6 +2248,9 @@ export class VoxelWorld {
 
       this.scene.add(citizenGroup);
       this.worldCitizens.push({
+        name: c.name,
+        role: c.role,
+        tagColor: c.tagColor,
         mesh: citizenGroup,
         basePos: new THREE.Vector3(c.x, groundY, c.z),
         initialHeading: c.heading,
