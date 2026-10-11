@@ -877,6 +877,10 @@ class Game {
 }
 
 // Start game when DOM is loaded
-window.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
   new Game();
-});
+} else {
+  window.addEventListener('DOMContentLoaded', () => {
+    new Game();
+  });
+}
