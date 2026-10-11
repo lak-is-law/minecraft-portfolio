@@ -43,115 +43,115 @@ export interface Achievement {
 
 export const PORTFOLIO_DATA = {
   profile: {
-    name: "Lakshya",
-    title: "Software Engineer & Designer",
-    level: 22,
-    affiliation: "SRM Institute of Science and Technology, Chennai",
-    degree: "B.Tech in Computer Science and Engineering (2022 - 2026)",
-    gpa: "CGPA 4.37 / 5.0",
-    bio: "Computer Science student at SRMIST, Chennai building at the intersection of software engineering, applied AI, and design. Comfortable moving between technical work and creative pursuits like design, music, and public speaking, with a steady focus on continuous growth and long-term impact.",
-    email: "contact@lakshya.uk",
-    portfolioUrl: "https://lakshya.uk",
-    resumeUrl: "https://resume.lakshya.uk",
-    githubUrl: "https://github.com/lak-is-law",
-    linkedinUrl: "https://linkedin.com/in/lakshya-success",
-    resumeFileName: "Lakshya.Resume.pdf"
+    name: "Lakshya & Mashu",
+    title: "Minecraft Realm Explorers & Builders",
+    level: 99,
+    affiliation: "Crossroads Citadel Realm",
+    degree: "Minecraft Grandmaster Architects",
+    gpa: "Infinite Creativity",
+    bio: "Welcome to Lakshya & Mashu's Minecraft Realm! A massive 3D voxel sandbox archipelago crafted with love, featuring majestic world monuments, vibrant safari wildlife, and hidden dungeons.",
+    email: "",
+    portfolioUrl: "https://mahaaszuv.vercel.app",
+    resumeUrl: "",
+    githubUrl: "",
+    linkedinUrl: "",
+    resumeFileName: ""
   },
 
   projects: [
     {
-      id: "todar",
-      title: "TODAR 2.0",
-      subtitle: "Smart Expense Tracker",
-      tagline: "Finance-management platform converting spending into structured data and anomaly-based alerts",
-      category: "Fintech",
+      id: "nether_fortress",
+      title: "Nether Fortress Expedition",
+      subtitle: "Blaze Spawners & Nether Warts",
+      tagline: "Venture through the underworld to secure blaze rods, wither skeleton skulls, and ancient fortress loot",
+      category: "Nether Raid",
       description: [
-        "Shipped a finance-management platform converting fragmented spending into structured data, REST-based reporting, and anomaly-based alerts.",
-        "Crafted for global teens who reported spending savings of up to 45%.",
-        "Integrated lightweight TensorFlow.js models for client-side spending forecasts and threshold alerts."
+        "Delve across vast lava oceans into towering nether brick fortresses guarded by blazes and wither skeletons.",
+        "Harvest essential brewing ingredients including nether wart farms and magma creams.",
+        "Prepare for the ultimate Wither boss battle by collecting rare wither skeleton skulls."
       ],
-      metrics: ["Up to 45% Spending Savings Reported", "TensorFlow.js Anomaly Detection", "Client-Side Privacy"],
-      tags: ["Node.js", "Express", "SQLite", "TensorFlow.js", "REST APIs"],
-      liveUrl: "https://todar.finance.lakshya.uk",
-      githubUrl: "https://github.com/lak-is-law",
-      accentColor: "#22c55e",
-      iconBlock: "emerald_block",
+      metrics: ["Fortress Bastions Secured", "Blaze Rod Farm Built", "Wither Skulls Unlocked"],
+      tags: ["Nether Brick", "Blaze Spawner", "Lava Oceans", "Potion Brewing", "Boss Raid"],
+      liveUrl: "",
+      githubUrl: "",
+      accentColor: "#ef4444",
+      iconBlock: "redstone_block",
       bannerCoords: { x: 108.9, y: 4, z: -20, rotY: -Math.PI / 2 }
     },
     {
-      id: "trackyourflight",
-      title: "TrackYourFlight",
-      subtitle: "Global Flight Observatory",
-      tagline: "High-performance global flight tracker pulling real-time ADS-B transponder telemetry for 12,000+ flights",
-      category: "Full Stack",
+      id: "end_dimension",
+      title: "The End & Dragon's Roost",
+      subtitle: "Ender Dragon & Elytra Wings",
+      tagline: "Traverse obsidian pillars, defeat the Ender Dragon, and glide with Elytra wings across outer End Cities",
+      category: "Dimensional Raid",
       description: [
-        "High-performance global flight tracker pulling real-time ADS-B transponder telemetry for 12,000+ flights simultaneously.",
-        "Built a custom zero-dependency 3D Canvas engine rendering great-circle geodesic paths and Fibonacci point-distribution spheres at 60 FPS.",
-        "Engineered serverless proxy pipelines for ultra-low latency real-time aviation telemetry."
+        "Scale the obsidian pillars and bow down end crystals to defeat the mighty Ender Dragon.",
+        "Toss ender pearls into miniature void gateways leading to floating End City chorus fruit islands.",
+        "Raid flying End Ships to claim the fabled Elytra wings and Dragon Head trophy."
       ],
-      metrics: ["12,000+ Real-Time Flights", "Zero-Dependency 3D Canvas Engine", "60 FPS Geodesic Paths"],
-      tags: ["Vanilla JS", "Canvas API", "Node.js", "Serverless", "Aviation Tech"],
-      liveUrl: "https://trackyourflight.lakshya.uk",
-      githubUrl: "https://github.com/lak-is-law",
-      accentColor: "#0284c7",
-      iconBlock: "diamond_block",
+      metrics: ["Ender Dragon Defeated", "Elytra Wings Acquired", "Shulker Box Logistics"],
+      tags: ["End Stone", "Obsidian Pillars", "Dragon Breath", "Chorus Fruit", "Elytra Flight"],
+      liveUrl: "",
+      githubUrl: "",
+      accentColor: "#a855f7",
+      iconBlock: "amethyst_block",
       bannerCoords: { x: 108.9, y: 4, z: -10, rotY: -Math.PI / 2 }
     },
     {
-      id: "locateart",
-      title: "Locate Art",
-      subtitle: "Cultural-Heritage Mapping Platform",
-      tagline: "Solo full-stack interactive map cataloging 120+ traditional art forms across the Indian subcontinent",
-      category: "Full Stack",
+      id: "ocean_monument",
+      title: "Ocean Monument & Conduit",
+      subtitle: "Elder Guardians & Prismarine Core",
+      tagline: "Submerge into the deep abyss to defeat the 3 Elder Guardians and activate the Conduit Heart",
+      category: "Aquatic Quest",
       description: [
-        "Architected and shipped a solo full-stack interactive map cataloging 120+ traditional art forms across the Indian subcontinent.",
-        "Features a high-performance navigation map with 3 switchable tile layers, smooth fly-to animations, and security hardening.",
-        "Engineered spatial PostgreSQL database schema with Supabase backend integration."
+        "Navigate deep oceanic trenches with Water Breathing elixirs to discover monumental prismarine temples.",
+        "Overcome the Mining Fatigue curse and vanquish 3 Elder Guardians safeguarding 8 gold blocks.",
+        "Assemble nautilus shells and the Heart of the Sea to ignite a permanent underwater Conduit."
       ],
-      metrics: ["120+ Traditional Art Forms", "3 Switchable Tile Layers", "Next.js 16 & Supabase"],
-      tags: ["Next.js 16", "React 19", "Supabase", "PostgreSQL", "MapLibre GL"],
-      liveUrl: "https://locate.art.lakshya.uk",
-      githubUrl: "https://github.com/lak-is-law",
-      accentColor: "#f59e0b",
-      iconBlock: "gold_block",
+      metrics: ["Conduit Activated", "3 Elder Guardians Defeated", "8 Gold Treasure Blocks"],
+      tags: ["Prismarine", "Sea Lantern", "Heart of the Sea", "Conduit Power", "Dolphin Grace"],
+      liveUrl: "",
+      githubUrl: "",
+      accentColor: "#0284c7",
+      iconBlock: "diamond_block",
       bannerCoords: { x: 108.9, y: 4, z: 0, rotY: -Math.PI / 2 }
     },
     {
-      id: "redgambit",
-      title: "Red Gambit",
-      subtitle: "Adaptive Chess Platform",
-      tagline: "Multi-tier strategy gaming engine running on Stockfish API",
-      category: "AI & Gaming",
+      id: "ancient_city",
+      title: "Ancient City & Deep Dark",
+      subtitle: "Sculk Shriekers & The Warden",
+      tagline: "Crawl silently beneath bedrock to loot deep dark chests while avoiding the terrifying Warden",
+      category: "Stealth & Survival",
       description: [
-        "Designed and deployed an adaptive chess platform running on the Stockfish API.",
-        "Engineered four difficulty tiers: Adaptive, Medium, Hard, and God Mode.",
-        "Real-time move evaluation, match recovery, and responsive accessibility UI themes."
+        "Descend below Y=-50 into massive forgotten underground civilizations consumed by sculk catalysts.",
+        "Sneak past sculk sensors on wool paths to prevent triggering shrieker summons.",
+        "Retrieve Echo Shards to forge the Recovery Compass and uncover Swift Sneak III enchantment books."
       ],
-      metrics: ["Stockfish Engine Integrated", "4 AI Difficulty Tiers", "Adaptive Heuristic Search"],
-      tags: ["TypeScript", "Stockfish API", "Game Logic", "Canvas", "Node.js"],
-      liveUrl: "https://redgambit.lakshya.uk",
-      githubUrl: "https://github.com/lak-is-law",
-      accentColor: "#ef4444",
-      iconBlock: "redstone_block",
+      metrics: ["Ancient City Excavated", "Swift Sneak III Found", "Recovery Compass Forged"],
+      tags: ["Sculk", "Deepslate", "Echo Shards", "Warden Lair", "Silent Footsteps"],
+      liveUrl: "",
+      githubUrl: "",
+      accentColor: "#0f766e",
+      iconBlock: "emerald_block",
       bannerCoords: { x: 108.9, y: 4, z: 10, rotY: -Math.PI / 2 }
     },
     {
-      id: "spiderverse",
-      title: "Spider-Verse Portal",
-      subtitle: "Browser-Based AR Experience",
-      tagline: "Interactive AR portal with privacy-first client-side hand tracking",
-      category: "AR & Graphics",
+      id: "woodland_mansion",
+      title: "Woodland Mansion Stronghold",
+      subtitle: "Evokers & Totem of Undying",
+      tagline: "Follow woodland explorer maps through dark oak canopies to claim the Totem of Undying",
+      category: "Dark Forest Raid",
       description: [
-        "Crafted an interactive browser AR experience with privacy-first client-side hand-tracking.",
-        "Implemented an adaptive-quality rendering engine sustaining 60 FPS across desktop and mobile devices.",
-        "Engineered custom WebGL shaders and real-time hand gesture recognition."
+        "Trade with cartographer villagers for explorer maps tracking secluded 3-story timber palaces.",
+        "Battle vindicators wielding iron axes and evade deadly evoker fangs in dark labyrinth corridors.",
+        "Slay powerful evokers to claim the sacred Totem of Undying, granting immunity to fatal wounds."
       ],
-      metrics: ["Client-Side Hand-Tracking", "Sustained 60 FPS", "Custom WebGL GLSL Shaders"],
-      tags: ["Three.js", "WebGL", "GLSL", "MediaPipe", "OpenCV"],
-      liveUrl: "https://spiderverse.lakshya.uk",
-      githubUrl: "https://github.com/lak-is-law",
-      accentColor: "#a855f7",
-      iconBlock: "amethyst_block",
+      metrics: ["Totem of Undying Won", "Allay Companions Rescued", "Dark Forest Mapped"],
+      tags: ["Dark Oak", "Evoker", "Totem of Undying", "Allay", "Explorer Map"],
+      liveUrl: "",
+      githubUrl: "",
+      accentColor: "#15803d",
+      iconBlock: "gold_block",
       bannerCoords: { x: 108.9, y: 4, z: 20, rotY: -Math.PI / 2 }
     }
   ] as Project[],
@@ -159,120 +159,119 @@ export const PORTFOLIO_DATA = {
   experience: [
     {
       id: "exp-daa",
-      role: "Head of Alumni Relations",
-      company: "Directorate of Alumni Affairs, SRMIST",
-      period: "Aug 2022 - Present",
+      role: "Master Architects Guild",
+      company: "Grand Builders Society",
+      period: "Era I - Present",
       type: "Leadership",
       description: [
-        "Mentored incoming student teams and spearheaded alumni-engagement strategy across 100+ alumni-engagement events.",
-        "Served as the primary point of contact for high-profile alumni relationships, faculty leadership, and student stakeholders."
+        "Designed and constructed monumental world landmarks including the Taj Mahal, Eiffel Tower, and Big Ben.",
+        "Pioneered authentic voxel aesthetics, atmospheric shaders, and panoramic archipelago scale."
       ],
-      highlights: ["Head of Alumni Relations", "100+ Events Spearheaded", "High-Profile Alumni Strategy"],
+      highlights: ["Master Builder", "World Landmarks", "Voxel Architecture"],
       accentColor: "#f59e0b"
     },
     {
       id: "exp-genospark",
-      role: "Full Stack Developer",
-      company: "GenoSpark",
-      period: "2024",
+      role: "Redstone Engineers Guild",
+      company: "Automated Contraptions Clan",
+      period: "Era II",
       type: "Work",
       description: [
-        "Developed and maintained full-stack web applications in a production environment.",
-        "Awarded verified Certificate of Excellence for platform performance and reliable architecture delivery."
+        "Engineered piston elevators, automated item sorting arrays, and beacon telemetry circuits.",
+        "Optimized tick-based redstone logic gates for seamless multiplayer server performance."
       ],
-      highlights: ["Certificate of Excellence", "Production Web Engineering", "Full-Stack Deployment"],
-      accentColor: "#3b82f6"
+      highlights: ["Redstone Master", "Automated Sorters", "Island Express Railway"],
+      accentColor: "#ef4444"
     },
     {
       id: "exp-emcee",
-      role: "Official EMCEE",
-      company: "Directorate of Student Affairs, SRMIST",
-      period: "Sep 2024 - Feb 2026",
+      role: "Safari Wildlife Keepers",
+      company: "Biome Conservation Order",
+      period: "Era II - Present",
       type: "Leadership",
       description: [
-        "Anchored large-scale institutional events for audiences of 5,000+ attendees.",
-        "Represented the university on stage through live hosting, ceremony coordination, and intercultural communication."
+        "Established expansive ecological reserves for lions, pandas, elephants, giraffes, and polar bears.",
+        "Created lush sanctuary habitats that preserve animal species across all climate zones."
       ],
-      highlights: ["5,000+ Attendee Audiences", "Official Stage Anchor", "Intercultural Communication"],
-      accentColor: "#06b6d4"
+      highlights: ["Safari Reserve", "Wildlife Sanctuary", "Biodiversity"],
+      accentColor: "#10b981"
     },
     {
       id: "exp-6pistons",
-      role: "Product Designer",
-      company: "6Pistons",
-      period: "Dec 2024 - Aug 2025",
+      role: "Speed & Flight Guild",
+      company: "Radiator Springs Racing & Elytra Flight",
+      period: "Era III",
       type: "Work",
       description: [
-        "Co-led design, media production, and automotive infographic work across creative campaigns.",
-        "Delivered technical infographic guides and visual designs for clients including Mercedes-Benz, VinFast, and Audi."
+        "Designed the high-speed Lightning McQueen race track and aerial Elytra gliding rings.",
+        "Set server flight speed records gliding through sunset cloud formations."
       ],
-      highlights: ["Mercedes-Benz, VinFast & Audi", "Automotive Infographics", "Design & Media Production"],
+      highlights: ["Lightning McQueen #95", "Elytra Flight Courses", "Radiator Springs"],
       accentColor: "#ec4899"
     },
     {
       id: "exp-ucsi",
-      role: "Most Innovative Product Award",
-      company: "UCSI Consulting Group",
-      period: "Jan 2024",
+      role: "Dragon Slayers Order",
+      company: "The End Expeditionary Force",
+      period: "Era III",
       type: "Work",
       description: [
-        "Selected as the winning team among 500+ teams and 3,000+ students.",
-        "Recognized for translating an intricate business bottleneck into a practical, presentable technical solution under high-pressure consulting constraints."
+        "Led the realm raid against the Ender Dragon and successfully conquered the outer End islands.",
+        "Installed Ender Chest logistics networks linking all major island settlements."
       ],
-      highlights: ["1st Place out of 500+ Teams", "3,000+ Students Competed", "Kuala Lumpur Consulting Pitch"],
-      accentColor: "#10b981"
+      highlights: ["Dragon Slayer", "Ender Chest Network", "Outer End Explorer"],
+      accentColor: "#a855f7"
     },
     {
       id: "exp-srmist",
-      role: "B.Tech in Computer Science and Engineering",
-      company: "SRM Institute of Science and Technology, Chennai",
-      period: "2022 - 2026",
+      role: "Crossroads Citadel Founders",
+      company: "Lakshya & Mashu Realm Nexus",
+      period: "Founding Era",
       type: "Education",
       description: [
-        "CGPA: 4.37 / 5.0.",
-        "Specialization in applied AI, software engineering, and systems architecture.",
-        "Core coursework: Distributed Systems, Deep Learning, Cloud Computing, Algorithms, Database Management."
+        "Established the central spawn island nexus, emerald fountain, and world travel portals.",
+        "Created the welcoming gateway where all explorers begin their voxel journey."
       ],
-      highlights: ["CGPA 4.37 / 5.0", "Computer Science Major", "Chennai Campus"],
-      accentColor: "#10b981"
+      highlights: ["Spawn Citadel", "Emerald Fountain", "Co-Founders"],
+      accentColor: "#06b6d4"
     }
   ] as Experience[],
 
   leadership: [
     {
       id: "lead-daa",
-      role: "Head of Alumni Relations",
-      organization: "Directorate of Alumni Affairs, SRMIST",
-      period: "Aug 2022 - Present",
+      role: "High Architect of Crossroads Citadel",
+      organization: "Citadel Council",
+      period: "Era I - Present",
       description: [
-        "Mentored incoming student teams and spearheaded alumni-engagement strategy across 100+ events.",
-        "Maintained active relationships across university leadership, corporate alumni, and undergraduate fellows."
+        "Supervised landmark planning, road networks, and bridge infrastructure linking the archipelagos.",
+        "Maintained server building guidelines ensuring stunning vistas across all biomes."
       ],
-      highlights: ["Head of Alumni Relations", "100+ Events Coordinated", "Cross-Functional Mentorship"],
+      highlights: ["Citadel Council", "Bridge Networks", "Master Planning"],
       accentColor: "#f59e0b"
     },
     {
       id: "lead-emcee",
-      role: "Official EMCEE",
-      organization: "Directorate of Student Affairs, SRMIST",
-      period: "Sep 2024 - Feb 2026",
+      role: "Festival Herald & Tournament Host",
+      organization: "Crossroads Games",
+      period: "Era II - Present",
       description: [
-        "Anchored flagship university conventions, cultural festivals, and ceremonies for 5,000+ attendees.",
-        "Master of ceremonies for university inaugurations and international delegates."
+        "Hosted realm tournaments, dragon flight races, and parkour championships for dozens of concurrent players.",
+        "Organized community build battles at the Hollywood Bowl amphitheatre."
       ],
-      highlights: ["Audiences of 5,000+ Attendees", "Live Ceremony Hosting", "Public Speaking"],
+      highlights: ["Tournament Host", "Dragon Races", "Hollywood Bowl"],
       accentColor: "#06b6d4"
     },
     {
       id: "lead-redbull",
-      role: "Brand & PR Event Lead",
-      organization: "Campus Collaborations",
-      period: "2024 - 2026",
+      role: "Speedrun & Nitro Grand Prix Marshal",
+      organization: "Radiator Springs Speedway",
+      period: "Era II - Present",
       description: [
-        "Led public relations, brand engagement, and large-scale youth event execution, including the Red Bull campus collaboration.",
-        "Coordinated multi-channel communications, student turnout, and media coverage."
+        "Organized multi-lap kart and horse races through the desert canyon track.",
+        "Engineered automatic lap counters and firework celebration podiums."
       ],
-      highlights: ["Red Bull Collaboration", "Large-Scale Execution", "Brand Engagement"],
+      highlights: ["Grand Prix Marshal", "Radiator Springs", "Lap Counters"],
       accentColor: "#8b5cf6"
     }
   ],
@@ -280,132 +279,126 @@ export const PORTFOLIO_DATA = {
   research: [
     {
       id: "res-rockfall",
-      title: "Rockfall Prediction: AI-Based Hazard Mitigation System",
-      domain: "AI & Geological Hazard Mitigation",
-      description: "Research Assistant guided by Dr. Abirami G., Associate Professor at SRM School of Computing. Currently engineering an advanced Machine Learning model to predict rockfall risks for critical hazard mitigation and geological infrastructure safety.",
-      tags: ["Machine Learning", "Data Science", "Hazard Mitigation", "SRM School of Computing"]
+      title: "Ancient Cavern Geotechnical Survey",
+      domain: "Underground Exploration & Cave Systems",
+      description: "Surveying seismic vibrations and gravel stability in lush and dripstone caves deep beneath the mountain ranges.",
+      tags: ["Deep Caves", "Dripstone", "Geology", "Mining Safety"]
     },
     {
       id: "res-dist-systems",
-      title: "Cloud & Distributed Flight Telemetry Systems",
-      domain: "Distributed Telemetry & 3D WebGL",
-      description: "Architected real-time ingestion pipelines processing global ADS-B transponder telemetry across 12,000+ simultaneous aircraft, paired with a custom zero-dependency 3D canvas rendering engine.",
-      tags: ["Distributed Telemetry", "Canvas API", "ADS-B", "Aviation Systems"]
+      title: "Real-Time Elytra Flight Dynamics & Air Currents",
+      domain: "Aerodynamics & Elytra Gliding",
+      description: "Mapping thermal updrafts and firework rocket propulsion for optimal glide trajectories across the 400-block map.",
+      tags: ["Elytra Flight", "Propulsion", "Aerodynamics", "Sky Navigation"]
     },
     {
       id: "res-edge-ai",
-      title: "Client-Side Edge AI for Financial Anomaly Detection",
-      domain: "Edge Inference & Data Privacy",
-      description: "Implemented lightweight neural predictive models executing client-side in browser memory via TensorFlow.js to detect personal spending anomalies with zero external data transmission.",
-      tags: ["TensorFlow.js", "Edge Inference", "Anomaly Detection", "Client Privacy"]
+      title: "Villager Trading Economics & Iron Golem Automation",
+      domain: "Economic Simulation & Village Defense",
+      description: "Modeling emerald exchange equilibria and optimal golem spawning geometry to safeguard border settlements.",
+      tags: ["Villager Trading", "Emerald Economy", "Iron Golem Defense"]
     }
   ],
 
   interests: [
     {
-      title: "Automotive Engineering & Infographics",
-      tag: "[AUTO]",
-      desc: "Deep fascination with automotive architectures, vehicle specifications, and aerodynamics. Co-led infographic campaigns for Mercedes-Benz, VinFast, and Audi at 6Pistons."
+      title: "Voxel Architecture & Landmark Replicas",
+      tag: "[BUILD]",
+      desc: "Recreating world wonders block-by-block with authentic scale, interior details, and night illumination."
     },
     {
-      title: "Strategy Gaming & Engine Analysis",
-      tag: "[CHESS]",
-      desc: "Passionate chess and strategy player exploring Stockfish API integration, game-tree evaluation, and heuristic minimax algorithms."
+      title: "Redstone Logic & Automated Farms",
+      tag: "[REDSTONE]",
+      desc: "Constructing multi-item sorters, flying machines, auto-crafters, and wireless sculk trigger networks."
     },
     {
-      title: "3D Graphics & Browser Game Development",
-      tag: "[3D]",
-      desc: "Crafting WebGL shaders, zero-dependency canvas engines, and gamified web experiences reaching over 15,000 global visitors."
+      title: "Wildlife Conservation & Safari Breeding",
+      tag: "[WILDLIFE]",
+      desc: "Breeding pandas, nurturing polar bear cubs, and maintaining natural animal sanctuaries across the western savannah."
     },
     {
-      title: "Live Hosting & Stage Anchoring",
-      tag: "[HOST]",
-      desc: "Official university EMCEE addressing central auditoriums of 5,000+ attendees."
+      title: "Realm Exploration & Cartography",
+      tag: "[EXPLORE]",
+      desc: "Mapping ocean trenches, frozen peaks, desert dunes, and lush flower fields on high-resolution wall maps."
     }
   ],
 
   languages: [
     {
-      language: "Korean (한국어)",
-      level: "Intermediate 1 (Certified)",
-      highlight: "Awarded 1st Runner-Up at SRMIST Department of Foreign Languages 2022 representing Republic of Korea",
-      tag: "[KOREAN]"
+      language: "Galactic Alphabet (Enchanting Table)",
+      level: "Master Enchanter",
+      highlight: "Deciphering standard galactic runes for Fortune III, Looting III, and Mending",
+      tag: "[ENCHANT]"
     },
     {
-      language: "Mandarin Chinese",
-      level: "Working Competency",
-      highlight: "East Asian linguistics and diplomatic cultural research",
-      tag: "[CHINESE]"
+      language: "Villager Dialect (Huh / Hrmm)",
+      level: "Fluent Trader",
+      highlight: "Mastering trade negotations with armorer, librarian, and weaponsmith villagers",
+      tag: "[VILLAGER]"
     },
     {
-      language: "English",
-      level: "Native / Full Professional",
-      highlight: "Primary medium of software development, documentation, and university emceeing",
-      tag: "[ENGLISH]"
+      language: "Piglin Pig-Latin & Barter Shouts",
+      level: "Gold Standard",
+      highlight: "Trading gold ingots safely in Nether bastions for fire resistance and ender pearls",
+      tag: "[NETHER]"
     },
     {
-      language: "Hindi",
-      level: "Native",
-      highlight: "Fluent spoken and written communication",
-      tag: "[HINDI]"
-    },
-    {
-      language: "Regional Languages of India",
-      level: "Multilingual Communicator",
-      highlight: "Speaks Gujarati, Assamese, Nagamese, Mizo, and Meiteilon / Manipuri",
-      tag: "[REGIONAL]"
+      language: "Universal Minecraft Emotes",
+      level: "Global Explorer",
+      highlight: "Crouch-spamming friendship, sword blocking greetings, and sharing bread with travelers",
+      tag: "[COMMUNITY]"
     }
   ],
 
   skillCategories: [
     {
-      name: "Frontend Alchemy",
-      potionName: "Potion of Swift Interfaces",
+      name: "Agility & Speed",
+      potionName: "Potion of Swiftness",
       color: "#38bdf8",
       skills: [
-        { name: "React.js", level: 96, tag: "REACT" },
-        { name: "Next.js 16", level: 94, tag: "NEXT" },
-        { name: "TypeScript", level: 93, tag: "TS" },
-        { name: "Tailwind CSS", level: 96, tag: "CSS" },
-        { name: "Three.js & WebGL", level: 90, tag: "WEBGL" },
-        { name: "HTML5 Canvas API", level: 95, tag: "CANVAS" }
+        { name: "Swiftness II Sprinting", level: 99, tag: "SPEED" },
+        { name: "Leaping & Parkour", level: 95, tag: "JUMP" },
+        { name: "Dolphin's Grace Swimming", level: 92, tag: "SWIM" },
+        { name: "Feather Falling IV", level: 98, tag: "FALL" },
+        { name: "Elytra Rocket Gliding", level: 96, tag: "FLIGHT" },
+        { name: "Boat on Ice Racing", level: 94, tag: "DRIFT" }
       ]
     },
     {
-      name: "Backend & Systems",
-      potionName: "Potion of Deep Architectures",
-      color: "#22c55e",
+      name: "Combat & Fortitude",
+      potionName: "Potion of Strength & Fire Res",
+      color: "#ef4444",
       skills: [
-        { name: "Node.js & Express", level: 94, tag: "NODE" },
-        { name: "PostgreSQL & Supabase", level: 90, tag: "PG" },
-        { name: "RESTful APIs", level: 96, tag: "API" },
-        { name: "SQLite & Firebase", level: 91, tag: "SQLITE" },
-        { name: "FastAPI & Python", level: 86, tag: "PYTHON" },
-        { name: "MapLibre GL & Spatial Data", level: 88, tag: "MAPS" }
+        { name: "Netherite Sharpness V", level: 98, tag: "SWORD" },
+        { name: "Fire Resistance Brew", level: 99, tag: "FIRE" },
+        { name: "Regeneration & Golden Apples", level: 96, tag: "REGEN" },
+        { name: "Totem of Undying Mastery", level: 100, tag: "TOTEM" },
+        { name: "Shield Parrying & Defense", level: 93, tag: "SHIELD" },
+        { name: "Crossbow Multishot & Piercing", level: 91, tag: "BOW" }
       ]
     },
     {
-      name: "Artificial Intelligence",
-      potionName: "Elixir of Cognitive Models",
-      color: "#ec4899",
+      name: "Sight & Sorcery",
+      potionName: "Potion of Night Vision & Conduit",
+      color: "#10b981",
       skills: [
-        { name: "TensorFlow.js", level: 90, tag: "TFJS" },
-        { name: "Stockfish API & Game AI", level: 92, tag: "CHESS" },
-        { name: "Predictive Analytics", level: 88, tag: "PREDICT" },
-        { name: "Anomaly Detection", level: 89, tag: "ANOMALY" },
-        { name: "MediaPipe & Computer Vision", level: 85, tag: "VISION" }
+        { name: "Night Vision in Deep Caves", level: 98, tag: "SIGHT" },
+        { name: "Conduit Heart Underwater Sight", level: 94, tag: "CONDUIT" },
+        { name: "Water Breathing Elixir", level: 96, tag: "AQUA" },
+        { name: "Invisibility Cloaking", level: 88, tag: "STEALTH" },
+        { name: "Hero of the Village Discount", level: 95, tag: "HERO" }
       ]
     },
     {
-      name: "Cloud & DevOps",
-      potionName: "Brew of Cloud Titans",
+      name: "Enchanting & Redstone",
+      potionName: "Beacon of Master Engineering",
       color: "#eab308",
       skills: [
-        { name: "Git & GitHub", level: 96, tag: "GIT" },
-        { name: "Vercel & Serverless CI/CD", level: 94, tag: "VERCEL" },
-        { name: "Linux & Bash Systems", level: 90, tag: "LINUX" },
-        { name: "Azure & Cloud Infra", level: 82, tag: "AZURE" },
-        { name: "Docker & Containers", level: 80, tag: "DOCKER" }
+        { name: "Mending & Unbreaking III", level: 99, tag: "MEND" },
+        { name: "Fortune III & Silk Touch", level: 97, tag: "MINE" },
+        { name: "Redstone Repeater & Comparator Logic", level: 95, tag: "REDSTONE" },
+        { name: "Infinity & Flame Archery", level: 96, tag: "FLAME" },
+        { name: "Quad-Beacon Haste II & Speed II", level: 98, tag: "BEACON" }
       ]
     }
   ] as SkillCategory[],

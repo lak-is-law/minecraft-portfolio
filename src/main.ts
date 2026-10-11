@@ -5,7 +5,7 @@ import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
 import { Player, TargetInfo } from './engine/player';
 import { HUDManager } from './ui/hud';
-import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml } from './ui/modals';
+import { ModalManager, getLakshyaAvatarHtml, getMashuAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml, getCitizenAvatarHtml } from './ui/modals';
 import { PORTFOLIO_DATA, Project } from './data/portfolioData';
 import { sound } from './engine/audio';
 import { npcChatManager } from './engine/npcChat';
@@ -63,12 +63,12 @@ class Game {
     // 1. Renderer setup
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: false,
+      antialias: true,
       powerPreference: 'high-performance',
       preserveDrawingBuffer: false
     });
     this.renderer.setSize(window.visualViewport?.width ?? window.innerWidth, window.visualViewport?.height ?? window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.shadowMap.enabled = false;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
@@ -90,7 +90,7 @@ class Game {
     this.player.onBeforeScreenshot = () => {
       this.renderer.render(this.scene, this.camera);
     };
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.scene.add(this.camera);
 
     this.hud = new HUDManager();
@@ -162,7 +162,7 @@ class Game {
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height);
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     };
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
@@ -537,10 +537,10 @@ class Game {
       this.hud.pushChatMessage('Minigame', 'Entered Builder\'s Arena!');
     } else if (inter.type === 'skills') {
       this.modals.openSkillsModal();
-      this.hud.pushChatMessage('Alchemy', 'Opened Skills & Proficiencies matrix.');
+      this.hud.pushChatMessage('Alchemy', 'Opened Alchemy Brewing Stand & Potions Guide.');
     } else if (inter.type === 'chest') {
       this.modals.openResumeChestModal();
-      this.hud.pushChatMessage('Loot', 'Opened Ancient Resume Chest!');
+      this.hud.pushChatMessage('Loot', 'Opened Ancient Dungeon Treasure Chest!');
     } else if (inter.type === 'sign') {
       const title = inter.title || 'Notice';
       const text = inter.text || '';
@@ -586,15 +586,16 @@ class Game {
         if (qPos) {
           this.world.spawnHammerSparkles(qPos.x, qPos.y + 1.2, qPos.z);
         }
-        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! "I am speed! Faster than fast, quicker than quick!"');
+        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! Roaring at Radiator Springs Speedway [X: 130, Y: 2, Z: -18]! "I am speed!"');
         this.modals.openNPCDialogModal({
           id: 'lightning_mcqueen',
           name: 'Lightning McQueen #95',
           title: '7-Time Piston Cup Champion · Rust-eze Racing',
           badge: '[CHAMPION #95]',
           badgeColor: '#dc2626',
+          locationBadge: 'Radiator Springs Speedway [X: 130, Z: -18]',
           avatarHtml: getLightningMcQueenAvatarHtml(),
-          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
+          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway [X: 130, Y: 2, Z: -18]! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -610,6 +611,11 @@ class Game {
                 this.player.startDrivingMcQueen();
                 this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SHIFT for Nitro Boost, H for Ka-Chow!, SPACE to exit.');
               }
+            },
+            {
+              label: '📍 Where is this raceway located?',
+              styleClass: 'mc-btn-stone',
+              response: '⚡ "You\'re at Radiator Springs Speedway & Hollywood Boulevard [X: 130, Y: 2, Z: -18]! Just east is Neo York Times Square, to the west is the Spawn Citadel, and north is the Hollywood Sign!"'
             },
             {
               label: '🏁 Hear Racing Wisdom (Doc Hudson)',
@@ -643,15 +649,16 @@ class Game {
         if (this.world.dogMesh) {
           this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
         }
-        this.hud.pushChatMessage('Roger', '*Woof woof!* (Wags tail happily and leans into your hand)');
+        this.hud.pushChatMessage('Roger', '*Woof woof!* Welcome to Spawn Plaza [X: 4.5, Y: 2, Z: 7.3] beside Lakshya! (Wags tail happily)');
         this.modals.openNPCDialogModal({
           id: 'roger',
           name: 'Roger',
           title: 'Loyal Companion · Best Boy 🐾',
           badge: '[GOOD BOY]',
           badgeColor: '#16a34a',
+          locationBadge: 'Spawn Plaza [X: 4.5, Z: 7.3]',
           avatarHtml: getRogerAvatarHtml(),
-          text: '*Pant pant!* Roger gazes up with bright, warm eyes. His golden tail swishes rhythmically across the green grass!\n\n*Woof!* (He gently bumps his wet nose against your hand, waiting for pats)',
+          text: '*Pant pant!* Roger gazes up with bright, warm eyes at Spawn Plaza [X: 4.5, Y: 2.0, Z: 7.3]!\n\nHis golden tail swishes rhythmically across the green grass beside Lakshya! *Woof!* (He gently bumps his wet nose against your hand, waiting for pats)',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -697,6 +704,11 @@ class Game {
               response: '*BARK!* You toss an oak twig across the spawn plaza! Roger bolts across the cobble path, snatches it mid-air with an Olympic jump, and trots proudly back to drop it directly on your shoes!\n\n*Woof woof!* (Throw it again!)'
             },
             {
+              label: '📍 Roger, where are we located right now?',
+              styleClass: 'mc-btn-stone',
+              response: '*Woof!* Roger does a happy spin and taps his paw on the grass!\n\n📍 Roger\'s Spot: Crossroads Citadel Spawn Plaza [X: 4.5, Y: 2.0, Z: 7.3]\n\n"We are sitting right beside Lakshya in the center of the world! To the west is the Safari Zoo, to the east is Neo York and Hollywood, and straight ahead is the Emerald Fountain!"'
+            },
+            {
               label: '🧭 Ask Roger where Lakshya\'s work is',
               styleClass: 'mc-btn-stone',
               response: '*Arf!* Roger sits upright, points his furry snout towards the eastern pillars and the Redstone Nether Portal, then glances back at Lakshya with a wagging tail!\n\nRoger recommends checking the Golden Landmark Pillars or opening the Fast Travel Map [M]!'
@@ -708,15 +720,16 @@ class Game {
         if (this.world.catMesh) {
           this.world.spawnHammerSparkles(this.world.catMesh.position.x, this.world.catMesh.position.y + 0.6, this.world.catMesh.position.z);
         }
-        this.hud.pushChatMessage('Oreo', '*Purrrrr!* (Black & white tuxedo cat basking on coastal boulders)');
+        this.hud.pushChatMessage('Oreo', '*Purrrrr!* Basking at Coastal Boulders [X: 10.5, Y: 1, Z: 82.5] by Palm Paradise Beach!');
         this.modals.openNPCDialogModal({
           id: 'oreo_cat',
           name: 'Oreo',
           title: 'Tuxedo Beach Cat · Coastal Sunbather 🐾',
           badge: '[MEOW]',
           badgeColor: '#18181b',
+          locationBadge: 'Coastal Boulders [X: 10.5, Z: 82.5]',
           avatarHtml: getAnimalAvatarHtml('🐱', '#18181b'),
-          text: '*Prrrr...* Oreo the black & white tuxedo cat lounges serenely on the warm coastal boulders, watching the ocean waves and twitching her tail contently.\n\nShe blinks slowly at you with bright emerald eyes.',
+          text: '*Prrrr...* Oreo the black & white tuxedo cat lounges serenely on the warm coastal boulders [X: 10.5, Y: 1.0, Z: 82.5] by Palm Paradise Beach!\n\nShe watches the turquoise ocean waves and twitches her tail contently in the warm sunlight.',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -737,6 +750,11 @@ class Game {
               response: '*Crunch munch!* Oreo devours the fresh fish delicately, licks her whiskers with deep satisfaction, and gives you a soft, raspy head-butt!\n\n(+100 Feline Friendship)'
             },
             {
+              label: '📍 Where is this beach spot located?',
+              styleClass: 'mc-btn-stone',
+              response: '*Mew...* Oreo stretches out her paws gracefully.\n\n📍 Location: Coastal Boulders Beachfront [X: 10.5, Y: 1.0, Z: 82.5]\n\n"You found the sunny ocean rocks southwest of Spawn Citadel! North is the Sunset Saloon, and just along the shore is Palm Paradise Beach and the Grand Ferris Wheel."'
+            },
+            {
               label: '🐾 Scratch behind ears',
               styleClass: 'mc-btn-gold',
               response: '*Loud motorboat purring!* Oreo stretches out her paws and rolls onto her back in complete sunlit ecstasy.'
@@ -748,6 +766,10 @@ class Game {
         const aType = aMeta?.animalType || 'animal';
         const aTitle = inter.title || 'Wild Animal';
         const aSpecies = aMeta?.animalSpecies || 'Island Inhabitant';
+        const aPos = aMeta?.position || { x: 0, y: 1, z: 0 };
+        const posX = Math.round(aPos.x);
+        const posY = Math.round(aPos.y);
+        const posZ = Math.round(aPos.z);
 
         sound.playAnimalSound(aType);
         if (aMeta?.position) {
@@ -772,7 +794,7 @@ class Game {
 
         const info = animalInfoMap[aType] || { emoji: '🐾', treat: '🌾', treatName: 'Wild Grass Treat', bg: '#1e293b', habit: 'Island Sanctuary', fact: 'A friendly creature living in harmony across Lakshya\'s Minecraft portfolio archipelago!' };
 
-        this.hud.pushChatMessage(aTitle, `Observing ${aTitle} (${aSpecies}) in ${info.habit}.`);
+        this.hud.pushChatMessage(aTitle, `*Observing ${aTitle} (${aSpecies}) at ${info.habit} [X: ${posX}, Y: ${posY}, Z: ${posZ}]!*`);
 
         this.modals.openNPCDialogModal({
           id: inter.id || `animal_${aType}`,
@@ -780,8 +802,9 @@ class Game {
           title: `${aSpecies} · ${info.habit}`,
           badge: `[SAFARI]`,
           badgeColor: '#059669',
+          locationBadge: `${info.habit} [X: ${posX}, Z: ${posZ}]`,
           avatarHtml: getAnimalAvatarHtml(info.emoji, info.bg),
-          text: `You approach ${aTitle}! They tilt their head inquisitively, observing you in the gentle island breeze.\n\nHabitat: ${info.habit}\nSpecies: ${aSpecies}`,
+          text: `You approach ${aTitle}! They tilt their head inquisitively, observing you in the gentle island breeze.\n\n📍 Location: ${info.habit} [X: ${posX}, Y: ${posY}, Z: ${posZ}]\nSpecies: ${aSpecies}`,
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -815,27 +838,47 @@ class Game {
               response: `You reach out and stroke ${aTitle} gently. They relax under your touch and lean in affectionately!\n\nNature harmony achieved (+25 Exploration XP)!`
             },
             {
+              label: '📍 Tell me about your habitat & location',
+              styleClass: 'mc-btn-stone',
+              response: `📍 Sanctuary Dossier [${aTitle}]:\n\n• Habitat: ${info.habit}\n• Coordinates: [X: ${posX}, Y: ${posY}, Z: ${posZ}]\n• Species: ${aSpecies}\n\n"${info.fact}"\n\nPress [M] anytime to open Fast Travel if you want to warp back here!`
+            },
+            {
               label: '📖 Learn Wildlife Fun Fact',
               styleClass: 'mc-btn-blue',
               response: `🌿 Wildlife Log [${aSpecies}]:\n\n"${info.fact}"\n\nLocated within the ${info.habit} of Lakshya's portfolio island!`
             }
           ]
         });
-      } else {
+      } else if (inter.id?.startsWith('citizen_') || inter.meta?.type === 'citizen') {
+        const cMeta = inter.meta;
+        const cRole = cMeta?.role || 'Island Resident';
+        const cTitle = inter.title || 'Island Citizen';
+        const cPos = cMeta?.position || { x: 0, y: 2, z: 0 };
+        const posX = Math.round(cPos.x);
+        const posY = Math.round(cPos.y);
+        const posZ = Math.round(cPos.z);
+        const cColor = cMeta?.tagColor || '#38bdf8';
+
         sound.playVillagerHuh();
-        if (this.world.npcMesh) {
-          this.world.spawnHammerSparkles(this.world.npcMesh.position.x, this.world.npcMesh.position.y + 1.2, this.world.npcMesh.position.z);
+        if (cPos) {
+          this.world.spawnHammerSparkles(cPos.x, cPos.y + 1.2, cPos.z);
         }
-        this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to my Minecraft Portfolio world! Press M anytime for Fast Travel.');
+
+        const npcId = inter.id || `citizen_${cTitle.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const npcInfo = npcChatManager.handleNPCInteract(npcId, cTitle);
+        const areaName = npcInfo?.areaName || 'World District';
+
+        this.hud.pushChatMessage(cTitle, `Greetings traveler! Speaking from ${areaName} [X: ${posX}, Y: ${posY}, Z: ${posZ}].`);
 
         this.modals.openNPCDialogModal({
-          id: 'lakshya_guide',
-          name: 'Lakshya',
-          title: 'Software Engineer & Designer · Portfolio Guide',
-          badge: '[LVL 22]',
-          badgeColor: '#ca8a04',
-          avatarHtml: getLakshyaAvatarHtml(),
-          text: 'Hey explorer! Welcome to my interactive 3D voxel portfolio island. I built this realm with TypeScript, Three.js, and custom WebGL shaders to showcase my engineering projects, experience, and skills in a playable Minecraft format!\n\nBeside me is my loyal companion dog Roger. What would you like to explore today?',
+          id: npcId,
+          name: cTitle,
+          title: `${cRole} · ${areaName}`,
+          badge: `[RESIDENT]`,
+          badgeColor: cColor,
+          locationBadge: `${areaName} [X: ${posX}, Z: ${posZ}]`,
+          avatarHtml: getCitizenAvatarHtml(npcInfo?.emoji || '👤', cColor),
+          text: `Hello there! I'm ${cTitle}, the ${cRole} here at ${areaName} [X: ${posX}, Y: ${posY}, Z: ${posZ}]. What brings you to our corner of the world today?`,
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -845,25 +888,111 @@ class Game {
           },
           options: [
             {
-              label: '💼 View My Engineering Projects',
+              label: '📍 Tell me about your location & surroundings',
+              styleClass: 'mc-btn-blue',
+              response: npcInfo?.detailedLocationText || `📍 Location: ${areaName} [X: ${posX}, Y: ${posY}, Z: ${posZ}]\n\nWelcome to ${areaName}! There is plenty to explore here. Press [M] anytime to open the Fast Travel map!`
+            },
+            {
+              label: '🗺️ Where should I explore nearby?',
+              styleClass: 'mc-btn-gold',
+              response: `Nearby Highlights around ${areaName}:\n\n${npcInfo?.nearbyLandmarks ? npcInfo.nearbyLandmarks.map(l => `• ${l}`).join('\n') : '• Explore the nearby landmark monuments and pathways!'}\n\nCoordinates: [X: ${posX}, Y: ${posY}, Z: ${posZ}]`
+            },
+            {
+              label: '👋 Wave and say hello',
               styleClass: 'mc-btn-green',
               action: () => {
-                this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
-              }
-            },
+                sound.playLevelUp();
+                if (cPos) this.world.spawnHammerSparkles(cPos.x, cPos.y + 1.2, cPos.z);
+              },
+              response: `*Waves warmly!* "Wonderful to meet you! Enjoy your journey through Lakshya's Minecraft portfolio realm!"`
+            }
+          ]
+        });
+      } else if (inter.id === 'mashu_guide' || inter.title?.includes('Mashu')) {
+        sound.playLevelUp();
+        if (this.world.mashuMesh) {
+          this.world.spawnHammerSparkles(this.world.mashuMesh.position.x, this.world.mashuMesh.position.y + 1.2, this.world.mashuMesh.position.z);
+        }
+        this.hud.pushChatMessage('Mashu', '🌸 "Welcome traveler! Lakshya and I are so happy to have you in our Minecraft realm!"');
+
+        this.modals.openNPCDialogModal({
+          id: 'mashu_guide',
+          name: 'Mashu',
+          title: 'Lakshya\'s Princess & Realm Co-Founder 🌸',
+          badge: '[LVL 22]',
+          badgeColor: '#ec4899',
+          locationBadge: 'Spawn Plaza [X: 2.3, Z: 7.5]',
+          avatarHtml: getMashuAvatarHtml(),
+          text: '🌸 "Hi there explorer! Welcome to our magical Minecraft realm! Lakshya and I crafted this entire voxel archipelago together block by block with love.\n\nFrom majestic world wonders to wild safari reserves and scenic viewpoints, there is so much to see. What would you like to know?"',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
+          options: [
             {
-              label: '📜 Open Career Resume Chest',
+              label: '💖 Tell me about you and Lakshya!',
               styleClass: 'mc-btn-gold',
-              action: () => {
-                this.modals.openResumeChestModal();
-              }
+              response: '🌸 "He is the sweetest! Lakshya built this whole voxel world for me so we could adventure and build together. Every single monument, flower garden, and hidden bridge has a sweet story behind it!"'
             },
             {
-              label: '⚡ Inspect Technical Skills Matrix',
-              styleClass: 'mc-btn-blue',
+              label: '✨ You look absolutely stunning!',
+              styleClass: 'mc-btn-green',
               action: () => {
-                this.modals.openSkillsModal();
-              }
+                sound.playLevelUp();
+                if (this.world.mashuMesh) {
+                  this.world.spawnHammerSparkles(this.world.mashuMesh.position.x, this.world.mashuMesh.position.y + 1.2, this.world.mashuMesh.position.z);
+                }
+              },
+              response: '*Blushes warmly with floating heart sparkles!* 🌸 "Aww, thank you so much! You\'re so sweet! Lakshya always compliments me like that too. May your travels through our realm be filled with joy and diamonds!"'
+            },
+            {
+              label: '🗺️ What are your favorite spots on the island?',
+              styleClass: 'mc-btn-blue',
+              response: '🌸 "My favorite spots:\n\n1. The Eiffel Tower at sunset — the panoramic view of the ocean is breathtaking!\n2. The Bamboo Safari Sanctuary feeding bamboo to the baby pandas.\n3. Sitting right here by the Emerald Fountain watching Roger chase butterflies!"'
+            },
+            {
+              label: '💎 Any realm secrets you can share?',
+              styleClass: 'mc-btn-stone',
+              response: '🌸 "Secret tips from Mashu:\n\n• Press [F] to toggle Flight Mode and soar into the clouds!\n• Press [C] or [F5] to admire your character from 3rd person perspective!\n• Press [M] anytime to open the Fast Travel Map and warp instantly across the world!"'
+            },
+            {
+              label: '🐶 How is Roger doing today?',
+              styleClass: 'mc-btn-stone',
+              response: '🌸 "Roger is the most loyal, lovable wolf ever! He loves ear scratches and always guards both Lakshya and me at spawn. Give him some love before you go explore!"'
+            }
+          ]
+        });
+      } else {
+        sound.playVillagerHuh();
+        if (this.world.npcMesh) {
+          this.world.spawnHammerSparkles(this.world.npcMesh.position.x, this.world.npcMesh.position.y + 1.2, this.world.npcMesh.position.z);
+        }
+        this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to our Minecraft realm! Stationed at Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2, Z: 7.5]. Press M anytime for Fast Travel.');
+
+        this.modals.openNPCDialogModal({
+          id: 'lakshya_guide',
+          name: 'Lakshya',
+          title: 'Realm Explorer & Architect ⚔️',
+          badge: '[LVL 22]',
+          badgeColor: '#ca8a04',
+          locationBadge: 'Spawn Plaza [X: 3.5, Z: 7.5]',
+          avatarHtml: getLakshyaAvatarHtml(),
+          text: 'Hey explorer! Welcome to our interactive 3D voxel realm. I am stationed right here at the Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5] by the Emerald Fountain.\n\nBeside me are my beautiful girlfriend Mashu and loyal companion dog Roger. What would you like to explore today?',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
+          options: [
+            {
+              label: '👑 Tell me about Mashu!',
+              styleClass: 'mc-btn-gold',
+              response: 'Mashu is my girlfriend and the light of my life! She is the co-founder of this Minecraft realm and helped inspire all the beauty you see here. Make sure to talk to her right beside me!'
             },
             {
               label: '🗺️ Open Fast Travel Realm Map [M]',
@@ -873,14 +1002,40 @@ class Game {
               }
             },
             {
+              label: '🏆 View Realm Expeditions',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
+              }
+            },
+            {
+              label: '📜 Open Ancient Dungeon Treasure Vault',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.modals.openResumeChestModal();
+              }
+            },
+            {
+              label: '⚡ Inspect Alchemy Potions Guide',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                this.modals.openSkillsModal();
+              }
+            },
+            {
+              label: '📍 Where are you and what are the island coordinates?',
+              styleClass: 'mc-btn-stone',
+              response: 'I am stationed at Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5] with Mashu & Roger!\n\nMajor Island Realms & Coordinates:\n• Crossroads Citadel (Spawn): [X: 0, Z: 0]\n• Safari Wildlife Park: [X: -65, Z: 0]\n• Neo York Tech Metropolis: [X: 100, Z: 0]\n• Imperial India & Taj Mahal: [X: 80, Z: -135]\n• London Elizabeth Tower (Big Ben): [X: -32, Z: -58]\n• Paris Eiffel Tower: [X: 26, Z: -38]\n• Tokyo Shibuya Scramble: [X: -155, Z: -80]\n• Egypt Giza Pyramids: [X: -155, Z: 36]\n• Mexico City Zócalo: [X: -105, Z: 60]\n• Dubai Burj Khalifa: [X: 170, Z: 42]\n• Hollywood Hills & Bowl: [X: 165, Z: -100]\n\nPress [M] anytime to open the Fast Travel Map and warp anywhere!'
+            },
+            {
               label: '🐶 Tell me about your dog Roger!',
               styleClass: 'mc-btn-stone',
-              response: 'That\'s Roger! He\'s my golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
+              response: 'That\'s Roger! He\'s our golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
             },
             {
               label: '🧭 Where should I explore first on the island?',
               styleClass: 'mc-btn-stone',
-              response: 'Start by inspecting the Emerald Central Fountain right behind me!\n\n• West: Giant Panda Bamboo Valley & African Lion Kopje\n• East: Taj Mahal, India Gate, & Cultural Pavilions\n• South: Redstone Nether Portal, Circular Railway Train, and Builder Arena\n\nOr press [M] anytime to teleport directly to any landmark!'
+              response: 'Start by inspecting the Emerald Central Fountain right behind us!\n\n• West: Giant Panda Bamboo Valley & African Lion Kopje\n• East: Taj Mahal, India Gate, & Cultural Pavilions\n• South: Redstone Nether Portal, Circular Railway Train, and Builder Arena\n\nOr press [M] anytime to teleport directly to any landmark!'
             },
             {
               label: '🎮 Any secret tips or Easter eggs?',

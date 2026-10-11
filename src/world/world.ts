@@ -40,6 +40,8 @@ export class VoxelWorld {
   public mcQueenManager!: LightningMcQueenManager;
   public catMesh: THREE.Group | null = null;
   public dogMesh: THREE.Group | null = null;
+  public mashuMesh: THREE.Group | null = null;
+  private mashuSparkles: THREE.Group | null = null;
   private dogTailMesh: THREE.Mesh | null = null;
   private dogHeadMesh: THREE.Group | null = null;
   private volcanoSmoke: THREE.Points | null = null;
@@ -392,6 +394,16 @@ export class VoxelWorld {
         id: 'lakshya_guide',
         position: this.npcMesh!.position.clone(),
         title: 'Lakshya'
+      }));
+    }
+
+    if (this.mashuMesh) {
+      const center = new THREE.Vector3(this.mashuMesh.position.x, this.mashuMesh.position.y + 1.0, this.mashuMesh.position.z);
+      testTarget(center, 1.6, 2.4, 1.6, () => ({
+        type: 'npc',
+        id: 'mashu_guide',
+        position: this.mashuMesh!.position.clone(),
+        title: 'Mashu 🌸'
       }));
     }
 
@@ -965,7 +977,7 @@ export class VoxelWorld {
 
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
-    nameCtx.fillText('Software Engineer & Designer', 192, 68);
+    nameCtx.fillText('Realm Explorer & Architect', 192, 68);
 
     const nameTexture = new THREE.CanvasTexture(nameCanvas);
     nameTexture.magFilter = THREE.NearestFilter;
@@ -979,6 +991,301 @@ export class VoxelWorld {
 
     // --- COMPANION DOG: ROGER (Wolf with Red Collar from og-image.jpg) ---
     this.createRogerDog();
+
+    // --- CO-FOUNDER & BELOVED: MASHU (Lakshya's GF) ---
+    this.createMashuNPC();
+  }
+
+  // 3D NPC of Mashu (Lakshya's girlfriend) standing gracefully beside him at spawn
+  private createMashuNPC() {
+    if (this.mashuMesh) return;
+
+    const mashu = new THREE.Group();
+    // Stand beside Lakshya on the left at spawn
+    const groundY = this.getGroundHeight(2.3, 7.5, 2);
+    mashu.position.set(2.3, groundY, 7.5);
+    mashu.rotation.y = Math.PI;
+
+    // Palette designed for a very pretty, aesthetic Minecraft girlfriend avatar
+    const skinMat = new THREE.MeshLambertMaterial({ color: 0xfce8d8 }); // Radiant, porcelain skin tone
+    const blushMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 }); // Soft rosy cheeks
+    const hairDarkMat = new THREE.MeshLambertMaterial({ color: 0x3d2012 }); // Rich glossy chestnut brown hair
+    const hairToneMat = new THREE.MeshLambertMaterial({ color: 0x542c19 }); // Warm highlights
+    const flowerPinkMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 }); // Cherry blossom pink flower
+    const flowerCenterMat = new THREE.MeshBasicMaterial({ color: 0xfef08a }); // Golden flower center
+    const flowerLeafMat = new THREE.MeshLambertMaterial({ color: 0x4ade80 }); // Soft spring green leaf
+    const dressBodiceMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 }); // Pretty rose pastel dress
+    const dressTrimMat = new THREE.MeshLambertMaterial({ color: 0xfff1f2 }); // Cream lace trim & collar
+    const dressSkirtMat = new THREE.MeshLambertMaterial({ color: 0xfb7185 }); // Tiered rose skirt
+    const dressRuffleMat = new THREE.MeshLambertMaterial({ color: 0xfda4af }); // Soft pastel pink ruffle
+    const ribbonMat = new THREE.MeshLambertMaterial({ color: 0xc084fc }); // Lavender ribbon bow
+    const pearlMat = new THREE.MeshBasicMaterial({ color: 0xfef9c3 }); // Pearl necklace
+    const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const eyeIrisMat = new THREE.MeshBasicMaterial({ color: 0x312e81 }); // Sparkling violet-indigo eyes
+    const eyeSparkleMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Catchlight glint
+    const lashMat = new THREE.MeshBasicMaterial({ color: 0x1e1b4b }); // Delicate eyelashes
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0xe11d48 }); // Sweet rose smile
+    const legsMat = new THREE.MeshLambertMaterial({ color: 0xfde2ce }); // Tights / skin tone
+    const shoeMat = new THREE.MeshLambertMaterial({ color: 0xffffff }); // Chic white Mary Jane boots
+    const shoeStrapMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 }); // Pink strap & bow
+
+    // --- HEAD GROUP ---
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 1.52, 0);
+
+    const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.48, 0.48), skinMat);
+    headGroup.add(headMesh);
+
+    // Hair Top Volume
+    const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.18, 0.52), hairDarkMat);
+    hairTop.position.set(0, 0.16, 0);
+    headGroup.add(hairTop);
+
+    // Flowing front bangs framing forehead
+    const bangCenter = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.1), hairDarkMat);
+    bangCenter.position.set(0, 0.13, 0.22);
+    headGroup.add(bangCenter);
+
+    const bangL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.24, 0.12), hairToneMat);
+    bangL.position.set(-0.17, 0.06, 0.21);
+    headGroup.add(bangL);
+
+    const bangR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.24, 0.12), hairToneMat);
+    bangR.position.set(0.17, 0.06, 0.21);
+    headGroup.add(bangR);
+
+    // Long cascading side tresses past shoulders
+    const sideHairL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.48, 0.16), hairDarkMat);
+    sideHairL.position.set(-0.21, -0.16, 0.06);
+    headGroup.add(sideHairL);
+
+    const sideHairR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.48, 0.16), hairDarkMat);
+    sideHairR.position.set(0.21, -0.16, 0.06);
+    headGroup.add(sideHairR);
+
+    // Long hair cascading down back
+    const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.58, 0.14), hairDarkMat);
+    hairBack.position.set(0, -0.12, -0.19);
+    headGroup.add(hairBack);
+
+    const hairBackLower = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.35, 0.1), hairToneMat);
+    hairBackLower.position.set(0, -0.42, -0.18);
+    headGroup.add(hairBackLower);
+
+    // Cherry Blossom Flower Clip (Nestled above her right temple)
+    const flowerGroup = new THREE.Group();
+    flowerGroup.position.set(0.22, 0.16, 0.18);
+    // 4 petals
+    const petal1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), flowerPinkMat);
+    petal1.position.set(-0.04, 0.04, 0);
+    flowerGroup.add(petal1);
+    const petal2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), flowerPinkMat);
+    petal2.position.set(0.04, 0.04, 0);
+    flowerGroup.add(petal2);
+    const petal3 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), flowerPinkMat);
+    petal3.position.set(-0.04, -0.04, 0);
+    flowerGroup.add(petal3);
+    const petal4 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.04), flowerPinkMat);
+    petal4.position.set(0.04, -0.04, 0);
+    flowerGroup.add(petal4);
+    // Golden center
+    const flowerCore = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), flowerCenterMat);
+    flowerGroup.add(flowerCore);
+    // Green leaf accent
+    const flowerLeaf = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 0.03), flowerLeafMat);
+    flowerLeaf.position.set(0.08, 0.06, -0.01);
+    flowerGroup.add(flowerLeaf);
+    headGroup.add(flowerGroup);
+
+    // Eyelashes & Eyelids (Feminine anime-style liner)
+    const lashL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), lashMat);
+    lashL.position.set(-0.11, 0.04, 0.245);
+    headGroup.add(lashL);
+    const lashR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), lashMat);
+    lashR.position.set(0.11, 0.04, 0.245);
+    headGroup.add(lashR);
+
+    // Beautiful Sparkling Eyes
+    const eyeWhiteL = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.08, 0.015), eyeWhiteMat);
+    eyeWhiteL.position.set(-0.11, -0.01, 0.245);
+    headGroup.add(eyeWhiteL);
+
+    const eyeIrisL = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.018), eyeIrisMat);
+    eyeIrisL.position.set(-0.11, -0.01, 0.246);
+    headGroup.add(eyeIrisL);
+
+    const eyeGlintL = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.02), eyeSparkleMat);
+    eyeGlintL.position.set(-0.095, 0.015, 0.248);
+    headGroup.add(eyeGlintL);
+
+    const eyeWhiteR = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.08, 0.015), eyeWhiteMat);
+    eyeWhiteR.position.set(0.11, -0.01, 0.245);
+    headGroup.add(eyeWhiteR);
+
+    const eyeIrisR = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.018), eyeIrisMat);
+    eyeIrisR.position.set(0.11, -0.01, 0.246);
+    headGroup.add(eyeIrisR);
+
+    const eyeGlintR = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.02), eyeSparkleMat);
+    eyeGlintR.position.set(0.125, 0.015, 0.248);
+    headGroup.add(eyeGlintR);
+
+    // Rosy Blush on Cheeks
+    const blushL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.012), blushMat);
+    blushL.position.set(-0.13, -0.07, 0.245);
+    headGroup.add(blushL);
+
+    const blushR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.012), blushMat);
+    blushR.position.set(0.13, -0.07, 0.245);
+    headGroup.add(blushR);
+
+    // Sweet Smile
+    const smile = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.025, 0.012), mouthMat);
+    smile.position.set(0, -0.11, 0.245);
+    headGroup.add(smile);
+
+    mashu.add(headGroup);
+
+    // --- TORSO & DRESS ---
+    const bodyGroup = new THREE.Group();
+    bodyGroup.position.set(0, 1.02, 0);
+
+    // Bodice
+    const bodice = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.46, 0.22), dressBodiceMat);
+    bodyGroup.add(bodice);
+
+    // Lace Collar Trim & Pearl Necklace
+    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.06, 0.03), dressTrimMat);
+    collar.position.set(0, 0.17, 0.115);
+    bodyGroup.add(collar);
+
+    const pearlNecklace = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.032), pearlMat);
+    pearlNecklace.position.set(0, 0.12, 0.116);
+    bodyGroup.add(pearlNecklace);
+
+    // Lavender Waistband & Ribbon Bow
+    const waistband = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.07, 0.24), ribbonMat);
+    waistband.position.set(0, -0.12, 0);
+    bodyGroup.add(waistband);
+
+    const bow = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 0.04), ribbonMat);
+    bow.position.set(0, -0.12, 0.13);
+    bodyGroup.add(bow);
+
+    // Flowing Tiered Skirt (Flaring out gracefully)
+    const skirtTop = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 0.28), dressSkirtMat);
+    skirtTop.position.set(0, -0.28, 0);
+    bodyGroup.add(skirtTop);
+
+    const skirtBottomRuffle = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.12, 0.32), dressRuffleMat);
+    skirtBottomRuffle.position.set(0, -0.44, 0);
+    bodyGroup.add(skirtBottomRuffle);
+
+    mashu.add(bodyGroup);
+
+    // --- ARMS (Slim Alex proportions) ---
+    // Left Arm
+    const armL = new THREE.Group();
+    armL.position.set(-0.27, 1.15, 0);
+    const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.18), dressBodiceMat);
+    sleeveL.position.set(0, -0.06, 0);
+    armL.add(sleeveL);
+    const sleeveTrimL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 0.19), dressTrimMat);
+    sleeveTrimL.position.set(0, -0.15, 0);
+    armL.add(sleeveTrimL);
+    const armSkinL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.36, 0.14), skinMat);
+    armSkinL.position.set(0, -0.32, 0);
+    armL.add(armSkinL);
+    // Flower corsage bracelet on left wrist
+    const wristFlower = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.05), flowerPinkMat);
+    wristFlower.position.set(-0.04, -0.42, 0.04);
+    armL.add(wristFlower);
+    mashu.add(armL);
+
+    // Right Arm
+    const armR = new THREE.Group();
+    armR.position.set(0.27, 1.15, 0);
+    const sleeveR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.18), dressBodiceMat);
+    sleeveR.position.set(0, -0.06, 0);
+    armR.add(sleeveR);
+    const sleeveTrimR = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 0.19), dressTrimMat);
+    sleeveTrimR.position.set(0, -0.15, 0);
+    armR.add(sleeveTrimR);
+    const armSkinR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.36, 0.14), skinMat);
+    armSkinR.position.set(0, -0.32, 0);
+    armR.add(armSkinR);
+    mashu.add(armR);
+
+    // --- LEGS & SHOES ---
+    // Left Leg
+    const legL = new THREE.Group();
+    legL.position.set(-0.11, 0.48, 0);
+    const legMeshL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.44, 0.16), legsMat);
+    legMeshL.position.set(0, -0.08, 0);
+    legL.add(legMeshL);
+    const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.22), shoeMat);
+    bootL.position.set(0, -0.32, 0.02);
+    legL.add(bootL);
+    const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.04, 0.23), shoeStrapMat);
+    strapL.position.set(0, -0.24, 0.02);
+    legL.add(strapL);
+    mashu.add(legL);
+
+    // Right Leg
+    const legR = new THREE.Group();
+    legR.position.set(0.11, 0.48, 0);
+    const legMeshR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.44, 0.16), legsMat);
+    legMeshR.position.set(0, -0.08, 0);
+    legR.add(legMeshR);
+    const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.22), shoeMat);
+    bootR.position.set(0, -0.32, 0.02);
+    legR.add(bootR);
+    const strapR = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.04, 0.23), shoeStrapMat);
+    strapR.position.set(0, -0.24, 0.02);
+    legR.add(strapR);
+    mashu.add(legR);
+
+    // --- FLOATING NAMEPLATE ---
+    const nameCanvas = document.createElement('canvas');
+    nameCanvas.width = 384;
+    nameCanvas.height = 96;
+    const nameCtx = nameCanvas.getContext('2d')!;
+    nameCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    nameCtx.fillRect(0, 0, 384, 96);
+    nameCtx.strokeStyle = '#ec4899';
+    nameCtx.lineWidth = 4;
+    nameCtx.strokeRect(2, 2, 380, 92);
+
+    nameCtx.fillStyle = '#f472b6';
+    nameCtx.font = 'bold 24px monospace';
+    nameCtx.textAlign = 'center';
+    nameCtx.fillText('[LVL 22] Mashu 🌸', 192, 36);
+
+    nameCtx.fillStyle = '#fdf2f8';
+    nameCtx.font = '18px monospace';
+    nameCtx.fillText("Lakshya's Princess & Co-Founder", 192, 68);
+
+    const nameTexture = new THREE.CanvasTexture(nameCanvas);
+    nameTexture.magFilter = THREE.NearestFilter;
+    const nameSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTexture }));
+    nameSprite.scale.set(2.4, 0.6, 1);
+    nameSprite.position.set(0, 2.25, 0);
+    mashu.add(nameSprite);
+
+    // Gentle floating heart sparkles around Mashu
+    const sparklesGroup = new THREE.Group();
+    const heartMat = new THREE.MeshBasicMaterial({ color: 0xf472b6 });
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const hMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), heartMat);
+      hMesh.position.set(Math.cos(angle) * 0.45, 1.6 + (i % 2) * 0.2, Math.sin(angle) * 0.45);
+      sparklesGroup.add(hMesh);
+    }
+    mashu.add(sparklesGroup);
+    this.mashuSparkles = sparklesGroup;
+
+    this.scene.add(mashu);
+    this.mashuMesh = mashu;
   }
 
   // Faithful companion Minecraft Wolf "ROGER" sitting right beside Lakshya
@@ -1249,6 +1556,18 @@ export class VoxelWorld {
         const dx = playerPos.x - this.npcMesh.position.x;
         const dz = playerPos.z - this.npcMesh.position.z;
         this.npcMesh.rotation.y = Math.atan2(dx, dz);
+      }
+    }
+
+    if (this.mashuMesh) {
+      const dist = this.mashuMesh.position.distanceTo(playerPos);
+      if (dist < 14) {
+        const dx = playerPos.x - this.mashuMesh.position.x;
+        const dz = playerPos.z - this.mashuMesh.position.z;
+        this.mashuMesh.rotation.y = Math.atan2(dx, dz);
+      }
+      if (this.mashuSparkles) {
+        this.mashuSparkles.rotation.y = time * 1.2;
       }
     }
 

@@ -28,6 +28,7 @@ body, html {
   height: 100%;
   display: block;
   touch-action: none;
+  image-rendering: auto;
 }
 
 /* ==========================================================

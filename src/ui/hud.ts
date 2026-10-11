@@ -17,11 +17,11 @@ export class HUDManager {
     { id: 'pickaxe', name: 'Diamond Pickaxe', icon: ASSETS.pickaxe },
     { id: 'cobblestone', name: 'Cobblestone Block', icon: ASSETS.cobblestone, blockType: 'cobblestone' },
     { id: 'oak_planks', name: 'Oak Planks Block', icon: ASSETS.wood, blockType: 'oak_planks' },
-    { id: 'projects_book', name: 'Projects Journal', icon: ASSETS.book, action: 'project' },
-    { id: 'skills_potion', name: 'Skills Alchemy Elixir', icon: ASSETS.potion, action: 'skills' },
+    { id: 'projects_book', name: 'Expeditions Journal', icon: ASSETS.book, action: 'project' },
+    { id: 'skills_potion', name: 'Alchemy Potions Brew', icon: ASSETS.potion, action: 'skills' },
     { id: 'compass', name: 'Fast-Travel Compass', icon: ASSETS.compass, action: 'fasttravel' },
     { id: 'day_night', name: 'Day / Night Torch', icon: ASSETS.torch, action: 'daynight' },
-    { id: 'resume_chest', name: 'Resume Loot Chest', icon: ASSETS.chest, action: 'resume' },
+    { id: 'resume_chest', name: 'Treasure Loot Chest', icon: ASSETS.chest, action: 'resume' },
   ];
 
   public activeSlotIndex: number = 1; // default to Pickaxe
@@ -45,11 +45,11 @@ export class HUDManager {
   constructor() {
     this.renderHUD();
     this.setupListeners();
-    this.pushChatMessage('System', 'Welcome to Lakshya\'s Minecraft Portfolio World!');
-    this.pushChatMessage('Lakshya', 'Explore 9 structures to see my live projects, experience, skills, and resume.');
+    this.pushChatMessage('System', 'Welcome to Lakshya & Mashu\'s Minecraft Realm!');
+    this.pushChatMessage('Lakshya', 'Explore world monuments, safari wildlife, and hidden dungeons with Mashu & Roger.');
     this.pushChatMessage('Tip', document.body.classList.contains('touch-device')
-      ? 'Use [USE] to inspect objects and [MINE] to launch banner links.'
-      : 'Press [E] to interact with objects. Hammer banners to launch live sites.');
+      ? 'Use [USE] to interact with NPCs, landmarks, and treasure chests.'
+      : 'Press [E] to interact with Mashu, Lakshya, or Roger. Press [M] to open Fast Travel.');
   }
 
   public onCycleWeather?: () => void;
@@ -107,10 +107,10 @@ export class HUDManager {
     const quickBar = document.getElementById('mc-quick-nav')!;
     quickBar.innerHTML = `
       <div class="mc-quick-buttons">
-        <button class="mc-chip-btn" id="btn-quick-projects" title="View Project Portfolios">[PROJECTS]</button>
+        <button class="mc-chip-btn" id="btn-quick-projects" title="View Realm Expeditions">[EXPEDITIONS]</button>
         <button class="mc-chip-btn" id="btn-quick-map" title="Interactive World Map (Key: M)">[MAP: M]</button>
-        <button class="mc-chip-btn" id="btn-quick-skills" title="Skills Matrix">[SKILLS]</button>
-        <button class="mc-chip-btn" id="btn-quick-resume" title="Official Resume">[RESUME]</button>
+        <button class="mc-chip-btn" id="btn-quick-skills" title="Alchemy Potions Guide">[POTIONS]</button>
+        <button class="mc-chip-btn" id="btn-quick-resume" title="Ancient Treasure Vault">[TREASURE]</button>
         <button class="mc-chip-btn" id="btn-quick-fly" title="Toggle Creative Flight">[FLY: OFF]</button>
         <button class="mc-chip-btn" id="btn-quick-weather" title="Cycle clear, rain, thunder, aurora, snowfall, and rainbow">[WEATHER: CLEAR]</button>
         <button class="mc-chip-btn" id="btn-quick-time" title="Toggle Day / Night (Key: T)">[TIME: DAY]</button>
@@ -272,16 +272,17 @@ export class HUDManager {
       } else if (inter.type === 'minigame') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Builder Arena: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'skills') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>Skills Matrix</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>Alchemy & Potions Guide</strong>`;
       } else if (inter.type === 'sign') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Read Sign: <strong>${inter.title}</strong>`;
       } else if (inter.type === 'teleport') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       } else if (inter.type === 'npc') {
         const isDog = inter.id === 'roger';
+        const isMashu = inter.id === 'mashu_guide' || inter.title?.includes('Mashu');
         const isAnimal = inter.id?.startsWith('animal_');
         const isCitizen = inter.id?.startsWith('citizen_');
-        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with'));
+        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : (isMashu ? 'Talk with Mashu 🌸' : 'Talk with')));
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {
@@ -345,7 +346,7 @@ export class HUDManager {
 
     const w = 160;
     const h = 160;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     const targetW = Math.round(w * pixelRatio);
     const targetH = Math.round(h * pixelRatio);
     if (canvas.width !== targetW || canvas.height !== targetH) {

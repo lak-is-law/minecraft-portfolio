@@ -150,7 +150,7 @@ export class ClimateEffects {
     this.sunLight.intensity *= gloom;
     this.ambientLight.intensity *= this.weather === 'thunderstorm' ? 0.55 : raining ? 0.78 : 1.0;
     if (this.scene.fog instanceof THREE.FogExp2) {
-      this.scene.fog.density = THREE.MathUtils.lerp(0.008, 0.024, 1 - gloom);
+      this.scene.fog.density = THREE.MathUtils.lerp(0.005, 0.022, 1 - gloom);
     }
 
     // Rainbow positioning
