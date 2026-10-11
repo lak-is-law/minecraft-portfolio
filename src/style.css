@@ -203,16 +203,16 @@ body, html {
 #mc-quick-nav {
   position: absolute;
   top: 10px;
-  left: 12px;
-  max-width: calc(100% - 220px);
+  left: 195px;
+  max-width: calc(100% - 210px);
   z-index: 40;
 }
 
 @media (max-width: 900px) {
   #mc-quick-nav {
     top: 10px;
-    left: 12px;
-    max-width: calc(100% - 195px);
+    left: 195px;
+    max-width: calc(100% - 205px);
   }
 }
 
@@ -257,13 +257,13 @@ body, html {
 
 
 /* ==========================================================
-   MINIMAP (TOP RIGHT - TAP TO MAXIMISE)
+   MINIMAP (TOP LEFT - TAP TO MAXIMISE)
    ========================================================== */
 #mc-minimap {
   position: absolute;
   top: 12px;
-  right: 12px;
-  left: auto;
+  left: 12px;
+  right: auto;
   z-index: 45;
   cursor: pointer;
   user-select: none;
@@ -2098,10 +2098,10 @@ body.modal-open #pause-overlay {
   }
   #mc-minimap {
     top: 8px;
-    right: 8px;
-    left: auto;
+    left: 8px;
+    right: auto;
     transform: scale(0.82);
-    transform-origin: top right;
+    transform-origin: top left;
   }
   .mc-hotbar-container {
     transform: scale(0.82);
@@ -2325,12 +2325,12 @@ body.touch-device .mc-chat-msg {
   body.touch-device #mc-minimap {
     display: block;
     top: 6px;
-    right: 6px;
-    left: auto;
+    left: 6px;
+    right: auto;
     transform: scale(0.68);
-    transform-origin: top right;
+    transform-origin: top left;
   }
-  body.touch-device #mc-quick-nav { top: 6px; left: 8px; right: 125px; max-width: none; }
+  body.touch-device #mc-quick-nav { top: 6px; left: 125px; right: 8px; max-width: none; }
   body.touch-device .mc-quick-buttons { flex-wrap: nowrap; }
   body.touch-device .mc-dpad { margin: 0 0 58px 0; gap: 2px; }
   body.touch-device .mc-dpad-middle { gap: 2px; }

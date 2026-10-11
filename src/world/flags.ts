@@ -18,7 +18,8 @@ export type CountryFlagId =
   | 'china'
   | 'mexico'
   | 'egypt'
-  | 'uae';
+  | 'uae'
+  | 'switzerland';
 
 export class FlagManager {
   private scene: THREE.Scene;
@@ -44,6 +45,7 @@ export class FlagManager {
     this.textures.set('mexico', this.createMexicoTexture());
     this.textures.set('egypt', this.createEgyptTexture());
     this.textures.set('uae', this.createUaeTexture());
+    this.textures.set('switzerland', this.createSwitzerlandTexture());
   }
 
   private createCanvas(w = 512, h = 340): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
@@ -478,6 +480,29 @@ export class FlagManager {
     // Left vertical hoist band (Red)
     ctx.fillStyle = '#ff0000';
     ctx.fillRect(0, 0, hoistW, 340);
+
+    return this.finalizeTexture(canvas);
+  }
+
+  // 11. Switzerland 🇨🇭 (Schweizerfahne / Swiss Cross)
+  private createSwitzerlandTexture(): THREE.CanvasTexture {
+    const { canvas, ctx } = this.createCanvas(512, 340);
+
+    // Official Swiss Red field (#d52b1e)
+    ctx.fillStyle = '#d52b1e';
+    ctx.fillRect(0, 0, 512, 340);
+
+    // White Greek Cross (equilateral arms: length is 1/6 longer than width)
+    ctx.fillStyle = '#ffffff';
+    const cx = 256;
+    const cy = 170;
+    const armW = 56;
+    const armH = 200;
+
+    // Vertical bar
+    ctx.fillRect(cx - armW / 2, cy - armH / 2, armW, armH);
+    // Horizontal bar
+    ctx.fillRect(cx - armH / 2, cy - armW / 2, armH, armW);
 
     return this.finalizeTexture(canvas);
   }

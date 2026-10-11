@@ -325,6 +325,10 @@ export class VoxelWorld {
     // Mexico: Mexico Realm near Zócalo & Chichén Itzá
     this.flagManager.addFlag('mexico', -100, 8.5, 57, 'west');
 
+    // 11. Swiss Confederation: Frostpeak Alps by Chalet de Lakshya & Citadel Plaza
+    this.flagManager.addFlag('switzerland', -18, 8.5, -86, 'east');
+    this.flagManager.addFlag('switzerland', 0, 8.5, -16, 'north');
+
     // 3. Gateway of India (Monumental Flying Tiranga atop the Apollo Bunder Arch at Y = 26.5)
     this.flagManager.addFlag('india', 75, 26.5, -150, 'east', 1.35);
   }

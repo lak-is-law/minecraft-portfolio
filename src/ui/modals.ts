@@ -477,7 +477,7 @@ export class ModalManager {
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
       { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
       { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 168 / Z −24' },
-      { number: '14', name: 'Frostpeak Alps · Ski Lodge', subtitle: 'Switzerland', detail: 'Snow-capped alpine peaks, Chalet ski lodge, Lake Serenity ice rink, and high summit observatory.', tag: '[ALPS]', tone: 'frost', direction: 'NORTH · X −2 / Z −100' },
+      { number: '14', name: 'Frostpeak Alps · Ski Lodge', subtitle: 'Switzerland 🇨🇭', detail: 'Snow-capped Swiss Alpine peaks, Chalet ski lodge, Lake Serenity ice rink, Swiss flag mast, and high summit observatory.', tag: '[ALPS]', tone: 'frost', direction: 'NORTH · X −2 / Z −100' },
       { number: '15', name: 'Sunflower Valley Farmstead', subtitle: 'Countryside', detail: 'Rustic 4-sail Dutch windmill, golden sunflower fields, and peaceful agricultural valley.', tag: '[VALLEY]', tone: 'citadel', direction: 'WEST · X −45 / Z 48' }
     ];
 
@@ -813,11 +813,11 @@ export class ModalManager {
       drawIslandShape(5);
       ctx.clip();
 
-      // Base interior emerald plains
-      ctx.fillStyle = '#15803d';
+      // Base interior plains (Minecraft vibrant grass)
+      ctx.fillStyle = '#4c7c29';
       ctx.fillRect(originX - 210 * effectiveScale, originZ - 210 * effectiveScale, 420 * effectiveScale, 420 * effectiveScale);
 
-      // Render Realm Territorials
+      // Render Realm Territorials with Flag Badges & Authentic Cartography Styling
       const drawCountryTerritory = (poly: [number, number][], fillColor: string, strokeColor: string, label: string, labelPos: [number, number]) => {
         ctx.beginPath();
         poly.forEach(([x, z], i) => {
@@ -829,61 +829,186 @@ export class ModalManager {
         ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = Math.max(1, 1.8 * userZoom);
+        ctx.lineWidth = Math.max(1.2, 2.0 * userZoom);
         ctx.stroke();
 
-        if (label && userZoom >= 0.8) {
+        if (label && userZoom >= 0.75) {
           ctx.save();
+          const lx = originX + labelPos[0] * effectiveScale;
+          const ly = originZ + labelPos[1] * effectiveScale;
+          const fontSize = Math.max(8.5, Math.round(9.5 * Math.min(1.35, userZoom)));
+          ctx.font = `bold ${fontSize}px monospace`;
+          const tw = ctx.measureText(label).width;
+          // Clean parchment pill badge behind territory label
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+          ctx.fillRect(lx - tw / 2 - 4, ly - fontSize + 1, tw + 8, fontSize + 4);
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(lx - tw / 2 - 4, ly - fontSize + 1, tw + 8, fontSize + 4);
+
           ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(9, Math.round(10 * Math.min(1.4, userZoom)))}px monospace`;
           ctx.textAlign = 'center';
-          ctx.shadowColor = '#000000';
-          ctx.shadowBlur = 4;
-          ctx.fillText(label, originX + labelPos[0] * effectiveScale, originZ + labelPos[1] * effectiveScale);
+          ctx.fillText(label, lx, ly + 2);
           ctx.restore();
         }
       };
 
       // 1. INDIA
-      drawCountryTerritory([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], 'rgba(249, 115, 22, 0.40)', '#f97316', 'INDIA', [95, -130]);
+      drawCountryTerritory([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], 'rgba(180, 83, 9, 0.42)', '#f97316', '🇮🇳 INDIA · TAJ MAHAL', [95, -130]);
       // 2. CHINA
-      drawCountryTerritory([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], 'rgba(220, 38, 38, 0.36)', '#dc2626', 'CHINA', [-115, -130]);
+      drawCountryTerritory([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], 'rgba(30, 63, 32, 0.45)', '#10b981', '🇨🇳 CHINA · GREAT WALL', [-115, -130]);
       // 3. JAPAN
-      drawCountryTerritory([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], 'rgba(244, 63, 94, 0.45)', '#f43f5e', 'JAPAN', [-155, -75]);
+      drawCountryTerritory([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], 'rgba(244, 114, 182, 0.48)', '#f43f5e', '🇯🇵 JAPAN · SHIBUYA & SAKURA', [-155, -75]);
       // 4. SOUTH KOREA
-      drawCountryTerritory([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], 'rgba(14, 165, 233, 0.45)', '#0ea5e9', 'SOUTH KOREA', [-60, -102]);
+      drawCountryTerritory([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], 'rgba(2, 132, 199, 0.45)', '#0ea5e9', '🇰🇷 S. KOREA · SEOUL', [-60, -102]);
       // 5. UK
-      drawCountryTerritory([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], 'rgba(239, 68, 68, 0.40)', '#ef4444', 'UNITED KINGDOM', [-32, -68]);
+      drawCountryTerritory([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], 'rgba(220, 38, 38, 0.42)', '#ef4444', '🇬🇧 UK · LONDON', [-32, -68]);
       // 6. FRANCE
-      drawCountryTerritory([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], 'rgba(56, 189, 248, 0.42)', '#38bdf8', 'FRANCE', [28, -42]);
+      drawCountryTerritory([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], 'rgba(56, 189, 248, 0.42)', '#38bdf8', '🇫🇷 FRANCE · PARIS', [28, -42]);
       // 7. USA
-      drawCountryTerritory([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], 'rgba(59, 130, 246, 0.38)', '#3b82f6', 'USA · VEGAS & NEO YORK', [120, -10]);
+      drawCountryTerritory([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], 'rgba(51, 65, 85, 0.45)', '#3b82f6', '🇺🇸 USA · VEGAS & HOLLYWOOD', [120, -10]);
       // 8. MEXICO
-      drawCountryTerritory([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], 'rgba(5, 150, 105, 0.38)', '#059669', 'MEXICO', [-125, 60]);
+      drawCountryTerritory([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], 'rgba(154, 52, 18, 0.42)', '#ea580c', '🇲🇽 MEXICO · CHICHÉN ITZÁ', [-125, 60]);
       // 9. EGYPT
-      drawCountryTerritory([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], 'rgba(234, 179, 8, 0.38)', '#eab308', 'EGYPT', [-155, 40]);
+      drawCountryTerritory([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], 'rgba(234, 179, 8, 0.42)', '#eab308', '🇪🇬 EGYPT · GIZA PYRAMIDS', [-155, 40]);
       // 10. UAE
-      drawCountryTerritory([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], 'rgba(16, 185, 129, 0.42)', '#10b981', 'UAE', [168, 38]);
-      // 11. ALPS SNOW MOUNTAINS
-      drawCountryTerritory([[-30, -125], [20, -125], [15, -85], [-25, -85], [-30, -125]], 'rgba(224, 242, 254, 0.55)', '#bae6fd', 'FROSTPEAK ALPS', [-5, -105]);
+      drawCountryTerritory([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], 'rgba(13, 148, 136, 0.45)', '#14b8a6', '🇦🇪 UAE · BURJ KHALIFA', [168, 38]);
       // 12. SUNFLOWER VALLEY
-      drawCountryTerritory([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], 'rgba(250, 204, 21, 0.35)', '#eab308', 'SUNFLOWER VALLEY', [-45, 48]);
+      drawCountryTerritory([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], 'rgba(250, 204, 21, 0.38)', '#facc15', '🌻 SUNFLOWER VALLEY', [-45, 48]);
       // 13. SAFARI ZOO
-      drawCountryTerritory([[-85, -20], [-45, -20], [-45, 20], [-85, 20], [-85, -20]], 'rgba(34, 197, 94, 0.35)', '#22c55e', 'SAFARI WILDLIFE PARK', [-65, 0]);
+      drawCountryTerritory([[-85, -20], [-45, -20], [-45, 20], [-85, 20], [-85, -20]], 'rgba(34, 197, 94, 0.38)', '#22c55e', '🐾 SAFARI WILDLIFE PARK', [-65, 0]);
       // Beach & Carnival Pier
-      drawCountryTerritory([[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]], 'rgba(212, 173, 100, 0.25)', '#d4ad64', 'BEACH & BOARDWALK', [0, 95]);
-      drawCountryTerritory([[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]], 'rgba(236, 72, 153, 0.40)', '#ec4899', 'CARNIVAL PIER', [5, 150]);
+      drawCountryTerritory([[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]], 'rgba(223, 196, 123, 0.35)', '#dfc47b', '🏖️ BEACH & BOARDWALK', [0, 95]);
+      drawCountryTerritory([[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]], 'rgba(219, 39, 119, 0.45)', '#ec4899', '🎡 CARNIVAL PIER', [5, 150]);
+
+      // =========================================================================
+      // 11. SWISS CONFEDERATION · FROSTPEAK ALPS (Elevation Relief Shading)
+      // =========================================================================
+      // Evergreen alpine spruce forest footing
+      drawCountryTerritory([[-32, -128], [24, -128], [18, -84], [-28, -84], [-32, -128]], 'rgba(22, 78, 50, 0.75)', '#164e32', '', [0, 0]);
+      // Rocky massif crags
+      drawCountryTerritory([[-28, -124], [20, -124], [15, -88], [-24, -88], [-28, -124]], 'rgba(71, 85, 105, 0.85)', '#475569', '', [0, 0]);
+      // Southeast shaded blue ice slopes
+      drawCountryTerritory([[-24, -122], [18, -122], [12, -92], [-18, -92], [-24, -122]], 'rgba(125, 211, 252, 0.85)', '#38bdf8', '', [0, 0]);
+      // Northwest sunlit alpine snow slopes
+      drawCountryTerritory([[-24, -122], [-4, -122], [-6, -92], [-20, -92], [-24, -122]], 'rgba(248, 250, 252, 0.95)', '#f1f5f9', '', [0, 0]);
+      // High summit glaciers & peaks
+      drawCountryTerritory([[-14, -118], [8, -118], [2, -98], [-10, -98], [-14, -118]], 'rgba(255, 255, 255, 0.98)', '#ffffff', '🇨🇭 SWITZERLAND · ALPS', [-3, -108]);
+
+      // Lake Serenity (natural frozen ice mirror in alpine bowl)
+      ctx.fillStyle = '#bae6fd';
+      ctx.beginPath();
+      ctx.ellipse(originX - 10 * effectiveScale, originZ - 112 * effectiveScale, 11 * effectiveScale, 7 * effectiveScale, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = Math.max(1.2, 1.8 * userZoom);
+      ctx.stroke();
+
+      // Chalet de Lakshya timber ski lodge footprint
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(originX - 22 * effectiveScale, originZ - 90 * effectiveScale, 10 * effectiveScale, 9 * effectiveScale);
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(originX - 22 * effectiveScale, originZ - 90 * effectiveScale, 10 * effectiveScale, 9 * effectiveScale);
+
+      // SWISS FLAG BADGE 🇨🇭 (Frostpeak Alps Flagpole Mast at X: -18, Z: -86)
+      const swissFlagX = originX - 18 * effectiveScale;
+      const swissFlagZ = originZ - 86 * effectiveScale;
+      const sFlagW = Math.max(14, 20 * effectiveScale * 0.4 * Math.min(1.4, userZoom));
+      const sFlagH = sFlagW;
+      ctx.save();
+      // Flagpole mast shadow and pole
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(swissFlagX - sFlagW / 2 - 2, swissFlagZ - sFlagH / 2);
+      ctx.lineTo(swissFlagX - sFlagW / 2 - 2, swissFlagZ + sFlagH / 2 + 5);
+      ctx.stroke();
+      // Official Swiss Red Field (#d52b1e)
+      ctx.fillStyle = '#d52b1e';
+      ctx.fillRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagH / 2, sFlagW, sFlagH);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagH / 2, sFlagW, sFlagH);
+      // Swiss White Greek Cross (equilateral arms)
+      ctx.fillStyle = '#ffffff';
+      const sArm = sFlagW * 0.22;
+      const sLen = sFlagW * 0.65;
+      ctx.fillRect(swissFlagX - sArm / 2, swissFlagZ - sLen / 2, sArm, sLen);
+      ctx.fillRect(swissFlagX - sLen / 2, swissFlagZ - sArm / 2, sLen, sArm);
+      ctx.restore();
 
       // Yamuna canal in India
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#0284c7';
       ctx.fillRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
+      ctx.strokeStyle = '#bae6fd';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
 
-      // Great Wall on China Ridge
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = Math.max(2, 4 * effectiveScale * 0.5);
+      // Taj Mahal marble monument footprint (central dome & 4 corner minarets)
+      const tajX = originX + 75 * effectiveScale;
+      const tajZ = originZ - 150 * effectiveScale;
+      const tajSize = 16 * effectiveScale;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
+      // 4 Minaret dots
+      ctx.fillStyle = '#f8fafc';
+      const minOff = tajSize * 0.6;
+      [[-minOff, -minOff], [minOff, -minOff], [minOff, minOff], [-minOff, minOff]].forEach(([mx, mz]) => {
+        ctx.beginPath();
+        ctx.arc(tajX + mx, tajZ + mz, 2.5 * userZoom, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      // Giza Stepped Pyramids (isometric 3D shaded triangles)
+      const drawEnlargedPyramid = (px: number, pz: number, sz: number, label: string) => {
+        const rx = originX + px * effectiveScale;
+        const rz = originZ + pz * effectiveScale;
+        const s = sz * effectiveScale;
+        // Sunlit NW facet
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath();
+        ctx.moveTo(rx, rz - s);
+        ctx.lineTo(rx - s, rz + s);
+        ctx.lineTo(rx, rz + s);
+        ctx.closePath();
+        ctx.fill();
+        // Shaded SE facet
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath();
+        ctx.moveTo(rx, rz - s);
+        ctx.lineTo(rx, rz + s);
+        ctx.lineTo(rx + s, rz + s);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (label && userZoom >= 1.2) {
+          ctx.fillStyle = '#fef08a';
+          ctx.font = 'bold 8px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(label, rx, rz + s + 9);
+        }
+      };
+      drawEnlargedPyramid(-155, 36, 12, 'KHUFU');
+      drawEnlargedPyramid(-142, 48, 9, 'KHAFRE');
+      drawEnlargedPyramid(-132, 58, 7, 'MENKAURE');
+
+      // Great Wall on China Ridge (stone ramparts with crenelated watchtowers)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = Math.max(3, 5 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.moveTo(originX - 150 * effectiveScale, originZ - 140 * effectiveScale);
       ctx.quadraticCurveTo(originX - 115 * effectiveScale, originZ - 132 * effectiveScale, originX - 80 * effectiveScale, originZ - 140 * effectiveScale);
+      ctx.stroke();
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = Math.max(1.5, 2.5 * effectiveScale * 0.5);
       ctx.stroke();
 
       // Hollywood Hills Ridge
@@ -909,14 +1034,17 @@ export class ModalManager {
       ctx.arc(originX + 180 * effectiveScale, originZ - 76 * effectiveScale, 6 * effectiveScale, -Math.PI * 0.4, Math.PI * 0.4);
       ctx.stroke();
 
-      // Lightning McQueen Speedway track
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = Math.max(2, 3.5 * effectiveScale * 0.5);
+      // Lightning McQueen Speedway track (Asphalt track with checkered red-and-white borders)
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = Math.max(3.5, 6 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.ellipse(originX + 168 * effectiveScale, originZ - 24 * effectiveScale, 18 * effectiveScale, 10 * effectiveScale, 0, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = Math.max(1.8, 3 * effectiveScale * 0.5);
+      ctx.stroke();
 
-      // Main Arterial Routes
+      // Main Arterial Routes (Double-line Minecraft gravel and paved highways)
       const route = (points: [number, number][]) => {
         ctx.beginPath();
         points.forEach(([x, z], i) => {
@@ -928,8 +1056,9 @@ export class ModalManager {
       };
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.strokeStyle = 'rgba(27,37,31,.75)';
-      ctx.lineWidth = Math.max(2.5, 4.5 * userZoom);
+      // Dark stone casing
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = Math.max(3.2, 5.5 * userZoom);
       route([[0, -22], [0, -65]]);
       route([[20, 0], [77, 0], [100, 0], [150, 0]]);
       route([[2, -60], [40, -84], [74, -106]]);
@@ -937,8 +1066,9 @@ export class ModalManager {
       route([[-20, 0], [-50, 25], [-79, 50]]);
       route([[0, 22], [0, 58], [0, 119], [0, 160]]);
       route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
-      ctx.strokeStyle = '#e6d5a5';
-      ctx.lineWidth = Math.max(1.5, 2.2 * userZoom);
+      // Light smooth stone / sandstone surface
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = Math.max(1.8, 3.0 * userZoom);
       route([[0, -22], [0, -65]]);
       route([[20, 0], [77, 0], [100, 0], [150, 0]]);
       route([[2, -60], [40, -84], [74, -106]]);
@@ -947,16 +1077,18 @@ export class ModalManager {
       route([[0, 22], [0, 58], [0, 119], [0, 160]]);
       route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
 
-      // Island Express Railway Loop
+      // Island Express Railway Loop (True twin rail tracks with wooden sleeper cross-ties)
       const railWaypoints = [
         [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
         [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
         [144, 98], [112, 98], [80, 96], [50, 92], [24, 88],
         [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
       ];
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = Math.max(1.8, 2.6 * userZoom);
-      ctx.setLineDash([5, 3]);
+      ctx.save();
+      // Wooden sleeper ties
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = Math.max(3.5, 5.0 * userZoom);
+      ctx.setLineDash([3, 5]);
       ctx.beginPath();
       railWaypoints.forEach(([wx, wz], idx) => {
         const rx = originX + wx * effectiveScale;
@@ -965,11 +1097,16 @@ export class ModalManager {
       });
       ctx.closePath();
       ctx.stroke();
+      // Golden steel rails
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = Math.max(1.5, 2.2 * userZoom);
       ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.restore();
 
-      // Central Crossroads Citadel Moat & Plaza
+      // Central Crossroads Citadel Moat & 4 Grand Bridges
       ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = Math.max(2, 4 * effectiveScale * 0.5);
+      ctx.lineWidth = Math.max(3, 5 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.arc(originX, originZ, 20 * effectiveScale, 0, Math.PI * 2);
       ctx.stroke();
@@ -981,14 +1118,14 @@ export class ModalManager {
       ctx.fillRect(originX + 17 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
       ctx.fillRect(originX - 23 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
 
-      // Central Citadel Hub
+      // Central Citadel Hub Plinth & Beacon
       ctx.fillStyle = '#475569';
       ctx.beginPath();
       ctx.arc(originX, originZ, 16 * effectiveScale, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#facc15';
       ctx.beginPath();
-      ctx.arc(originX, originZ, 4 * effectiveScale, 0, Math.PI * 2);
+      ctx.arc(originX, originZ, 4.5 * effectiveScale, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore(); // restore island clipping

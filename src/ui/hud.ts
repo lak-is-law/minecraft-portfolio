@@ -488,8 +488,8 @@ export class HUDManager {
     drawIslandShape(5);
     ctx.clip();
 
-    // Base interior plains
-    ctx.fillStyle = '#15803d';
+    // Base interior plains (Minecraft vibrant grass)
+    ctx.fillStyle = '#4c7c29';
     ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
 
     // Draw Country Territories on Minimap Radar
@@ -505,44 +505,119 @@ export class HUDManager {
       ctx.fill();
     };
 
-    // 1. India (Subcontinent Peninsula)
-    drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#c7a94e');
-    // 2. China (Northern Arc)
-    drawMiniCountry([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#2d7a5b');
-    // 3. Japan (Archipelago Chain)
-    drawMiniCountry([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], '#f43f5e');
+    // 1. India (Subcontinent Peninsula - terracotta sandstone)
+    drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
+    // 2. China (Northern Pine Arc)
+    drawMiniCountry([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#1e3f20');
+    // 3. Japan (Archipelago - Sakura Blossom)
+    drawMiniCountry([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], '#f472b6');
     // 4. South Korea (Peninsula)
-    drawMiniCountry([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], '#0ea5e9');
+    drawMiniCountry([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], '#0284c7');
     // 5. UK (British Isles)
-    drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#ef4444');
+    drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#dc2626');
     // 6. France (L’Hexagone)
     drawMiniCountry([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], '#38bdf8');
     // 7. USA (Las Vegas Strip, Broadway & Hollywood)
-    drawMiniCountry([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#47798b');
-    // 8. Mexico (Mesoamerican Horn)
-    drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#a95e36');
-    // 9. Egypt (Nile & Giza)
+    drawMiniCountry([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#334155');
+    // 8. Mexico (Mesoamerican Horn - terracotta)
+    drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
+    // 9. Egypt (Sahara desert dunes)
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
     // 10. UAE (Dubai Waterfront & Palm)
-    drawMiniCountry([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], '#10b981');
-    // 11. Alpine Snow Mountains & Chalet
-    drawMiniCountry([[-25, -125], [20, -125], [15, -85], [-20, -85], [-25, -125]], '#e0f2fe');
+    drawMiniCountry([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], '#0d9488');
     // 12. Sunflower Valley
     drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
-    // Pier & Beach
-    drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#d0ad58');
-    drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#ec4899');
+    // Pier & Beach Boardwalk
+    drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#dfc47b');
+    drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#db2777');
+
+    // =========================================================================
+    // 11. SWISS CONFEDERATION · FROSTPEAK ALPS (Elevation Relief Shading)
+    // =========================================================================
+    // Alpine evergreen foothills
+    drawMiniCountry([[-32, -128], [24, -128], [18, -84], [-28, -84], [-32, -128]], '#164e32');
+    // Rocky crags base
+    drawMiniCountry([[-28, -124], [20, -124], [15, -88], [-24, -88], [-28, -124]], '#475569');
+    // Glacial ice slope (SE shadow)
+    drawMiniCountry([[-24, -122], [18, -122], [12, -92], [-18, -92], [-24, -122]], '#7dd3fc');
+    // Sunlit alpine snow slope (NW highlight)
+    drawMiniCountry([[-24, -122], [-4, -122], [-6, -92], [-20, -92], [-24, -122]], '#f8fafc');
+    // Summit ridge pristine snowcaps
+    drawMiniCountry([[-14, -118], [8, -118], [2, -98], [-10, -98], [-14, -118]], '#ffffff');
+
+    // Lake Serenity (natural frozen ice rink in the alpine bowl)
+    ctx.fillStyle = '#bae6fd';
+    ctx.beginPath();
+    ctx.ellipse(originX - 10 * scale, originZ - 112 * scale, 9 * scale, 6 * scale, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Chalet de Lakshya timber ski lodge footprint
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(originX - 22 * scale, originZ - 90 * scale, 8 * scale, 8 * scale);
+
+    // SWISS FLAG BADGE 🇨🇭 (Frostpeak Alps Chalet Plinth)
+    const swissFlagX = originX - 18 * scale;
+    const swissFlagZ = originZ - 86 * scale;
+    const sFlagSize = Math.max(9, 14 * scale);
+    ctx.save();
+    ctx.fillStyle = '#d52b1e'; // Official Swiss Red
+    ctx.fillRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
+    // Swiss White Greek Cross
+    ctx.fillStyle = '#ffffff';
+    const sArm = sFlagSize * 0.22;
+    const sLen = sFlagSize * 0.65;
+    ctx.fillRect(swissFlagX - sArm / 2, swissFlagZ - sLen / 2, sArm, sLen);
+    ctx.fillRect(swissFlagX - sLen / 2, swissFlagZ - sArm / 2, sLen, sArm);
+    ctx.restore();
 
     // Yamuna river in India
-    ctx.fillStyle = '#0284c7';
-    ctx.beginPath();
-    ctx.lineWidth = 5 * scale;
     ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 5 * scale;
+    ctx.beginPath();
     ctx.moveTo(originX + 75 * scale, originZ - 60 * scale);
     ctx.quadraticCurveTo(originX + 85 * scale, originZ - 100 * scale, originX + 75 * scale, originZ - 160 * scale);
     ctx.stroke();
 
-    // Great Wall in China
+    // Taj Mahal marble dome footprint
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
+
+    // Giza Pyramids in Egypt (isometric shaded triangles)
+    const drawMiniPyramid = (px: number, pz: number, sz: number) => {
+      const rx = originX + px * scale;
+      const rz = originZ + pz * scale;
+      const s = sz * scale;
+      // Sunlit NW side
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.moveTo(rx, rz - s);
+      ctx.lineTo(rx - s, rz + s);
+      ctx.lineTo(rx, rz + s);
+      ctx.closePath();
+      ctx.fill();
+      // Shaded SE side
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.moveTo(rx, rz - s);
+      ctx.lineTo(rx, rz + s);
+      ctx.lineTo(rx + s, rz + s);
+      ctx.closePath();
+      ctx.fill();
+    };
+    drawMiniPyramid(-155, 36, 9); // Khufu
+    drawMiniPyramid(-142, 48, 7); // Khafre
+    drawMiniPyramid(-132, 58, 5); // Menkaure
+
+    // Great Wall in China (stone ramparts with watchtowers)
     ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 3.5 * scale;
     ctx.beginPath();
@@ -556,7 +631,7 @@ export class HUDManager {
     ctx.ellipse(originX + 165 * scale, originZ - 100 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hollywood Boulevard Walk of Fame & Hollywood Bowl in USA
+    // Hollywood Boulevard Walk of Fame
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 2.4 * scale;
     ctx.beginPath();
@@ -564,34 +639,50 @@ export class HUDManager {
     ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
     ctx.stroke();
 
-    ctx.strokeStyle = '#f8fafc';
-    ctx.lineWidth = 1.8 * scale;
-    ctx.beginPath();
-    ctx.arc(originX + 180 * scale, originZ - 76 * scale, 5 * scale, -Math.PI * 0.4, Math.PI * 0.4);
-    ctx.stroke();
-
-    // Lightning McQueen Speedway track
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 2.5 * scale;
+    // Lightning McQueen Speedway track (Asphalt with red curb chevrons)
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 4 * scale;
     ctx.beginPath();
     ctx.ellipse(originX + 168 * scale, originZ - 24 * scale, 16 * scale, 9 * scale, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
     ctx.restore(); // restore island clip
 
-    // Main Roads
-    ctx.strokeStyle = 'rgba(226,232,240,.75)';
+    // Main Roads (Double-line Minecraft gravel and paved highway)
+    const drawMiniRoad = (points: [number, number][]) => {
+      ctx.beginPath();
+      points.forEach(([x, z], i) => {
+        const px = originX + x * scale;
+        const pz = originZ + z * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
+      ctx.stroke();
+    };
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    // Dark stone border
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = Math.max(2.4, 3.2 * this.minimapZoom);
+    drawMiniRoad([[0, -20], [0, -65]]);
+    drawMiniRoad([[20, 0], [150, 0]]);
+    drawMiniRoad([[2, -60], [74, -106]]);
+    drawMiniRoad([[-2, -55], [-70, -85]]);
+    drawMiniRoad([[-20, 0], [-79, 50]]);
+    drawMiniRoad([[0, 20], [0, 160]]);
+    // Light cobblestone / sandstone fill
+    ctx.strokeStyle = '#f8fafc';
     ctx.lineWidth = Math.max(1.2, 1.8 * this.minimapZoom);
-    ctx.beginPath();
-    ctx.moveTo(originX, originZ - 20 * scale); ctx.lineTo(originX, originZ - 65 * scale);
-    ctx.moveTo(originX + 20 * scale, originZ); ctx.lineTo(originX + 150 * scale, originZ);
-    ctx.moveTo(originX + 2 * scale, originZ - 60 * scale); ctx.lineTo(originX + 74 * scale, originZ - 106 * scale);
-    ctx.moveTo(originX - 2 * scale, originZ - 55 * scale); ctx.lineTo(originX - 70 * scale, originZ - 85 * scale);
-    ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 79 * scale, originZ + 50 * scale);
-    ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 160 * scale);
-    ctx.stroke();
+    drawMiniRoad([[0, -20], [0, -65]]);
+    drawMiniRoad([[20, 0], [150, 0]]);
+    drawMiniRoad([[2, -60], [74, -106]]);
+    drawMiniRoad([[-2, -55], [-70, -85]]);
+    drawMiniRoad([[-20, 0], [-79, 50]]);
+    drawMiniRoad([[0, 20], [0, 160]]);
 
-    // Island Express Railway Transit Loop
+    // Island Express Railway Transit Loop (Twin rails with sleeper ties)
     const railWaypoints = [
       [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
       [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
@@ -599,9 +690,10 @@ export class HUDManager {
       [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
     ];
     ctx.save();
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = Math.max(1.5, 2.2 * this.minimapZoom);
-    ctx.setLineDash([3, 2]);
+    // Sleeper ties
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = Math.max(2.8, 3.8 * this.minimapZoom);
+    ctx.setLineDash([2, 4]);
     ctx.beginPath();
     railWaypoints.forEach(([wx, wz], idx) => {
       const rx = originX + wx * scale;
@@ -610,7 +702,11 @@ export class HUDManager {
     });
     ctx.closePath();
     ctx.stroke();
+    // Steel rails
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = Math.max(1.2, 1.8 * this.minimapZoom);
     ctx.setLineDash([]);
+    ctx.stroke();
     ctx.restore();
 
     // Railway Station Markers on Minimap
@@ -629,16 +725,27 @@ export class HUDManager {
       ctx.stroke();
     });
 
-    // Central Citadel Moat & Hub
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2;
+    // Central Citadel Moat, 4 Bridges & Hub
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(originX, originZ, 20 * scale, 0, Math.PI * 2);
     ctx.stroke();
 
+    // 4 Moat Bridges
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(originX - 2 * scale, originZ - 23 * scale, 4 * scale, 6 * scale);
+    ctx.fillRect(originX - 2 * scale, originZ + 17 * scale, 4 * scale, 6 * scale);
+    ctx.fillRect(originX + 17 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
+    ctx.fillRect(originX - 23 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
+
     ctx.fillStyle = '#64748b';
     ctx.beginPath();
     ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 3.5 * scale, 0, Math.PI * 2);
     ctx.fill();
 
     // Crosshair grid lines
