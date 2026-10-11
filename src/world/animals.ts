@@ -134,6 +134,18 @@ export class AnimalManager {
 
     // Sacred Caparisoned Temple Bull Elephant (Dravidian Temple Gopuram Mandapam)
     this.createTempleElephant(115, 2.0, -122, '🐘 Gajendra', 'Caparisoned Temple Elephant', 1.22);
+
+    // 10. Frostpeak Alps Living Arctic Fauna
+    this.createPolarBear(-6, 8.0, -118, '🐻‍❄️ Aurora', 'Glacial Polar Bear', 1.05);
+    this.createPolarBear(2, 8.0, -122, '🐻‍❄️ Frost', 'Arctic Polar Bear Cub', 0.75);
+    this.createPenguin(-10, 8.0, -112, '🐧 Blizzard', 'Emperor Penguin');
+    this.createPenguin(-8, 8.0, -114, '🐧 Frosty', 'Emperor Penguin');
+    this.createPenguin(-9, 8.0, -116, '🐧 Pip', 'Baby Penguin', 0.65);
+
+    // 11. Sunflower Valley Countryside Animals
+    this.createSheep(-30, 1.0, 42, '🐑 Clover', 'Pasture Sheep');
+    this.createSheep(-28, 1.0, 44, '🐑 Daisy', 'Pasture Sheep');
+    this.createPig(-35, 1.0, 42, '🐖 Barnaby', 'Farm Pig');
   }
 
   // ==========================================

@@ -57,6 +57,9 @@ export class WorldBuilder {
     this.buildNatureAndFlora();
     this.buildCountryMapKiosks();
     this.buildRealmCountryFlags();
+    this.buildAlpineSnowMountainRealm();
+    this.buildSunflowerValleyAndFarmstead();
+    this.buildPromenadeParklands();
   }
 
   // Deterministic Biome Topography Elevation Engine
@@ -95,6 +98,80 @@ export class WorldBuilder {
         return 0;
       }
       return 1;
+    }
+
+    // 3.5 North Alpine Snow Mountain Realm (Frostpeak Alps)
+    // Bounds: X in [-44, 36], Z <= -68 (rising up to northern shoreline)
+    if (x >= -44 && x <= 36 && z <= -68) {
+      // Respect London Realm at south-west corner of this zone
+      if (x <= -20 && z >= -80) {
+        if (z >= -54 && z <= -48 && x <= -22 && x >= -44) {
+          return 0; // River Thames waterway channel
+        }
+        return 1;
+      }
+
+      // Smooth southern foothills connecting to Citadel North Road
+      if (z >= -72) {
+        return (Math.abs(x) <= 3) ? 1 : 2;
+      }
+
+      // Walkable switchback pass between North Road (Z=-68) and Chalet / Lake Serenity (Z=-105)
+      if (Math.abs(x) <= 3 && z >= -105 && z <= -70) {
+        const passProgress = (-z - 70) / 35;
+        return Math.max(1, Math.round(1 + passProgress * 7));
+      }
+
+      // Lake Serenity Glacial Ice Basin at (-2, -115)
+      const lakeDist = Math.hypot((x - (-2)) / 12, (z - (-115)) / 10);
+      if (lakeDist <= 0.85) {
+        return 8; // Level frozen lake surface
+      }
+      if (lakeDist <= 1.15) {
+        const t = (lakeDist - 0.85) / 0.3;
+        return Math.round(8 + t * 4);
+      }
+
+      // Chalet de Lakshya plinth terrace at (-18, -95)
+      if (Math.hypot((x - (-18)) / 8, (z - (-95)) / 7) <= 1) {
+        return 8;
+      }
+
+      // Twin Majestic Summits & Ridges
+      // Summit 1: Frostpeak Mount Lakshya at (-2, -160, summit H=28)
+      const dPeak1 = Math.hypot((x - (-2)) / 20, (z - (-160)) / 24);
+      let peak1H = 0;
+      if (dPeak1 <= 1) {
+        peak1H = Math.round(28 * Math.pow(1 - dPeak1, 1.25));
+      }
+
+      // Summit 2: Glacier Horn at (24, -145, summit H=24)
+      const dPeak2 = Math.hypot((x - 24) / 16, (z - (-145)) / 18);
+      let peak2H = 0;
+      if (dPeak2 <= 1) {
+        peak2H = Math.round(24 * Math.pow(1 - dPeak2, 1.2));
+      }
+
+      // High Mountain Massif base elevation rising to the north
+      const zMassif = Math.min(1, Math.max(0, (-z - 72) / 70));
+      const xProfile = Math.max(0, 1 - Math.abs(x) / 42);
+      const crags = Math.sin((x + 10) * 0.18) * 1.8 + Math.cos(z * 0.15) * 1.6;
+      let massifH = 2 + Math.round(zMassif * (10 + xProfile * 6) + crags);
+
+      let h = Math.max(massifH, Math.max(peak1H, peak2H));
+
+      // Smooth blend towards eastern border (India plains at X >= 28)
+      if (x >= 28) {
+        const blendE = Math.max(0, (36 - x) / 8);
+        h = Math.round(2 + (h - 2) * blendE);
+      }
+      // Smooth blend towards western border (Seoul / China at X <= -36)
+      if (x <= -36) {
+        const blendW = Math.max(0, (x - (-44)) / 8);
+        h = Math.round(2 + (h - 2) * blendW);
+      }
+
+      return Math.max(1, Math.min(28, h));
     }
 
     // 4. North-West: China, Tokyo, Seoul Mountain Ridge, London & Zoo
@@ -143,6 +220,10 @@ export class WorldBuilder {
 
     // 5. South-West: Mexico Canyon Mesas & Egypt Giza Dunes
     if (x <= -20 && z >= 20) {
+      // Sunflower Valley & Countryside Farmland (X in [-68, -25], Z in [24, 76])
+      if (x >= -68 && x <= -25 && z >= 24 && z <= 76) {
+        return 1; // Level fertile agricultural terrace
+      }
       // Egypt Nile River Channel (X in [-131, -127], Z in [10, 65])
       if (x >= -131 && x <= -127 && z >= 10 && z <= 65) {
         return 0; // Nile waterway at Y = 0
@@ -264,7 +345,19 @@ export class WorldBuilder {
 
         for (let y = bottomY; y < h; y++) {
           let subType = 'dirt';
-          if (x >= 20 && z <= -35) {
+          const isAlpineMountain = (x >= -44 && x <= 36 && z <= -68);
+          const isSunflowerValley = (x >= -68 && x <= -25 && z >= 24 && z <= 76);
+
+          if (isAlpineMountain) {
+            const isLake = (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85);
+            if (isLake && y === h - 1) {
+              subType = 'prismarine_bricks';
+            } else {
+              subType = (y >= h - 2 && h >= 10) ? 'snow' : (y >= 6) ? 'cobblestone' : (h >= 4) ? 'stone_bricks' : 'dirt';
+            }
+          } else if (isSunflowerValley) {
+            subType = 'dirt';
+          } else if (x >= 20 && z <= -35) {
             subType = 'red_sandstone'; // India sub-base
           } else if (x <= -20 && z <= -35) {
             subType = (h >= 6) ? 'stone_bricks' : 'dirt'; // China mountain rock
@@ -282,7 +375,23 @@ export class WorldBuilder {
         // Top surface block at Y = h
         let topType = 'grass';
         const dist = Math.hypot(x, z);
-        if (dist < 18) {
+        const isAlpineMountain = (x >= -44 && x <= 36 && z <= -68);
+        const isSunflowerValley = (x >= -68 && x <= -25 && z >= 24 && z <= 76);
+
+        if (isAlpineMountain) {
+          const isLake = (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85);
+          if (isLake) {
+            topType = 'ice';
+          } else if (h >= 10) {
+            topType = 'snow';
+          } else if (h >= 4) {
+            topType = ((x + z) % 3 === 0) ? 'mossy_stone_bricks' : 'snow_grass';
+          } else {
+            topType = ((x + z) % 4 === 0) ? 'snow_grass' : 'grass';
+          }
+        } else if (isSunflowerValley) {
+          topType = 'grass';
+        } else if (dist < 18) {
           topType = (dist < 4) ? 'quartz_block' : (Math.abs(x) <= 1 || Math.abs(z) <= 1) ? 'smooth_stone' : 'stone_bricks';
         } else if (ax > 192 || az > 192 || dCorner > 48) {
           // Perimeter coastal beach
@@ -951,6 +1060,13 @@ export class WorldBuilder {
       ['emerald_block', 'gold_block', 'quartz_block', 'redstone_block'],
       ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block']
     ], 'west');
+
+    // 11. Swiss Confederation 🇨🇭 (Frostpeak Alps by Chalet de Lakshya)
+    this.buildFlagpole(-18, -86, 'Swiss Confederation 🇨🇭 · Cross of the Alps', 'White Greek cross on red field, representing alpine freedom, peace, and neutrality. Erected in the Frostpeak Alps at Chalet de Lakshya.', [
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block'],
+      ['redstone_block', 'quartz_block', 'quartz_block', 'redstone_block'],
+      ['redstone_block', 'redstone_block', 'redstone_block', 'redstone_block']
+    ], 'east');
   }
 
   private buildFlagpole(px: number, pz: number, title: string, desc: string, _pattern?: string[][], _dir?: 'east' | 'west') {
@@ -7843,4 +7959,720 @@ export class WorldBuilder {
       text: 'Runway 09/27, twin-engine passenger jet, ATC control tower, and direct rail link.'
     });
   }
+
+  // =========================================================================
+  // 13. Frostpeak Alps · Alpine Snow & Mountain Biome Realm
+  // =========================================================================
+  private buildAlpineSnowMountainRealm() {
+    // 1. Alpine Mountain Portal Entrance (0, 1, -68)
+    const gateZ = -68;
+    for (let x = -3; x <= 3; x++) {
+      this.setBlock(x, 1, gateZ, 'stone_bricks');
+    }
+    // Twin stone archway pillars
+    for (let y = 1; y <= 4; y++) {
+      this.setBlock(-3, y, gateZ, 'spruce_log');
+      this.setBlock(3, y, gateZ, 'spruce_log');
+    }
+    // Overhead timber beam with lantern
+    for (let x = -3; x <= 3; x++) {
+      this.setBlock(x, 5, gateZ, 'spruce_log');
+    }
+    this.setBlock(0, 4, gateZ, 'lantern');
+    this.setBlock(-3, 6, gateZ, 'snow');
+    this.setBlock(3, 6, gateZ, 'snow');
+
+    this.setBlock(0, 2, gateZ + 1, 'glowstone', {
+      type: 'sign',
+      title: 'Frostpeak Alps · Mountain Sanctuary 🏔️❄️',
+      text: 'Ascend into the alpine peaks! Discover the Chalet de Lakshya, Lake Serenity ice rink, high summit observatory, and cable car aerial lift.'
+    });
+
+    // 2. Winding Alpine Switchback Mountain Trail (Z = -68 to -105)
+    for (let z = -68; z >= -105; z--) {
+      const gy = this.getTerrainHeight(0, z);
+      for (let dx = -2; dx <= 2; dx++) {
+        const blk = (Math.abs(dx) === 2) ? 'mossy_stone_bricks' : (z % 2 === 0) ? 'cobblestone' : 'smooth_stone';
+        this.setBlock(dx, gy, z, blk);
+      }
+      // Wooden fence railings and lantern posts along trail
+      if (Math.abs(z) % 6 === 0) {
+        this.setBlock(-3, gy + 1, z, 'spruce_log');
+        this.setBlock(-3, gy + 2, z, 'lantern');
+        this.setBlock(3, gy + 1, z, 'spruce_log');
+        this.setBlock(3, gy + 2, z, 'lantern');
+      } else {
+        this.setBlock(-3, gy + 1, z, 'oak_fence');
+        this.setBlock(3, gy + 1, z, 'oak_fence');
+      }
+    }
+
+    // Branch trail to Chalet de Lakshya at (-18, -95)
+    for (let step = 0; step <= 18; step++) {
+      const tx = Math.round(0 - step);
+      const tz = Math.round(-90 - (step / 18) * 5);
+      const gy = this.getTerrainHeight(tx, tz);
+      this.setBlock(tx, gy, tz, 'cobblestone');
+      this.setBlock(tx, gy, tz - 1, 'cobblestone');
+      if (step % 5 === 0) {
+        this.setBlock(tx, gy + 1, tz + 1, 'oak_fence');
+        this.setBlock(tx, gy + 2, tz + 1, 'lantern');
+      }
+    }
+
+    // 3. Chalet de Lakshya (Alpine Ski Lodge & Heated Jacuzzi)
+    // Centered at (-18, -95), Base Floor at Y = 8
+    const cx = -18;
+    const cz = -95;
+    const baseY = 8;
+
+    // Foundation plinth & first floor (Y = 8 to 11)
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      for (let z = cz - 5; z <= cz + 5; z++) {
+        // Floor
+        this.setBlock(x, baseY, z, 'oak_planks');
+
+        const isWall = (x === cx - 6 || x === cx + 6 || z === cz - 5 || z === cz + 5);
+        const isCorner = (Math.abs(x - cx) === 6 && Math.abs(z - cz) === 5);
+        const isDoor = (z === cz + 5 && (x === cx || x === cx - 1));
+
+        if (isWall) {
+          for (let y = baseY + 1; y <= baseY + 3; y++) {
+            if (isDoor && y <= baseY + 2) continue; // Walk-in entrance
+            if (isCorner) {
+              this.setBlock(x, y, z, 'spruce_log');
+            } else if (y === baseY + 2 && (Math.abs(x - cx) === 2 || Math.abs(z - cz) === 2)) {
+              this.setBlock(x, y, z, 'cyber_glass'); // Large picture windows
+            } else {
+              this.setBlock(x, y, z, 'spruce_log');
+            }
+          }
+        }
+      }
+    }
+
+    // Grand stone fireplace & chimney at northern wall
+    for (let y = baseY + 1; y <= baseY + 12; y++) {
+      this.setBlock(cx, y, cz - 5, 'cobblestone');
+      this.setBlock(cx - 1, y, cz - 5, 'cobblestone');
+      this.setBlock(cx + 1, y, cz - 5, 'cobblestone');
+    }
+    this.setBlock(cx, baseY + 1, cz - 4, 'magma_block'); // Open glowing hearth fire
+    this.setBlock(cx, baseY + 2, cz - 4, 'glowstone');
+    this.setBlock(cx, baseY + 13, cz - 5, 'cobblestone'); // Chimney top
+    this.setBlock(cx, baseY + 14, cz - 5, 'cobblestone');
+
+    // Interior amenities (First Floor)
+    // Long oak dining table & chairs
+    for (let z = cz - 2; z <= cz + 2; z++) {
+      this.setBlock(cx - 2, baseY + 1, z, 'oak_planks');
+      this.setBlock(cx - 3, baseY + 1, z, 'oak_fence');
+      this.setBlock(cx - 1, baseY + 1, z, 'oak_fence');
+    }
+    // Hot chocolate / tea beverage bar and shelves
+    this.setBlock(cx + 4, baseY + 1, cz - 3, 'bookshelf');
+    this.setBlock(cx + 5, baseY + 1, cz - 3, 'bookshelf');
+    this.setBlock(cx + 4, baseY + 1, cz - 2, 'crafting_table');
+    this.setBlock(cx + 5, baseY + 1, cz - 2, 'chest', {
+      type: 'chest',
+      title: 'Chalet Winter Supply Chest ☕🧣',
+      text: 'Stocked with warm woolen cloaks, artisan hot cocoa, snowshoes, and alpine trail maps.'
+    });
+    this.setBlock(cx, baseY + 3, cz, 'sea_lantern'); // Hanging iron chandelier
+
+    // Second Floor Loft & Balcony (Y = 12 to 14)
+    for (let x = cx - 6; x <= cx + 6; x++) {
+      for (let z = cz - 5; z <= cz + 5; z++) {
+        this.setBlock(x, baseY + 4, z, 'oak_planks');
+        const isWall = (x === cx - 6 || x === cx + 6 || z === cz - 5 || z === cz + 5);
+        if (isWall) {
+          for (let y = baseY + 5; y <= baseY + 6; y++) {
+            this.setBlock(x, y, z, (y === baseY + 5 && (x + z) % 3 === 0) ? 'cyber_glass' : 'spruce_log');
+          }
+        }
+      }
+    }
+    // East-facing observation balcony overlooking Lake Serenity (Z in [cz - 2, cz + 2])
+    for (let z = cz - 2; z <= cz + 2; z++) {
+      this.setBlock(cx + 7, baseY + 4, z, 'oak_planks');
+      this.setBlock(cx + 7, baseY + 5, z, 'oak_fence');
+    }
+
+    // High Peaked Gabled A-Frame Snow Roof (Y = 15 to 19)
+    for (let step = 0; step <= 5; step++) {
+      const roofY = baseY + 7 + step;
+      const curHalfW = 6 - step;
+      for (let z = cz - 6; z <= cz + 6; z++) {
+        this.setBlock(cx - curHalfW, roofY, z, 'spruce_log');
+        this.setBlock(cx - curHalfW, roofY + 1, z, 'snow'); // Thick snow blanket on roof
+        this.setBlock(cx + curHalfW, roofY, z, 'spruce_log');
+        this.setBlock(cx + curHalfW, roofY + 1, z, 'snow');
+      }
+    }
+
+    // Outdoor Steaming Alpine Hot Spring / Jacuzzi (Southeast Deck)
+    const spaX = cx + 8;
+    const spaZ = cz + 2;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const isBorder = (Math.abs(dx) === 2 || Math.abs(dz) === 2);
+        if (isBorder) {
+          this.setBlock(spaX + dx, baseY, spaZ + dz, 'quartz_block');
+          this.setBlock(spaX + dx, baseY + 1, spaZ + dz, 'quartz_pillar');
+        } else {
+          this.setBlock(spaX + dx, baseY - 1, spaZ + dz, 'magma_block'); // Underfloor heat
+          this.setBlock(spaX + dx, baseY, spaZ + dz, 'water');
+        }
+      }
+    }
+    this.setBlock(spaX - 2, baseY + 2, spaZ - 2, 'lantern');
+    this.setBlock(spaX + 2, baseY + 2, spaZ + 2, 'lantern');
+
+    this.setBlock(cx, baseY + 1, cz + 6, 'glowstone', {
+      type: 'sign',
+      title: 'Chalet de Lakshya · Alpine Ski Lodge 🏔️🔥',
+      text: 'Warm timber refuge nestled in the Frostpeak Alps. Open hearth fireplace, heated thermal bath, and panoramic vistas of Lake Serenity.'
+    });
+
+    // 4. Lake Serenity Glacial Ice Rink & Frozen Waterfall
+    // Lake Basin: X in [-14, 8], Z in [-125, -110], Y = 8
+    const lakeMinX = -14;
+    const lakeMaxX = 8;
+    const lakeMinZ = -125;
+    const lakeMaxZ = -110;
+    const lakeY = 8;
+
+    for (let x = lakeMinX; x <= lakeMaxX; x++) {
+      for (let z = lakeMinZ; z <= lakeMaxZ; z++) {
+        if (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85) {
+          this.setBlock(x, lakeY - 1, z, 'prismarine_bricks');
+          this.setBlock(x, lakeY, z, 'ice');
+        }
+      }
+    }
+
+    // Perimeter benches, lanterns & fence on south shore
+    for (let x = -8; x <= 6; x += 4) {
+      this.setBlock(x, lakeY + 1, -107, 'spruce_log'); // Bench
+      this.setBlock(x, lakeY + 2, -107, 'snow');
+      this.setBlock(x + 2, lakeY + 1, -107, 'oak_fence');
+      this.setBlock(x + 2, lakeY + 2, -107, 'lantern');
+    }
+
+    // Ice Skater Warming Shack at (10, 8, -114)
+    const shackX = 10;
+    const shackZ = -114;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(shackX + dx, lakeY, shackZ + dz, 'oak_planks');
+        const isWall = (Math.abs(dx) === 2 || Math.abs(dz) === 2);
+        if (isWall) {
+          this.setBlock(shackX + dx, lakeY + 1, shackZ + dz, 'spruce_log');
+          this.setBlock(shackX + dx, lakeY + 2, shackZ + dz, (dx === 0 && dz === -2) ? 'air' : 'spruce_log');
+        }
+        this.setBlock(shackX + dx, lakeY + 3, shackZ + dz, 'snow');
+      }
+    }
+    this.setBlock(shackX, lakeY + 1, shackZ, 'bookshelf');
+    this.setBlock(shackX, lakeY + 2, shackZ, 'sea_lantern');
+
+    // Cascading Frozen Waterfall (cliff face at Z = -126, X from -5 to 3, Y = 8 to 19)
+    for (let x = -5; x <= 3; x++) {
+      for (let y = 8; y <= 19; y++) {
+        const isSpout = (y >= 16);
+        const wType = (isSpout && (x === -1 || x === 0)) ? 'water' : ((x + y) % 3 === 0) ? 'cyber_glass' : 'ice';
+        this.setBlock(x, y, -125, wType);
+        if (y % 3 === 0) {
+          this.setBlock(x, y, -124, 'ice');
+        }
+      }
+      this.setBlock(x, 20, -126, 'snow');
+    }
+
+    this.setBlock(-2, lakeY + 1, -106, 'glowstone', {
+      type: 'sign',
+      title: 'Lake Serenity · Glacial Ice Rink ⛸️❄️',
+      text: 'Turquoise glacial lake frozen solid under the mountain shadow. Enjoy ice skating beneath the frozen waterfall and surrounding spruce pines.'
+    });
+
+    // 5. Frostpeak Summit Observatory & Skyward Aurora Beacon
+    // Summit Peak at (-2, -160), Terrace at Y = 28
+    const sumX = -2;
+    const sumZ = -160;
+    const sumY = 28;
+
+    // Stone Steps winding up the summit crag from Z = -140 up to -155
+    for (let step = 0; step <= 15; step++) {
+      const stepZ = -142 - step;
+      const stepY = 20 + Math.round((step / 15) * 8);
+      for (let dx = -1; dx <= 1; dx++) {
+        this.setBlock(sumX + dx, stepY, stepZ, 'smooth_stone');
+      }
+      if (step % 4 === 0) {
+        this.setBlock(sumX - 2, stepY + 1, stepZ, 'iron_block');
+        this.setBlock(sumX - 2, stepY + 2, stepZ, 'sea_lantern');
+        this.setBlock(sumX + 2, stepY + 1, stepZ, 'iron_block');
+        this.setBlock(sumX + 2, stepY + 2, stepZ, 'sea_lantern');
+      }
+    }
+
+    // Circular Summit Observation Terrace at Y = 28 (Radius 6)
+    for (let dx = -6; dx <= 6; dx++) {
+      for (let dz = -6; dz <= 6; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 6) {
+          this.setBlock(sumX + dx, sumY, sumZ + dz, (d <= 2) ? 'diamond_block' : (d <= 5) ? 'quartz_block' : 'stone_bricks');
+          if (d >= 5.2 && d <= 6) {
+            this.setBlock(sumX + dx, sumY + 1, sumZ + dz, 'iron_block'); // Safety guardrail
+          }
+        }
+      }
+    }
+
+    // Astronomical Observatory Dome at (sumX - 3, sumZ)
+    const obsX = sumX - 3;
+    const obsZ = sumZ;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        if (Math.hypot(dx, dz) <= 2.2) {
+          // Walls
+          for (let y = sumY + 1; y <= sumY + 3; y++) {
+            this.setBlock(obsX + dx, y, obsZ + dz, 'quartz_pillar');
+          }
+          // Curved Glass Dome
+          this.setBlock(obsX + dx, sumY + 4, obsZ + dz, 'cyber_glass');
+        }
+      }
+    }
+    this.setBlock(obsX, sumY + 5, obsZ, 'quartz_block');
+    // Astronomical deep-sky telescope angled up
+    this.setBlock(obsX, sumY + 2, obsZ, 'iron_block');
+    this.setBlock(obsX, sumY + 3, obsZ, 'iron_block');
+    this.setBlock(obsX, sumY + 4, obsZ - 1, 'sea_lantern'); // Objective lens
+
+    // Skyward Aurora Beacon at (sumX + 3, sumZ)
+    const becX = sumX + 3;
+    const becZ = sumZ;
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(becX + dx, sumY, becZ + dz, 'diamond_block');
+      }
+    }
+    this.setBlock(becX, sumY + 1, becZ, 'beacon');
+    this.setBlock(becX, sumY + 2, becZ, 'sea_lantern');
+
+    this.setBlock(sumX, sumY + 1, sumZ - 5, 'glowstone', {
+      type: 'sign',
+      title: 'Frostpeak Summit Observatory · Alt 28m 🔭🌌',
+      text: 'Highest vantage point of the island realm! Deep-sky telescope, celestial aurora beacon, and panoramic 360-degree views across the entire world.'
+    });
+
+    // 6. Mountain Cable Car / Aerial Gondola Lift
+    // 3 Structural Steel Lattice Pylons
+    const pylons = [
+      { x: 8, z: -76, baseY: 3, topY: 15 },
+      { x: 8, z: -115, baseY: 11, topY: 22 },
+      { x: 8, z: -152, baseY: 26, topY: 34 }
+    ];
+
+    for (const p of pylons) {
+      // 2x2 Steel pylon column
+      for (let y = p.baseY; y <= p.topY; y++) {
+        this.setBlock(p.x, y, p.z, (y % 3 === 0) ? 'sea_lantern' : 'iron_block');
+        this.setBlock(p.x + 1, y, p.z, 'iron_block');
+      }
+      // Crossarm beam
+      for (let dx = -2; dx <= 3; dx++) {
+        this.setBlock(p.x + dx, p.topY, p.z, 'iron_block');
+      }
+    }
+
+    // Aerial Steel Cable Span connecting Pylon 1 to 2 to 3
+    for (let z = -76; z >= -152; z--) {
+      const u = (z - (-76)) / (-152 - (-76));
+      const cableY = Math.round(15 + u * (34 - 15));
+      this.setBlock(8, cableY, z, 'iron_block');
+    }
+
+    // Valley Cable Station Building at (8, 3, -76)
+    for (let dx = -2; dx <= 3; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(8 + dx, 3, -76 + dz, 'stone_bricks');
+        if (Math.abs(dx) === 2 || Math.abs(dz) === 2) {
+          this.setBlock(8 + dx, 4, -76 + dz, 'iron_block');
+        }
+      }
+    }
+    this.setBlock(8, 4, -73, 'glowstone', {
+      type: 'sign',
+      title: 'Frostpeak Mountain Aerial Tramway 🚡',
+      text: 'Scenic aerial cable car linking the valley base station to the high alpine summit. Operating continuous service across Lake Serenity.'
+    });
+
+    // Gondola 1 (Alpine Red Express) at (8, 18, -100)
+    const g1X = 8;
+    const g1Y = 18;
+    const g1Z = -100;
+    this.setBlock(g1X, g1Y + 2, g1Z, 'iron_block'); // Cable hanger
+    this.setBlock(g1X, g1Y + 1, g1Z, 'iron_block');
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(g1X + dx, g1Y - 1, g1Z + dz, 'iron_block'); // Floor
+        this.setBlock(g1X + dx, g1Y, g1Z + dz, (dx === 0 && dz === 0) ? 'sea_lantern' : 'cyber_glass'); // Windows & Light
+        this.setBlock(g1X + dx, g1Y + 1, g1Z + dz, 'redstone_block'); // Red cabin roof
+      }
+    }
+
+    // Gondola 2 (Glacier Gold Express) at (8, 28, -136)
+    const g2X = 8;
+    const g2Y = 28;
+    const g2Z = -136;
+    this.setBlock(g2X, g2Y + 2, g2Z, 'iron_block');
+    this.setBlock(g2X, g2Y + 1, g2Z, 'iron_block');
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(g2X + dx, g2Y - 1, g2Z + dz, 'iron_block');
+        this.setBlock(g2X + dx, g2Y, g2Z + dz, (dx === 0 && dz === 0) ? 'sea_lantern' : 'cyber_glass');
+        this.setBlock(g2X + dx, g2Y + 1, g2Z + dz, 'gold_block'); // Gold cabin roof
+      }
+    }
+
+    // 7. Crystal Ice Cavern & Amethyst Grotto at (18, 11, -125)
+    const caveX = 18;
+    const caveY = 11;
+    const caveZ = -125;
+
+    // Carved Cavern Room
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        // Floor & ceiling
+        this.setBlock(caveX + dx, caveY, caveZ + dz, 'ice');
+        this.setBlock(caveX + dx, caveY + 4, caveZ + dz, ((dx + dz) % 2 === 0) ? 'amethyst_block' : 'ice');
+        // Stalactites
+        if (Math.abs(dx) === 2 && Math.abs(dz) === 2) {
+          this.setBlock(caveX + dx, caveY + 3, caveZ + dz, 'cyber_glass');
+          this.setBlock(caveX + dx, caveY + 2, caveZ + dz, 'sea_lantern');
+        }
+      }
+    }
+    // Glowing crystal clusters
+    this.setBlock(caveX + 2, caveY + 1, caveZ - 2, 'amethyst_block');
+    this.setBlock(caveX + 2, caveY + 2, caveZ - 2, 'amethyst_block');
+    this.setBlock(caveX - 2, caveY + 1, caveZ + 2, 'amethyst_block');
+    this.setBlock(caveX - 2, caveY + 2, caveZ + 2, 'amethyst_block');
+
+    // Ancient Permafrost Treasure Chest
+    this.setBlock(caveX, caveY + 1, caveZ, 'chest', {
+      type: 'chest',
+      title: 'Permafrost Crystal Grotto 💎❄️',
+      text: 'You discovered the hidden crystal cavern deep beneath Glacier Horn! Resonating amethyst crystals and ancient glacial relics.'
+    });
+
+    // 8. Alpine Spruce Pine Forests
+    const spruceSites = [
+      { x: -12, z: -80, h: 6 },
+      { x: -8, z: -86, h: 7 },
+      { x: 12, z: -82, h: 6 },
+      { x: 14, z: -90, h: 7 },
+      { x: -28, z: -98, h: 8 },
+      { x: -25, z: -108, h: 7 },
+      { x: -18, z: -116, h: 8 },
+      { x: -20, z: -125, h: 6 },
+      { x: 14, z: -102, h: 7 },
+      { x: 16, z: -112, h: 8 },
+      { x: 18, z: -135, h: 7 },
+      { x: -10, z: -138, h: 8 },
+      { x: -4, z: -148, h: 7 },
+      { x: 6, z: -145, h: 7 },
+      { x: 14, z: -160, h: 6 },
+      { x: -14, z: -165, h: 6 }
+    ];
+
+    for (const site of spruceSites) {
+      this.buildSnowSpruceTree(site.x, this.getTerrainHeight(site.x, site.z), site.z, site.h);
+    }
+
+    // 9. Snowmen
+    this.buildSnowman(-14, this.getTerrainHeight(-14, -92), -92);
+    this.buildSnowman(-22, this.getTerrainHeight(-22, -92), -92);
+    this.buildSnowman(-4, this.getTerrainHeight(-4, -107), -107);
+    this.buildSnowman(4, this.getTerrainHeight(4, -107), -107);
+  }
+
+  // =========================================================================
+  // 14. Sunflower Valley & Countryside Farmland Realm (South-West Plain)
+  // =========================================================================
+  private buildSunflowerValleyAndFarmstead() {
+    const millX = -45;
+    const millZ = 48;
+    const baseY = 1;
+
+    // 1. Traditional 4-Sail Dutch Windmill
+    // Octagonal Stone Foundation (radius 3, Y = 1 to 3)
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        if (Math.abs(dx) + Math.abs(dz) <= 4) {
+          for (let y = baseY; y <= baseY + 2; y++) {
+            this.setBlock(millX + dx, y, millZ + dz, 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    // Tapering Cylindrical Tower Body (Y = 4 to 12)
+    for (let y = baseY + 3; y <= baseY + 11; y++) {
+      const r = (y >= baseY + 8) ? 2 : 2;
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dz = -r; dz <= r; dz++) {
+          const isPerimeter = (Math.abs(dx) === r || Math.abs(dz) === r);
+          if (isPerimeter) {
+            const isWindow = (y === baseY + 6 && (dx === 0 || dz === 0));
+            this.setBlock(millX + dx, y, millZ + dz, isWindow ? 'cyber_glass' : 'quartz_block');
+          }
+        }
+      }
+    }
+
+    // Conical Wooden Roof Cap (Y = 13 to 15)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(millX + dx, baseY + 12, millZ + dz, 'spruce_log');
+      }
+    }
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(millX + dx, baseY + 13, millZ + dz, 'spruce_log');
+      }
+    }
+    this.setBlock(millX, baseY + 14, millZ, 'gold_block');
+    this.setBlock(millX, baseY + 15, millZ, 'sea_lantern');
+
+    // Rotating Hub & 4 Giant Windmill Sails (at Z = millZ + 3, Y = baseY + 11)
+    const hubY = baseY + 11;
+    const hubZ = millZ + 3;
+    this.setBlock(millX, hubY, hubZ, 'iron_block');
+
+    // 4 Cross Sail Arms extending 6 blocks in cardinal directions
+    const armLen = 6;
+    for (let i = 1; i <= armLen; i++) {
+      // Top arm (+Y)
+      this.setBlock(millX, hubY + i, hubZ, 'oak_fence');
+      this.setBlock(millX + 1, hubY + i, hubZ, 'quartz_block'); // Canvas sail
+      // Bottom arm (-Y)
+      this.setBlock(millX, hubY - i, hubZ, 'oak_fence');
+      this.setBlock(millX - 1, hubY - i, hubZ, 'quartz_block');
+      // Right arm (+X)
+      this.setBlock(millX + i, hubY, hubZ, 'oak_fence');
+      this.setBlock(millX + i, hubY - 1, hubZ, 'quartz_block');
+      // Left arm (-X)
+      this.setBlock(millX - i, hubY, hubZ, 'oak_fence');
+      this.setBlock(millX - i, hubY + 1, hubZ, 'quartz_block');
+    }
+
+    this.setBlock(millX, baseY + 1, millZ + 4, 'glowstone', {
+      type: 'sign',
+      title: 'Sunflower Valley Historic Windmill 🌾⚙️',
+      text: 'Traditional 4-sail grain windmill overlooking the golden sunflower fields, wheat terraces, and countryside farmlands.'
+    });
+
+    // 2. Red Farmhouse Barn & Hayloft at (-32, 38)
+    const barnX = -32;
+    const barnZ = 38;
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -5; dz <= 5; dz++) {
+        this.setBlock(barnX + dx, baseY, barnZ + dz, 'oak_planks');
+        const isWall = (Math.abs(dx) === 4 || Math.abs(dz) === 5);
+        if (isWall) {
+          for (let y = baseY + 1; y <= baseY + 4; y++) {
+            const isCorner = (Math.abs(dx) === 4 && Math.abs(dz) === 5);
+            this.setBlock(barnX + dx, y, barnZ + dz, isCorner ? 'quartz_block' : 'red_terracotta');
+          }
+        }
+      }
+    }
+    // Barn Gambrel Roof
+    for (let yStep = 0; yStep <= 3; yStep++) {
+      const curW = 4 - yStep;
+      for (let dz = -5; dz <= 5; dz++) {
+        this.setBlock(barnX - curW, baseY + 5 + yStep, barnZ + dz, 'spruce_log');
+        this.setBlock(barnX + curW, baseY + 5 + yStep, barnZ + dz, 'spruce_log');
+      }
+    }
+    // Hay bales inside & outside
+    this.setBlock(barnX - 2, baseY + 1, barnZ, 'gold_block');
+    this.setBlock(barnX - 1, baseY + 1, barnZ, 'gold_block');
+    this.setBlock(barnX - 2, baseY + 2, barnZ, 'gold_block');
+    this.setBlock(barnX + 6, baseY + 1, barnZ - 2, 'gold_block');
+    this.setBlock(barnX + 6, baseY + 1, barnZ - 1, 'gold_block');
+
+    // 3. Golden Wheat, Sunflower, and Pumpkin Fields
+    // Field 1: Golden Wheat (X in [-60, -50], Z in [35, 55])
+    for (let x = -60; x <= -50; x++) {
+      for (let z = 35; z <= 55; z++) {
+        if (x % 3 === 0) {
+          this.setBlock(x, baseY, z, 'water'); // Irrigation canal
+        } else {
+          this.setBlock(x, baseY, z, 'dirt');
+          this.setBlock(x, baseY + 1, z, 'gold_block'); // Ripe golden wheat stalks
+        }
+      }
+    }
+
+    // Field 2: Sunflowers & Pumpkins (X in [-58, -36], Z in [60, 72])
+    for (let x = -58; x <= -36; x++) {
+      for (let z = 60; z <= 72; z++) {
+        if ((x + z) % 4 === 0) {
+          this.setBlock(x, baseY, z, 'dirt');
+          this.setBlock(x, baseY + 1, z, 'glowstone'); // Glowing sunflower blooms
+        } else if ((x + z) % 7 === 0) {
+          this.setBlock(x, baseY, z, 'dirt');
+          this.setBlock(x, baseY + 1, z, 'sea_lantern'); // Harvest lanterns
+        }
+      }
+    }
+
+    // 4. Rustic Stone Well with Bucket Winch
+    const wellX = -42;
+    const wellZ = 40;
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        if (dx === 0 && dz === 0) {
+          this.setBlock(wellX, baseY, wellZ, 'water');
+        } else {
+          this.setBlock(wellX + dx, baseY, wellZ + dz, 'stone_bricks');
+          this.setBlock(wellX + dx, baseY + 1, wellZ + dz, 'stone_bricks');
+        }
+      }
+    }
+    this.setBlock(wellX - 1, baseY + 2, wellZ, 'oak_fence');
+    this.setBlock(wellX + 1, baseY + 2, wellZ, 'oak_fence');
+    this.setBlock(wellX, baseY + 3, wellZ, 'spruce_log');
+    this.setBlock(wellX, baseY + 2, wellZ, 'iron_block'); // Bucket
+
+    // 5. Connecting Country Road linking Citadel to Sunflower Valley & Mexico
+    for (let step = 0; step <= 36; step++) {
+      const u = step / 36;
+      const px = Math.round(-2 + (-78 - (-2)) * u);
+      const pz = Math.round(24 + (60 - 24) * u);
+      const gy = this.getTerrainHeight(px, pz);
+      for (let dx = -1; dx <= 1; dx++) {
+        this.setBlock(px + dx, gy, pz, (step % 2 === 0) ? 'cobblestone' : 'smooth_stone');
+      }
+      if (step % 6 === 0) {
+        this.setBlock(px + 2, gy + 1, pz, 'oak_fence');
+        this.setBlock(px + 2, gy + 2, pz, 'lantern');
+      }
+    }
+  }
+
+  // =========================================================================
+  // 15. European Promenade & Garden Parklands (North Transition Zone)
+  // =========================================================================
+  private buildPromenadeParklands() {
+    // Fills the parkland corridor between Citadel North Gate, London, and Paris
+    // X in [-18, 18], Z in [-35, -58]
+    for (let z = -35; z >= -58; z -= 6) {
+      // Rose flowerbeds
+      this.setBlock(-10, 1, z, 'redstone_block');
+      this.setBlock(-9, 1, z, 'redstone_block');
+      this.setBlock(10, 1, z, 'redstone_block');
+      this.setBlock(9, 1, z, 'redstone_block');
+
+      // Boxwood trimmed hedges
+      this.setBlock(-12, 1, z, 'oak_leaves');
+      this.setBlock(-12, 2, z, 'oak_leaves');
+      this.setBlock(12, 1, z, 'oak_leaves');
+      this.setBlock(12, 2, z, 'oak_leaves');
+
+      // Victorian promenade lampposts
+      this.setBlock(-6, 1, z, 'stone_bricks');
+      this.setBlock(-6, 2, z, 'iron_block');
+      this.setBlock(-6, 3, z, 'iron_block');
+      this.setBlock(-6, 4, z, 'lantern');
+
+      this.setBlock(6, 1, z, 'stone_bricks');
+      this.setBlock(6, 2, z, 'iron_block');
+      this.setBlock(6, 3, z, 'iron_block');
+      this.setBlock(6, 4, z, 'lantern');
+
+      // Park benches
+      this.setBlock(-5, 1, z + 2, 'oak_planks');
+      this.setBlock(5, 1, z + 2, 'oak_planks');
+    }
+
+    // Central reflection fountain at (0, -45)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        if (Math.abs(dx) === 2 || Math.abs(dz) === 2) {
+          this.setBlock(dx, 1, -45 + dz, 'quartz_block');
+        } else {
+          this.setBlock(dx, 1, -45 + dz, 'water');
+        }
+      }
+    }
+    this.setBlock(0, 2, -45, 'quartz_pillar');
+    this.setBlock(0, 3, -45, 'sea_lantern');
+  }
+
+  // Helpers
+  private buildSnowSpruceTree(cx: number, baseY: number, cz: number, height: number = 6) {
+    const gy = this.getTerrainHeight(cx, cz);
+    const startY = Math.max(baseY, gy + 1);
+
+    // Trunk
+    for (let y = startY; y < startY + height; y++) {
+      this.setBlock(cx, y, cz, 'spruce_log');
+    }
+
+    // Tiered snow-covered foliage
+    const topY = startY + height;
+
+    // Apex
+    this.setBlock(cx, topY, cz, 'spruce_leaves');
+    this.setBlock(cx, topY + 1, cz, 'snow');
+
+    // Tier 1 (top - 1): plus shape
+    for (const [dx, dz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+      this.setBlock(cx + dx, topY - 1, cz + dz, 'spruce_leaves');
+      this.setBlock(cx + dx, topY, cz + dz, 'snow');
+    }
+
+    // Tier 2 (top - 2): 3x3 with corners
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        if (dx === 0 && dz === 0) continue;
+        this.setBlock(cx + dx, topY - 2, cz + dz, 'spruce_leaves');
+        this.setBlock(cx + dx, topY - 1, cz + dz, 'snow');
+      }
+    }
+
+    // Tier 3 (top - 3): plus shape r=2
+    for (const [dx, dz] of [[0, 2], [0, -2], [2, 0], [-2, 0]]) {
+      this.setBlock(cx + dx, topY - 3, cz + dz, 'spruce_leaves');
+      this.setBlock(cx + dx, topY - 2, cz + dz, 'snow');
+    }
+
+    // Tier 4 (top - 4): 5x5 rounded
+    if (height >= 6) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue;
+          if (dx === 0 && dz === 0) continue;
+          this.setBlock(cx + dx, topY - 4, cz + dz, 'spruce_leaves');
+          this.setBlock(cx + dx, topY - 3, cz + dz, 'snow');
+        }
+      }
+    }
+  }
+
+  private buildSnowman(cx: number, baseY: number, cz: number) {
+    const gy = this.getTerrainHeight(cx, cz);
+    const startY = Math.max(baseY, gy + 1);
+    this.setBlock(cx, startY, cz, 'snow');
+    this.setBlock(cx, startY + 1, cz, 'snow');
+    this.setBlock(cx, startY + 2, cz, 'glowstone');
+    this.setBlock(cx - 1, startY + 1, cz, 'oak_fence');
+    this.setBlock(cx + 1, startY + 1, cz, 'oak_fence');
+  }
 }
+

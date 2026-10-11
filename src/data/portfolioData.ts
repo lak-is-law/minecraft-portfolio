@@ -446,6 +446,8 @@ export const PORTFOLIO_DATA = {
     { name: "Sher-e-Punjab Highway Dhaba & Tata Truck", coords: [55, 2, -75], tag: "[DHABA]", desc: "Grand Trunk Road dhaba with woven charpai cots, smoking tandoor oven, and decorated 'Horn OK Please' Tata truck" },
     { name: "ISRO Spaceport · Chandrayaan-3", coords: [115, 2, -85], tag: "[ISRO]", desc: "Lunar South Pole Vikram lander, Pragyan rover, deployed solar wings, and deep-space telemetry center" },
     { name: "Jaipur · Hawa Mahal (Palace of Winds)", coords: [58, 2, -103], tag: "[HAWA MAHAL]", desc: "5-tiered Rajasthani rose sandstone facade with 953 honeycombed jharokha lattice balconies" },
-    { name: "India Gate & Amar Jawan Jyoti", coords: [80, 2, -60], tag: "[INDIA GATE]", desc: "Monumental New Delhi triumphal arch with perpetual eternal flame braziers and Diwali illuminations" }
+    { name: "India Gate & Amar Jawan Jyoti", coords: [80, 2, -60], tag: "[INDIA GATE]", desc: "Monumental New Delhi triumphal arch with perpetual eternal flame braziers and Diwali illuminations" },
+    { name: "Frostpeak Alps · Mountain Lodge & Observatory", coords: [-2, 9, -100], tag: "[ALPS]", desc: "Majestic snow-capped mountain peaks, Chalet de Lakshya timber ski lodge, Lake Serenity ice rink, cable car gondola, and high summit observatory" },
+    { name: "Sunflower Valley · Windmill & Farmstead", coords: [-45, 2, 48], tag: "[VALLEY]", desc: "Rustic 4-sail Dutch windmill, golden wheat and sunflower fields, countryside barn, and peaceful agricultural valley" }
   ]
 };

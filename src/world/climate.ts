@@ -63,8 +63,9 @@ export class ClimateEffects {
     this.translateParticles(this.seasonParticles.geometry, move);
 
     const raining = this.weather === 'rain' || this.weather === 'thunderstorm';
-    const snowing = this.weather === 'snowfall' || (this.season === 'winter' && this.weather === 'clear');
-    const seasonActive = this.season === 'spring' || this.season === 'summer' || this.season === 'autumn';
+    const isAlpine = (playerPosition.z <= -70 && Math.abs(playerPosition.x) <= 45 && playerPosition.y >= 3);
+    const snowing = this.weather === 'snowfall' || (this.season === 'winter' && this.weather === 'clear') || isAlpine;
+    const seasonActive = (this.season === 'spring' || this.season === 'summer' || this.season === 'autumn') && !isAlpine;
     this.rain.visible = raining;
     this.snow.visible = snowing;
     this.seasonParticles.visible = seasonActive;
