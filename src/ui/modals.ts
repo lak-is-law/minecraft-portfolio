@@ -2,6 +2,66 @@ import { PORTFOLIO_DATA, Project, Experience } from '../data/portfolioData';
 import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
 
+export interface NPCDialogOption {
+  label: string;
+  response?: string;
+  action?: () => void;
+  nextOptions?: NPCDialogOption[];
+  styleClass?: 'mc-btn-green' | 'mc-btn-blue' | 'mc-btn-gold' | 'mc-btn-stone' | 'mc-btn-red';
+  badge?: string;
+}
+
+export interface NPCDialogData {
+  id: string;
+  name: string;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  badgeColor?: string;
+  avatarHtml: string;
+  text: string;
+  options: NPCDialogOption[];
+  onDone?: () => void;
+}
+
+export function getLakshyaAvatarHtml(): string {
+  return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
+    <rect width="32" height="32" fill="#1e293b"/>
+    <rect x="6" y="2" width="20" height="7" fill="#171717"/>
+    <rect x="4" y="5" width="4" height="10" fill="#171717"/>
+    <rect x="24" y="5" width="4" height="10" fill="#171717"/>
+    <rect x="7" y="7" width="18" height="16" fill="#f5d0a9"/>
+    <rect x="9" y="12" width="4" height="3" fill="#ffffff"/>
+    <rect x="11" y="12" width="2" height="3" fill="#1e293b"/>
+    <rect x="19" y="12" width="4" height="3" fill="#ffffff"/>
+    <rect x="19" y="12" width="2" height="3" fill="#1e293b"/>
+    <rect x="12" y="18" width="8" height="2" fill="#b45309"/>
+    <rect x="6" y="23" width="20" height="9" fill="#881337"/>
+    <polygon points="16,23 12,28 20,28" fill="#facc15"/>
+  </svg>`;
+}
+
+export function getRogerAvatarHtml(): string {
+  return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
+    <rect width="32" height="32" fill="#36291a"/>
+    <rect x="6" y="7" width="20" height="18" fill="#eab308"/>
+    <rect x="4" y="6" width="5" height="11" fill="#ca8a04"/>
+    <rect x="23" y="6" width="5" height="11" fill="#ca8a04"/>
+    <rect x="9" y="13" width="14" height="10" fill="#fef08a"/>
+    <rect x="13" y="14" width="6" height="4" fill="#1c1917"/>
+    <rect x="8" y="10" width="3" height="3" fill="#1c1917"/>
+    <rect x="21" y="10" width="3" height="3" fill="#1c1917"/>
+    <rect x="7" y="25" width="18" height="4" fill="#dc2626"/>
+    <circle cx="16" cy="27" r="2" fill="#facc15"/>
+  </svg>`;
+}
+
+export function getAnimalAvatarHtml(emoji: string, bgColor: string = '#1e293b'): string {
+  return `<div class="mc-npc-animal-avatar" style="background: ${bgColor};">
+    <span>${emoji}</span>
+  </div>`;
+}
+
 export class ModalManager {
   private modalContainer: HTMLElement;
   public isOpen: boolean = false;
@@ -1028,6 +1088,114 @@ export class ModalManager {
     this.modalContainer.style.display = 'flex';
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
+  }
+
+  // 6.5. Interactive NPC Dialogue Modal
+  public openNPCDialogModal(data: NPCDialogData) {
+    this.onModalOpen();
+
+    const renderOptions = (options: NPCDialogOption[], isSubMenu: boolean = false) => {
+      const optionsContainer = document.getElementById('mc-npc-options');
+      if (!optionsContainer) return;
+      optionsContainer.innerHTML = '';
+
+      options.forEach((opt) => {
+        const btn = document.createElement('button');
+        const styleClass = opt.styleClass || 'mc-btn-stone';
+        btn.className = `mc-btn ${styleClass} mc-npc-option-btn`;
+        btn.innerHTML = `
+          <span>${opt.label}</span>
+          <span class="mc-npc-option-arrow">➔</span>
+        `;
+        btn.addEventListener('click', () => {
+          sound.playClick();
+          if (opt.action) {
+            opt.action();
+          }
+          if (opt.response) {
+            const speechEl = document.getElementById('mc-npc-speech-text');
+            if (speechEl) {
+              speechEl.textContent = opt.response;
+              speechEl.style.animation = 'none';
+              void speechEl.offsetWidth;
+              speechEl.style.animation = 'mcNpcPopIn 0.15s ease';
+            }
+            if (opt.nextOptions && opt.nextOptions.length > 0) {
+              renderOptions(opt.nextOptions, true);
+            } else {
+              renderOptions([
+                {
+                  label: '↩️ Ask something else...',
+                  styleClass: 'mc-btn-blue',
+                  action: () => {
+                    const speechEl = document.getElementById('mc-npc-speech-text');
+                    if (speechEl) speechEl.textContent = data.text;
+                    renderOptions(data.options, false);
+                  }
+                }
+              ], true);
+            }
+          }
+        });
+        optionsContainer.appendChild(btn);
+      });
+
+      if (isSubMenu) {
+        const backBtn = document.createElement('button');
+        backBtn.className = 'mc-btn mc-btn-stone mc-npc-option-btn';
+        backBtn.style.marginTop = '4px';
+        backBtn.innerHTML = `<span>↩️ Return to questions</span><span class="mc-npc-option-arrow">⤴</span>`;
+        backBtn.addEventListener('click', () => {
+          sound.playClick();
+          const speechEl = document.getElementById('mc-npc-speech-text');
+          if (speechEl) speechEl.textContent = data.text;
+          renderOptions(data.options, false);
+        });
+        optionsContainer.appendChild(backBtn);
+      }
+    };
+
+    this.modalContainer.innerHTML = `
+      <div class="mc-dialog mc-npc-dialog">
+        <div class="mc-dialog-header mc-npc-dialog-header">
+          <div class="mc-dialog-title-row">
+            <div class="mc-npc-avatar-box">
+              ${data.avatarHtml}
+            </div>
+            <div class="mc-npc-header-text">
+              <div class="mc-npc-name-badge-row">
+                <h2 class="mc-dialog-title mc-npc-title">${data.name}</h2>
+                ${data.badge ? `<span class="mc-npc-level-badge" style="background: ${data.badgeColor || '#ca8a04'};">${data.badge}</span>` : ''}
+              </div>
+              <span class="mc-dialog-subtitle mc-npc-subtitle">${data.subtitle || data.title}</span>
+            </div>
+          </div>
+          <button class="mc-close-btn" id="mc-modal-close" title="Close (ESC)">✕</button>
+        </div>
+
+        <div class="mc-dialog-body mc-npc-dialog-body">
+          <div class="mc-npc-speech-bubble" id="mc-npc-speech-text">${data.text}</div>
+          <div class="mc-npc-options-grid" id="mc-npc-options"></div>
+        </div>
+
+        <div class="mc-dialog-footer mc-npc-dialog-footer">
+          <span class="mc-npc-footer-hint">[ESC] or [E] to exit</span>
+          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Leave</button>
+        </div>
+      </div>
+    `;
+
+    this.modalContainer.style.display = 'flex';
+    document.getElementById('mc-modal-close')?.addEventListener('click', () => {
+      data.onDone?.();
+      this.close();
+    });
+    document.getElementById('mc-modal-done')?.addEventListener('click', () => {
+      data.onDone?.();
+      this.close();
+    });
+
+    renderOptions(data.options, false);
   }
 
   // 7. Leadership Palace Modal

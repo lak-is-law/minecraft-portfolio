@@ -16,6 +16,7 @@ export interface TargetInfo {
     id?: string;
     title?: string;
     text?: string;
+    meta?: any;
   };
 }
 
@@ -62,6 +63,8 @@ export class Player {
   // Targeting & Raycasting
   public currentTarget: TargetInfo | null = null;
   private blockHighlight: THREE.LineSegments | null = null;
+  private scratchRayDir = new THREE.Vector3();
+  private scratchRayP = new THREE.Vector3();
 
   // First-person hand / item in viewport
   public handGroup: THREE.Group = new THREE.Group();
@@ -98,6 +101,7 @@ export class Player {
   public onHammerBanner?: (project: Project) => void;
   public onHotbarSelect?: (slotIndex: number) => void;
   public onWorldNotice?: (msg: string) => void;
+  public onBeforeScreenshot?: () => void;
   public onFlyStateChange?: (isFlying: boolean) => void;
 
   constructor(camera: THREE.PerspectiveCamera, world: VoxelWorld, domElement: HTMLElement) {
@@ -252,6 +256,11 @@ export class Player {
               console.warn('Popup blocked:', err);
             }
           }
+        } else if (this.currentTarget?.interactable?.type === 'npc') {
+          if (this.onInteract) {
+            this.onInteract(this.currentTarget);
+          }
+          return;
         } else if (this.currentTarget) {
           const { x, y, z } = this.currentTarget.blockPos;
           const target = this.world.getBlock(x, y, z);
@@ -557,6 +566,7 @@ export class Player {
 
   // Capture high-definition 3D screenshot and save as PNG file
   public takeScreenshot() {
+    this.onBeforeScreenshot?.();
     const canvas = this.domElement as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -1186,12 +1196,11 @@ export class Player {
   // Fast Raycasting forwards to find targeted block & face
   private updateRaycast() {
     const maxReach = 7.5; // reach distance in blocks
-    const rayDir = new THREE.Vector3();
-    this.camera.getWorldDirection(rayDir);
-    const origin = this.camera.position.clone();
+    this.camera.getWorldDirection(this.scratchRayDir);
+    const origin = this.camera.position;
 
     // 1. Check if looking at a hammerable project banner
-    const banner = this.world.checkBannerHit(origin, rayDir, maxReach);
+    const banner = this.world.checkBannerHit(origin, this.scratchRayDir, maxReach);
     if (banner) {
       this.currentTarget = {
         blockPos: new THREE.Vector3(Math.floor(banner.mesh.position.x), Math.floor(banner.mesh.position.y), Math.floor(banner.mesh.position.z)),
@@ -1203,8 +1212,8 @@ export class Player {
       return;
     }
 
-    // 2. Check if looking at Lakshya NPC or Roger the dog
-    const npcHit = this.world.checkNPCHit(origin, rayDir, maxReach);
+    // 2. Check if looking at Lakshya NPC, Roger the dog, or Animals
+    const npcHit = this.world.checkNPCHit(origin, this.scratchRayDir, maxReach);
     if (npcHit) {
       this.currentTarget = {
         blockPos: new THREE.Vector3(Math.floor(npcHit.position.x), Math.floor(npcHit.position.y), Math.floor(npcHit.position.z)),
@@ -1212,8 +1221,9 @@ export class Player {
         distance: origin.distanceTo(npcHit.position),
         interactable: {
           type: 'npc',
-          id: npcHit.type === 'dog' ? 'roger' : 'lakshya_guide',
-          title: npcHit.title
+          id: npcHit.id,
+          title: npcHit.title,
+          meta: npcHit
         }
       };
       if (this.blockHighlight) this.blockHighlight.visible = false;
@@ -1222,10 +1232,10 @@ export class Player {
 
     // 2. Voxel DDA (Fast digital differential analysis) raycast
     let foundTarget: TargetInfo | null = null;
-    let stepSize = 0.08;
+    const stepSize = 0.15;
 
     for (let d = 0.2; d <= 5.5; d += stepSize) {
-      const p = origin.clone().addScaledVector(rayDir, d);
+      const p = this.scratchRayP.copy(origin).addScaledVector(this.scratchRayDir, d);
       const bx = Math.floor(p.x);
       const by = Math.floor(p.y);
       const bz = Math.floor(p.z);
@@ -1598,8 +1608,11 @@ export class Player {
     document.body.classList.add('game-active');
   }
 
-  // Swipe-to-Look Camera on Right Half of Screen
+  // Swipe-to-Look Camera on Right Half of Screen & Direct NPC Tap Raycasting
   private setupTouchLook() {
+    let touchDownPos = { x: 0, y: 0 };
+    let touchDownTime = 0;
+
     this.domElement.addEventListener('pointerdown', (e: PointerEvent) => {
       if (e.pointerType !== 'touch' || !this.isMobileActive || this.touchLookId !== null) return;
       const target = e.target instanceof Element ? e.target : null;
@@ -1607,6 +1620,8 @@ export class Player {
 
       this.touchLookId = e.pointerId;
       this.lastTouchLookPos = { x: e.clientX, y: e.clientY };
+      touchDownPos = { x: e.clientX, y: e.clientY };
+      touchDownTime = performance.now();
       try { this.domElement.setPointerCapture(e.pointerId); } catch { /* capture can fail if the pointer already ended */ }
 
       const now = performance.now();
@@ -1630,6 +1645,32 @@ export class Player {
       if (e.pointerId !== this.touchLookId) return;
       this.touchLookId = null;
       if (this.domElement.hasPointerCapture(e.pointerId)) this.domElement.releasePointerCapture(e.pointerId);
+
+      // Check if this was a quick tap (< 320ms, < 18px movement) directly on an NPC
+      const elapsed = performance.now() - touchDownTime;
+      const dist = Math.hypot(e.clientX - touchDownPos.x, e.clientY - touchDownPos.y);
+      if (elapsed < 320 && dist < 18) {
+        const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
+        const ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.camera);
+        const hit = this.world.checkNPCHit(raycaster.ray.origin, raycaster.ray.direction, 22.0);
+        if (hit && this.onInteract) {
+          this.triggerSwing();
+          this.onInteract({
+            blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
+            faceNormal: new THREE.Vector3(0, 1, 0),
+            distance: raycaster.ray.origin.distanceTo(hit.position),
+            interactable: {
+              type: 'npc',
+              id: hit.id,
+              title: hit.title,
+              meta: hit
+            }
+          });
+          return;
+        }
+      }
     };
     this.domElement.addEventListener('pointerup', endLook);
     this.domElement.addEventListener('pointercancel', endLook);
@@ -1639,6 +1680,32 @@ export class Player {
       this.touchMove.forward = this.touchMove.backward = false;
       this.touchMove.left = this.touchMove.right = false;
       this.touchMove.jump = false;
+    });
+
+    // Desktop direct tap / click raycast when pointer is not locked
+    window.addEventListener('click', (e: MouseEvent) => {
+      if (this.isLocked || this.isMobileActive) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('#mc-touch-controls, #mc-hotbar, #mc-quick-nav, #mc-minimap, #modal-container, #pause-overlay')) return;
+      const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
+      const ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.camera);
+      const hit = this.world.checkNPCHit(raycaster.ray.origin, raycaster.ray.direction, 22.0);
+      if (hit && this.onInteract) {
+        this.triggerSwing();
+        this.onInteract({
+          blockPos: new THREE.Vector3(Math.floor(hit.position.x), Math.floor(hit.position.y), Math.floor(hit.position.z)),
+          faceNormal: new THREE.Vector3(0, 1, 0),
+          distance: raycaster.ray.origin.distanceTo(hit.position),
+          interactable: {
+            type: 'npc',
+            id: hit.id,
+            title: hit.title,
+            meta: hit
+          }
+        });
+      }
     });
   }
 
@@ -1680,6 +1747,13 @@ export class Player {
       }
       if (banner.project.liveUrl) {
         window.open(banner.project.liveUrl, '_blank');
+      }
+      return;
+    }
+
+    if (this.currentTarget?.interactable?.type === 'npc') {
+      if (this.onInteract) {
+        this.onInteract(this.currentTarget);
       }
       return;
     }

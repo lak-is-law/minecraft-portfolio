@@ -1239,6 +1239,172 @@ button:focus-visible, a:focus-visible { outline: 3px solid #facc15; outline-offs
   background: #737373;
 }
 
+.mc-btn-gold {
+  background: #ca8a04;
+  border: 2px solid #fef08a;
+  color: #fff;
+  box-shadow: inset -2px -2px #854d0e, inset 2px 2px #fde047;
+}
+
+.mc-btn-gold:hover {
+  background: #eab308;
+}
+
+/* ==========================================================
+   MINECRAFT NPC DIALOGUE SYSTEM
+   ========================================================== */
+.mc-npc-dialog {
+  max-width: 620px;
+  background: #1e1e1e;
+  border: 4px solid #4a4a4a;
+  box-shadow: inset -4px -4px #121212, inset 4px 4px #707070, 0 16px 48px rgba(0,0,0,0.85);
+  animation: mcNpcPopIn 0.18s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes mcNpcPopIn {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mc-npc-dialog-header {
+  border-bottom: 3px solid #383838;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.mc-npc-avatar-box {
+  width: 58px;
+  height: 58px;
+  background: #141414;
+  border: 3px solid #6b7280;
+  box-shadow: inset -2px -2px #0a0a0a, inset 2px 2px #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mc-npc-animal-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.mc-npc-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mc-npc-name-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mc-npc-title {
+  font-size: 16px;
+  color: #facc15;
+  text-shadow: 2px 2px 0 #000;
+  margin: 0;
+}
+
+.mc-npc-level-badge {
+  font-size: 9px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #fff;
+  padding: 3px 7px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 1px 1px 0 #000;
+  letter-spacing: 0.5px;
+}
+
+.mc-npc-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.mc-npc-dialog-body {
+  gap: 14px;
+  padding-right: 4px;
+}
+
+/* Speech Balloon */
+.mc-npc-speech-bubble {
+  background: #14181f;
+  border: 3px solid #334155;
+  box-shadow: inset -2px -2px #0b0f14, inset 2px 2px #475569;
+  border-radius: 4px;
+  padding: 14px 16px;
+  color: #f8fafc;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  position: relative;
+  min-height: 60px;
+  white-space: pre-wrap;
+}
+
+.mc-npc-speech-bubble::before {
+  content: '💬 ';
+  margin-right: 2px;
+}
+
+/* Response options */
+.mc-npc-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-npc-option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.08s ease;
+  font-family: monospace;
+}
+
+.mc-npc-option-btn:hover {
+  transform: translateX(3px);
+  filter: brightness(1.1);
+}
+
+.mc-npc-option-arrow {
+  color: #facc15;
+  font-weight: bold;
+}
+
+.mc-npc-dialog-footer {
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid #383838;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.mc-npc-footer-hint {
+  font-size: 9px;
+  color: #64748b;
+  font-family: monospace;
+}
+
 /* ==========================================================
    CHEST GUI SPECIFICS
    ========================================================== */

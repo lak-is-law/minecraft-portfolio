@@ -595,9 +595,16 @@ export class FlagManager {
   // --------------------------------------------------------------------------
   // PHYSICAL CLOTH WAVE SIMULATION TICK
   // --------------------------------------------------------------------------
-  public update(time: number) {
+  public update(time: number, playerPos?: THREE.Vector3) {
     for (let f = 0; f < this.flags.length; f++) {
       const flag = this.flags[f];
+      if (playerPos) {
+        const dx = flag.mesh.position.x - playerPos.x;
+        const dz = flag.mesh.position.z - playerPos.z;
+        if (dx * dx + dz * dz > 3600) {
+          continue;
+        }
+      }
       const posAttr = flag.geometry.attributes.position;
       const pos = posAttr.array as Float32Array;
       const base = flag.basePositions;
@@ -627,7 +634,6 @@ export class FlagManager {
       }
 
       posAttr.needsUpdate = true;
-      flag.geometry.computeVertexNormals();
     }
   }
 

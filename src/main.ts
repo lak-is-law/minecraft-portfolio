@@ -1,10 +1,11 @@
 import { ClimateEffects } from './world/climate';
+import { CelestialSky } from './world/celestial';
 import * as THREE from 'three';
 import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
 import { Player, TargetInfo } from './engine/player';
 import { HUDManager } from './ui/hud';
-import { ModalManager } from './ui/modals';
+import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml } from './ui/modals';
 import { PORTFOLIO_DATA, Project } from './data/portfolioData';
 import { sound } from './engine/audio';
 type InstallPromptEvent = Event & {
@@ -22,13 +23,11 @@ class Game {
   private hud: HUDManager;
   private modals: ModalManager;
   private climate: ClimateEffects;
+  private celestial: CelestialSky;
 
   // Lighting & Day/Night
   private ambientLight: THREE.AmbientLight;
   private sunLight: THREE.DirectionalLight;
-  private sunMesh: THREE.Mesh;
-  private moonMesh: THREE.Mesh;
-  private skyGroup: THREE.Group;
   private dayNightAngle: number = 0.8; // begin in the morning
   private isNightMode: boolean = false;
   private timeTransitionTarget: number | null = null;
@@ -65,12 +64,11 @@ class Game {
       canvas,
       antialias: false,
       powerPreference: 'high-performance',
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: false
     });
     this.renderer.setSize(window.visualViewport?.width ?? window.innerWidth, window.visualViewport?.height ?? window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.BasicShadowMap;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+    this.renderer.shadowMap.enabled = false;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
@@ -88,40 +86,24 @@ class Game {
     this.world.init();
 
     this.player = new Player(this.camera, this.world, canvas);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.player.isTouchDevice ? 1.5 : 2));
+    this.player.onBeforeScreenshot = () => {
+      this.renderer.render(this.scene, this.camera);
+    };
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     this.scene.add(this.camera);
 
     this.hud = new HUDManager();
     this.modals = new ModalManager();
 
-    // 5. Sky, Sun, Moon & Clouds
-    this.skyGroup = new THREE.Group();
-    this.scene.add(this.skyGroup);
-
-    // Sun & Moon
-    const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff4cc });
-    this.sunMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 0.2), sunMat);
-    this.skyGroup.add(this.sunMesh);
-
-    const moonMat = new THREE.MeshBasicMaterial({ color: 0xe0e7ff });
-    this.moonMesh = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 0.2), moonMat);
-    this.skyGroup.add(this.moonMesh);
+    // 5. Sky, Celestial Bodies (Sun, Moon, Stars) & Clouds
+    this.celestial = new CelestialSky(this.scene);
 
     // Lighting
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     this.scene.add(this.ambientLight);
 
     this.sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
-    this.sunLight.castShadow = true;
-    this.sunLight.shadow.mapSize.width = 1024;
-    this.sunLight.shadow.mapSize.height = 1024;
-    this.sunLight.shadow.camera.near = 0.5;
-    this.sunLight.shadow.camera.far = 80;
-    const d = 35;
-    this.sunLight.shadow.camera.left = -d;
-    this.sunLight.shadow.camera.right = d;
-    this.sunLight.shadow.camera.top = d;
-    this.sunLight.shadow.camera.bottom = -d;
+    this.sunLight.castShadow = false;
     this.scene.add(this.sunLight);
 
     this.createMinecraftClouds();
@@ -174,7 +156,7 @@ class Game {
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height);
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.player.isTouchDevice ? 1.5 : 2));
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     };
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
@@ -209,8 +191,16 @@ class Game {
     this.hud.onDayNightToggle = () => {
       this.isNightMode = !this.isNightMode;
       this.timeTransitionTarget = this.isNightMode ? Math.PI * 1.5 : Math.PI / 2;
+      this.hud.updateTimeStatus(this.isNightMode);
       this.hud.pushChatMessage('System', `Transitioning to ${this.isNightMode ? 'midnight' : 'noon'}...`);
     };
+
+    // Keyboard shortcut [T] to toggle day & night
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyT' && !this.modals.isOpen) {
+        this.hud.onDayNightToggle?.();
+      }
+    });
 
     this.hud.onOpenProjects = () => {
       this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
@@ -321,7 +311,9 @@ class Game {
       'Hire me!',
       'Dragons included!',
       'Press M for World Map!',
-      'Try night mode with [T]!'
+      'Try night mode with [T]!',
+      'Witness the Northern Lights!',
+      'Thunder & lightning storms!'
     ];
     const splashEl = document.getElementById('mc-splash-text');
     if (splashEl) {
@@ -582,26 +574,200 @@ class Game {
       this.modals.openFastTravelModal();
     } else if (inter.type === 'npc') {
       if (inter.id === 'roger') {
-        sound.playLevelUp();
+        sound.playDogBark();
         if (this.world.dogMesh) {
           this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
         }
         this.hud.pushChatMessage('Roger', '*Woof woof!* (Wags tail happily and leans into your hand)');
+        this.modals.openNPCDialogModal({
+          id: 'roger',
+          name: 'Roger',
+          title: 'Loyal Companion · Best Boy 🐾',
+          badge: '[GOOD BOY]',
+          badgeColor: '#16a34a',
+          avatarHtml: getRogerAvatarHtml(),
+          text: '*Pant pant!* Roger gazes up with bright, warm eyes. His golden tail swishes rhythmically across the green grass!\n\n*Woof!* (He gently bumps his wet nose against your hand, waiting for pats)',
+          options: [
+            {
+              label: '🐾 Pet Roger gently',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                sound.playLevelUp();
+                if (this.world.dogMesh) {
+                  this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
+                }
+                this.hud.pushChatMessage('Roger', '*Happy purrs & tail wags* (Roger leans deeply into your palm!)');
+              },
+              response: '*Woof!* Roger closes his eyes in bliss, leaning his head firmly into your palm while making soft contented puppy murmurs. Roger\'s tail is wagging at supersonic speed!\n\n(+50 Good Boy Affection)'
+            },
+            {
+              label: '🥩 Feed tasty cooked steak',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                sound.playLevelUp();
+                sound.playBlockBreak();
+                if (this.world.dogMesh) {
+                  this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
+                }
+                this.hud.pushChatMessage('Roger', '*Chomp chomp!* (Roger joyfully devours the steak!)');
+              },
+              response: '*CHOMP CHOMP!* Roger snatches the Minecraft steak out of your hand and gulps it down in two bites! He does a little happy tap-dance on the grass. Sparkles and hearts burst overhead!\n\nRoger\'s happiness is at 100%!'
+            },
+            {
+              label: '🎾 Play fetch with stick',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                sound.playDogBark();
+                if (this.world.dogMesh) {
+                  this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
+                }
+              },
+              response: '*BARK!* You toss an oak twig across the spawn plaza! Roger bolts across the cobble path, snatches it mid-air with an Olympic jump, and trots proudly back to drop it directly on your shoes!\n\n*Woof woof!* (Throw it again!)'
+            },
+            {
+              label: '🧭 Ask Roger where Lakshya\'s work is',
+              styleClass: 'mc-btn-stone',
+              response: '*Arf!* Roger sits upright, points his furry snout towards the eastern pillars and the Redstone Nether Portal, then glances back at Lakshya with a wagging tail!\n\nRoger recommends checking the Golden Landmark Pillars or opening the Fast Travel Map [M]!'
+            }
+          ]
+        });
+      } else if (inter.id?.startsWith('animal_') || inter.meta?.type === 'animal') {
+        const aMeta = inter.meta;
+        const aType = aMeta?.animalType || 'animal';
+        const aTitle = inter.title || 'Wild Animal';
+        const aSpecies = aMeta?.animalSpecies || 'Island Inhabitant';
+
+        sound.playAnimalSound(aType);
+        if (aMeta?.position) {
+          this.world.spawnHammerSparkles(aMeta.position.x, aMeta.position.y + 1.2, aMeta.position.z);
+        }
+
+        const animalInfoMap: Record<string, { emoji: string; treat: string; treatName: string; bg: string; fact: string; habit: string }> = {
+          panda: { emoji: '🐼', treat: '🎋', treatName: 'Fresh Bamboo Shoot', bg: '#14532d', habit: 'Giant Panda Bamboo Valley', fact: 'Pandas spend up to 12 hours a day eating bamboo! In this world, they enjoy tumbling downhill into the water canals.' },
+          lion: { emoji: '🦁', treat: '🥩', treatName: 'Savanna Steak Cutlet', bg: '#854d0e', habit: 'Serengeti African Lion Kopje', fact: 'Simba perches high on the granite kopje outcrop to survey the savanna territory and watch travelers board the railway.' },
+          elephant: { emoji: '🐘', treat: '🌾', treatName: 'Sugar Cane Sheaf', bg: '#334155', habit: 'Gentle Elephant Oasis', fact: 'Elephants have incredible memory and deep social bonds. Tembo and the herd love swimming near the waterfall base.' },
+          temple_elephant: { emoji: '🐘', treat: '🪔', treatName: 'Blessed Modak & Fruits', bg: '#78350f', habit: 'Royal Temple Sanctuary', fact: 'Airavata is adorned with royal festival headwear and guards the sacred temple pavilions with peaceful dignity.' },
+          giraffe: { emoji: '🦒', treat: '🍃', treatName: 'Acacia Leaf Twig', bg: '#a16207', habit: 'Rothschild Giraffe Canopy Reserve', fact: 'Giraffes can reach acacia trees over 5 meters tall! Their long necks help them spot approaching visitors from miles away.' },
+          polar_bear: { emoji: '🐻‍❄️', treat: '🐟', treatName: 'Chilled Raw Salmon', bg: '#0369a1', habit: 'Glacial Iceberg Cove', fact: 'Barnaby and cub Snowdrop enjoy cool northern breezes and diving off the pack ice into deep ocean waters.' },
+          penguin: { emoji: '🐧', treat: '🐟', treatName: 'Silver Cod Fish', bg: '#0f766e', habit: 'Antarctic Colony Shelf', fact: 'Emperor penguins slide across the snow on their bellies (tobogganing) to travel faster than walking!' },
+          tiger: { emoji: '🐯', treat: '🥩', treatName: 'Forest Prime Rib', bg: '#9a3412', habit: 'Royal Bengal Tiger Sanctuary', fact: 'Shera is the guardian of the eastern forests. Bengal tigers are strong swimmers and often cool off in shaded streams.' },
+          peacock: { emoji: '🦚', treat: '🌻', treatName: 'Golden Sunflower Seeds', bg: '#1e3a8a', habit: 'Royal Palace Gardens', fact: 'Mayur displays majestic iridescent plumage during morning mist and sunrise across the palace courtyard.' },
+          sheep: { emoji: '🐑', treat: '🌾', treatName: 'Sweet Field Wheat', bg: '#475569', habit: 'Sunflower Countryside Meadows', fact: 'Woolly provides warm wool for voxel tapestries and loves grazing among the sunflowers and poppies.' },
+          pig: { emoji: '🐷', treat: '🥕', treatName: 'Crisp Orange Carrot', bg: '#be185d', habit: 'Countryside Barnyard', fact: 'Wilbur has an acute sense of smell and loves snuffling through soft dirt near the farm fences for hidden truffles.' },
+          zebra: { emoji: '🦓', treat: '🌱', treatName: 'Fresh Savanna Grass', bg: '#374151', habit: 'Serengeti Open Plains', fact: 'Every zebra has a stripe pattern as unique as human fingerprints! Marty enjoys racing alongside the railway trains.' },
+          flamingo: { emoji: '🦩', treat: '🦐', treatName: 'Lagoon Brine Shrimp', bg: '#db2777', habit: 'Tropical Waters Sanctuary', fact: 'Flamingos get their vibrant pink coloration from carotenoids in the aquatic food they filter from the shallow waters.' }
+        };
+
+        const info = animalInfoMap[aType] || { emoji: '🐾', treat: '🌾', treatName: 'Wild Grass Treat', bg: '#1e293b', habit: 'Island Sanctuary', fact: 'A friendly creature living in harmony across Lakshya\'s Minecraft portfolio archipelago!' };
+
+        this.hud.pushChatMessage(aTitle, `Observing ${aTitle} (${aSpecies}) in ${info.habit}.`);
+
+        this.modals.openNPCDialogModal({
+          id: inter.id || `animal_${aType}`,
+          name: aTitle,
+          title: `${aSpecies} · ${info.habit}`,
+          badge: `[SAFARI]`,
+          badgeColor: '#059669',
+          avatarHtml: getAnimalAvatarHtml(info.emoji, info.bg),
+          text: `You approach ${aTitle}! They tilt their head inquisitively, observing you in the gentle island breeze.\n\nHabitat: ${info.habit}\nSpecies: ${aSpecies}`,
+          options: [
+            {
+              label: `${info.treat} Feed ${info.treatName}`,
+              styleClass: 'mc-btn-green',
+              action: () => {
+                sound.playLevelUp();
+                sound.playAnimalSound(aType);
+                if (aMeta?.position) {
+                  this.world.spawnHammerSparkles(aMeta.position.x, aMeta.position.y + 1.2, aMeta.position.z);
+                }
+                this.hud.pushChatMessage(aTitle, `Happily munches on the ${info.treatName}! ✨`);
+              },
+              response: `*Munch munch!* ${aTitle} enthusiastically enjoys the ${info.treatName}! Sparkles swirl all around them, and they let out a contented, happy sound.\n\nThey now trust you as a friend of the sanctuary!`
+            },
+            {
+              label: '🐾 Pet gently',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                sound.playAnimalSound(aType);
+                if (aMeta?.position) {
+                  this.world.spawnHammerSparkles(aMeta.position.x, aMeta.position.y + 0.8, aMeta.position.z);
+                }
+              },
+              response: `You reach out and stroke ${aTitle} gently. They relax under your touch and lean in affectionately!\n\nNature harmony achieved (+25 Exploration XP)!`
+            },
+            {
+              label: '📖 Learn Wildlife Fun Fact',
+              styleClass: 'mc-btn-blue',
+              response: `🌿 Wildlife Log [${aSpecies}]:\n\n"${info.fact}"\n\nLocated within the ${info.habit} of Lakshya's portfolio island!`
+            }
+          ]
+        });
       } else {
-        sound.playLevelUp();
+        sound.playVillagerHuh();
         if (this.world.npcMesh) {
           this.world.spawnHammerSparkles(this.world.npcMesh.position.x, this.world.npcMesh.position.y + 1.2, this.world.npcMesh.position.z);
         }
         this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to my Minecraft Portfolio world! Press M anytime for Fast Travel.');
-        this.modals.openSignModal(
-          'Lakshya [LVL 22] · Welcome Guide',
-          'Hey! I\'m Lakshya, Software Engineer & Designer.\n\nWelcome to my interactive 3D voxel portfolio island! Explore all 9 landmarks to inspect my live full-stack projects, experience history, skills matrix, and career resume chest.\n\nBeside me is my loyal dog Roger! Press [M] anytime to open the Fast Travel Map, or [C] to customize perspective.'
-        );
+
+        this.modals.openNPCDialogModal({
+          id: 'lakshya_guide',
+          name: 'Lakshya',
+          title: 'Software Engineer & Designer · Portfolio Guide',
+          badge: '[LVL 22]',
+          badgeColor: '#ca8a04',
+          avatarHtml: getLakshyaAvatarHtml(),
+          text: 'Hey explorer! Welcome to my interactive 3D voxel portfolio island. I built this realm with TypeScript, Three.js, and custom WebGL shaders to showcase my engineering projects, experience, and skills in a playable Minecraft format!\n\nBeside me is my loyal companion dog Roger. What would you like to explore today?',
+          options: [
+            {
+              label: '💼 View My Engineering Projects',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
+              }
+            },
+            {
+              label: '📜 Open Career Resume Chest',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.modals.openResumeChestModal();
+              }
+            },
+            {
+              label: '⚡ Inspect Technical Skills Matrix',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                this.modals.openSkillsModal();
+              }
+            },
+            {
+              label: '🗺️ Open Fast Travel Realm Map [M]',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+              }
+            },
+            {
+              label: '🐶 Tell me about your dog Roger!',
+              styleClass: 'mc-btn-stone',
+              response: 'That\'s Roger! He\'s my golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
+            },
+            {
+              label: '🧭 Where should I explore first on the island?',
+              styleClass: 'mc-btn-stone',
+              response: 'Start by inspecting the Emerald Central Fountain right behind me!\n\n• West: Giant Panda Bamboo Valley & African Lion Kopje\n• East: Taj Mahal, India Gate, & Cultural Pavilions\n• South: Redstone Nether Portal, Circular Railway Train, and Builder Arena\n\nOr press [M] anytime to teleport directly to any landmark!'
+            },
+            {
+              label: '🎮 Any secret tips or Easter eggs?',
+              styleClass: 'mc-btn-stone',
+              response: 'Here are a few builder secrets:\n\n1. Press [C] or [F5] to switch camera between 1st Person and 3rd Person!\n2. Press [F] to toggle Flight Mode and soar over the voxel clouds.\n3. Press [B] to open your creative building block palette.\n4. Walk up to the circular railway train or auto-rickshaw and press [E] to board and ride!'
+            }
+          ]
+        });
       }
     }
   }
 
-  private updateDayNight(dt: number) {
+  private updateDayNight(dt: number, gloom: number = 1.0) {
     if (this.timeTransitionTarget !== null) {
       const delta = Math.atan2(
         Math.sin(this.timeTransitionTarget - this.dayNightAngle),
@@ -618,18 +784,15 @@ class Game {
       this.dayNightAngle = (this.dayNightAngle + dt * 0.03) % (Math.PI * 2);
     }
 
-    const dist = 55;
+    const dist = 60;
     const sx = Math.cos(this.dayNightAngle) * dist;
     const sy = Math.sin(this.dayNightAngle) * dist;
 
-    // Sun position
-    this.sunMesh.position.set(sx, sy, 0);
-    this.sunMesh.lookAt(0, 0, 0);
+    // Direct sun lighting direction
     this.sunLight.position.set(sx, sy, 0);
 
-    // Moon on opposite side
-    this.moonMesh.position.set(-sx, -sy, 0);
-    this.moonMesh.lookAt(0, 0, 0);
+    // Update Celestial system (Sun, Moon, Halos, Twinkling Starfield)
+    this.celestial.update(dt, this.camera.position, this.dayNightAngle, gloom);
 
     const cycle = Math.PI * 2;
     const angle = ((this.dayNightAngle % cycle) + cycle) % cycle;
@@ -653,8 +816,6 @@ class Game {
     if (this.scene.fog) this.scene.fog.color.copy(this.currentSkyColor);
     this.ambientLight.intensity = THREE.MathUtils.lerp(prev.ambient, next.ambient, eased);
     this.sunLight.intensity = THREE.MathUtils.lerp(prev.sun, next.sun, eased);
-    this.sunMesh.visible = sy > -4;
-    this.moonMesh.visible = sy < 4;
   }
 
   private animate = () => {
@@ -683,17 +844,26 @@ class Game {
     // 2. Update World effects (spinning gems, portal particles, NPC)
     this.world.update(now * 0.001, this.player.position);
 
-    // 3. Drift blocky clouds slowly
+    // 3. Drift blocky clouds slowly & tint dynamically during stormy weather
     if (this.cloudsMesh) {
       this.cloudsMesh.position.x += dt * 0.8;
       if (this.cloudsMesh.position.x > 80) {
         this.cloudsMesh.position.x = -80;
       }
+      const cloudMat = this.cloudsMesh.material as THREE.MeshBasicMaterial;
+      const targetCloudColor = this.climate.weather === 'thunderstorm'
+        ? new THREE.Color(0x384152)
+        : this.climate.weather === 'rain'
+        ? new THREE.Color(0x6b7280)
+        : new THREE.Color(0xffffff);
+      cloudMat.color.lerp(targetCloudColor, dt * 2.0);
     }
 
-    // 4. Update Day/Night
-    this.updateDayNight(dt);
-    this.climate.update(dt, this.player.position, this.player.yaw);
+    // 4. Update Day/Night and Climate
+    const gloom = this.climate.weather === 'thunderstorm' ? 0.32 : this.climate.weather === 'rain' ? 0.58 : 1.0;
+    this.updateDayNight(dt, gloom);
+    const isNight = this.isNightMode || Math.sin(this.dayNightAngle) < -0.05;
+    this.climate.update(dt, this.player.position, this.player.yaw, isNight);
 
     // 5. Update HUD elements
     this.hud.updatePrompt(this.player.currentTarget);

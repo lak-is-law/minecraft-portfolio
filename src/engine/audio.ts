@@ -1,6 +1,8 @@
 export class SoundEngine {
   private ctx: AudioContext | null = null;
   public enabled: boolean = true;
+  private rainSource: AudioBufferSourceNode | null = null;
+  private rainGain: GainNode | null = null;
 
   constructor() {
     // AudioContext will be initialized on first user interaction
@@ -20,6 +22,8 @@ export class SoundEngine {
     this.enabled = !this.enabled;
     if (this.enabled) {
       this.playClick();
+    } else {
+      this.stopRainAmbient();
     }
     return this.enabled;
   }
@@ -198,37 +202,180 @@ export class SoundEngine {
     osc.stop(t + 0.04);
   }
 
-  // Low, distant thunder rumble for storm weather.
+  // Atmospheric rain ambient sound loop
+  public startRainAmbient(volume: number = 0.14) {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    if (this.rainGain) {
+      // Already running, just adjust volume ramp
+      const t = this.ctx.currentTime;
+      this.rainGain.gain.cancelScheduledValues(t);
+      this.rainGain.gain.linearRampToValueAtTime(volume, t + 0.8);
+      return;
+    }
+
+    const t = this.ctx.currentTime;
+    // 2-second looping white/pink rain noise buffer
+    const bufferSize = this.ctx.sampleRate * 2;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      // Pink noise approximation for soft raindrops
+      b0 = 0.99765 * b0 + white * 0.0990460;
+      b1 = 0.96300 * b1 + white * 0.2965164;
+      b2 = 0.57000 * b2 + white * 1.0526913;
+      const pink = (b0 + b1 + b2 + white * 0.1848) * 0.12;
+      // Micro-fluctuations mimicking distant drops hitting surfaces
+      const micro = Math.sin(i * 0.005) * 0.04;
+      data[i] = pink + micro;
+    }
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1100, t);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.linearRampToValueAtTime(volume, t + 1.2);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    source.start(t);
+    this.rainSource = source;
+    this.rainGain = gain;
+  }
+
+  public stopRainAmbient() {
+    if (!this.rainGain || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const gain = this.rainGain;
+    const source = this.rainSource;
+    this.rainGain = null;
+    this.rainSource = null;
+
+    gain.gain.cancelScheduledValues(t);
+    gain.gain.linearRampToValueAtTime(0.0001, t + 1.2);
+    setTimeout(() => {
+      try {
+        source?.stop();
+        source?.disconnect();
+        gain.disconnect();
+      } catch {
+        // already disconnected
+      }
+    }, 1300);
+  }
+
+  // Intense, atmospheric thunder strike with sharp electric crack & deep rolling rumble.
   public playThunder() {
     if (!this.enabled) return;
     this.initContext();
     if (!this.ctx) return;
 
     const t = this.ctx.currentTime;
-    const duration = 2.4;
-    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const samples = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      const fade = Math.pow(1 - i / bufferSize, 2.2);
-      samples[i] = (Math.random() * 2 - 1) * fade;
+
+    // 1. Sharp electric crack transient (immediate lightning strike impact)
+    const crackLen = 0.12;
+    const crackSize = Math.floor(this.ctx.sampleRate * crackLen);
+    const crackBuffer = this.ctx.createBuffer(1, crackSize, this.ctx.sampleRate);
+    const crackData = crackBuffer.getChannelData(0);
+    for (let i = 0; i < crackSize; i++) {
+      crackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / crackSize, 1.5);
+    }
+    const crackSource = this.ctx.createBufferSource();
+    crackSource.buffer = crackBuffer;
+    const crackFilter = this.ctx.createBiquadFilter();
+    crackFilter.type = 'highpass';
+    crackFilter.frequency.setValueAtTime(450, t);
+    const crackGain = this.ctx.createGain();
+    crackGain.gain.setValueAtTime(0.35, t);
+    crackGain.gain.exponentialRampToValueAtTime(0.001, t + crackLen);
+    crackSource.connect(crackFilter);
+    crackFilter.connect(crackGain);
+    crackGain.connect(this.ctx.destination);
+    crackSource.start(t);
+
+    // 2. Rolling bass rumble reverberating across the mountains & plains
+    const rumbleDuration = 3.2;
+    const rumbleSize = Math.floor(this.ctx.sampleRate * rumbleDuration);
+    const rumbleBuffer = this.ctx.createBuffer(1, rumbleSize, this.ctx.sampleRate);
+    const rumbleData = rumbleBuffer.getChannelData(0);
+    for (let i = 0; i < rumbleSize; i++) {
+      const progress = i / rumbleSize;
+      const decay = Math.pow(1 - progress, 1.8);
+      // Rolling wave swell
+      const wave = Math.sin(progress * 18 * Math.PI) * 0.25;
+      rumbleData[i] = ((Math.random() * 2 - 1) * 0.8 + wave) * decay;
     }
 
-    const source = this.ctx.createBufferSource();
-    source.buffer = buffer;
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(170, t);
-    filter.frequency.exponentialRampToValueAtTime(55, t + duration);
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.linearRampToValueAtTime(0.22, t + 0.12);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-    source.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
-    source.start(t);
-    source.stop(t + duration);
+    const rumbleSource = this.ctx.createBufferSource();
+    rumbleSource.buffer = rumbleBuffer;
+    const rumbleFilter = this.ctx.createBiquadFilter();
+    rumbleFilter.type = 'lowpass';
+    rumbleFilter.frequency.setValueAtTime(220, t);
+    rumbleFilter.frequency.exponentialRampToValueAtTime(45, t + rumbleDuration);
+
+    const rumbleGain = this.ctx.createGain();
+    rumbleGain.gain.setValueAtTime(0.001, t);
+    rumbleGain.gain.linearRampToValueAtTime(0.32, t + 0.15);
+    rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + rumbleDuration);
+
+    rumbleSource.connect(rumbleFilter);
+    rumbleFilter.connect(rumbleGain);
+    rumbleGain.connect(this.ctx.destination);
+    rumbleSource.start(t + 0.03);
+
+    // 3. Sub-bass sine boom for visceral impact
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(80, t);
+    subOsc.frequency.exponentialRampToValueAtTime(32, t + 0.9);
+    subGain.gain.setValueAtTime(0.28, t);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+    subOsc.connect(subGain);
+    subGain.connect(this.ctx.destination);
+    subOsc.start(t);
+    subOsc.stop(t + 0.9);
+  }
+
+  // Ethereal celestial chime / shimmer sound when Aurora Borealis glows
+  public playAuroraChime() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    // Harmonic notes: E5, G#5, B5, E6, F#6
+    const freqs = [659.25, 830.61, 987.77, 1318.51, 1479.98];
+    freqs.forEach((freq, idx) => {
+      const noteTime = t + idx * 0.12;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.001, noteTime);
+      gain.gain.linearRampToValueAtTime(0.08, noteTime + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 1.8);
+
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 1.8);
+    });
   }
 
   // Iconic high-pitched double-beep Auto-Rickshaw horn ("Pee-Pee!")
@@ -598,6 +745,72 @@ export class SoundEngine {
       osc.start(t);
       osc.stop(t + 0.2);
     }
+  }
+
+  // Authentic Minecraft villager "Huh!" dialogue chime
+  public playVillagerHuh() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'triangle';
+    osc1.frequency.setValueAtTime(145, t);
+    osc1.frequency.exponentialRampToValueAtTime(110, t + 0.32);
+    osc2.frequency.setValueAtTime(140, t);
+    osc2.frequency.exponentialRampToValueAtTime(105, t + 0.32);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(480, t);
+    filter.frequency.exponentialRampToValueAtTime(320, t + 0.32);
+
+    gain.gain.setValueAtTime(0.18, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc1.start(t);
+    osc2.start(t);
+    osc1.stop(t + 0.32);
+    osc2.stop(t + 0.32);
+  }
+
+  // Playful companion dog bark for Roger
+  public playDogBark() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(420, t);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.14);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(650, t);
+
+    gain.gain.setValueAtTime(0.22, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.16);
   }
 }
 

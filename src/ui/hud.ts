@@ -27,6 +27,9 @@ export class HUDManager {
   public activeSlotIndex: number = 1; // default to Pickaxe
   private f3Visible: boolean = false;
   private chatMessages: { sender: string; text: string; time: number }[] = [];
+  private minimapCanvas: HTMLCanvasElement | null = null;
+  private minimapCtx: CanvasRenderingContext2D | null = null;
+  private lastMinimapUpdate: number = 0;
 
   // Callbacks
   public onDayNightToggle?: () => void;
@@ -109,7 +112,8 @@ export class HUDManager {
         <button class="mc-chip-btn" id="btn-quick-skills" title="Skills Matrix">[SKILLS]</button>
         <button class="mc-chip-btn" id="btn-quick-resume" title="Official Resume">[RESUME]</button>
         <button class="mc-chip-btn" id="btn-quick-fly" title="Toggle Creative Flight">[FLY: OFF]</button>
-        <button class="mc-chip-btn" id="btn-quick-weather" title="Cycle clear, rain, thunder, rainbow, and snowfall">[WEATHER: CLEAR]</button>
+        <button class="mc-chip-btn" id="btn-quick-weather" title="Cycle clear, rain, thunder, aurora, snowfall, and rainbow">[WEATHER: CLEAR]</button>
+        <button class="mc-chip-btn" id="btn-quick-time" title="Toggle Day / Night (Key: T)">[TIME: DAY]</button>
         <button class="mc-chip-btn" id="btn-quick-season" title="Cycle spring, summer, autumn, and winter">[SEASON: SPRING]</button>
         <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1P / 3P View (F5)">[VIEW: 1P]</button>
         <button class="mc-chip-btn" id="btn-quick-sound" title="Toggle Audio">[AUDIO: ON]</button>
@@ -161,6 +165,7 @@ export class HUDManager {
     document.getElementById('btn-quick-resume')?.addEventListener('click', () => this.onOpenResume?.());
     document.getElementById('btn-quick-map')?.addEventListener('click', () => this.onOpenFastTravel?.());
     document.getElementById('btn-quick-weather')?.addEventListener('click', () => this.onCycleWeather?.());
+    document.getElementById('btn-quick-time')?.addEventListener('click', () => this.onDayNightToggle?.());
     document.getElementById('btn-quick-season')?.addEventListener('click', () => this.onCycleSeason?.());
     document.getElementById('btn-quick-unlock')?.addEventListener('click', () => {
       if (document.pointerLockElement) {
@@ -273,7 +278,9 @@ export class HUDManager {
       } else if (inter.type === 'teleport') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       } else if (inter.type === 'npc') {
-        const actionVerb = inter.id === 'roger' ? 'Pet Dog' : 'Talk';
+        const isDog = inter.id === 'roger';
+        const isAnimal = inter.id?.startsWith('animal_');
+        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : 'Talk');
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {
@@ -321,17 +328,28 @@ export class HUDManager {
     dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
     trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
-    const canvas = document.getElementById('minimap-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const now = performance.now();
+    if (now - this.lastMinimapUpdate < 45) return;
+    this.lastMinimapUpdate = now;
+
+    if (!this.minimapCanvas) {
+      this.minimapCanvas = document.getElementById('minimap-canvas') as HTMLCanvasElement;
+      if (this.minimapCanvas) {
+        this.minimapCtx = this.minimapCanvas.getContext('2d');
+      }
+    }
+    const canvas = this.minimapCanvas;
+    const ctx = this.minimapCtx;
+    if (!canvas || !ctx) return;
 
     const w = 160;
     const h = 160;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    if (canvas.width !== w * pixelRatio || canvas.height !== h * pixelRatio) {
-      canvas.width = w * pixelRatio;
-      canvas.height = h * pixelRatio;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
+    const targetW = Math.round(w * pixelRatio);
+    const targetH = Math.round(h * pixelRatio);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
     }
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.clearRect(0, 0, w, h);
@@ -695,6 +713,11 @@ export class HUDManager {
     const seasonBtn = document.getElementById('btn-quick-season');
     if (weatherBtn) weatherBtn.textContent = `[WEATHER: ${weather.toUpperCase()}]`;
     if (seasonBtn) seasonBtn.textContent = `[SEASON: ${season.toUpperCase()}]`;
+  }
+
+  public updateTimeStatus(isNight: boolean) {
+    const timeBtn = document.getElementById('btn-quick-time');
+    if (timeBtn) timeBtn.textContent = `[TIME: ${isNight ? 'NIGHT' : 'DAY'}]`;
   }
 
   public showLiveRedirectToast(title: string, url: string) {

@@ -13,6 +13,16 @@ export interface ProjectBanner {
   box: THREE.Box3;
 }
 
+export interface NPCHitInfo {
+  type: 'npc' | 'dog' | 'animal';
+  id: string;
+  position: THREE.Vector3;
+  title: string;
+  animalType?: string;
+  animalSpecies?: string;
+  animalEntity?: any;
+}
+
 export class VoxelWorld {
   public scene: THREE.Scene;
   public textureManager: TextureManager;
@@ -59,6 +69,13 @@ export class VoxelWorld {
   // Builder's Minigame state
   public minigameBlocksPlaced: number = 0;
 
+  // Scratch objects for zero-allocation raycasting
+  private scratchRay = new THREE.Ray();
+  private scratchHitPoint = new THREE.Vector3();
+  private scratchNpcBox = new THREE.Box3();
+  private scratchBoxCenter = new THREE.Vector3();
+  private scratchBoxSize = new THREE.Vector3();
+
   constructor(scene: THREE.Scene, textureManager: TextureManager) {
     this.scene = scene;
     this.textureManager = textureManager;
@@ -102,8 +119,8 @@ export class VoxelWorld {
       const capacity = Math.max(count + 500, 200);
       const material = this.textureManager.getMaterial(type);
       const instMesh = new THREE.InstancedMesh(boxGeo, material, capacity);
-      instMesh.castShadow = (type !== 'bedrock' && type !== 'dirt');
-      instMesh.receiveShadow = true;
+      instMesh.castShadow = false;
+      instMesh.receiveShadow = false;
       instMesh.frustumCulled = false;
       instMesh.name = `voxel_${type}`;
 
@@ -299,14 +316,14 @@ export class VoxelWorld {
 
   // Check if player raycast hits any hammerable project banner
   public checkBannerHit(rayOrigin: THREE.Vector3, rayDir: THREE.Vector3, reach: number): ProjectBanner | null {
-    const ray = new THREE.Ray(rayOrigin, rayDir);
+    this.scratchRay.origin.copy(rayOrigin);
+    this.scratchRay.direction.copy(rayDir);
     let closestBanner: ProjectBanner | null = null;
     let closestDist = reach;
 
     for (const b of this.projectBanners) {
-      const hitPoint = new THREE.Vector3();
-      if (ray.intersectBox(b.box, hitPoint)) {
-        const dist = rayOrigin.distanceTo(hitPoint);
+      if (this.scratchRay.intersectBox(b.box, this.scratchHitPoint)) {
+        const dist = rayOrigin.distanceTo(this.scratchHitPoint);
         if (dist < closestDist) {
           closestDist = dist;
           closestBanner = b;
@@ -316,38 +333,74 @@ export class VoxelWorld {
     return closestBanner;
   }
 
-  // Check if player raycast hits Lakshya NPC or companion dog Roger
-  public checkNPCHit(rayOrigin: THREE.Vector3, rayDir: THREE.Vector3, reach: number): { type: 'npc' | 'dog'; position: THREE.Vector3; title: string } | null {
-    const ray = new THREE.Ray(rayOrigin, rayDir);
+  // Check if player raycast hits Lakshya NPC, companion dog Roger, or any animal
+  public checkNPCHit(rayOrigin: THREE.Vector3, rayDir: THREE.Vector3, reach: number): NPCHitInfo | null {
+    this.scratchRay.origin.copy(rayOrigin);
+    this.scratchRay.direction.copy(rayDir);
     let closestDist = reach;
-    let hit: { type: 'npc' | 'dog'; position: THREE.Vector3; title: string } | null = null;
+    let hit: NPCHitInfo | null = null;
 
     if (this.npcMesh) {
-      const npcBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z),
-        new THREE.Vector3(1.0, 2.2, 1.0)
-      );
-      const hitPoint = new THREE.Vector3();
-      if (ray.intersectBox(npcBox, hitPoint)) {
-        const dist = rayOrigin.distanceTo(hitPoint);
+      this.scratchBoxCenter.set(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z);
+      this.scratchBoxSize.set(1.2, 2.3, 1.2);
+      this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
+      if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
+        const dist = rayOrigin.distanceTo(this.scratchHitPoint);
         if (dist < closestDist) {
           closestDist = dist;
-          hit = { type: 'npc', position: this.npcMesh.position.clone(), title: 'Lakshya' };
+          hit = { type: 'npc', id: 'lakshya_guide', position: this.npcMesh.position.clone(), title: 'Lakshya' };
         }
       }
     }
 
     if (this.dogMesh) {
-      const dogBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z),
-        new THREE.Vector3(0.8, 0.9, 0.8)
-      );
-      const hitPoint = new THREE.Vector3();
-      if (ray.intersectBox(dogBox, hitPoint)) {
-        const dist = rayOrigin.distanceTo(hitPoint);
+      this.scratchBoxCenter.set(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z);
+      this.scratchBoxSize.set(1.0, 1.1, 1.0);
+      this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
+      if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
+        const dist = rayOrigin.distanceTo(this.scratchHitPoint);
         if (dist < closestDist) {
           closestDist = dist;
-          hit = { type: 'dog', position: this.dogMesh.position.clone(), title: 'Roger' };
+          hit = { type: 'dog', id: 'roger', position: this.dogMesh.position.clone(), title: 'Roger' };
+        }
+      }
+    }
+
+    if (this.animalManager && this.animalManager.animals) {
+      for (const animal of this.animalManager.animals) {
+        const aPos = animal.group.position;
+        if (rayOrigin.distanceTo(aPos) > reach + 5.0) continue;
+
+        let h = 1.6;
+        let w = 1.6;
+        if (animal.type === 'giraffe' || animal.type === 'elephant' || animal.type === 'temple_elephant') {
+          h = 3.2;
+          w = 2.6;
+        } else if (animal.type === 'lion' || animal.type === 'tiger' || animal.type === 'polar_bear' || animal.type === 'panda') {
+          h = 2.0;
+          w = 1.8;
+        } else if (animal.type === 'penguin' || animal.type === 'peacock' || animal.type === 'flamingo') {
+          h = 1.4;
+          w = 1.2;
+        }
+
+        this.scratchBoxCenter.set(aPos.x, aPos.y + h * 0.5, aPos.z);
+        this.scratchBoxSize.set(w, h, w);
+        this.scratchNpcBox.setFromCenterAndSize(this.scratchBoxCenter, this.scratchBoxSize);
+        if (this.scratchRay.intersectBox(this.scratchNpcBox, this.scratchHitPoint)) {
+          const dist = rayOrigin.distanceTo(this.scratchHitPoint);
+          if (dist < closestDist) {
+            closestDist = dist;
+            hit = {
+              type: 'animal',
+              id: `animal_${animal.type}_${animal.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
+              position: aPos.clone(),
+              title: animal.name,
+              animalType: animal.type,
+              animalSpecies: animal.species,
+              animalEntity: animal
+            };
+          }
         }
       }
     }
@@ -1084,7 +1137,7 @@ export class VoxelWorld {
     }
 
     if (this.flagManager) {
-      this.flagManager.update(time);
+      this.flagManager.update(time, playerPos);
     }
 
     if (this.animalManager) {
