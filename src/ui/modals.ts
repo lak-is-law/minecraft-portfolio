@@ -139,7 +139,8 @@ export class ModalManager {
   public isOpen: boolean = false;
   private openTime: number = 0;
   public onTeleportRequest?: (coords: [number, number, number]) => void;
-  public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[] };
+  public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[]; trains?: any[] };
+  private mapAnimId: number | null = null;
 
   constructor() {
     this.modalContainer = document.getElementById('modal-container')!;
@@ -156,7 +157,7 @@ export class ModalManager {
       }
       if (e.code === 'KeyM' && !this.isOpen) {
         const info = this.getPlayerInfo?.();
-        this.openFastTravelModal(info?.position, info?.yaw, info?.dragons);
+        this.openFastTravelModal(info?.position, info?.yaw, info?.dragons, (info as any)?.trains);
       }
     });
 
@@ -171,6 +172,10 @@ export class ModalManager {
   }
 
   public close() {
+    if (this.mapAnimId !== null) {
+      cancelAnimationFrame(this.mapAnimId);
+      this.mapAnimId = null;
+    }
     this.isOpen = false;
     this.modalContainer.innerHTML = '';
     this.modalContainer.style.display = 'none';
@@ -444,12 +449,19 @@ export class ModalManager {
   public openFastTravelModal(
     playerPos?: { x: number; y: number; z: number },
     playerYaw?: number,
-    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
+    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     this.onModalOpen();
 
-    const curX = Math.round(playerPos?.x || 0);
-    const curZ = Math.round(playerPos?.z || 0);
+    const info = this.getPlayerInfo?.();
+    const effectivePos = playerPos || info?.position || { x: 0, y: 2, z: 0 };
+    const effectiveYaw = playerYaw ?? info?.yaw ?? 0;
+    const effectiveDragons = dragons || info?.dragons;
+    const effectiveTrains = trains || (info as any)?.trains;
+
+    const curX = Math.round(effectivePos.x);
+    const curZ = Math.round(effectivePos.z);
 
     const atlasRegions = [
       { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', tag: '[CITADEL]', tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
@@ -465,7 +477,10 @@ export class ModalManager {
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
       { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
       { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 168 / Z −24' },
+      { number: '14', name: 'Frostpeak Alps · Ski Lodge', subtitle: 'Switzerland', detail: 'Snow-capped alpine peaks, Chalet ski lodge, Lake Serenity ice rink, and high summit observatory.', tag: '[ALPS]', tone: 'frost', direction: 'NORTH · X −2 / Z −100' },
+      { number: '15', name: 'Sunflower Valley Farmstead', subtitle: 'Countryside', detail: 'Rustic 4-sail Dutch windmill, golden sunflower fields, and peaceful agricultural valley.', tag: '[VALLEY]', tone: 'citadel', direction: 'WEST · X −45 / Z 48' }
     ];
+
     const regionsHtml = atlasRegions.map((region) => {
       const targetIdx = PORTFOLIO_DATA.landmarks.findIndex(lm => lm.tag === region.tag);
       const safeIdx = targetIdx >= 0 ? targetIdx : 0;
@@ -479,6 +494,7 @@ export class ModalManager {
       </article>
     `;
     }).join('');
+
     const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
       <button class="atlas-destination mc-map-chip-btn" data-index="${idx}">
         <span class="atlas-destination-tag">${lm.tag.replace(/[\[\]]/g, '')}</span>
@@ -493,7 +509,7 @@ export class ModalManager {
           <div>
             <p class="atlas-eyebrow">LAKSHYA’S PORTFOLIO WORLD <span>·</span> FIELD GUIDE 01</p>
             <h2 class="mc-dialog-title">A world worth exploring.</h2>
-            <span class="mc-dialog-subtitle">Twelve planned districts and eighteen waypoints, connected by clear routes.</span>
+            <span class="mc-dialog-subtitle">All 39 destinations and 15 districts across 10 realms. Zoom, pan, and click to travel anywhere.</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
@@ -506,22 +522,44 @@ export class ModalManager {
 
         <div class="atlas-scroll-area">
           <section class="atlas-map-section" id="atlas-map-section" aria-label="Interactive world map">
-        <div class="mc-map-top-status-bar">
-          <div class="mc-map-gps-pill">
-            <span class="gps-label">YOUR POSITION</span>
-            <span class="gps-val" id="map-live-coords">X: ${curX}, Z: ${curZ}</span>
-          </div>
-          <div class="mc-map-cursor-pill">
-            <span class="cursor-label">MAP TARGET</span>
-            <span class="cursor-val" id="map-cursor-coords">Select a point · click to travel</span>
-          </div>
-        </div>
+            <div class="mc-map-top-status-bar">
+              <div class="mc-map-gps-pill">
+                <span class="gps-label">YOUR POSITION:</span>
+                <span class="gps-val" id="map-live-coords">X: ${curX}, Z: ${curZ}</span>
+              </div>
+              <div class="mc-map-cursor-pill">
+                <span class="cursor-label">TARGET:</span>
+                <span class="cursor-val" id="map-cursor-coords">Select a landmark or click anywhere to travel</span>
+              </div>
+            </div>
 
-        <div class="mc-max-map-canvas-container">
-          <canvas id="max-realm-canvas" width="1600" height="860"></canvas>
-        </div>
+            <div class="mc-map-controls-bar">
+              <div class="mc-map-tools-group">
+                <button class="mc-map-tool-btn" id="btn-map-zoom-in" type="button" title="Zoom in (+)">🔍+ IN</button>
+                <button class="mc-map-tool-btn" id="btn-map-zoom-out" type="button" title="Zoom out (-)">🔍- OUT</button>
+                <button class="mc-map-tool-btn" id="btn-map-reset" type="button" title="Reset view">⟲ RESET</button>
+                <button class="mc-map-tool-btn" id="btn-map-locate-player" type="button" title="Center on your position">🎯 YOU</button>
+              </div>
+              <div class="mc-map-filter-group" id="mc-map-filter-group">
+                <button class="mc-map-filter-btn active" data-filter="all">ALL (39)</button>
+                <button class="mc-map-filter-btn" data-filter="monuments">MONUMENTS</button>
+                <button class="mc-map-filter-btn" data-filter="cities">CITIES</button>
+                <button class="mc-map-filter-btn" data-filter="transit">TRANSIT</button>
+                <button class="mc-map-filter-btn" data-filter="nature">NATURE</button>
+              </div>
+            </div>
 
-        <div class="atlas-map-caption"><span><i class="atlas-key-dot atlas-key-player"></i> YOU ARE HERE</span><span><i class="atlas-key-dot atlas-key-place"></i> WAYPOINT</span><span><i class="atlas-key-line"></i> MAIN ROUTE</span><span class="atlas-caption-hint">Click the map to travel anywhere</span></div>
+            <div class="mc-max-map-canvas-container" id="mc-max-map-canvas-container">
+              <canvas id="max-realm-canvas" width="1200" height="900"></canvas>
+              <div class="mc-map-tooltip-card" id="mc-map-tooltip-card"></div>
+            </div>
+
+            <div class="atlas-map-caption">
+              <span><i class="atlas-key-dot atlas-key-player"></i> YOU ARE HERE</span>
+              <span><i class="atlas-key-dot atlas-key-place"></i> WAYPOINT PIN</span>
+              <span><i class="atlas-key-line"></i> EXPRESS RAIL TRANSIT</span>
+              <span class="atlas-caption-hint">Drag to Pan · Wheel or Buttons to Zoom · Click to Travel</span>
+            </div>
           </section>
 
           <section class="atlas-content-section" id="atlas-regions-section">
@@ -561,148 +599,197 @@ export class ModalManager {
     });
 
     // Render Canvas and attach hover/click interactions
-    this.initMaximizedMapCanvas(playerPos, playerYaw, dragons);
+    this.initMaximizedMapCanvas(effectivePos, effectiveYaw, effectiveDragons, effectiveTrains);
   }
 
   private initMaximizedMapCanvas(
     playerPos?: { x: number; y: number; z: number },
     playerYaw?: number,
-    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[]
+    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
+    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     const canvas = document.getElementById('max-realm-canvas') as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    const tooltipEl = document.getElementById('mc-map-tooltip-card');
+    const containerEl = document.getElementById('mc-max-map-canvas-container');
 
-    const compact = window.innerWidth < 740;
-    const width = compact ? 960 : 1600;
-    const height = 860;
+    const width = 1200;
+    const height = 900;
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = width * pixelRatio;
     canvas.height = height * pixelRatio;
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
     const cx = width / 2;
     const cy = height / 2;
-    const scale = 1.9;
+    const baseScale = 2.05;
     const worldLimit = 205;
-    const mapHalfW = worldLimit * scale;
-    const mapHalfH = worldLimit * scale;
+
+    let userZoom = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let activeFilter: 'all' | 'monuments' | 'cities' | 'transit' | 'nature' = 'all';
 
     let hoverWorldX: number | null = null;
     let hoverWorldZ: number | null = null;
+    let hoveredLm: typeof PORTFOLIO_DATA.landmarks[0] | null = null;
 
+    let isPointerDown = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialPanX = 0;
+    let initialPanY = 0;
+    let hasDragged = false;
+
+    // Helper: Category classifier for all landmarks
+    const getLandmarkCategory = (tag: string): 'monuments' | 'cities' | 'transit' | 'nature' => {
+      if (tag.includes('TAJ') || tag.includes('GREAT WALL') || tag.includes('EIFFEL') ||
+          tag.includes('LONDON') || tag.includes('PYRAMID') || tag.includes('GIZA') ||
+          tag.includes('TEMPLE') || tag.includes('ISRO') || tag.includes('HAWA MAHAL') ||
+          tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE')) {
+        return 'monuments';
+      }
+      if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
+          tag.includes('HOLLYWOOD') || tag.includes('McQUEEN') || tag.includes('MEXICO') ||
+          tag.includes('DUBAI') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
+          tag.includes('VARANASI') || tag.includes('CITADEL')) {
+        return 'cities';
+      }
+      if (tag.includes('AIRPORT') || tag.includes('RAILWAY') || tag.includes('MARINA') || tag.includes('DHABA')) {
+        return 'transit';
+      }
+      return 'nature';
+    };
+
+    const getPinColor = (tag: string): string => {
+      if (tag.includes('TAJ')) return '#ffffff';
+      if (tag.includes('TOKYO')) return '#ec4899';
+      if (tag.includes('MEXICO')) return '#fb923c';
+      if (tag.includes('NEO') || tag.includes('TOWER')) return '#38bdf8';
+      if (tag.includes('ALPS') || tag.includes('FROST')) return '#e0f2fe';
+      if (tag.includes('SALOON')) return '#d97706';
+      if (tag.includes('BEACH') || tag.includes('MARINA')) return '#06b6d4';
+      if (tag.includes('CITADEL')) return '#4ade80';
+      if (tag.includes('AIRPORT')) return '#0284c7';
+      if (tag.includes('POLICE')) return '#3b82f6';
+      if (tag.includes('HOSPITAL')) return '#fb7185';
+      if (tag.includes('SCHOOL') || tag.includes('DHABA') || tag.includes('VARANASI')) return '#fbbf24';
+      if (tag.includes('ZOO')) return '#22c55e';
+      if (tag.includes('CASTLE')) return '#c084fc';
+      if (tag.includes('EIFFEL')) return '#f472b6';
+      if (tag.includes('RAILWAY') || tag.includes('MUMBAI')) return '#f97316';
+      if (tag.includes('HOLLYWOOD')) return '#f59e0b';
+      if (tag.includes('McQUEEN')) return '#ef4444';
+      if (tag.includes('GREAT WALL')) return '#10b981';
+      if (tag.includes('PAVILION')) return '#f43f5e';
+      if (tag.includes('PYRAMID') || tag.includes('GIZA')) return '#eab308';
+      if (tag.includes('CARNIVAL')) return '#f472b6';
+      if (tag.includes('LONDON')) return '#dc2626';
+      if (tag.includes('SEOUL')) return '#8b5cf6';
+      if (tag.includes('DUBAI')) return '#14b8a6';
+      if (tag.includes('TEMPLE')) return '#a855f7';
+      if (tag.includes('ISRO')) return '#38bdf8';
+      if (tag.includes('HAWA MAHAL')) return '#fb923c';
+      if (tag.includes('INDIA GATE')) return '#f59e0b';
+      if (tag.includes('VALLEY')) return '#eab308';
+      return '#94a3b8';
+    };
+
+    // Toolbar buttons hookup
+    document.getElementById('btn-map-zoom-in')?.addEventListener('click', () => {
+      userZoom = Math.min(3.6, userZoom * 1.25);
+      sound.playClick();
+    });
+
+    document.getElementById('btn-map-zoom-out')?.addEventListener('click', () => {
+      userZoom = Math.max(0.7, userZoom * 0.8);
+      sound.playClick();
+    });
+
+    document.getElementById('btn-map-reset')?.addEventListener('click', () => {
+      userZoom = 1.0;
+      panX = 0;
+      panY = 0;
+      sound.playClick();
+    });
+
+    document.getElementById('btn-map-locate-player')?.addEventListener('click', () => {
+      userZoom = Math.max(1.4, userZoom);
+      const px = playerPos?.x || 0;
+      const pz = playerPos?.z || 0;
+      panX = -px * baseScale * userZoom;
+      panY = -pz * baseScale * userZoom;
+      sound.playClick();
+    });
+
+    // Category filter buttons hookup
+    document.querySelectorAll('.mc-map-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        document.querySelectorAll('.mc-map-filter-btn').forEach(b => b.classList.remove('active'));
+        target.classList.add('active');
+        activeFilter = (target.getAttribute('data-filter') || 'all') as any;
+        sound.playClick();
+      });
+    });
+
+    // Main Draw Function
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Canvas outer background
-      ctx.fillStyle = '#080c14';
+      const effectiveScale = baseScale * userZoom;
+      const originX = cx + panX;
+      const originZ = cy + panY;
+
+      // 1. Deep Ocean Background
+      ctx.fillStyle = '#0284c7';
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Side Information Panels (the small-screen map gets the full canvas)
-      if (!compact) {
-      // Left Panel: Biome Legend
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(10, 10, 180, height - 20);
-      ctx.strokeStyle = '#334155';
-      ctx.strokeRect(10, 10, 180, height - 20);
-
-      ctx.font = 'bold 11px monospace';
-      ctx.fillStyle = '#facc15';
-      ctx.fillText('[REALM QUADRANTS]', 22, 34);
-
-      const biomes = [
-        { name: 'NE: Imperial India', color: '#fef08a', desc: 'Taj Mahal, ISRO & Jaipur' },
-        { name: 'NW: China Realm', color: '#34d399', desc: 'Great Wall & Pagoda' },
-        { name: 'SW: Mexico Realm', color: '#fb923c', desc: 'Zócalo & Aztec Pyramid' },
-        { name: 'SE: USA & Neo York', color: '#38bdf8', desc: 'Times Sq, Lak & Hollywood' },
-        { name: 'South: Grand Carnival', color: '#f472b6', desc: 'Ferris Wheel & Coaster' },
-        { name: 'Center: Citadel Hub', color: '#94a3b8', desc: 'Compass Rose & Moat' },
-        { name: 'Beach: Palm Pier', color: '#06b6d4', desc: 'Merlion & Sailing Ships' }
-      ];
-
-      biomes.forEach((b, i) => {
-        const by = 48 + i * 36;
-        ctx.fillStyle = b.color;
-        ctx.fillRect(22, by, 10, 10);
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 10px monospace';
-        ctx.fillText(b.name, 38, by + 9);
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '9px monospace';
-        ctx.fillText(b.desc, 38, by + 20);
-      });
-
-      // Compass Rose
-      const compY = height - 70;
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.arc(100, compY, 32, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#38bdf8';
-      ctx.stroke();
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 10px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('N', 100, compY - 20);
-      ctx.fillText('S', 100, compY + 28);
-      ctx.fillText('W', 74, compY + 4);
-      ctx.fillText('E', 126, compY + 4);
-      ctx.textAlign = 'left';
-
-      // Right Panel: Active Radar & Distance Tracker
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(width - 190, 10, 180, height - 20);
-      ctx.strokeStyle = '#334155';
-      ctx.strokeRect(width - 190, 10, 180, height - 20);
-
-      ctx.font = 'bold 11px monospace';
-      ctx.fillStyle = '#facc15';
-      ctx.fillText('[LANDMARKS RADAR]', width - 178, 34);
-
-      const px = playerPos?.x || 0;
-      const pz = playerPos?.z || 0;
-
-      [...PORTFOLIO_DATA.landmarks]
-        .map(lm => ({ lm, dist: Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz)) }))
-        .sort((a, b) => a.dist - b.dist)
-        .slice(0, 9)
-        .forEach(({ lm, dist }, i) => {
-        const ly = 55 + i * 40;
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 9px monospace';
-        ctx.fillText(lm.tag, width - 178, ly);
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '8px monospace';
-        ctx.fillText(`${lm.name} • ${dist}m`, width - 178, ly + 14);
-      });
-      }
-
-      // 3. Central Map Viewport (Clipped to World Bounds)
-      const mapX = cx - mapHalfW;
-      const mapY = cy - mapHalfH;
+      // World boundary clipping
+      const mapHalfW = worldLimit * effectiveScale;
+      const mapHalfH = worldLimit * effectiveScale;
+      const mapX = originX - mapHalfW;
+      const mapY = originZ - mapHalfH;
       const mapW = mapHalfW * 2;
       const mapH = mapHalfH * 2;
+
+      // Coordinate Grid Lines (every 50 blocks)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let wCoord = -200; wCoord <= 200; wCoord += 50) {
+        const gx = originX + wCoord * effectiveScale;
+        const gz = originZ + wCoord * effectiveScale;
+        ctx.beginPath();
+        ctx.moveTo(gx, 0); ctx.lineTo(gx, height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, gz); ctx.lineTo(width, gz);
+        ctx.stroke();
+
+        // Subtle coordinate markings
+        if (userZoom >= 1.0) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.font = '8px monospace';
+          ctx.fillText(`${wCoord}`, gx + 3, originZ + 10);
+        }
+      }
 
       ctx.save();
       ctx.beginPath();
       ctx.rect(mapX, mapY, mapW, mapH);
       ctx.clip();
 
-      // Base Open Ocean (Outer Waters)
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(mapX, mapY, mapW, mapH);
-
-      // Island Landmass Coastline (Rounded Square matching 3D world)
-      ctx.save();
+      // Rounded Square Island Outline matching 3D world (R = 200, cornerR = 55)
       const drawIslandShape = (margin = 0) => {
         ctx.beginPath();
-        const r = (200 - margin) * scale;
-        const cornerR = Math.max(10, (55 - margin) * scale);
-        const minX = cx - r;
-        const maxX = cx + r;
-        const minZ = cy - r;
-        const maxZ = cy + r;
+        const r = (200 - margin) * effectiveScale;
+        const cornerR = Math.max(6, (55 - margin) * effectiveScale);
+        const minX = originX - r;
+        const maxX = originX + r;
+        const minZ = originZ - r;
+        const maxZ = originZ + r;
 
         ctx.moveTo(minX + cornerR, minZ);
         ctx.lineTo(maxX - cornerR, minZ);
@@ -716,166 +803,133 @@ export class ModalManager {
         ctx.closePath();
       };
 
-      // Outer golden beach ring
+      // Golden beach coastline
       drawIslandShape(0);
       ctx.fillStyle = '#fde047';
       ctx.fill();
 
-      // Clip subsequent biome drawing inside island
-      drawIslandShape(6);
+      // Clip interior landmass
+      ctx.save();
+      drawIslandShape(5);
       ctx.clip();
 
-      // Inner Island Plains
-      ctx.fillStyle = '#22c55e';
-      ctx.fillRect(cx - 210 * scale, cy - 210 * scale, 420 * scale, 420 * scale);
+      // Base interior emerald plains
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(originX - 210 * effectiveScale, originZ - 210 * effectiveScale, 420 * effectiveScale, 420 * effectiveScale);
 
-      // Render Authentic Country Map Silhouettes Across All 10 Realms
+      // Render Realm Territorials
       const drawCountryTerritory = (poly: [number, number][], fillColor: string, strokeColor: string, label: string, labelPos: [number, number]) => {
         ctx.beginPath();
         poly.forEach(([x, z], i) => {
-          const px = cx + x * scale;
-          const pz = cy + z * scale;
+          const px = originX + x * effectiveScale;
+          const pz = originZ + z * effectiveScale;
           if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
         });
         ctx.closePath();
         ctx.fillStyle = fillColor;
         ctx.fill();
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 1.8 * scale;
+        ctx.lineWidth = Math.max(1, 1.8 * userZoom);
         ctx.stroke();
 
-        if (label) {
+        if (label && userZoom >= 0.8) {
           ctx.save();
           ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(10, Math.round(11 * scale))}px monospace`;
+          ctx.font = `bold ${Math.max(9, Math.round(10 * Math.min(1.4, userZoom)))}px monospace`;
           ctx.textAlign = 'center';
           ctx.shadowColor = '#000000';
           ctx.shadowBlur = 4;
-          ctx.fillText(label, cx + labelPos[0] * scale, cy + labelPos[1] * scale);
+          ctx.fillText(label, originX + labelPos[0] * effectiveScale, originZ + labelPos[1] * effectiveScale);
           ctx.restore();
         }
       };
 
-      // 1. INDIA (Subcontinent Peninsula)
-      drawCountryTerritory(
-        [[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]],
-        'rgba(249, 115, 22, 0.40)', '#f97316', 'INDIA', [95, -130]
-      );
-
-      // 2. CHINA (Northern Continental Arc)
-      drawCountryTerritory(
-        [[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]],
-        'rgba(220, 38, 38, 0.36)', '#dc2626', 'CHINA', [-115, -130]
-      );
-
-      // 3. JAPAN (Archipelago Chain)
-      drawCountryTerritory(
-        [[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]],
-        'rgba(244, 63, 94, 0.45)', '#f43f5e', 'JAPAN', [-155, -75]
-      );
-
-      // 4. SOUTH KOREA (Korean Peninsula)
-      drawCountryTerritory(
-        [[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]],
-        'rgba(14, 165, 233, 0.45)', '#0ea5e9', 'SOUTH KOREA', [-60, -102]
-      );
-
-      // 5. UNITED KINGDOM (Great Britain)
-      drawCountryTerritory(
-        [[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]],
-        'rgba(239, 68, 68, 0.40)', '#ef4444', 'UNITED KINGDOM', [-32, -68]
-      );
-
-      // 6. FRANCE (L’Hexagone)
-      drawCountryTerritory(
-        [[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]],
-        'rgba(56, 189, 248, 0.42)', '#38bdf8', 'FRANCE', [28, -42]
-      );
-
-      // 7. USA (Las Vegas Strip, Broadway & Hollywood)
-      drawCountryTerritory(
-        [[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]],
-        'rgba(59, 130, 246, 0.38)', '#3b82f6', 'USA · VEGAS', [120, -10]
-      );
-
-      // 8. MEXICO (Mesoamerican Horn)
-      drawCountryTerritory(
-        [[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]],
-        'rgba(5, 150, 105, 0.38)', '#059669', 'MEXICO', [-125, 60]
-      );
-
-      // 9. EGYPT (Nile & Giza Plateau)
-      drawCountryTerritory(
-        [[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]],
-        'rgba(234, 179, 8, 0.38)', '#eab308', 'EGYPT', [-155, 40]
-      );
-
-      // 10. UAE (Dubai Waterfront & Palm)
-      drawCountryTerritory(
-        [[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]],
-        'rgba(16, 185, 129, 0.42)', '#10b981', 'UAE', [168, 38]
-      );
-
-      // Southern Coasts & Grand Carnival Pier
-      drawCountryTerritory(
-        [[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]],
-        'rgba(212, 173, 100, 0.25)', '#d4ad64', 'BEACH & BOARDWALK', [0, 95]
-      );
-      drawCountryTerritory(
-        [[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]],
-        'rgba(236, 72, 153, 0.40)', '#ec4899', 'CARNIVAL PIER', [5, 150]
-      );
+      // 1. INDIA
+      drawCountryTerritory([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], 'rgba(249, 115, 22, 0.40)', '#f97316', 'INDIA', [95, -130]);
+      // 2. CHINA
+      drawCountryTerritory([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], 'rgba(220, 38, 38, 0.36)', '#dc2626', 'CHINA', [-115, -130]);
+      // 3. JAPAN
+      drawCountryTerritory([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], 'rgba(244, 63, 94, 0.45)', '#f43f5e', 'JAPAN', [-155, -75]);
+      // 4. SOUTH KOREA
+      drawCountryTerritory([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], 'rgba(14, 165, 233, 0.45)', '#0ea5e9', 'SOUTH KOREA', [-60, -102]);
+      // 5. UK
+      drawCountryTerritory([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], 'rgba(239, 68, 68, 0.40)', '#ef4444', 'UNITED KINGDOM', [-32, -68]);
+      // 6. FRANCE
+      drawCountryTerritory([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], 'rgba(56, 189, 248, 0.42)', '#38bdf8', 'FRANCE', [28, -42]);
+      // 7. USA
+      drawCountryTerritory([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], 'rgba(59, 130, 246, 0.38)', '#3b82f6', 'USA · VEGAS & NEO YORK', [120, -10]);
+      // 8. MEXICO
+      drawCountryTerritory([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], 'rgba(5, 150, 105, 0.38)', '#059669', 'MEXICO', [-125, 60]);
+      // 9. EGYPT
+      drawCountryTerritory([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], 'rgba(234, 179, 8, 0.38)', '#eab308', 'EGYPT', [-155, 40]);
+      // 10. UAE
+      drawCountryTerritory([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], 'rgba(16, 185, 129, 0.42)', '#10b981', 'UAE', [168, 38]);
+      // 11. ALPS SNOW MOUNTAINS
+      drawCountryTerritory([[-30, -125], [20, -125], [15, -85], [-25, -85], [-30, -125]], 'rgba(224, 242, 254, 0.55)', '#bae6fd', 'FROSTPEAK ALPS', [-5, -105]);
+      // 12. SUNFLOWER VALLEY
+      drawCountryTerritory([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], 'rgba(250, 204, 21, 0.35)', '#eab308', 'SUNFLOWER VALLEY', [-45, 48]);
+      // 13. SAFARI ZOO
+      drawCountryTerritory([[-85, -20], [-45, -20], [-45, 20], [-85, 20], [-85, -20]], 'rgba(34, 197, 94, 0.35)', '#22c55e', 'SAFARI WILDLIFE PARK', [-65, 0]);
+      // Beach & Carnival Pier
+      drawCountryTerritory([[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]], 'rgba(212, 173, 100, 0.25)', '#d4ad64', 'BEACH & BOARDWALK', [0, 95]);
+      drawCountryTerritory([[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]], 'rgba(236, 72, 153, 0.40)', '#ec4899', 'CARNIVAL PIER', [5, 150]);
 
       // Yamuna canal in India
       ctx.fillStyle = '#38bdf8';
-      ctx.fillRect(cx + 76 * scale, cy - 122 * scale, 8 * scale, 47 * scale);
+      ctx.fillRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
 
       // Great Wall on China Ridge
       ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 4 * scale;
+      ctx.lineWidth = Math.max(2, 4 * effectiveScale * 0.5);
       ctx.beginPath();
-      ctx.moveTo(cx - 150 * scale, cy - 140 * scale);
-      ctx.quadraticCurveTo(cx - 115 * scale, cy - 132 * scale, cx - 80 * scale, cy - 140 * scale);
+      ctx.moveTo(originX - 150 * effectiveScale, originZ - 140 * effectiveScale);
+      ctx.quadraticCurveTo(originX - 115 * effectiveScale, originZ - 132 * effectiveScale, originX - 80 * effectiveScale, originZ - 140 * effectiveScale);
       ctx.stroke();
 
-      // Hollywood Hills Ridge in USA Realm
-      const hollywoodX = cx + 165 * scale;
-      const hollywoodZ = cy - 100 * scale;
+      // Hollywood Hills Ridge
+      const hollywoodX = originX + 165 * effectiveScale;
+      const hollywoodZ = originZ - 100 * effectiveScale;
       ctx.fillStyle = 'rgba(91,61,43,.48)';
       ctx.beginPath();
-      ctx.ellipse(hollywoodX, hollywoodZ + 6 * scale, 24 * scale, 12 * scale, -.2, 0, Math.PI * 2);
+      ctx.ellipse(hollywoodX, hollywoodZ + 6 * effectiveScale, 24 * effectiveScale, 12 * effectiveScale, -.2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillRect(hollywoodX - 18 * scale, hollywoodZ + 5 * scale, 36 * scale, 2 * scale);
 
-      // Hollywood Boulevard Walk of Fame & Hollywood Bowl Shell on Map
+      // Hollywood Boulevard Walk of Fame
       ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 3.2 * scale;
+      ctx.lineWidth = Math.max(2, 3.2 * effectiveScale * 0.5);
       ctx.beginPath();
-      ctx.moveTo(cx + 161 * scale, cy - 84 * scale);
-      ctx.lineTo(cx + 161 * scale, cy - 54 * scale);
+      ctx.moveTo(originX + 161 * effectiveScale, originZ - 84 * effectiveScale);
+      ctx.lineTo(originX + 161 * effectiveScale, originZ - 54 * effectiveScale);
       ctx.stroke();
 
       // Hollywood Bowl acoustic concentric shell arc
       ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = 2.4 * scale;
+      ctx.lineWidth = Math.max(1.5, 2.4 * effectiveScale * 0.5);
       ctx.beginPath();
-      ctx.arc(cx + 180 * scale, cy - 76 * scale, 6 * scale, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.arc(originX + 180 * effectiveScale, originZ - 76 * effectiveScale, 6 * effectiveScale, -Math.PI * 0.4, Math.PI * 0.4);
+      ctx.stroke();
+
+      // Lightning McQueen Speedway track
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = Math.max(2, 3.5 * effectiveScale * 0.5);
+      ctx.beginPath();
+      ctx.ellipse(originX + 168 * effectiveScale, originZ - 24 * effectiveScale, 18 * effectiveScale, 10 * effectiveScale, 0, 0, Math.PI * 2);
       ctx.stroke();
 
       // Main Arterial Routes
       const route = (points: [number, number][]) => {
         ctx.beginPath();
         points.forEach(([x, z], i) => {
-          const px = cx + x * scale;
-          const pz = cy + z * scale;
+          const px = originX + x * effectiveScale;
+          const pz = originZ + z * effectiveScale;
           if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
         });
         ctx.stroke();
       };
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.strokeStyle = 'rgba(27,37,31,.62)';
-      ctx.lineWidth = 5;
+      ctx.strokeStyle = 'rgba(27,37,31,.75)';
+      ctx.lineWidth = Math.max(2.5, 4.5 * userZoom);
       route([[0, -22], [0, -65]]);
       route([[20, 0], [77, 0], [100, 0], [150, 0]]);
       route([[2, -60], [40, -84], [74, -106]]);
@@ -884,7 +938,7 @@ export class ModalManager {
       route([[0, 22], [0, 58], [0, 119], [0, 160]]);
       route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
       ctx.strokeStyle = '#e6d5a5';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = Math.max(1.5, 2.2 * userZoom);
       route([[0, -22], [0, -65]]);
       route([[20, 0], [77, 0], [100, 0], [150, 0]]);
       route([[2, -60], [40, -84], [74, -106]]);
@@ -893,143 +947,63 @@ export class ModalManager {
       route([[0, 22], [0, 58], [0, 119], [0, 160]]);
       route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
 
-      // Small settlement marks help distinguish the built-up districts.
-      const block = (x: number, z: number, color: string, size = 5) => {
-        ctx.fillStyle = 'rgba(19,28,23,.55)';
-        ctx.fillRect(cx + x * scale - size / 2 + 1, cy + z * scale - size / 2 + 2, size, size);
-        ctx.fillStyle = color;
-        ctx.fillRect(cx + x * scale - size / 2, cy + z * scale - size / 2, size, size);
-      };
-      [[63,-2],[69,8],[73,-12],[87,12],[91,-12],[96,5]].forEach(([x,z]) => block(x,z,'#8ebfc0',6));
-      [[-82,-80],[-60,-95],[-72,-105]].forEach(([x,z]) => block(x,z,'#dfa9c3',6));
-      [[-85,29],[-68,16],[-79,49]].forEach(([x,z]) => block(x,z,'#e1ad7e',6));
-      [[39,-76],[70,-76]].forEach(([x,z]) => block(x,z,'#e9dfc6',5));
+      // Island Express Railway Loop
+      const railWaypoints = [
+        [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
+        [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
+        [144, 98], [112, 98], [80, 96], [50, 92], [24, 88],
+        [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
+      ];
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = Math.max(1.8, 2.6 * userZoom);
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      railWaypoints.forEach(([wx, wz], idx) => {
+        const rx = originX + wx * effectiveScale;
+        const rz = originZ + wz * effectiveScale;
+        if (idx === 0) ctx.moveTo(rx, rz); else ctx.lineTo(rx, rz);
+      });
+      ctx.closePath();
+      ctx.stroke();
+      ctx.setLineDash([]);
 
       // Central Crossroads Citadel Moat & Plaza
       ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = 5 * scale;
+      ctx.lineWidth = Math.max(2, 4 * effectiveScale * 0.5);
       ctx.beginPath();
-      ctx.arc(cx, cy, 20 * scale, 0, Math.PI * 2);
+      ctx.arc(originX, originZ, 20 * effectiveScale, 0, Math.PI * 2);
       ctx.stroke();
 
       // 4 Moat Bridges
       ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(cx - 3 * scale, cy - 23 * scale, 6 * scale, 6 * scale);
-      ctx.fillRect(cx - 3 * scale, cy + 17 * scale, 6 * scale, 6 * scale);
-      ctx.fillRect(cx + 17 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
-      ctx.fillRect(cx - 23 * scale, cy - 3 * scale, 6 * scale, 6 * scale);
+      ctx.fillRect(originX - 3 * effectiveScale, originZ - 23 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
+      ctx.fillRect(originX - 3 * effectiveScale, originZ + 17 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
+      ctx.fillRect(originX + 17 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
+      ctx.fillRect(originX - 23 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
 
       // Central Citadel Hub
       ctx.fillStyle = '#475569';
       ctx.beginPath();
-      ctx.arc(cx, cy, 16 * scale, 0, Math.PI * 2);
+      ctx.arc(originX, originZ, 16 * effectiveScale, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#facc15';
       ctx.beginPath();
-      ctx.arc(cx, cy, 4 * scale, 0, Math.PI * 2);
+      ctx.arc(originX, originZ, 4 * effectiveScale, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.restore(); // restore clipping
+      ctx.restore(); // restore island clipping
 
-      // Coordinate Grid Lines (every 50 blocks)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.lineWidth = 1;
-      for (let wCoord = -100; wCoord <= 100; wCoord += 50) {
-        const gx = cx + wCoord * scale;
-        const gz = cy + wCoord * scale;
-        ctx.beginPath();
-        ctx.moveTo(gx, mapY); ctx.lineTo(gx, mapY + mapH);
-        ctx.moveTo(mapX, gz); ctx.lineTo(mapX + mapW, gz);
-        ctx.stroke();
-      }
-
-      // 4. Landmarks Icons and Badges
-      for (const lm of PORTFOLIO_DATA.landmarks) {
-        const lx = cx + lm.coords[0] * scale;
-        const lz = cy + lm.coords[2] * scale;
-
-        let col = '#facc15';
-        if (lm.tag.includes('TAJ')) col = '#ffffff';
-        else if (lm.tag.includes('SAKURA')) col = '#f472b6';
-        else if (lm.tag.includes('PUEBLO')) col = '#fb923c';
-        else if (lm.tag.includes('NEO')) col = '#38bdf8';
-        else if (lm.tag.includes('TOWER')) col = '#facc15';
-        else if (lm.tag.includes('FROSTPEAK')) col = '#e0f2fe';
-        else if (lm.tag.includes('SALOON')) col = '#a16207';
-        else if (lm.tag.includes('BEACH')) col = '#06b6d4';
-        else if (lm.tag.includes('CITADEL')) col = '#4ade80';
-        else if (lm.tag.includes('AIRPORT')) col = '#38bdf8';
-        else if (lm.tag.includes('POLICE')) col = '#60a5fa';
-        else if (lm.tag.includes('HOSPITAL')) col = '#fb7185';
-        else if (lm.tag.includes('SCHOOL')) col = '#fbbf24';
-        else if (lm.tag.includes('ZOO')) col = '#4ade80';
-        else if (lm.tag.includes('CASTLE')) col = '#c084fc';
-        else if (lm.tag.includes('MEXICO')) col = '#34d399';
-        else if (lm.tag.includes('EIFFEL')) col = '#f9a8d4';
-        else if (lm.tag.includes('RAILWAY')) col = '#f97316';
-        else if (lm.tag.includes('HOLLYWOOD')) col = '#f5c389';
-        else if (lm.tag.includes('GREAT WALL')) col = '#34d399';
-        else if (lm.tag.includes('PAVILION')) col = '#f43f5e';
-        else if (lm.tag.includes('PYRAMID')) col = '#f59e0b';
-        else if (lm.tag.includes('CARNIVAL')) col = '#f472b6';
-        else if (lm.tag.includes('VARANASI')) col = '#fb923c';
-        else if (lm.tag.includes('LONDON')) col = '#ef4444';
-        else if (lm.tag.includes('TOKYO')) col = '#ec4899';
-        else if (lm.tag.includes('SEOUL')) col = '#8b5cf6';
-        else if (lm.tag.includes('GIZA')) col = '#eab308';
-        else if (lm.tag.includes('DUBAI')) col = '#06b6d4';
-        else if (lm.tag.includes('MUMBAI')) col = '#f97316';
-        else if (lm.tag.includes('TEMPLE')) col = '#a855f7';
-        else if (lm.tag.includes('MARINA')) col = '#38bdf8';
-        else if (lm.tag.includes('DHABA')) col = '#fb923c';
-
-        // Glowing outer halo
-        ctx.fillStyle = col + '44';
-        ctx.beginPath();
-        ctx.arc(lx, lz, 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pin diamond
-        ctx.fillStyle = col;
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(lx, lz - 5);
-        ctx.lineTo(lx + 5, lz);
-        ctx.lineTo(lx, lz + 5);
-        ctx.lineTo(lx - 5, lz);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Smart non-overlapping badge placement
-        const topTags = ['SCHOOL', 'HOSPITAL', 'CASTLE', 'EIFFEL', 'HOLLYWOOD', 'FROSTPEAK', 'NEO YORK'];
-        const isTop = topTags.some(t => lm.tag.includes(t));
-        const badgeY = isTop ? lz - 21 : lz + 7;
-
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 10px monospace';
-        const txt = lm.tag.replace(/[\[\]]/g, '');
-        const tw = ctx.measureText(txt).width;
-        ctx.fillRect(lx - tw / 2 - 3, badgeY, tw + 6, 14);
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(lx - tw / 2 - 2, badgeY, tw + 4, 11);
-        ctx.fillStyle = col;
-        ctx.fillText(txt, lx - tw / 2, badgeY + 10);
-      }
-
-      // 5. Active Live Dragons
+      // Live Soaring Dragons
       if (dragons) {
         for (const d of dragons) {
-          const dx = cx + d.position.x * scale;
-          const dz = cy + d.position.z * scale;
+          const dx = originX + d.position.x * effectiveScale;
+          const dz = originZ + d.position.z * effectiveScale;
           ctx.fillStyle = '#' + d.config.eyeColor.toString(16).padStart(6, '0');
           ctx.beginPath();
-          ctx.moveTo(dx, dz - 6);
-          ctx.lineTo(dx + 6, dz);
-          ctx.lineTo(dx, dz + 6);
-          ctx.lineTo(dx - 6, dz);
+          ctx.moveTo(dx, dz - 7);
+          ctx.lineTo(dx + 7, dz);
+          ctx.lineTo(dx, dz + 7);
+          ctx.lineTo(dx - 7, dz);
           ctx.closePath();
           ctx.fill();
           ctx.strokeStyle = '#ffffff';
@@ -1038,63 +1012,150 @@ export class ModalManager {
         }
       }
 
-      // 6. Live Player Indicator
-      const pScreenX = cx + (playerPos?.x || 0) * scale;
-      const pScreenZ = cy + (playerPos?.z || 0) * scale;
+      // Live Moving Express Trains
+      if (trains) {
+        for (const t of trains) {
+          const tx = originX + t.position.x * effectiveScale;
+          const tz = originZ + t.position.z * effectiveScale;
+          ctx.save();
+          ctx.translate(tx, tz);
+          ctx.rotate(-t.rotation.y);
+          ctx.fillStyle = '#0284c7';
+          ctx.strokeStyle = '#facc15';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          if (typeof ctx.roundRect === 'function') {
+            ctx.roundRect(-4, -8, 8, 16, 3);
+          } else {
+            ctx.rect(-4, -8, 8, 16);
+          }
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // Landmark Pins with Category Filter & Collision-Free Display
+      const majorHubTags = [
+        'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'NEO YORK',
+        'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN'
+      ];
+
+      for (const lm of PORTFOLIO_DATA.landmarks) {
+        const cat = getLandmarkCategory(lm.tag);
+        if (activeFilter !== 'all' && activeFilter !== cat) {
+          continue;
+        }
+
+        const lx = originX + lm.coords[0] * effectiveScale;
+        const lz = originZ + lm.coords[2] * effectiveScale;
+        const col = getPinColor(lm.tag);
+        const isHovered = hoveredLm && hoveredLm.name === lm.name;
+
+        // Glowing outer halo
+        ctx.fillStyle = col + (isHovered ? '88' : '33');
+        ctx.beginPath();
+        ctx.arc(lx, lz, isHovered ? 12 : 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pin diamond
+        ctx.fillStyle = col;
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = isHovered ? 2 : 1.2;
+        ctx.beginPath();
+        const pinSize = isHovered ? 7 : 5;
+        ctx.moveTo(lx, lz - pinSize);
+        ctx.lineTo(lx + pinSize, lz);
+        ctx.lineTo(lx, lz + pinSize);
+        ctx.lineTo(lx - pinSize, lz);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Major realm hubs display an elegant badge if not hovering another landmark
+        const isMajorHub = majorHubTags.some(t => lm.tag.includes(t));
+        if (isMajorHub && userZoom >= 0.85 && !isHovered) {
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+          ctx.font = 'bold 9px monospace';
+          const txt = lm.tag.replace(/[\[\]]/g, '');
+          const tw = ctx.measureText(txt).width;
+          ctx.fillRect(lx - tw / 2 - 3, lz + 8, tw + 6, 13);
+          ctx.strokeStyle = col;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(lx - tw / 2 - 2, lz + 8, tw + 4, 11);
+          ctx.fillStyle = col;
+          ctx.fillText(txt, lx - tw / 2, lz + 17);
+        }
+      }
+
+      // Live Player Indicator
+      const px = playerPos?.x || 0;
+      const pz = playerPos?.z || 0;
+      const pScreenX = originX + px * effectiveScale;
+      const pScreenZ = originZ + pz * effectiveScale;
       const yaw = playerYaw || 0;
 
       // Pulsing beacon ring
       const time = performance.now() * 0.003;
-      const pulseR = 10 + Math.sin(time) * 3;
+      const pulseR = 12 + Math.sin(time) * 4;
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(pScreenX, pScreenZ, pulseR, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Rotating Player Arrow
+      // Directional Vision FOV cone
       ctx.save();
       ctx.translate(pScreenX, pScreenZ);
       ctx.rotate(-yaw);
 
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.24)';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 36 * Math.min(1.5, userZoom), -Math.PI / 2 - 0.45, -Math.PI / 2 + 0.45);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rotating Player Arrow
       ctx.fillStyle = '#ef4444';
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(0, -11);
-      ctx.lineTo(7, 8);
-      ctx.lineTo(0, 4);
-      ctx.lineTo(-7, 8);
+      ctx.moveTo(0, -12);
+      ctx.lineTo(7.5, 9);
+      ctx.lineTo(0, 4.5);
+      ctx.lineTo(-7.5, 9);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+
       ctx.restore();
 
       // Player Label
       ctx.fillStyle = '#0f172a';
-      ctx.fillRect(pScreenX - 35, pScreenZ - 24, 70, 13);
+      ctx.fillRect(pScreenX - 38, pScreenZ - 26, 76, 14);
       ctx.strokeStyle = '#ef4444';
       ctx.lineWidth = 1;
-      ctx.strokeRect(pScreenX - 35, pScreenZ - 24, 70, 13);
+      ctx.strokeRect(pScreenX - 38, pScreenZ - 26, 76, 14);
       ctx.fillStyle = '#f8fafc';
       ctx.font = 'bold 8px monospace';
-      ctx.fillText('YOU [LAKSHYA]', pScreenX - 31, pScreenZ - 15);
+      ctx.fillText('YOU [LAKSHYA]', pScreenX - 34, pScreenZ - 16);
 
-      // 7. Hover Cursor Crosshair
+      // Hover Crosshairs
       if (hoverWorldX !== null && hoverWorldZ !== null) {
-        const hx = cx + hoverWorldX * scale;
-        const hz = cy + hoverWorldZ * scale;
+        const hx = originX + hoverWorldX * effectiveScale;
+        const hz = originZ + hoverWorldZ * effectiveScale;
 
         ctx.strokeStyle = '#facc15';
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.2;
         ctx.setLineDash([4, 4]);
         ctx.beginPath();
-        ctx.moveTo(hx, mapY); ctx.lineTo(hx, mapY + mapH);
-        ctx.moveTo(mapX, hz); ctx.lineTo(mapX + mapW, hz);
+        ctx.moveTo(hx, 0); ctx.lineTo(hx, height);
+        ctx.moveTo(0, hz); ctx.lineTo(width, hz);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Target reticle ring
+        // Target reticle
         ctx.strokeStyle = '#facc15';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -1105,72 +1166,268 @@ export class ModalManager {
       ctx.restore(); // restore clipping
 
       // World Border Perimeter Frame
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2.5;
       ctx.strokeRect(mapX, mapY, mapW, mapH);
 
-      // World Limit Labels
+      // Compass Rose
+      const compX = 46;
+      const compY = height - 46;
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.beginPath();
+      ctx.arc(compX, compY, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('N', compX, compY - 14);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('S', compX, compY + 20);
+      ctx.fillText('W', compX - 16, compY + 3);
+      ctx.fillText('E', compX + 16, compY + 3);
+      ctx.textAlign = 'left';
+
+      // Scale indicator
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(width - 150, height - 32, 140, 22);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(width - 150, height - 32, 140, 22);
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 8px monospace';
-      ctx.fillText('PORTFOLIO ISLAND  ·  NORTH ↑', mapX + 8, mapY + 15);
+      const scaleBarLen = Math.round(50 * effectiveScale);
+      ctx.fillRect(width - 142, height - 16, Math.min(124, scaleBarLen), 3);
+      ctx.fillText(`SCALE: 50 BLOCKS`, width - 142, height - 21);
     };
 
-    draw();
+    // Continuous Animation Loop using requestAnimationFrame
+    const animLoop = () => {
+      draw();
+      this.mapAnimId = requestAnimationFrame(animLoop);
+    };
+    this.mapAnimId = requestAnimationFrame(animLoop);
 
-    // Mousemove for live hover coordinates
-    canvas.addEventListener('mousemove', (e) => {
+    // Exact Canvas-to-World Coordinate Mapping Function
+    const getCoords = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (width / rect.width);
-      const my = (e.clientY - rect.top) * (height / rect.height);
+      const mx = (clientX - rect.left) * (width / rect.width);
+      const my = (clientY - rect.top) * (height / rect.height);
+      const effectiveScale = baseScale * userZoom;
+      const originX = cx + panX;
+      const originZ = cy + panY;
+      const wx = Math.round((mx - originX) / effectiveScale);
+      const wz = Math.round((my - originZ) / effectiveScale);
+      return { mx, my, wx, wz, rect };
+    };
 
-      const wx = Math.round((mx - cx) / scale);
-      const wz = Math.round((my - cy) / scale);
+    // Find closest landmark within radius
+    const findHoveredLandmark = (mx: number, my: number) => {
+      const effectiveScale = baseScale * userZoom;
+      const originX = cx + panX;
+      const originZ = cy + panY;
+      let closest: typeof PORTFOLIO_DATA.landmarks[0] | null = null;
+      let closestDist = Infinity;
+
+      for (const lm of PORTFOLIO_DATA.landmarks) {
+        const cat = getLandmarkCategory(lm.tag);
+        if (activeFilter !== 'all' && activeFilter !== cat) continue;
+
+        const lx = originX + lm.coords[0] * effectiveScale;
+        const lz = originZ + lm.coords[2] * effectiveScale;
+        const d = Math.hypot(mx - lx, my - lz);
+        if (d < 18 && d < closestDist) {
+          closestDist = d;
+          closest = lm;
+        }
+      }
+      return closest;
+    };
+
+    // Mouse Move & Hover
+    canvas.addEventListener('mousemove', (e) => {
+      const { mx, my, wx, wz, rect } = getCoords(e.clientX, e.clientY);
+
+      if (isPointerDown) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        if (Math.hypot(dx, dy) > 4) {
+          hasDragged = true;
+          const scaleRatio = width / rect.width;
+          panX = initialPanX + dx * scaleRatio;
+          panY = initialPanY + dy * scaleRatio;
+        }
+      }
 
       if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
         hoverWorldX = wx;
         hoverWorldZ = wz;
-        canvas.style.cursor = 'crosshair';
+        canvas.style.cursor = isPointerDown ? 'grabbing' : 'crosshair';
+
+        const lm = findHoveredLandmark(mx, my);
+        hoveredLm = lm;
 
         const statusEl = document.getElementById('map-cursor-coords');
-        if (statusEl) {
-          statusEl.textContent = `[X: ${wx}, Z: ${wz}] - Click to Teleport Here!`;
+        if (lm) {
+          const px = playerPos?.x || 0;
+          const pz = playerPos?.z || 0;
+          const dist = Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz));
+          if (statusEl) {
+            statusEl.textContent = `📍 ${lm.name} [X: ${lm.coords[0]}, Z: ${lm.coords[2]}] · ${dist}m away · Click to Travel!`;
+          }
+
+          if (tooltipEl && containerEl) {
+            const containerRect = containerEl.getBoundingClientRect();
+            const posX = e.clientX - containerRect.left;
+            const posY = e.clientY - containerRect.top;
+            tooltipEl.style.left = `${posX}px`;
+            tooltipEl.style.top = `${posY}px`;
+            tooltipEl.style.display = 'block';
+            tooltipEl.innerHTML = `
+              <span class="mc-map-tooltip-tag">${lm.tag}</span>
+              <div class="mc-map-tooltip-name">${lm.name}</div>
+              <div class="mc-map-tooltip-dist">📍 Distance: ${dist}m · [X: ${lm.coords[0]}, Z: ${lm.coords[2]}]</div>
+              <div class="mc-map-tooltip-desc">${lm.desc}</div>
+              <span class="mc-map-tooltip-hint">⚡ Click anywhere to Fast Travel here ↗</span>
+            `;
+          }
+        } else {
+          if (tooltipEl) tooltipEl.style.display = 'none';
+          const px = playerPos?.x || 0;
+          const pz = playerPos?.z || 0;
+          const dist = Math.round(Math.hypot(wx - px, wz - pz));
+          if (statusEl) {
+            statusEl.textContent = `[X: ${wx}, Z: ${wz}] · ${dist}m from you · Click to Travel Here`;
+          }
         }
       } else {
         hoverWorldX = null;
         hoverWorldZ = null;
-        canvas.style.cursor = 'default';
+        hoveredLm = null;
+        canvas.style.cursor = isPointerDown ? 'grabbing' : 'default';
+        if (tooltipEl) tooltipEl.style.display = 'none';
       }
-      draw();
     });
 
     canvas.addEventListener('mouseleave', () => {
       hoverWorldX = null;
       hoverWorldZ = null;
-      draw();
+      hoveredLm = null;
+      isPointerDown = false;
+      if (tooltipEl) tooltipEl.style.display = 'none';
     });
+
+    // Pointer Down (Pan Start)
+    canvas.addEventListener('mousedown', (e) => {
+      isPointerDown = true;
+      hasDragged = false;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      initialPanX = panX;
+      initialPanY = panY;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPointerDown = false;
+    });
+
+    // Mouse Wheel Zoom
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      const newZoom = Math.max(0.7, Math.min(3.6, userZoom * zoomFactor));
+
+      const { mx, my } = getCoords(e.clientX, e.clientY);
+      // Zoom centered at cursor
+      const ratio = newZoom / userZoom;
+      panX = mx - cx - (mx - cx - panX) * ratio;
+      panY = my - cy - (my - cy - panY) * ratio;
+      userZoom = newZoom;
+    }, { passive: false });
+
+    // Touch Support for Pan and Zoom
+    let touchStartDist = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isPointerDown = true;
+        hasDragged = false;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+        initialPanX = panX;
+        initialPanY = panY;
+      } else if (e.touches.length === 2) {
+        touchStartDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && isPointerDown) {
+        const dx = e.touches[0].clientX - dragStartX;
+        const dy = e.touches[0].clientY - dragStartY;
+        if (Math.hypot(dx, dy) > 4) {
+          hasDragged = true;
+          const rect = canvas.getBoundingClientRect();
+          const scaleRatio = width / rect.width;
+          panX = initialPanX + dx * scaleRatio;
+          panY = initialPanY + dy * scaleRatio;
+        }
+      } else if (e.touches.length === 2 && touchStartDist > 0) {
+        const newDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = newDist / touchStartDist;
+        userZoom = Math.max(0.7, Math.min(3.6, userZoom * factor));
+        touchStartDist = newDist;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', (e) => {
+      isPointerDown = false;
+      touchStartDist = 0;
+      if (!hasDragged && e.changedTouches.length === 1) {
+        const t = e.changedTouches[0];
+        const { wx, wz } = getCoords(t.clientX, t.clientY);
+        if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
+          teleportTo(wx, wz);
+        }
+      }
+    });
+
+    const teleportTo = (wx: number, wz: number) => {
+      if (hoveredLm) {
+        sound.playLevelUp();
+        this.onTeleportRequest?.(hoveredLm.coords as [number, number, number]);
+        this.close();
+        return;
+      }
+
+      if (this.onTeleportRequest) {
+        sound.playLevelUp();
+        let targetY = 2;
+        if (wz <= -75 && Math.abs(wx) <= 35) targetY = 18;
+        else if (wz <= -80 && wx >= 35 && wx <= 75) targetY = 4;
+        else {
+          const hillDistance = Math.hypot((wx - 82) / 34, (wz + 58) / 24);
+          if (hillDistance < 1) targetY = Math.max(2, Math.round(28 * (1 - hillDistance)) + 2);
+        }
+        this.onTeleportRequest([wx, targetY, wz]);
+        this.close();
+      }
+    };
 
     // Click to Teleport!
     canvas.addEventListener('click', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (width / rect.width);
-      const my = (e.clientY - rect.top) * (height / rect.height);
-
-      const wx = Math.round((mx - cx) / scale);
-      const wz = Math.round((my - cy) / scale);
-
+      if (hasDragged) return;
+      const { wx, wz } = getCoords(e.clientX, e.clientY);
       if (Math.abs(wx) <= worldLimit && Math.abs(wz) <= worldLimit) {
-        if (this.onTeleportRequest) {
-          sound.playLevelUp();
-          let targetY = 2;
-          if (wz <= -75 && Math.abs(wx) <= 35) targetY = 18;
-          else if (wz <= -80 && wx >= 35 && wx <= 75) targetY = 4;
-          else {
-            const hillDistance = Math.hypot((wx - 82) / 34, (wz + 58) / 24);
-            if (hillDistance < 1) targetY = Math.max(2, Math.round(28 * (1 - hillDistance)) + 2);
-          }
-          this.onTeleportRequest([wx, targetY, wz]);
-          this.close();
-        }
+        teleportTo(wx, wz);
       }
     });
   }

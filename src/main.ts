@@ -217,13 +217,14 @@ class Game {
     };
 
     this.hud.onOpenFastTravel = () => {
-      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     };
 
     this.modals.getPlayerInfo = () => ({
       position: this.player.position,
       yaw: this.player.yaw,
-      dragons: this.world.dragonManager?.getDragons()
+      dragons: this.world.dragonManager?.getDragons(),
+      trains: this.world.liveTrains
     });
 
     this.player.onWorldNotice = (msg: string) => {
@@ -277,7 +278,7 @@ class Game {
 
     document.getElementById('menu-btn-map')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     });
 
     document.getElementById('menu-btn-resume')?.addEventListener('click', (e) => {
@@ -577,7 +578,7 @@ class Game {
       }
       this.modals.openSignModal(title, text);
     } else if (inter.type === 'teleport') {
-      this.modals.openFastTravelModal();
+      this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     } else if (inter.type === 'npc') {
       npcChatManager.handleNPCInteract(inter.id || '', inter.title);
       if (inter.id === 'lightning_mcqueen') {
@@ -998,7 +999,7 @@ class Game {
               label: '🗺️ Open Fast Travel Realm Map [M]',
               styleClass: 'mc-btn-gold',
               action: () => {
-                this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons());
+                this.modals.openFastTravelModal(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
               }
             },
             {

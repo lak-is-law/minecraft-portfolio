@@ -203,16 +203,16 @@ body, html {
 #mc-quick-nav {
   position: absolute;
   top: 10px;
-  left: 160px;
-  max-width: calc(100% - 175px);
+  left: 12px;
+  max-width: calc(100% - 220px);
   z-index: 40;
 }
 
 @media (max-width: 900px) {
   #mc-quick-nav {
-    top: 172px;
+    top: 10px;
     left: 12px;
-    max-width: calc(100% - 24px);
+    max-width: calc(100% - 195px);
   }
 }
 
@@ -257,29 +257,33 @@ body, html {
 
 
 /* ==========================================================
-   MINIMAP (TOP LEFT - TAP TO MAXIMISE)
+   MINIMAP (TOP RIGHT - TAP TO MAXIMISE)
    ========================================================== */
 #mc-minimap {
   position: absolute;
   top: 12px;
-  left: 12px;
+  right: 12px;
+  left: auto;
   z-index: 45;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mc-minimap-box {
   position: relative;
-  border: 3px solid #0284c7;
+  border: 2px solid #0284c7;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
-  background: rgba(15, 23, 42, 0.95);
-  transition: transform 0.15s, border-color 0.15s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.75), 0 0 12px rgba(2, 132, 199, 0.35);
+  background: rgba(15, 23, 42, 0.96);
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .mc-minimap-box:hover {
-  transform: scale(1.03);
+  transform: scale(1.02);
   border-color: #38bdf8;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.85), 0 0 16px rgba(56, 189, 248, 0.5);
 }
 
 .mc-minimap-top-bar {
@@ -288,31 +292,93 @@ body, html {
   align-items: center;
   background: #0f172a;
   padding: 4px 6px;
-  border-bottom: 2px solid #334155;
+  border-bottom: 1.5px solid #334155;
+  gap: 4px;
 }
 
 .mc-minimap-title {
   font-family: 'Press Start 2P', monospace;
   font-size: 7px;
   color: #facc15;
+  letter-spacing: 0.5px;
+}
+
+.mc-minimap-coords {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #7dd3fc;
+  letter-spacing: 0.2px;
 }
 
 .mc-minimap-heading {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 7.5px;
   color: #38bdf8;
   font-weight: bold;
+  background: #1e293b;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid #475569;
+}
+
+.mc-minimap-zoom-group {
+  display: flex;
+  gap: 2px;
+}
+
+.mc-minimap-zoom-btn {
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 2px;
+  color: #cbd5e1;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.1s;
+}
+
+.mc-minimap-zoom-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
 }
 
 #minimap-canvas {
   display: block;
   width: 160px;
   height: 160px;
+  background: #0284c7;
+}
+
+.mc-minimap-footer {
+  background: #0b111e;
+  padding: 3px 6px;
+  border-top: 1px solid #1e293b;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 160px;
+}
+
+.mc-minimap-footer-highlight {
+  color: #38bdf8;
 }
 
 /* Maximised World Map & Realm Atlas Dialog */
 .mc-max-map-dialog {
-  max-width: 960px;
+  max-width: 1200px;
   width: 95vw;
   max-height: 94vh;
   display: flex;
@@ -366,24 +432,172 @@ body, html {
 .mc-max-map-canvas-container {
   position: relative;
   width: 100%;
-  border: 3px solid #0284c7;
-  border-radius: 6px;
+  border: 1.5px solid #3d5242;
+  border-radius: 8px;
   overflow: hidden;
-  background: #080c14;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.5);
+  background: #080d11;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 4px 18px rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 0;
+  min-height: 280px;
+  touch-action: none;
 }
 
 #max-realm-canvas {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 70vh;
-  object-fit: contain;
   cursor: crosshair;
+}
+
+/* Map Interactive Controls Toolbar */
+.mc-map-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 6px 4px;
+}
+
+.mc-map-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mc-map-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #18231c;
+  border: 1px solid #3b4e3f;
+  border-radius: 5px;
+  color: #d6e2d6;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.mc-map-tool-btn:hover {
+  background: #233428;
+  border-color: #5d7e64;
+  color: #a8d5ad;
+  transform: translateY(-1px);
+}
+
+.mc-map-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
+.mc-map-filter-btn {
+  padding: 5px 9px;
+  background: #141d17;
+  border: 1px solid #2e3e31;
+  border-radius: 4px;
+  color: #92a394;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.mc-map-filter-btn:hover {
+  background: #1c2b20;
+  color: #e2e8dc;
+  border-color: #4a634e;
+}
+
+.mc-map-filter-btn.active {
+  background: #25402c;
+  border-color: #5c8f65;
+  color: #c9e8cd;
+  box-shadow: 0 0 8px rgba(85, 135, 93, 0.4);
+}
+
+/* Floating Landmark Tooltip Card */
+.mc-map-tooltip-card {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(14, 21, 18, 0.96);
+  border: 1.5px solid #4a6650;
+  border-radius: 7px;
+  padding: 9px 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 14px rgba(74, 102, 80, 0.3);
+  z-index: 120;
+  transform: translate(-50%, -100%);
+  margin-top: -14px;
+  max-width: 280px;
+  display: none;
+  animation: mcTooltipPop 0.12s ease-out;
+}
+
+@keyframes mcTooltipPop {
+  from { opacity: 0; transform: translate(-50%, -92%); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+.mc-map-tooltip-card::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #4a6650 transparent transparent transparent;
+}
+
+.mc-map-tooltip-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #facc15;
+  margin-bottom: 4px;
+  display: block;
+  letter-spacing: 0.5px;
+}
+
+.mc-map-tooltip-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #f0fdf4;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.mc-map-tooltip-dist {
+  font-family: monospace;
+  font-size: 10px;
+  color: #38bdf8;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mc-map-tooltip-desc {
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.mc-map-tooltip-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: #4ade80;
+  display: block;
 }
 
 .mc-map-chips-container {
@@ -1884,9 +2098,10 @@ body.modal-open #pause-overlay {
   }
   #mc-minimap {
     top: 8px;
-    left: 8px;
+    right: 8px;
+    left: auto;
     transform: scale(0.82);
-    transform-origin: top left;
+    transform-origin: top right;
   }
   .mc-hotbar-container {
     transform: scale(0.82);
@@ -2107,8 +2322,15 @@ body.touch-device .mc-chat-msg {
 #install-help:empty { display: none; }
 
 @media (max-height: 520px) and (orientation: landscape) {
-  body.touch-device #mc-minimap { display: none; }
-  body.touch-device #mc-quick-nav { top: 6px; left: 8px; right: 8px; max-width: none; }
+  body.touch-device #mc-minimap {
+    display: block;
+    top: 6px;
+    right: 6px;
+    left: auto;
+    transform: scale(0.68);
+    transform-origin: top right;
+  }
+  body.touch-device #mc-quick-nav { top: 6px; left: 8px; right: 125px; max-width: none; }
   body.touch-device .mc-quick-buttons { flex-wrap: nowrap; }
   body.touch-device .mc-dpad { margin: 0 0 58px 0; gap: 2px; }
   body.touch-device .mc-dpad-middle { gap: 2px; }

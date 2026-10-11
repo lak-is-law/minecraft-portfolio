@@ -30,6 +30,8 @@ export class HUDManager {
   private minimapCanvas: HTMLCanvasElement | null = null;
   private minimapCtx: CanvasRenderingContext2D | null = null;
   private lastMinimapUpdate: number = 0;
+  private minimapZoom: number = 1.0;
+  private readonly zoomLevels: number[] = [0.75, 1.0, 1.5, 2.2];
 
   // Callbacks
   public onDayNightToggle?: () => void;
@@ -121,15 +123,21 @@ export class HUDManager {
       </div>
     `;
 
-    // 5. Minimap container in top-left (Click/Tap to Maximise)
+    // 5. Minimap container in top-right (Click/Tap to Maximise)
     const minimapEl = document.getElementById('mc-minimap')!;
     minimapEl.innerHTML = `
       <div class="mc-minimap-box" id="mc-minimap-box" title="Click or Tap to Maximise World Map (Key: M)">
         <div class="mc-minimap-top-bar">
-          <span class="mc-minimap-title">[MAP: M]</span>
+          <span class="mc-minimap-title" id="minimap-title-btn">[MAP]</span>
+          <span class="mc-minimap-coords" id="minimap-coords">X:0 Z:0</span>
           <span class="mc-minimap-heading" id="minimap-heading">N</span>
+          <div class="mc-minimap-zoom-group">
+            <button class="mc-minimap-zoom-btn" id="btn-minimap-zoomin" title="Zoom In" type="button">+</button>
+            <button class="mc-minimap-zoom-btn" id="btn-minimap-zoomout" title="Zoom Out" type="button">-</button>
+          </div>
         </div>
         <canvas id="minimap-canvas" width="320" height="320"></canvas>
+        <div class="mc-minimap-footer" id="minimap-footer">📍 <span id="minimap-nearest-landmark">Crossroads Citadel</span></div>
       </div>
     `;
   }
@@ -186,11 +194,52 @@ export class HUDManager {
     document.getElementById('btn-quick-sit')?.addEventListener('click', () => {
       this.onToggleSit?.();
     });
-    document.getElementById('mc-minimap-box')?.addEventListener('click', () => {
+    // Minimap Zoom Controls
+    document.getElementById('btn-minimap-zoomin')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
+      const nextIdx = currentIdx >= 0 ? Math.min(this.zoomLevels.length - 1, currentIdx + 1) : 1;
+      this.minimapZoom = this.zoomLevels[nextIdx];
+      sound.playClick();
+    });
+
+    document.getElementById('btn-minimap-zoomout')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
+      const prevIdx = currentIdx >= 0 ? Math.max(0, currentIdx - 1) : 1;
+      this.minimapZoom = this.zoomLevels[prevIdx];
+      sound.playClick();
+    });
+
+    const minimapBox = document.getElementById('mc-minimap-box');
+    const triggerOpenMap = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (document.pointerLockElement) {
         document.exitPointerLock();
       }
       this.onOpenFastTravel?.();
+    };
+
+    minimapBox?.addEventListener('click', triggerOpenMap);
+
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    minimapBox?.addEventListener('touchstart', (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchStartTime = performance.now();
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    minimapBox?.addEventListener('touchend', (e: TouchEvent) => {
+      const dt = performance.now() - touchStartTime;
+      const t = e.changedTouches[0];
+      if (t && dt < 450 && Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) < 18) {
+        triggerOpenMap(e);
+      }
     });
 
     const soundBtn = document.getElementById('btn-quick-sound');
@@ -331,8 +380,43 @@ export class HUDManager {
     trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     const now = performance.now();
-    if (now - this.lastMinimapUpdate < 45) return;
+    if (now - this.lastMinimapUpdate < 40) return;
     this.lastMinimapUpdate = now;
+
+    // Update Header Coordinates & 8-point Compass Heading
+    const coordsEl = document.getElementById('minimap-coords');
+    if (coordsEl) {
+      coordsEl.textContent = `X:${Math.round(playerPos.x)} Z:${Math.round(playerPos.z)}`;
+    }
+
+    const headingEl = document.getElementById('minimap-heading');
+    if (headingEl) {
+      const deg = ((yaw * 180 / Math.PI) % 360 + 360) % 360;
+      let dir = 'N';
+      if (deg >= 22.5 && deg < 67.5) dir = 'NW';
+      else if (deg >= 67.5 && deg < 112.5) dir = 'W';
+      else if (deg >= 112.5 && deg < 157.5) dir = 'SW';
+      else if (deg >= 157.5 && deg < 202.5) dir = 'S';
+      else if (deg >= 202.5 && deg < 247.5) dir = 'SE';
+      else if (deg >= 247.5 && deg < 292.5) dir = 'E';
+      else if (deg >= 292.5 && deg < 337.5) dir = 'NE';
+      headingEl.textContent = dir;
+    }
+
+    // Update Nearest Landmark
+    const nearestEl = document.getElementById('minimap-nearest-landmark');
+    if (nearestEl) {
+      let closestName = 'Crossroads Citadel';
+      let minDist = Infinity;
+      for (const lm of PORTFOLIO_DATA.landmarks) {
+        const dist = Math.hypot(lm.coords[0] - playerPos.x, lm.coords[2] - playerPos.z);
+        if (dist < minDist) {
+          minDist = dist;
+          closestName = lm.name;
+        }
+      }
+      nearestEl.textContent = `${closestName} (${Math.round(minDist)}m)`;
+    }
 
     if (!this.minimapCanvas) {
       this.minimapCanvas = document.getElementById('minimap-canvas') as HTMLCanvasElement;
@@ -362,7 +446,7 @@ export class HUDManager {
 
     const cx = 80;
     const cz = 80;
-    const scale = 0.38;
+    const scale = 0.38 * this.minimapZoom;
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
@@ -376,7 +460,7 @@ export class HUDManager {
     const drawIslandShape = (margin = 0) => {
       ctx.beginPath();
       const r = (200 - margin) * scale;
-      const cornerR = Math.max(8, (55 - margin) * scale);
+      const cornerR = Math.max(6, (55 - margin) * scale);
       const minX = originX - r;
       const maxX = originX + r;
       const minZ = originZ - r;
@@ -401,14 +485,14 @@ export class HUDManager {
 
     // Clip all terrain and biomes strictly inside the island landmass
     ctx.save();
-    drawIslandShape(6);
+    drawIslandShape(5);
     ctx.clip();
 
     // Base interior plains
     ctx.fillStyle = '#15803d';
     ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
 
-    // Draw Authentic Country Territories on Minimap Radar
+    // Draw Country Territories on Minimap Radar
     const drawMiniCountry = (poly: [number, number][], color: string) => {
       ctx.beginPath();
       poly.forEach(([x, z], i) => {
@@ -441,6 +525,10 @@ export class HUDManager {
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
     // 10. UAE (Dubai Waterfront & Palm)
     drawMiniCountry([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], '#10b981');
+    // 11. Alpine Snow Mountains & Chalet
+    drawMiniCountry([[-25, -125], [20, -125], [15, -85], [-20, -85], [-25, -125]], '#e0f2fe');
+    // 12. Sunflower Valley
+    drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
     // Pier & Beach
     drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#d0ad58');
     drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#ec4899');
@@ -448,7 +536,7 @@ export class HUDManager {
     // Yamuna river in India
     ctx.fillStyle = '#0284c7';
     ctx.beginPath();
-    ctx.lineWidth = 6 * scale;
+    ctx.lineWidth = 5 * scale;
     ctx.strokeStyle = '#0284c7';
     ctx.moveTo(originX + 75 * scale, originZ - 60 * scale);
     ctx.quadraticCurveTo(originX + 85 * scale, originZ - 100 * scale, originX + 75 * scale, originZ - 160 * scale);
@@ -482,11 +570,18 @@ export class HUDManager {
     ctx.arc(originX + 180 * scale, originZ - 76 * scale, 5 * scale, -Math.PI * 0.4, Math.PI * 0.4);
     ctx.stroke();
 
+    // Lightning McQueen Speedway track
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2.5 * scale;
+    ctx.beginPath();
+    ctx.ellipse(originX + 168 * scale, originZ - 24 * scale, 16 * scale, 9 * scale, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
     ctx.restore(); // restore island clip
 
     // Main Roads
-    ctx.strokeStyle = 'rgba(226,232,240,.8)';
-    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = 'rgba(226,232,240,.75)';
+    ctx.lineWidth = Math.max(1.2, 1.8 * this.minimapZoom);
     ctx.beginPath();
     ctx.moveTo(originX, originZ - 20 * scale); ctx.lineTo(originX, originZ - 65 * scale);
     ctx.moveTo(originX + 20 * scale, originZ); ctx.lineTo(originX + 150 * scale, originZ);
@@ -494,7 +589,6 @@ export class HUDManager {
     ctx.moveTo(originX - 2 * scale, originZ - 55 * scale); ctx.lineTo(originX - 70 * scale, originZ - 85 * scale);
     ctx.moveTo(originX - 20 * scale, originZ); ctx.lineTo(originX - 79 * scale, originZ + 50 * scale);
     ctx.moveTo(originX, originZ + 20 * scale); ctx.lineTo(originX, originZ + 160 * scale);
-    ctx.moveTo(originX + 161 * scale, originZ - 84 * scale); ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
     ctx.stroke();
 
     // Island Express Railway Transit Loop
@@ -506,8 +600,8 @@ export class HUDManager {
     ];
     ctx.save();
     ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2.2;
-    ctx.setLineDash([4, 2]);
+    ctx.lineWidth = Math.max(1.5, 2.2 * this.minimapZoom);
+    ctx.setLineDash([3, 2]);
     ctx.beginPath();
     railWaypoints.forEach(([wx, wz], idx) => {
       const rx = originX + wx * scale;
@@ -528,7 +622,7 @@ export class HUDManager {
       const pz = originZ + sz * scale;
       ctx.fillStyle = '#fbbf24';
       ctx.beginPath();
-      ctx.arc(px, pz, 2.8, 0, Math.PI * 2);
+      ctx.arc(px, pz, Math.max(2, 2.8 * this.minimapZoom), 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#78350f';
       ctx.lineWidth = 1;
@@ -547,58 +641,67 @@ export class HUDManager {
     ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.restore();
-
     // Crosshair grid lines
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(cx, 0); ctx.lineTo(cx, h);
     ctx.moveTo(0, cz); ctx.lineTo(w, cz);
     ctx.stroke();
 
-    // 2. Landmarks
+    // 2. Comprehensive Landmark Pin Rendering
+    const getPinColor = (tag: string) => {
+      if (tag.includes('TAJ')) return '#ffffff';
+      if (tag.includes('TOKYO')) return '#ec4899';
+      if (tag.includes('MEXICO')) return '#fb923c';
+      if (tag.includes('NEO') || tag.includes('TOWER')) return '#38bdf8';
+      if (tag.includes('ALPS') || tag.includes('FROST')) return '#e0f2fe';
+      if (tag.includes('SALOON')) return '#d97706';
+      if (tag.includes('BEACH') || tag.includes('MARINA')) return '#06b6d4';
+      if (tag.includes('CITADEL')) return '#4ade80';
+      if (tag.includes('AIRPORT')) return '#0284c7';
+      if (tag.includes('POLICE')) return '#3b82f6';
+      if (tag.includes('HOSPITAL')) return '#fb7185';
+      if (tag.includes('SCHOOL') || tag.includes('DHABA') || tag.includes('VARANASI')) return '#fbbf24';
+      if (tag.includes('ZOO')) return '#22c55e';
+      if (tag.includes('CASTLE')) return '#c084fc';
+      if (tag.includes('EIFFEL')) return '#f472b6';
+      if (tag.includes('RAILWAY') || tag.includes('MUMBAI')) return '#f97316';
+      if (tag.includes('HOLLYWOOD')) return '#f59e0b';
+      if (tag.includes('McQUEEN')) return '#ef4444';
+      if (tag.includes('GREAT WALL')) return '#10b981';
+      if (tag.includes('PAVILION')) return '#f43f5e';
+      if (tag.includes('PYRAMID') || tag.includes('GIZA')) return '#eab308';
+      if (tag.includes('CARNIVAL')) return '#f472b6';
+      if (tag.includes('LONDON')) return '#dc2626';
+      if (tag.includes('SEOUL')) return '#8b5cf6';
+      if (tag.includes('DUBAI')) return '#14b8a6';
+      if (tag.includes('TEMPLE')) return '#a855f7';
+      if (tag.includes('ISRO')) return '#38bdf8';
+      if (tag.includes('HAWA MAHAL')) return '#fb923c';
+      if (tag.includes('INDIA GATE')) return '#f59e0b';
+      if (tag.includes('VALLEY')) return '#eab308';
+      return '#94a3b8';
+    };
+
     for (const lm of PORTFOLIO_DATA.landmarks) {
       const lx = cx + (lm.coords[0] - playerPos.x) * scale;
       const lz = cz + (lm.coords[2] - playerPos.z) * scale;
 
-      if (lx >= 5 && lx <= w - 5 && lz >= 5 && lz <= h - 5) {
-        if (lm.tag === '[TAJ MAHAL]') ctx.fillStyle = '#ffffff';
-        else if (lm.tag === '[SAKURA]') ctx.fillStyle = '#f472b6';
-        else if (lm.tag === '[PUEBLO]') ctx.fillStyle = '#fb923c';
-        else if (lm.tag === '[NEO YORK]') ctx.fillStyle = '#38bdf8';
-        else if (lm.tag === '[LAK TOWER]') ctx.fillStyle = '#facc15';
-        else if (lm.tag === '[FROSTPEAK]') ctx.fillStyle = '#e0f2fe';
-        else if (lm.tag === '[SALOON]') ctx.fillStyle = '#a16207';
-        else if (lm.tag === '[BEACH]') ctx.fillStyle = '#06b6d4';
-        else if (lm.tag === '[CITADEL]') ctx.fillStyle = '#4ade80';
-        else if (lm.tag.includes('AIRPORT')) ctx.fillStyle = '#38bdf8';
-        else if (lm.tag.includes('POLICE')) ctx.fillStyle = '#60a5fa';
-        else if (lm.tag.includes('HOSPITAL')) ctx.fillStyle = '#fb7185';
-        else if (lm.tag.includes('SCHOOL')) ctx.fillStyle = '#fbbf24';
-        else if (lm.tag.includes('ZOO')) ctx.fillStyle = '#4ade80';
-        else if (lm.tag.includes('CASTLE')) ctx.fillStyle = '#c084fc';
-        else if (lm.tag.includes('MEXICO')) ctx.fillStyle = '#34d399';
-        else if (lm.tag.includes('EIFFEL')) ctx.fillStyle = '#f9a8d4';
-        else if (lm.tag.includes('RAILWAY')) ctx.fillStyle = '#f97316';
-        else if (lm.tag.includes('HOLLYWOOD')) ctx.fillStyle = '#f5c389';
-        else if (lm.tag.includes('GREAT WALL')) ctx.fillStyle = '#34d399';
-        else if (lm.tag.includes('PYRAMID')) ctx.fillStyle = '#f59e0b';
-        else if (lm.tag.includes('CARNIVAL')) ctx.fillStyle = '#f472b6';
-        else if (lm.tag.includes('VARANASI')) ctx.fillStyle = '#fb923c';
-        else if (lm.tag.includes('PAVILION')) ctx.fillStyle = '#f43f5e';
-        else if (lm.tag.includes('LONDON')) ctx.fillStyle = '#ef4444';
-        else if (lm.tag.includes('TOKYO')) ctx.fillStyle = '#ec4899';
-        else if (lm.tag.includes('SEOUL')) ctx.fillStyle = '#8b5cf6';
-        else if (lm.tag.includes('GIZA')) ctx.fillStyle = '#eab308';
-        else if (lm.tag.includes('DUBAI')) ctx.fillStyle = '#06b6d4';
-        else if (lm.tag.includes('MUMBAI')) ctx.fillStyle = '#f97316';
-        else if (lm.tag.includes('TEMPLE')) ctx.fillStyle = '#a855f7';
-        else if (lm.tag.includes('MARINA')) ctx.fillStyle = '#38bdf8';
-        else if (lm.tag.includes('DHABA')) ctx.fillStyle = '#fb923c';
-        else ctx.fillStyle = '#94a3b8';
-
-        ctx.fillRect(lx - 2, lz - 2, 4, 4);
+      if (lx >= 4 && lx <= w - 4 && lz >= 4 && lz <= h - 4) {
+        const pinCol = getPinColor(lm.tag);
+        // Diamond pin
+        ctx.fillStyle = pinCol;
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(lx, lz - 3);
+        ctx.lineTo(lx + 3, lz);
+        ctx.lineTo(lx, lz + 3);
+        ctx.lineTo(lx - 3, lz);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
       }
     }
 
@@ -617,6 +720,9 @@ export class HUDManager {
           ctx.lineTo(dx - 4, dz);
           ctx.closePath();
           ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
         }
       }
     }
@@ -646,39 +752,46 @@ export class HUDManager {
       }
     }
 
-    // 4. Center Player Arrow
+    // 4. Center Player Indicator with FOV Vision Cone & Pulsing Beacon
     ctx.save();
     ctx.translate(cx, cz);
     ctx.rotate(-yaw);
 
+    // Subtle radar vision cone pointing forward (towards -Z / top of arrow)
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, 26, -Math.PI / 2 - 0.48, -Math.PI / 2 + 0.48);
+    ctx.closePath();
+    ctx.fill();
+
+    // Player Direction Arrow
     ctx.fillStyle = '#ef4444';
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.moveTo(0, -7);
-    ctx.lineTo(5, 5);
+    ctx.moveTo(0, -8);
+    ctx.lineTo(5.5, 6);
     ctx.lineTo(0, 3);
-    ctx.lineTo(-5, 5);
+    ctx.lineTo(-5.5, 6);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
+    // Center pivot dot
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(0, 1.5, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
 
     // Radar frame border
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1.5;
     ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
 
-    const headingEl = document.getElementById('minimap-heading');
-    if (headingEl) {
-      const deg = ((yaw * 180 / Math.PI) % 360 + 360) % 360;
-      let dir = 'N';
-      if (deg >= 45 && deg < 135) dir = 'W';
-      else if (deg >= 135 && deg < 225) dir = 'S';
-      else if (deg >= 225 && deg < 315) dir = 'E';
-      headingEl.textContent = dir;
-    }
+    ctx.restore(); // restore initial clip
   }
 
   public pushChatMessage(sender: string, text: string) {
