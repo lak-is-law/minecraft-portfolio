@@ -328,9 +328,10 @@ export class HUDManager {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       } else if (inter.type === 'npc') {
         const isDog = inter.id === 'roger';
+        const isLakshya = inter.id === 'lakshya_guide' || inter.id === 'lakshya';
         const isAnimal = inter.id?.startsWith('animal_');
         const isCitizen = inter.id?.startsWith('citizen_');
-        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with'));
+        const actionVerb = isDog ? 'Pet Dog / Ask Roger' : (isLakshya ? 'Talk & Resume' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with')));
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {

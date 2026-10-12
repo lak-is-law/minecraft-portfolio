@@ -659,7 +659,7 @@ class Game {
           badgeColor: '#16a34a',
           locationBadge: 'Spawn Plaza [X: 4.5, Z: 7.3]',
           avatarHtml: getRogerAvatarHtml(),
-          text: '*Pant pant!* Roger gazes up with bright, warm eyes at Spawn Plaza [X: 4.5, Y: 2.0, Z: 7.3]!\n\nHis golden tail swishes rhythmically across the green grass beside Lakshya! *Woof!* (He gently bumps his wet nose against your hand, waiting for pats)',
+          text: '*Pant pant!* Roger gazes up with bright, warm eyes at Spawn Plaza [X: 4.5, Y: 2.0, Z: 7.3]!\n\nHis golden tail swishes rhythmically across the green grass beside Lakshya! *Woof!* (He gently bumps his wet nose against your hand, ready to fetch Lakshya\'s resume or play!)',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -669,8 +669,35 @@ class Game {
           },
           options: [
             {
-              label: '🐾 Pet Roger gently',
+              label: '📜 Roger, fetch Lakshya\'s Resume Chest! [Open Resume]',
               styleClass: 'mc-btn-gold',
+              action: () => {
+                sound.playLevelUp();
+                sound.playDogBark();
+                if (this.world.dogMesh) {
+                  this.world.spawnHammerSparkles(this.world.dogMesh.position.x, this.world.dogMesh.position.y + 0.8, this.world.dogMesh.position.z);
+                }
+                this.hud.pushChatMessage('Roger', '*Woof woof!* (Roger proudly trots over and presents Lakshya\'s Ancient Resume Chest!)');
+                this.modals.openResumeChestModal();
+              },
+              response: '*BARK BARK!* Roger trots over to the Ancient Chest, flips open the latch with his nose, and presents Lakshya\'s official resume dossier!\n\n📄 Check out the PDF download, technical skills, and credentials inside!'
+            },
+            {
+              label: '💡 Roger, what makes Lakshya a great engineer?',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                sound.playDogBark();
+              },
+              response: '*Woof!* Roger sits upright with pride:\n\n"Lakshya is a full-stack engineer and creative technologist who builds high-performance real-time applications! He created TODAR 2.0 (defense radar), TrackYourFlight (flight telemetry), and this entire interactive 3D Minecraft realm in TypeScript & WebGL!\n\nHe writes clean code, solves complex algorithms, and always tests his software!"'
+            },
+            {
+              label: '🏆 Roger, what are Lakshya\'s top achievements?',
+              styleClass: 'mc-btn-gold',
+              response: '*Arf arf!* Roger does an excited tap-dance on the grass:\n\n• 🥇 1st Place Winner at UCSI University Hackathon\n• 🎓 B.Tech CSE at SRMIST (8.89 CGPA)\n• 🤝 Head of Alumni Relations (DAA) managing 25,000+ members\n• 🚀 5+ production-grade web applications & open-source projects!'
+            },
+            {
+              label: '🐾 Pet Roger gently',
+              styleClass: 'mc-btn-green',
               action: () => {
                 sound.playLevelUp();
                 if (this.world.dogMesh) {
@@ -695,7 +722,7 @@ class Game {
             },
             {
               label: '🎾 Play fetch with stick',
-              styleClass: 'mc-btn-blue',
+              styleClass: 'mc-btn-stone',
               action: () => {
                 sound.playDogBark();
                 if (this.world.dogMesh) {
@@ -934,18 +961,31 @@ class Game {
           },
           options: [
             {
-              label: '💼 View My Engineering Projects',
+              label: '📜 Open Career Resume Chest & Download PDF',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.modals.openResumeChestModal();
+              }
+            },
+            {
+              label: '💼 View Flagship Engineering Projects',
               styleClass: 'mc-btn-green',
               action: () => {
                 this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
               }
             },
             {
-              label: '📜 Open Career Resume Chest',
-              styleClass: 'mc-btn-gold',
+              label: '🎓 Tell me about your education & background',
+              styleClass: 'mc-btn-blue',
+              response: 'I am pursuing my B.Tech in Computer Science and Engineering at SRMIST (CGPA: 8.89). My coursework emphasizes Algorithms, Distributed Systems, Software Engineering, and AI/ML.\n\nI combine rigorous systems fundamentals with interactive front-end and real-time graphics engineering!'
+            },
+            {
+              label: '🏢 Walk me through your work experience & leadership',
+              styleClass: 'mc-btn-green',
               action: () => {
-                this.modals.openResumeChestModal();
-              }
+                this.modals.openExperienceModal(PORTFOLIO_DATA.experience[0]);
+              },
+              response: 'I served as Head of Alumni Relations for the Directorate of Alumni Affairs (DAA), managing an engaged community of 25,000+ alumni, coordinating flagship summits, and spearheading tech automation.\n\nI also lead technical initiatives at GenoSpark and 6Pistons, and won 1st Place at the UCSI University Hackathon!'
             },
             {
               label: '⚡ Inspect Technical Skills Matrix',
@@ -953,6 +993,11 @@ class Game {
               action: () => {
                 this.modals.openSkillsModal();
               }
+            },
+            {
+              label: '📬 How can I reach out or hire you?',
+              styleClass: 'mc-btn-gold',
+              response: 'I\'d love to connect! You can reach me directly via:\n\n• Email: lakshyaagarwalw006@gmail.com\n• LinkedIn: linkedin.com/in/lakshya-agarwal-006\n• Resume: resume.lakshya.uk\n• GitHub: github.com/lak-is-law\n\nOr click [RESUME CHEST] in the pause menu to download my full PDF!'
             },
             {
               label: '🗺️ Open Fast Travel Realm Map [M]',
@@ -964,7 +1009,7 @@ class Game {
             {
               label: '🐶 Tell me about your dog Roger!',
               styleClass: 'mc-btn-stone',
-              response: 'That\'s Roger! He\'s my golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
+              response: 'That\'s Roger! He\'s my golden companion dog. He guards the spawn plaza, knows all my resume highlights by heart, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, ask him about my career, or play fetch!'
             },
             {
               label: '🧭 Where should I explore first on the island?',

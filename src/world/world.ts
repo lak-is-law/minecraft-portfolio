@@ -969,7 +969,7 @@ export class VoxelWorld {
 
     nameCtx.fillStyle = '#ffffff';
     nameCtx.font = '18px monospace';
-    nameCtx.fillText('Realm Explorer & Architect', 192, 68);
+    nameCtx.fillText('Software Engineer & Designer', 192, 68);
 
     const nameTexture = new THREE.CanvasTexture(nameCanvas);
     nameTexture.magFilter = THREE.NearestFilter;

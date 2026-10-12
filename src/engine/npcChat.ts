@@ -57,10 +57,11 @@ export class NPCChatManager {
         nearbyLandmarks: ['Emerald Central Fountain', 'Fast Travel Nether Portal', 'Ancient Resume Chest', 'Skills Matrix'],
         ambientMessages: [
           'Standing at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8] by the Emerald Fountain! Press [M] anytime for Fast Travel.',
+          'Welcome to my 3D resume portfolio! Talk to me or Roger to inspect my projects, experience, and career dossier.',
           'Checking server telemetry at Spawn Plaza [X: 4, Y: 2, Z: 8]. Come say hi or inspect the project pedestals!',
           'Hanging out by the spawn fountain [X: 4, Y: 2, Z: 8] with Roger! Press [B] to build or [F] to fly.'
         ],
-        proximityGreeting: 'Hey explorer! You found me at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8]! Ready to explore?',
+        proximityGreeting: 'Hey explorer! You found me at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8]! Talk to me to explore my resume & projects!',
         detailedLocationText: 'I am stationed right here at the Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5], the beating heart of this portfolio island!\n\nSurroundings:\n• North: Emerald Central Fountain & Nether Portal\n• East: Neo York Tech Metropolis & Taj Mahal\n• West: Grand Safari Wildlife Park & Animal Habitats\n• South: Redstone Nether Portal, Circular Railway Station, and Builder Arena\n\nPress [M] to open your Fast Travel Realm Map and warp anywhere instantly!',
         tagColor: '#ca8a04',
         emoji: '🧑‍💻'
@@ -75,6 +76,7 @@ export class NPCChatManager {
         nearbyLandmarks: ['Lakshya Guide', 'Emerald Fountain', 'Spawn Gateway'],
         ambientMessages: [
           '*Woof woof!* Guarding Spawn Plaza [X: 5, Y: 2, Z: 7] next to Lakshya! Wags tail happily.',
+          '*Arf!* Roger guards Lakshya\'s Ancient Resume Chest! Come say hi and I\'ll fetch it for you!',
           '*Pant pant!* Sunbathing on the cobblestones at Spawn Plaza [X: 5, Y: 2, Z: 7]! Come toss a stick or give me steak!',
           '*Arf!* Greeting travelers at the Spawn Plaza [X: 5, Y: 2, Z: 7]! The island breeze smells wonderful today.'
         ],
