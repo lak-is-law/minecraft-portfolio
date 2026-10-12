@@ -5,7 +5,7 @@ import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
 import { Player, TargetInfo } from './engine/player';
 import { HUDManager } from './ui/hud';
-import { ModalManager, getLakshyaAvatarHtml, getMashuAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml, getCitizenAvatarHtml } from './ui/modals';
+import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml, getCitizenAvatarHtml } from './ui/modals';
 import { PORTFOLIO_DATA, Project } from './data/portfolioData';
 import { sound } from './engine/audio';
 import { npcChatManager } from './engine/npcChat';
@@ -909,79 +909,22 @@ class Game {
             }
           ]
         });
-      } else if (inter.id === 'mashu_guide' || inter.title?.includes('Mashu')) {
-        sound.playLevelUp();
-        if (this.world.mashuMesh) {
-          this.world.spawnHammerSparkles(this.world.mashuMesh.position.x, this.world.mashuMesh.position.y + 1.2, this.world.mashuMesh.position.z);
-        }
-        this.hud.pushChatMessage('Mashu', '🌸 "Welcome traveler! Lakshya and I are so happy to have you in our Minecraft realm!"');
-
-        this.modals.openNPCDialogModal({
-          id: 'mashu_guide',
-          name: 'Mashu',
-          title: 'Lakshya\'s Princess & Realm Co-Founder 🌸',
-          badge: '[LVL 22]',
-          badgeColor: '#ec4899',
-          locationBadge: 'Spawn Plaza [X: 2.3, Z: 7.5]',
-          avatarHtml: getMashuAvatarHtml(),
-          text: '🌸 "Hi there explorer! Welcome to our magical Minecraft realm! Lakshya and I crafted this entire voxel archipelago together block by block with love.\n\nFrom majestic world wonders to wild safari reserves and scenic viewpoints, there is so much to see. What would you like to know?"',
-          onOptionSelect: (opt, d) => {
-            this.hud.pushChatMessage('You', opt.label);
-            if (opt.response) {
-              const snippet = opt.response.split('\n')[0].trim();
-              this.hud.pushChatMessage(d.name, snippet);
-            }
-          },
-          options: [
-            {
-              label: '💖 Tell me about you and Lakshya!',
-              styleClass: 'mc-btn-gold',
-              response: '🌸 "He is the sweetest! Lakshya built this whole voxel world for me so we could adventure and build together. Every single monument, flower garden, and hidden bridge has a sweet story behind it!"'
-            },
-            {
-              label: '✨ You look absolutely stunning!',
-              styleClass: 'mc-btn-green',
-              action: () => {
-                sound.playLevelUp();
-                if (this.world.mashuMesh) {
-                  this.world.spawnHammerSparkles(this.world.mashuMesh.position.x, this.world.mashuMesh.position.y + 1.2, this.world.mashuMesh.position.z);
-                }
-              },
-              response: '*Blushes warmly with floating heart sparkles!* 🌸 "Aww, thank you so much! You\'re so sweet! Lakshya always compliments me like that too. May your travels through our realm be filled with joy and diamonds!"'
-            },
-            {
-              label: '🗺️ What are your favorite spots on the island?',
-              styleClass: 'mc-btn-blue',
-              response: '🌸 "My favorite spots:\n\n1. The Eiffel Tower at sunset — the panoramic view of the ocean is breathtaking!\n2. The Bamboo Safari Sanctuary feeding bamboo to the baby pandas.\n3. Sitting right here by the Emerald Fountain watching Roger chase butterflies!"'
-            },
-            {
-              label: '💎 Any realm secrets you can share?',
-              styleClass: 'mc-btn-stone',
-              response: '🌸 "Secret tips from Mashu:\n\n• Press [F] to toggle Flight Mode and soar into the clouds!\n• Press [C] or [F5] to admire your character from 3rd person perspective!\n• Press [M] anytime to open the Fast Travel Map and warp instantly across the world!"'
-            },
-            {
-              label: '🐶 How is Roger doing today?',
-              styleClass: 'mc-btn-stone',
-              response: '🌸 "Roger is the most loyal, lovable wolf ever! He loves ear scratches and always guards both Lakshya and me at spawn. Give him some love before you go explore!"'
-            }
-          ]
-        });
       } else {
         sound.playVillagerHuh();
         if (this.world.npcMesh) {
           this.world.spawnHammerSparkles(this.world.npcMesh.position.x, this.world.npcMesh.position.y + 1.2, this.world.npcMesh.position.z);
         }
-        this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to our Minecraft realm! Stationed at Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2, Z: 7.5]. Press M anytime for Fast Travel.');
+        this.hud.pushChatMessage('Lakshya', 'Hey there! Welcome to my Minecraft Portfolio world! Press M anytime for World Map.');
 
         this.modals.openNPCDialogModal({
           id: 'lakshya_guide',
           name: 'Lakshya',
-          title: 'Realm Explorer & Architect ⚔️',
+          title: 'Software Engineer & Designer · Portfolio Guide',
           badge: '[LVL 22]',
           badgeColor: '#ca8a04',
           locationBadge: 'Spawn Plaza [X: 3.5, Z: 7.5]',
           avatarHtml: getLakshyaAvatarHtml(),
-          text: 'Hey explorer! Welcome to our interactive 3D voxel realm. I am stationed right here at the Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5] by the Emerald Fountain.\n\nBeside me are my beautiful girlfriend Mashu and loyal companion dog Roger. What would you like to explore today?',
+          text: 'Hey explorer! Welcome to my interactive 3D voxel portfolio island. I built this realm with TypeScript, Three.js, and custom WebGL shaders to showcase my engineering projects, experience, and skills in a playable Minecraft format!\n\nBeside me is my loyal companion dog Roger. What would you like to explore today?',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -991,9 +934,25 @@ class Game {
           },
           options: [
             {
-              label: '👑 Tell me about Mashu!',
+              label: '💼 View My Engineering Projects',
+              styleClass: 'mc-btn-green',
+              action: () => {
+                this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
+              }
+            },
+            {
+              label: '📜 Open Career Resume Chest',
               styleClass: 'mc-btn-gold',
-              response: 'Mashu is my girlfriend and the light of my life! She is the co-founder of this Minecraft realm and helped inspire all the beauty you see here. Make sure to talk to her right beside me!'
+              action: () => {
+                this.modals.openResumeChestModal();
+              }
+            },
+            {
+              label: '⚡ Inspect Technical Skills Matrix',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                this.modals.openSkillsModal();
+              }
             },
             {
               label: '🗺️ Open Fast Travel Realm Map [M]',
@@ -1003,40 +962,14 @@ class Game {
               }
             },
             {
-              label: '🏆 View Realm Expeditions',
-              styleClass: 'mc-btn-green',
-              action: () => {
-                this.modals.openProjectModal(PORTFOLIO_DATA.projects[0]);
-              }
-            },
-            {
-              label: '📜 Open Ancient Dungeon Treasure Vault',
-              styleClass: 'mc-btn-gold',
-              action: () => {
-                this.modals.openResumeChestModal();
-              }
-            },
-            {
-              label: '⚡ Inspect Alchemy Potions Guide',
-              styleClass: 'mc-btn-blue',
-              action: () => {
-                this.modals.openSkillsModal();
-              }
-            },
-            {
-              label: '📍 Where are you and what are the island coordinates?',
-              styleClass: 'mc-btn-stone',
-              response: 'I am stationed at Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5] with Mashu & Roger!\n\nMajor Island Realms & Coordinates:\n• Crossroads Citadel (Spawn): [X: 0, Z: 0]\n• Safari Wildlife Park: [X: -65, Z: 0]\n• Neo York Tech Metropolis: [X: 100, Z: 0]\n• Imperial India & Taj Mahal: [X: 80, Z: -135]\n• London Elizabeth Tower (Big Ben): [X: -32, Z: -58]\n• Paris Eiffel Tower: [X: 26, Z: -38]\n• Tokyo Shibuya Scramble: [X: -155, Z: -80]\n• Egypt Giza Pyramids: [X: -155, Z: 36]\n• Mexico City Zócalo: [X: -105, Z: 60]\n• Dubai Burj Khalifa: [X: 170, Z: 42]\n• Hollywood Hills & Bowl: [X: 165, Z: -100]\n\nPress [M] anytime to open the Fast Travel Map and warp anywhere!'
-            },
-            {
               label: '🐶 Tell me about your dog Roger!',
               styleClass: 'mc-btn-stone',
-              response: 'That\'s Roger! He\'s our golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
+              response: 'That\'s Roger! He\'s my golden companion dog. He guards the spawn plaza, loves ear scratches, and gets super excited whenever visitors feed him steak.\n\nWalk over and tap Roger anytime to pet him, feed him, or play fetch!'
             },
             {
               label: '🧭 Where should I explore first on the island?',
               styleClass: 'mc-btn-stone',
-              response: 'Start by inspecting the Emerald Central Fountain right behind us!\n\n• West: Giant Panda Bamboo Valley & African Lion Kopje\n• East: Taj Mahal, India Gate, & Cultural Pavilions\n• South: Redstone Nether Portal, Circular Railway Train, and Builder Arena\n\nOr press [M] anytime to teleport directly to any landmark!'
+              response: 'Start by inspecting the Emerald Central Fountain right behind me!\n\n• West: Giant Panda Bamboo Valley & African Lion Kopje\n• East: Taj Mahal, India Gate, & Cultural Pavilions\n• South: Redstone Nether Portal, Circular Railway Train, and Builder Arena\n\nOr press [M] anytime to teleport directly to any landmark!'
             },
             {
               label: '🎮 Any secret tips or Easter eggs?',

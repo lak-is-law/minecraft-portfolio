@@ -50,38 +50,20 @@ export class NPCChatManager {
       {
         id: 'lakshya_guide',
         name: 'Lakshya',
-        role: 'Realm Explorer & Architect ⚔️',
+        role: 'Portfolio Guide & Engineer',
         areaName: 'Crossroads Citadel Spawn Plaza',
         coords: { x: 3.5, y: 2.0, z: 7.5 },
         directionFromSpawn: 'Spawn Center (Island Nexus)',
-        nearbyLandmarks: ['Mashu 🌸', 'Emerald Central Fountain', 'Roger the Dog', 'Fast Travel Nether Portal'],
+        nearbyLandmarks: ['Emerald Central Fountain', 'Fast Travel Nether Portal', 'Ancient Resume Chest', 'Skills Matrix'],
         ambientMessages: [
-          'Standing at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8] with Mashu and Roger! Press [M] anytime for Fast Travel.',
-          'Checking the horizon from Spawn Plaza [X: 4, Y: 2, Z: 8]. Come say hi to Mashu or explore the world wonders!',
-          'Hanging out by the emerald spawn fountain [X: 4, Y: 2, Z: 8]! Press [B] to build or [F] to fly.'
+          'Standing at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8] by the Emerald Fountain! Press [M] anytime for Fast Travel.',
+          'Checking server telemetry at Spawn Plaza [X: 4, Y: 2, Z: 8]. Come say hi or inspect the project pedestals!',
+          'Hanging out by the spawn fountain [X: 4, Y: 2, Z: 8] with Roger! Press [B] to build or [F] to fly.'
         ],
-        proximityGreeting: 'Hey explorer! Welcome to our Minecraft realm! Mashu and I are excited to have you here!',
-        detailedLocationText: 'I am stationed right here at the Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5] with my girlfriend Mashu and dog Roger!\n\nSurroundings:\n• North: Emerald Central Fountain & Nether Portal\n• East: Neo York Tech Metropolis & Taj Mahal\n• West: Grand Safari Wildlife Park & Animal Habitats\n• South: Redstone Nether Portal, Circular Railway Station, and Builder Arena\n\nPress [M] to open your Fast Travel Realm Map and warp anywhere instantly!',
+        proximityGreeting: 'Hey explorer! You found me at Crossroads Citadel Spawn Plaza [X: 4, Y: 2, Z: 8]! Ready to explore?',
+        detailedLocationText: 'I am stationed right here at the Crossroads Citadel Spawn Plaza [X: 3.5, Y: 2.0, Z: 7.5], the beating heart of this portfolio island!\n\nSurroundings:\n• North: Emerald Central Fountain & Nether Portal\n• East: Neo York Tech Metropolis & Taj Mahal\n• West: Grand Safari Wildlife Park & Animal Habitats\n• South: Redstone Nether Portal, Circular Railway Station, and Builder Arena\n\nPress [M] to open your Fast Travel Realm Map and warp anywhere instantly!',
         tagColor: '#ca8a04',
-        emoji: '⚔️'
-      },
-      {
-        id: 'mashu_guide',
-        name: 'Mashu',
-        role: 'Lakshya\'s Princess & Realm Co-Founder 🌸',
-        areaName: 'Crossroads Citadel Spawn Plaza',
-        coords: { x: 2.3, y: 2.0, z: 7.5 },
-        directionFromSpawn: 'Spawn Center (Beside Lakshya)',
-        nearbyLandmarks: ['Lakshya ⚔️', 'Emerald Fountain', 'Roger the Dog 🐶', 'Fast Travel Nether Portal'],
-        ambientMessages: [
-          '🌸 "Welcome to our Minecraft realm! Lakshya built this magical voxel world for us to share!"',
-          '✨ Braiding cherry blossoms by the fountain at Spawn Plaza [X: 2, Y: 2, Z: 8]. "Enjoy your journey, traveler!"',
-          '💖 Gently petting Roger at Spawn Plaza [X: 2, Y: 2, Z: 8] with a sweet smile!'
-        ],
-        proximityGreeting: '🌸 "Hello traveler! I\'m Mashu! Welcome to our magical Minecraft realm!"',
-        detailedLocationText: '🌸 Welcome! I\'m Mashu, standing right beside Lakshya at Crossroads Citadel Spawn Plaza [X: 2.3, Y: 2.0, Z: 7.5].\n\nLakshya and I crafted this magical voxel archipelago together. Explore the monuments, sail across the oceans, or say hi to Roger!',
-        tagColor: '#ec4899',
-        emoji: '🌸'
+        emoji: '🧑‍💻'
       },
       {
         id: 'roger',

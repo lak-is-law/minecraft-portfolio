@@ -49,47 +49,6 @@ export function getLakshyaAvatarHtml(): string {
   </svg>`;
 }
 
-export function getMashuAvatarHtml(): string {
-  return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
-    <rect width="32" height="32" fill="#2e1065"/>
-    <!-- Hair background and crown -->
-    <rect x="5" y="2" width="22" height="9" fill="#3d2012"/>
-    <rect x="3" y="6" width="5" height="18" fill="#3d2012"/>
-    <rect x="24" y="6" width="5" height="18" fill="#3d2012"/>
-    <rect x="5" y="14" width="3" height="10" fill="#542c19"/>
-    <rect x="24" y="14" width="3" height="10" fill="#542c19"/>
-    <!-- Face -->
-    <rect x="7" y="7" width="18" height="16" fill="#fce8d8"/>
-    <!-- Front bangs framing forehead -->
-    <rect x="8" y="7" width="4" height="6" fill="#3d2012"/>
-    <rect x="20" y="7" width="4" height="6" fill="#3d2012"/>
-    <rect x="12" y="7" width="8" height="3" fill="#3d2012"/>
-    <!-- Cherry blossom hair clip -->
-    <rect x="22" y="4" width="4" height="4" fill="#f472b6"/>
-    <rect x="23" y="5" width="2" height="2" fill="#fef08a"/>
-    <rect x="26" y="5" width="2" height="2" fill="#4ade80"/>
-    <!-- Eyelashes & Sparkling Eyes -->
-    <rect x="9" y="12" width="4" height="1" fill="#1e1b4b"/>
-    <rect x="19" y="12" width="4" height="1" fill="#1e1b4b"/>
-    <rect x="9" y="13" width="4" height="3" fill="#ffffff"/>
-    <rect x="11" y="13" width="2" height="3" fill="#4338ca"/>
-    <rect x="11" y="13" width="1" height="1" fill="#ffffff"/>
-    <rect x="19" y="13" width="4" height="3" fill="#ffffff"/>
-    <rect x="19" y="13" width="2" height="3" fill="#4338ca"/>
-    <rect x="19" y="13" width="1" height="1" fill="#ffffff"/>
-    <!-- Rosy Cheek Blush -->
-    <rect x="8" y="16" width="3" height="2" fill="#fb7185"/>
-    <rect x="21" y="16" width="3" height="2" fill="#fb7185"/>
-    <!-- Sweet Smile -->
-    <rect x="13" y="18" width="6" height="2" fill="#e11d48"/>
-    <!-- Dress collar & Pearl necklace -->
-    <rect x="6" y="23" width="20" height="9" fill="#f472b6"/>
-    <rect x="11" y="23" width="10" height="3" fill="#fff1f2"/>
-    <rect x="13" y="24" width="6" height="1" fill="#fef08a"/>
-    <rect x="14" y="27" width="4" height="5" fill="#fbcfe8"/>
-  </svg>`;
-}
-
 export function getRogerAvatarHtml(): string {
   return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
     <rect width="32" height="32" fill="#36291a"/>
@@ -231,12 +190,12 @@ export class ModalManager {
           </div>
 
           <div class="mc-desc-section">
-            <h4 class="mc-section-heading">Expedition Briefing & Lore</h4>
+            <h4 class="mc-section-heading">Overview and Architecture</h4>
             ${descHtml}
           </div>
 
           <div class="mc-tags-section">
-            <h4 class="mc-section-heading">Key Equipment & Drops</h4>
+            <h4 class="mc-section-heading">Tech Stack</h4>
             <div class="mc-tags-wrapper">
               ${tagsHtml}
             </div>
@@ -244,7 +203,8 @@ export class ModalManager {
         </div>
 
         <div class="mc-dialog-footer">
-          <button class="mc-btn mc-btn-green" id="mc-expedition-ready">[READY] Log Expedition</button>
+          ${project.liveUrl ? `<a href="${project.liveUrl}" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-green">[OPEN] Launch Live Demo</a>` : ''}
+          ${project.githubUrl ? `<a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-blue">[CODE] View GitHub</a>` : ''}
           <button class="mc-btn mc-btn-stone" id="mc-modal-done">Done (ESC)</button>
         </div>
       </div>
@@ -253,13 +213,9 @@ export class ModalManager {
     this.modalContainer.style.display = 'flex';
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
-    document.getElementById('mc-expedition-ready')?.addEventListener('click', () => {
-      sound.playLevelUp();
-      this.close();
-    });
   }
 
-  // 2. Experience / Guild Modal
+  // 2. Experience / Education Modal
   public openExperienceModal(exp: Experience) {
     this.onModalOpen();
 
@@ -281,7 +237,7 @@ export class ModalManager {
             ${highlightsHtml}
           </div>
           <div class="mc-desc-section">
-            <h4 class="mc-section-heading">Guild Achievements & Chronicles</h4>
+            <h4 class="mc-section-heading">Role Contributions and Impact</h4>
             ${descHtml}
           </div>
         </div>
@@ -297,7 +253,7 @@ export class ModalManager {
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
   }
 
-  // 3. Ancient Dungeon Treasure Chest GUI (Legendary Loot Vault)
+  // 3. Ancient Treasure Chest GUI (Resume Vault & Loot) - Zero emojis, SVG assets
   public openResumeChestModal() {
     this.onModalOpen();
     sound.playChestOpen();
@@ -305,61 +261,61 @@ export class ModalManager {
     this.modalContainer.innerHTML = `
       <div class="mc-chest-gui">
         <div class="mc-chest-header">
-          <span>Ancient Dungeon Treasure Chest</span>
+          <span>Lakshya: Ancient Resume Chest</span>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>
 
         <div class="mc-chest-grid">
-          <!-- Row 1 with Minecraft Loot Assets -->
-          <div class="mc-slot" title="Enchanted Book: Mending & Unbreaking III">
+          <!-- Row 1 with SVG Assets -->
+          <div class="mc-slot" title="Enchanted Scroll: Lakshya's Software Engineering Resume (PDF)">
             <div class="mc-slot-item">${ASSETS.book}</div>
-            <span class="mc-slot-badge">MEND</span>
+            <span class="mc-slot-badge">SWE</span>
           </div>
-          <div class="mc-slot" title="Enchanted Book: Fortune III & Efficiency V">
+          <div class="mc-slot" title="Brand & PR Resume (PDF)">
             <div class="mc-slot-item">${ASSETS.book}</div>
-            <span class="mc-slot-badge">FORT</span>
+            <span class="mc-slot-badge">PR</span>
           </div>
-          <div class="mc-slot" title="Netherite Sword: Sharpness V & Fire Aspect II">
+          <div class="mc-slot" title="Diamond Sword: Full Stack Architecture">
             <div class="mc-slot-item">${ASSETS.sword}</div>
           </div>
-          <div class="mc-slot" title="Netherite Pickaxe: Efficiency V & Silk Touch">
+          <div class="mc-slot" title="Netherite Pickaxe: AI Systems & Distributed Telemetry">
             <div class="mc-slot-item">${ASSETS.pickaxe}</div>
           </div>
-          <div class="mc-slot" title="Enchanted Golden Apple: Regeneration II & Absorption IV">
+          <div class="mc-slot" title="Golden Apple: CGPA 4.37 / 5.0 (SRMIST Chennai)">
             <div class="mc-slot-item">${ASSETS.apple}</div>
           </div>
-          <div class="mc-slot" title="Heart of the Sea & Conduit Heart">
+          <div class="mc-slot" title="Ender Pearl: Email (contact@lakshya.uk)">
             <div class="mc-slot-item">${ASSETS.pearl}</div>
           </div>
-          <div class="mc-slot" title="Eye of Ender: Stronghold Navigator">
+          <div class="mc-slot" title="Compass: LinkedIn (/in/lakshya-success)">
             <div class="mc-slot-item">${ASSETS.compass}</div>
           </div>
-          <div class="mc-slot" title="Elytra Wings & Fireworks Flight System">
+          <div class="mc-slot" title="Map: GitHub (lak-is-law)">
             <div class="mc-slot-item">${ASSETS.cobblestone}</div>
           </div>
-          <div class="mc-slot" title="Nether Star: Beacon Power Core">
+          <div class="mc-slot" title="Nether Star: UCSI 1st Place Most Innovative Product">
             <div class="mc-slot-item">${ASSETS.star}</div>
           </div>
         </div>
 
         <div class="mc-chest-loot-action">
           <div class="mc-resume-preview-info">
-            <h3>Ancient Dungeon Treasure Vault</h3>
-            <p>Legendary relics, enchanted equipment, and treasures gathered across Minecraft realms.</p>
+            <h3>Lakshya: Master Resume Documents</h3>
+            <p>Software Engineer & Designer (SRMIST Chennai, CGPA: 4.37 / 5.0)</p>
           </div>
           <div class="mc-chest-btn-row">
-            <button class="mc-btn mc-btn-green" id="mc-claim-apple">
-              [CLAIM] Enchanted Golden Apple
-            </button>
-            <button class="mc-btn mc-btn-gold" id="mc-claim-totem">
-              [TAKE] Totem of Undying
-            </button>
-            <button class="mc-btn mc-btn-blue" id="mc-claim-sword">
-              [EQUIP] Netherite Sword
-            </button>
-            <button class="mc-btn mc-btn-stone" id="mc-modal-done-btn">
-              [CLOSE] Seal Vault
-            </button>
+            <a href="/Lakshya.Resume.pdf" download="Lakshya_Resume.pdf" class="mc-btn mc-btn-green" id="mc-download-resume">
+              [DOWNLOAD] Software Resume (PDF)
+            </a>
+            <a href="https://resume.lakshya.uk" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-blue">
+              [WEB] Live resume.lakshya.uk
+            </a>
+            <a href="mailto:contact@lakshya.uk" class="mc-btn mc-btn-stone">
+              [EMAIL] contact@lakshya.uk
+            </a>
+            <a href="https://linkedin.com/in/lakshya-success" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-stone">
+              [LINKEDIN] Profile
+            </a>
           </div>
         </div>
       </div>
@@ -367,27 +323,8 @@ export class ModalManager {
 
     this.modalContainer.style.display = 'flex';
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
-    document.getElementById('mc-modal-done-btn')?.addEventListener('click', () => this.close());
-
-    document.getElementById('mc-claim-apple')?.addEventListener('click', (e) => {
+    document.getElementById('mc-download-resume')?.addEventListener('click', () => {
       sound.playLevelUp();
-      const target = e.currentTarget as HTMLElement;
-      target.textContent = '[CLAIMED!] +Absorption Boost';
-      target.classList.replace('mc-btn-green', 'mc-btn-stone');
-    });
-
-    document.getElementById('mc-claim-totem')?.addEventListener('click', (e) => {
-      sound.playLevelUp();
-      const target = e.currentTarget as HTMLElement;
-      target.textContent = '[EQUIPPED!] Second Life Active';
-      target.classList.replace('mc-btn-gold', 'mc-btn-stone');
-    });
-
-    document.getElementById('mc-claim-sword')?.addEventListener('click', () => {
-      sound.playBlockBreak();
-      const target = document.getElementById('mc-claim-sword') as HTMLElement;
-      target.textContent = '[DRAWN!] Sharpness V Ready';
-      target.classList.replace('mc-btn-blue', 'mc-btn-stone');
     });
   }
 
@@ -424,8 +361,8 @@ export class ModalManager {
       <div class="mc-dialog mc-skills-dialog">
         <div class="mc-dialog-header">
           <div>
-            <h2 class="mc-dialog-title">Alchemy Brewing Stand & Potions Guide</h2>
-            <span class="mc-dialog-subtitle">Essential Minecraft Elixirs, Combat Brews, and Enchantment Recipes</span>
+            <h2 class="mc-dialog-title">Skills Alchemy and Technical Matrix</h2>
+            <span class="mc-dialog-subtitle">Frontend, Backend, Applied AI, and Cloud Infrastructure</span>
           </div>
           <button class="mc-close-btn" id="mc-modal-close">X</button>
         </div>

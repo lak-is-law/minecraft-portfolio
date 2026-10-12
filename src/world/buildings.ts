@@ -993,7 +993,7 @@ export class WorldBuilder {
     this.setBlock(0, 2, 6, 'gold_block', {
       type: 'sign',
       title: 'Crossroads Global Nexus · World Directory',
-      text: 'Welcome to Lakshya & Mashu\'s Minecraft Realm!\nNorth: London, Paris, Tokyo, Seoul & China\nEast: USA Metropolis, Hollywood & Dubai\nSouth: Carnival Pier, Airport & Marina\nWest: Mexico City, Giza Pyramids & Sphinx'
+      text: 'Welcome to Lakshya\'s Portfolio World!\nNorth: London, Paris, Tokyo, Seoul & China\nEast: USA Metropolis, Hollywood & Dubai\nSouth: Carnival Pier, Airport & Marina\nWest: Mexico City, Giza Pyramids & Sphinx'
     });
     this.setBlock(-1, 2, 6, 'quartz_block', {
       type: 'sign',
@@ -6200,7 +6200,7 @@ export class WorldBuilder {
       { x: 165, z: -82, name: 'Marilyn Monroe ⭐', category: 'Motion Pictures Legend', bio: 'Golden Age silver-screen icon celebrated in Some Like It Hot & Gentlemen Prefer Blondes.' },
       { x: 157, z: -76, name: 'Steven Spielberg ⭐', category: 'Director of the Century', bio: 'Visionary master of Jurassic Park, Jaws, Raiders of the Lost Ark, and E.T.' },
       { x: 165, z: -76, name: 'Walt Disney ⭐', category: 'Animation & Storytelling', bio: 'Pioneer of classic animated feature films and creator of worlds of imagination.' },
-      { x: 157, z: -70, name: 'Lakshya & Mashu ⭐', category: 'Realm Co-Founders & Adventurers', bio: 'Founders of this magical 3D Minecraft realm, exploring and building side-by-side.' },
+      { x: 157, z: -70, name: 'Lakshya K ⭐', category: 'Chief Metaverse Architect', bio: 'Lead creator of this 3D Minecraft interactive portfolio realm & software architect.' },
       { x: 165, z: -70, name: 'Keanu Reeves ⭐', category: 'Sci-Fi & Action Icon', bio: "Beloved star of The Matrix, John Wick, and Cyberpunk. You're breathtaking!" },
       { x: 157, z: -64, name: 'Audrey Hepburn ⭐', category: 'Golden Age Cinema & Philanthropy', bio: "Iconic star of Breakfast at Tiffany's, Roman Holiday, and UNICEF Goodwill Ambassador." },
       { x: 165, z: -64, name: 'Morgan Freeman ⭐', category: 'Master of Dramatic Arts', bio: 'The definitive resonant narrator of cinema, beloved in Shawshank Redemption & Driving Miss Daisy.' },
@@ -6507,7 +6507,7 @@ export class WorldBuilder {
     this.setBlock(148, 3, -78, 'gold_block', {
       type: 'sign',
       title: 'Director\'s Chair · Scene 42 Take 1 🎬',
-      text: 'DIRECTOR: LAKSHYA K\nFilm: "A Minecraft Love Story: Lakshya & Mashu"\nStatus: Rolling! Quiet on set... and ACTION!'
+      text: 'DIRECTOR: LAKSHYA K\nFilm: "Journey Through the 3D Portfolio"\nStatus: Rolling! Quiet on set... and ACTION!'
     });
 
     // 4. Overhead Lighting Truss Rig at Y = 8

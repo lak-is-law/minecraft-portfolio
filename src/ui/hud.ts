@@ -47,11 +47,11 @@ export class HUDManager {
   constructor() {
     this.renderHUD();
     this.setupListeners();
-    this.pushChatMessage('System', 'Welcome to Lakshya & Mashu\'s Minecraft Realm!');
-    this.pushChatMessage('Lakshya', 'Explore world monuments, safari wildlife, and hidden dungeons with Mashu & Roger.');
+    this.pushChatMessage('System', 'Welcome to Lakshya\'s Minecraft Portfolio World!');
+    this.pushChatMessage('Lakshya', 'Explore world structures to see my live projects, experience, skills, and resume.');
     this.pushChatMessage('Tip', document.body.classList.contains('touch-device')
-      ? 'Use [USE] to interact with NPCs, landmarks, and treasure chests.'
-      : 'Press [E] to interact with Mashu, Lakshya, or Roger. Press [M] to open Fast Travel.');
+      ? 'Use [USE] to inspect objects, talk with NPCs, and open chests.'
+      : 'Press [E] to interact with objects and NPCs. Press [M] to open World Map.');
   }
 
   public onCycleWeather?: () => void;
@@ -328,10 +328,9 @@ export class HUDManager {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       } else if (inter.type === 'npc') {
         const isDog = inter.id === 'roger';
-        const isMashu = inter.id === 'mashu_guide' || inter.title?.includes('Mashu');
         const isAnimal = inter.id?.startsWith('animal_');
         const isCitizen = inter.id?.startsWith('citizen_');
-        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : (isMashu ? 'Talk with Mashu 🌸' : 'Talk with')));
+        const actionVerb = isDog ? 'Pet Dog' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with'));
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
       }
     } else {
