@@ -51,3 +51,4 @@
 - 2026-10-10 16:59: feat(lighting): directional sunlight ray casting across voxel faces
 - 2026-10-10 22:07: feat(voxel): chunk mesh generation and greedy meshing
 - 2026-10-12 10:16: fix(controls): pointer lock sensitivity on high-DPI displays
+- 2026-10-12 11:30: feat(audio): spatial distance attenuation for ambient loops
