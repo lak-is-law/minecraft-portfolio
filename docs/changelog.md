@@ -51,3 +51,4 @@
 - 2026-10-13 15:15: refactor(terrain): Perlin noise octaves for procedural valleys
 - 2026-10-13 16:59: test(collision): verify player bounding box floor snapping
 - 2026-10-13 18:20: test(collision): verify player bounding box floor snapping
+- 2026-10-13 19:13: feat(audio): spatial distance attenuation for ambient loops
