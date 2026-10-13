@@ -57,3 +57,4 @@
 - 2026-10-13 12:44: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-10-13 13:35: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-10-13 14:11: feat(audio): spatial distance attenuation for ambient loops
+- 2026-10-13 15:15: refactor(terrain): Perlin noise octaves for procedural valleys
