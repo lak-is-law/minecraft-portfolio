@@ -57,3 +57,4 @@
 - 2026-10-14 12:52: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-10-14 13:01: refactor(blocks): bit-packed voxel state representation
 - 2026-10-14 14:45: feat(audio): spatial distance attenuation for ambient loops
+- 2026-10-14 16:37: perf(render): frustum culling for non-visible chunk boundaries
