@@ -51,3 +51,4 @@
 - 2026-10-14 16:37: perf(render): frustum culling for non-visible chunk boundaries
 - 2026-10-14 17:42: docs(engine): document voxel coordinate transformation pipeline
 - 2026-10-14 18:02: refactor(blocks): bit-packed voxel state representation
+- 2026-10-14 19:22: refactor(blocks): bit-packed voxel state representation
