@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-09-18 22:07: refactor(physics): AABB collision detection against voxel grid
-- 2026-09-20 19:02: fix(controls): pointer lock sensitivity on high-DPI displays
-- 2026-09-20 20:57: test(collision): verify player bounding box floor snapping
-- 2026-09-21 11:17: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-09-21 18:21: docs(engine): document voxel coordinate transformation pipeline
-- 2026-09-24 10:58: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-09-24 11:43: docs(engine): document voxel coordinate transformation pipeline
-- 2026-09-24 13:15: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-09-24 14:07: perf(worker): offload terrain generation to web workers
 - 2026-09-24 16:33: perf(worker): offload terrain generation to web workers
 - 2026-09-24 17:41: perf(worker): offload terrain generation to web workers
 - 2026-09-24 19:58: feat(ui): inventory hotbar HUD and interactive crosshair
@@ -58,3 +49,4 @@
 - 2026-10-14 13:01: refactor(blocks): bit-packed voxel state representation
 - 2026-10-14 14:45: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-14 16:37: perf(render): frustum culling for non-visible chunk boundaries
+- 2026-10-14 17:42: docs(engine): document voxel coordinate transformation pipeline
