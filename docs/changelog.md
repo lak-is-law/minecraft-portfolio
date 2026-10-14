@@ -53,3 +53,4 @@
 - 2026-10-13 18:20: test(collision): verify player bounding box floor snapping
 - 2026-10-13 19:13: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-14 10:39: perf(memory): reuse Float32Array buffers across chunk re-meshes
+- 2026-10-14 11:38: perf(shaders): optimize ambient occlusion fragment pass
