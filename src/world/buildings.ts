@@ -257,8 +257,8 @@ export class WorldBuilder {
 
     // 6. East: USA Realm & Dubai Palm (X in [105, 225], Z in [-80, 68])
     if (x >= 105) {
-      // Dubai Coastline & Palm Jumeirah Arabian Gulf Lagoon Bay (X in [175, 225], Z in [18, 66])
-      if (x >= 175 && x <= 225 && z >= 18 && z <= 66) {
+      // Dubai Coastline & Palm Jumeirah Arabian Gulf Lagoon Bay (X in [174, 225], Z in [14, 70])
+      if (x >= 174 && x <= 225 && z >= 14 && z <= 70) {
         return this.getPalmJumeirahTerrainHeight(x, z);
       }
       // Hollywood Hills (Mount Lee & Griffith Observatory north-east ridge)
@@ -301,54 +301,69 @@ export class WorldBuilder {
     return 1;
   }
 
-  // Palm Jumeirah Archipelago Topography in Arabian Gulf (X in [175, 225], Z in [18, 66])
+  // Palm Jumeirah Archipelago Topography in Arabian Gulf (X in [174, 225], Z in [14, 70])
   private getPalmJumeirahTerrainHeight(x: number, z: number): number {
     // Dubai mainland and coastal waterfront promenade
     if (x <= 176) return 1;
 
-    // The Palm Central Trunk (X in [176, 208], Z in [40, 44])
-    if (x >= 176 && x <= 208 && Math.abs(z - 42) <= 2) {
+    // 1. The Palm Trunk & Flared Base
+    if (x >= 174 && x <= 178 && Math.abs(z - 42) <= Math.round(4 - (x - 174) * 0.5)) {
+      return 1;
+    }
+    if (x >= 178 && x <= 196 && Math.abs(z - 42) <= 3) {
+      return 1;
+    }
+    // Crown Fan Hub
+    if (x >= 196 && x <= 202 && Math.abs(z - 42) <= 4) {
       return 1;
     }
 
-    // 10 Symmetrical Palm Fronds (5 North, 5 South)
-    const fronds = [
-      // North Fronds (Z < 42)
-      { minX: 180, maxX: 196, minZ: 37, maxZ: 38 },
-      { minX: 184, maxX: 202, minZ: 33, maxZ: 34 },
-      { minX: 188, maxX: 206, minZ: 29, maxZ: 30 },
-      { minX: 193, maxX: 210, minZ: 25, maxZ: 26 },
-      { minX: 198, maxX: 213, minZ: 21, maxZ: 22 },
-      // South Fronds (Z > 42)
-      { minX: 180, maxX: 196, minZ: 46, maxZ: 47 },
-      { minX: 184, maxX: 202, minZ: 50, maxZ: 51 },
-      { minX: 188, maxX: 206, minZ: 54, maxZ: 55 },
-      { minX: 193, maxX: 210, minZ: 58, maxZ: 59 },
-      { minX: 198, maxX: 213, minZ: 62, maxZ: 63 },
+    // 2. 16 Symmetrical Parametric Curved Fronds (8 Pairs)
+    const frondDefs = [
+      { xRoot: 182, xTip: 195, dz: 8 },
+      { xRoot: 185, xTip: 200, dz: 12 },
+      { xRoot: 188, xTip: 204, dz: 16 },
+      { xRoot: 191, xTip: 208, dz: 20 },
+      { xRoot: 194, xTip: 210, dz: 23 },
+      { xRoot: 197, xTip: 211, dz: 25 },
+      { xRoot: 200, xTip: 211, dz: 23 },
+      { xRoot: 203, xTip: 210, dz: 16 }
     ];
-    for (const f of fronds) {
-      if (x >= f.minX && x <= f.maxX && z >= f.minZ && z <= f.maxZ) {
-        return 1;
+
+    for (const f of frondDefs) {
+      if (x >= f.xRoot && x <= f.xTip) {
+        const u = (x - f.xRoot) / (f.xTip - f.xRoot);
+        const curveOffset = 3 + (f.dz - 3) * Math.pow(u, 1.3);
+        const northZ = Math.round(42 - curveOffset);
+        const southZ = Math.round(42 + curveOffset);
+        if (Math.abs(z - northZ) <= 1 || Math.abs(z - southZ) <= 1) {
+          return 1;
+        }
+        if (x >= f.xTip - 1) {
+          if (Math.hypot(x - f.xTip, z - northZ) <= 1.8 || Math.hypot(x - f.xTip, z - southZ) <= 1.8) {
+            return 1;
+          }
+        }
       }
     }
 
-    // Atlantis, The Palm Resort Plinth at Crescent Crown
+    // 3. Atlantis, The Palm Resort Plinth at Crescent Crown
     if (x >= 215 && x <= 223 && z >= 36 && z <= 48) {
       return 1;
     }
 
-    // Outer Crescent Breakwater Barrier Reef Island
-    const cd = Math.hypot((x - 198) / 24, (z - 42) / 22);
-    if (cd >= 0.88 && cd <= 1.04 && x >= 178) {
-      // Natural tidal breach gaps at North (Z ≈ 27..28) and South (Z ≈ 56..57) for maritime navigation
-      const isNorthGap = (z >= 27 && z <= 28 && x >= 184 && x <= 189);
-      const isSouthGap = (z >= 56 && z <= 57 && x >= 184 && x <= 189);
+    // 4. Detached Outer Crescent Breakwater Barrier Reef Island
+    const cd = Math.hypot((x - 196) / 26, (z - 42) / 26);
+    if (cd >= 0.90 && cd <= 1.05 && x >= 180) {
+      // Natural tidal breach gaps at North (Z ≈ 26..28) and South (Z ≈ 56..58) for maritime navigation
+      const isNorthGap = (z >= 26 && z <= 28 && x >= 184 && x <= 189);
+      const isSouthGap = (z >= 56 && z <= 58 && x >= 184 && x <= 189);
       if (!isNorthGap && !isSouthGap) {
         return 1;
       }
     }
 
-    // Everything else in the bay is turquoise lagoon water at Y = 0
+    // Everything else in the bay is crystal turquoise lagoon water at Y = 0
     return 0;
   }
 
@@ -475,7 +490,7 @@ export class WorldBuilder {
           } else {
             topType = ((x + z) % 5 === 0) ? 'red_sandstone' : 'grass';
           }
-        } else if (x >= 175 && x <= 225 && z >= 18 && z <= 66) {
+        } else if (x >= 174 && x <= 225 && z >= 14 && z <= 70) {
           // Dubai Palm Jumeirah coastal sands & archipelago
           topType = 'sand';
         } else if (x >= 35 && z >= -25 && z <= 55) {
@@ -3804,79 +3819,109 @@ export class WorldBuilder {
     this.buildPalmJumeirahArchipelago();
   }
 
-  // Grand Palm Jumeirah Archipelago in Arabian Gulf (X in [174, 223], Z in [18, 66])
+  // Grand Palm Jumeirah Archipelago in Arabian Gulf (X in [174, 224], Z in [14, 70])
   private buildPalmJumeirahArchipelago() {
     this.buildDubaiWaterfrontPromenade();
-    this.buildPalmTrunkAndTower();
-    this.buildPalmFrondsAndVillas();
-    this.buildOuterCrescentBreakwater();
-    this.buildAtlantisThePalmResort();
-    this.buildUnderwaterTransitTunnel();
-    this.buildLagoonYachtsAndMarineLife();
+    this.buildPalmTrunkAndFlaredBase();
+    this.buildCentralCrownHub();
+    this.build16ParametricCurvedFronds();
+    this.buildDetachedCrescentBreakwater();
+    this.buildAtlantisPalaceResort();
+    this.buildSubseaGlassTunnel();
+    this.buildLagoonYachtsAndCoralReefs();
   }
 
   // A. Dubai Coastal Waterfront Promenade linking Burj Khalifa to Palm Jumeirah
   private buildDubaiWaterfrontPromenade() {
-    // Seawall & Promenade along X = 174..176, Z in [24, 60]
-    for (let z = 24; z <= 60; z++) {
+    // Seawall & Promenade along X = 174..176, Z in [20, 64]
+    for (let z = 20; z <= 64; z++) {
       for (let x = 174; x <= 176; x++) {
         this.setBlock(x, 1, z, (x === 176) ? 'stone_bricks' : 'smooth_stone');
       }
-      // Ornate marine streetlamps every 6 blocks
       if (z % 6 === 0) {
         this.setBlock(176, 2, z, 'iron_block');
         this.setBlock(176, 3, z, 'lantern');
       }
     }
-    // Palm Gateway Archway at (176, 42)
-    for (let y = 2; y <= 5; y++) {
-      this.setBlock(176, y, 39, 'quartz_pillar');
-      this.setBlock(176, y, 45, 'quartz_pillar');
+
+    // Monumental Palm Gateway Archway at (176, 42)
+    for (let y = 2; y <= 6; y++) {
+      this.setBlock(176, y, 38, 'quartz_pillar');
+      this.setBlock(176, y, 46, 'quartz_pillar');
     }
-    for (let z = 39; z <= 45; z++) {
-      this.setBlock(176, 6, z, (z === 42) ? 'gold_block' : 'quartz_block');
-      this.setBlock(176, 7, z, 'gold_block');
+    this.setBlock(176, 7, 38, 'gold_block');
+    this.setBlock(176, 7, 46, 'gold_block');
+    this.setBlock(176, 8, 38, 'sea_lantern');
+    this.setBlock(176, 8, 46, 'sea_lantern');
+
+    for (let z = 38; z <= 46; z++) {
+      this.setBlock(176, 7, z, (z === 42) ? 'sea_lantern' : 'gold_block');
+      this.setBlock(176, 8, z, (z === 42) ? 'gold_block' : 'quartz_block');
     }
-    this.setBlock(176, 8, 42, 'sea_lantern');
+
     this.setBlock(176, 2, 40, 'gold_block', {
       type: 'sign',
       title: 'Palm Jumeirah Gateway · مدخل نخلة جميرا 🌴',
-      text: 'Welcome to the Eighth Wonder of the World! Spanning into the turquoise Arabian Gulf with luxury frond villas, The Palm Tower, and Atlantis The Palm.'
+      text: 'Welcome to the Eighth Wonder of the World! Spanning into the turquoise Arabian Gulf with 16 curved fronds, luxury beachfront villas, The Palm Tower, and Atlantis The Palm.'
     });
   }
 
-  // B. The Palm Trunk & The Palm Tower (X in [176, 208], Z in [40, 44])
-  private buildPalmTrunkAndTower() {
-    for (let x = 176; x <= 208; x++) {
-      // Sub-foundation down to seabed
-      for (let z = 40; z <= 44; z++) {
+  // B. The Flared Trunk, Monorail Spine & The Palm Tower (X in [174, 196], Z in [38, 46])
+  private buildPalmTrunkAndFlaredBase() {
+    // 1. Flared Base & Linear Spine Paving
+    for (let x = 174; x <= 196; x++) {
+      // Calculate flared width: width 9 at X=174 tapering to width 7 at X=178
+      const halfW = (x <= 178) ? Math.round(4 - (x - 174) * 0.25) : 3;
+
+      for (let dz = -halfW; dz <= halfW; dz++) {
+        const z = 42 + dz;
+        // Sub-foundation to seabed
         this.setBlock(x, -1, z, 'sand');
         this.setBlock(x, 0, z, 'smooth_stone');
-      }
-      // Surface paving at Y = 1
-      this.setBlock(x, 1, 40, 'stone_bricks'); // North seawall / promenade
-      this.setBlock(x, 1, 41, 'asphalt_road'); // North lane
-      this.setBlock(x, 1, 42, (x % 3 === 0) ? 'gold_block' : 'smooth_stone'); // Monorail track with gold centerline
-      this.setBlock(x, 1, 43, 'asphalt_road'); // South lane
-      this.setBlock(x, 1, 44, 'stone_bricks'); // South seawall / promenade
 
-      // Streetlights and palms along trunk flanks
-      if (x % 6 === 0) {
-        this.setBlock(x, 2, 40, 'iron_block');
-        this.setBlock(x, 3, 40, 'lantern');
-        this.setBlock(x, 2, 44, 'iron_block');
-        this.setBlock(x, 3, 44, 'lantern');
+        const isOuterEdge = (Math.abs(dz) === halfW);
+        if (isOuterEdge) {
+          this.setBlock(x, 1, z, 'stone_bricks'); // Seawall
+          if (x % 5 === 0) {
+            this.setBlock(x, 2, z, 'iron_block');
+            this.setBlock(x, 3, z, 'lantern');
+          }
+        } else if (Math.abs(dz) === halfW - 1) {
+          // Sidewalk promenade
+          this.setBlock(x, 1, z, 'smooth_stone');
+          if (x === 180 || x === 184 || x === 188 || x === 192) {
+            this.buildPalmTree(x, 1, z);
+          }
+        } else if (dz === -1 || dz === 1) {
+          // Northbound & Southbound 2-lane divided highway
+          this.setBlock(x, 1, z, 'asphalt_road');
+        } else if (dz === 0) {
+          // Central elevated Palm Monorail line
+          this.setBlock(x, 1, 42, 'smooth_stone');
+          if (x % 4 === 0) {
+            this.setBlock(x, 2, 42, 'quartz_pillar'); // Monorail pylon
+          } else {
+            this.setBlock(x, 2, 42, 'air');
+          }
+          // Elevated Monorail track beam at Y = 3
+          this.setBlock(x, 3, 42, (x % 2 === 0) ? 'gold_block' : 'smooth_stone');
+        }
       }
-      if (x === 180 || x === 186 || x === 198 || x === 204) {
-        this.buildPalmTree(x, 1, 39);
-        this.buildPalmTree(x, 1, 45);
+
+      // Shoreline / Golden Mile luxury residential frontage along flanks (X in [180, 189])
+      if (x >= 180 && x <= 189 && x % 3 !== 0) {
+        for (const sz of [39, 45]) {
+          this.setBlock(x, 2, sz, 'terracotta_adobe');
+          this.setBlock(x, 3, sz, 'cyber_glass');
+          this.setBlock(x, 4, sz, 'quartz_block');
+        }
       }
     }
 
-    // The Palm Tower & Nakheel Mall (X in [190, 194], Z in [40, 44])
+    // 2. The Palm Tower & Nakheel Mall (X in [190, 195], Z in [40, 44])
     const ptx = 192;
     const ptz = 42;
-    // Grand Lobby (Y = 2 to 4)
+    // Grand Ground-Floor Lobby (Y = 2 to 4)
     for (let x = 190; x <= 194; x++) {
       for (let z = 40; z <= 44; z++) {
         const isCorner = (x === 190 || x === 194) && (z === 40 || z === 44);
@@ -3895,7 +3940,7 @@ export class WorldBuilder {
     this.setBlock(ptx, 2, ptz, 'gold_block'); // Concierge desk
     this.setBlock(ptx, 4, ptz, 'sea_lantern'); // Chandelier
 
-    // Tower Body (Y = 5 to 11) - Stepped modern skyscraper
+    // Stepped Modern Skyscraper Shaft (Y = 5 to 11)
     for (let y = 5; y <= 11; y++) {
       for (let x = 191; x <= 193; x++) {
         for (let z = 41; z <= 43; z++) {
@@ -3905,7 +3950,7 @@ export class WorldBuilder {
       }
     }
 
-    // Aura Skypool cantilevered 360-degree infinity pool deck (Y = 12 to 14)
+    // Aura Skypool Cantilevered 360-Degree Infinity Pool Deck (Y = 12 to 14)
     for (let x = 189; x <= 195; x++) {
       for (let z = 39; z <= 45; z++) {
         this.setBlock(x, 12, z, 'quartz_block'); // Deck floor
@@ -3918,7 +3963,7 @@ export class WorldBuilder {
         }
       }
     }
-    // Skypool center bar & beacon spire (Y = 13 to 17)
+    // Skypool Spire Beacon (Y = 13 to 17)
     this.setBlock(ptx, 13, ptz, 'glowstone');
     this.setBlock(ptx, 14, ptz, 'gold_block');
     this.setBlock(ptx, 15, ptz, 'beacon');
@@ -3927,115 +3972,186 @@ export class WorldBuilder {
     this.setBlock(ptx, 2, 39, 'quartz_block', {
       type: 'sign',
       title: 'The Palm Tower & Aura Skypool · برج النخلة 🏙️',
-      text: '52-story landmark tower with the world-famous Aura Skypool 360-degree infinity pool at Y=12, offering panoramic views over the fronds and the Arabian Gulf!'
+      text: '52-story landmark tower with the world-famous Aura Skypool 360-degree infinity pool at Y=12, offering panoramic views over the 16 fronds and the Arabian Gulf!'
     });
   }
 
-  // C. 10 Symmetrical Palm Fronds & Billionaire Luxury Beachfront Villas
-  private buildPalmFrondsAndVillas() {
-    const fronds = [
-      // 5 North Fronds (Z < 42)
-      { id: 'Frond A', minX: 180, maxX: 196, z1: 37, z2: 38, rootZ: 39, villaX: 187, poolX: 191, palmX: [183, 195] },
-      { id: 'Frond B', minX: 184, maxX: 202, z1: 33, z2: 34, rootZ: 35, villaX: 192, poolX: 197, palmX: [187, 200] },
-      { id: 'Frond C', minX: 188, maxX: 206, z1: 29, z2: 30, rootZ: 31, villaX: 196, poolX: 201, palmX: [191, 204] },
-      { id: 'Frond D', minX: 193, maxX: 210, z1: 25, z2: 26, rootZ: 27, villaX: 201, poolX: 206, palmX: [196, 208] },
-      { id: 'Frond E', minX: 198, maxX: 213, z1: 21, z2: 22, rootZ: 23, villaX: 205, poolX: 210, palmX: [200, 212] },
-      // 5 South Fronds (Z > 42)
-      { id: 'Frond F', minX: 180, maxX: 196, z1: 46, z2: 47, rootZ: 45, villaX: 187, poolX: 191, palmX: [183, 195] },
-      { id: 'Frond G', minX: 184, maxX: 202, z1: 50, z2: 51, rootZ: 49, villaX: 192, poolX: 197, palmX: [187, 200] },
-      { id: 'Frond H', minX: 188, maxX: 206, z1: 54, z2: 55, rootZ: 53, villaX: 196, poolX: 201, palmX: [191, 204] },
-      { id: 'Frond I', minX: 193, maxX: 210, z1: 58, z2: 59, rootZ: 57, villaX: 201, poolX: 206, palmX: [196, 208] },
-      { id: 'Frond J', minX: 198, maxX: 213, z1: 62, z2: 63, rootZ: 61, villaX: 205, poolX: 210, palmX: [200, 212] },
-    ];
+  // C. Central Crown Fan Hub (X in [196, 202], Z in [38, 46])
+  private buildCentralCrownHub() {
+    for (let x = 196; x <= 202; x++) {
+      for (let z = 38; z <= 46; z++) {
+        const d = Math.hypot(x - 198, z - 42);
+        this.setBlock(x, -1, z, 'sand');
+        this.setBlock(x, 0, z, 'smooth_stone');
 
-    for (const f of fronds) {
-      // 1. Root junction curving from trunk into the frond
-      for (let x = f.minX; x <= f.minX + 2; x++) {
-        this.setBlock(x, 0, f.rootZ, 'sand');
-        this.setBlock(x, 1, f.rootZ, 'smooth_stone');
-      }
-
-      // 2. Frond Spine & Sandy Beaches (Y = 0 to 1)
-      for (let x = f.minX; x <= f.maxX; x++) {
-        for (let z = f.z1; z <= f.z2; z++) {
-          this.setBlock(x, -1, z, 'sand');
-          this.setBlock(x, 0, z, 'sand');
-          const isEdge = (x === f.maxX || z === f.z1 || z === f.z2);
-          this.setBlock(x, 1, z, isEdge ? 'sand' : 'quartz_block');
+        if (d >= 4.5) {
+          this.setBlock(x, 1, z, 'stone_bricks'); // Outer hub seawall
+        } else if (d >= 2.5) {
+          this.setBlock(x, 1, z, 'smooth_stone'); // Circular plaza pavement
+        } else {
+          this.setBlock(x, 1, z, 'quartz_block');
         }
       }
-
-      // 3. Luxury Beachfront Billionaire Villa on each frond
-      const vx = f.villaX;
-      for (let dx = -2; dx <= 2; dx++) {
-        for (let dz = -1; dz <= 2; dz++) {
-          const bx = vx + dx;
-          const bz = f.z1 + dz;
-          this.setBlock(bx, 1, bz, 'quartz_block');
-          // Ground Floor (Y = 2)
-          const isWall = (Math.abs(dx) === 2 || dz === -1 || dz === 2);
-          this.setBlock(bx, 2, bz, isWall ? 'quartz_block' : 'smooth_stone');
-          // Panoramic windows facing the lagoon
-          if (dz === -1 || dz === 2) {
-            this.setBlock(bx, 2, bz, 'cyber_glass');
-          }
-          // Upper Level (Y = 3)
-          if (Math.abs(dx) <= 1 && dz >= 0 && dz <= 1) {
-            this.setBlock(bx, 3, bz, (dx === 0) ? 'cyber_glass' : 'quartz_block');
-            this.setBlock(bx, 4, bz, 'smooth_stone'); // Flat modern roof deck
-          }
-        }
-      }
-
-      // 4. Private Infinity Plunge Pool overlooking the lagoon
-      const px = f.poolX;
-      for (let dx = 0; dx <= 2; dx++) {
-        for (let dz = 0; dz <= 1; dz++) {
-          const bx = px + dx;
-          const bz = f.z1 + dz;
-          this.setBlock(bx, 0, bz, 'prismarine_bricks');
-          this.setBlock(bx, 1, bz, 'water');
-          // Glass infinity lip at pool edge
-          if (dx === 2) {
-            this.setBlock(bx, 1, bz, 'cyber_glass');
-          }
-        }
-      }
-
-      // 5. Sun Loungers and Parasol on beachfront deck
-      this.setBlock(px - 1, 1, f.z1, 'oak_planks');
-      this.setBlock(px - 1, 2, f.z1, 'redstone_block'); // Sun lounger cushion
-      this.setBlock(px - 1, 1, f.z2, 'oak_planks');
-      this.setBlock(px - 1, 2, f.z2, 'quartz_block'); // Umbrella base
-      this.setBlock(px - 1, 3, f.z2, 'gold_block'); // Parasol canopy
-
-      // 6. Tropical Palm Trees
-      this.buildPalmTree(f.palmX[0], 1, f.z1);
-      this.buildPalmTree(f.palmX[1], 1, f.z2);
     }
 
-    // Interactive sign on central billionaire frond C
-    this.setBlock(196, 2, 28, 'gold_block', {
+    // Royal Crown Fountain Basin at (199, 42)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        const isRim = Math.abs(dx) === 1 || Math.abs(dz) === 1;
+        this.setBlock(199 + dx, 1, 42 + dz, isRim ? 'prismarine_bricks' : 'sea_lantern');
+        this.setBlock(199 + dx, 2, 42 + dz, isRim ? 'quartz_block' : 'water');
+      }
+    }
+    this.setBlock(199, 3, 42, 'water');
+    this.setBlock(199, 4, 42, 'sea_lantern');
+
+    // Monorail Terminus Platform at (196..197, 42)
+    this.setBlock(196, 2, 41, 'quartz_pillar');
+    this.setBlock(196, 2, 43, 'quartz_pillar');
+    this.setBlock(196, 3, 42, 'gold_block');
+    this.setBlock(197, 3, 42, 'gold_block');
+    this.setBlock(197, 4, 42, 'sea_lantern');
+
+    this.setBlock(198, 2, 38, 'quartz_block', {
       type: 'sign',
-      title: "Billionaire's Row · Signature Beachfront Villa 🏖️",
-      text: 'Ultra-exclusive private residence on Palm Jumeirah. Private infinity pool overlooking turquoise lagoons, floor-to-ceiling glass, and yacht mooring.'
+      title: 'The Palm Crown Hub · ساحة النخلة 👑',
+      text: 'The grand central fan hub where all 16 fronds radiate outward into the Arabian Gulf lagoons.'
     });
   }
 
-  // D. Outer Crescent Breakwater Barrier Reef Island
-  private buildOuterCrescentBreakwater() {
-    const cx = 198;
-    const cz = 42;
-    const rx = 24;
-    const rz = 22;
+  // D. 16 Symmetrical Parametric Curved Palm Fronds & Beachfront Billionaire Villas
+  private build16ParametricCurvedFronds() {
+    const frondDefs = [
+      { id: 'Frond A', idS: 'Frond P', xRoot: 182, xTip: 195, dz: 8, nameN: 'Frond A · Billionaire Villa', nameS: 'Frond P · Coral Coast Villa' },
+      { id: 'Frond B', idS: 'Frond O', xRoot: 185, xTip: 200, dz: 12, nameN: 'Frond B · Sunset Beach Villa', nameS: 'Frond O · Palm Haven Villa' },
+      { id: 'Frond C', idS: 'Frond N', xRoot: 188, xTip: 204, dz: 16, nameN: "Frond C · Billionaire's Row Villa", nameS: 'Frond N · Royal Marina Villa' },
+      { id: 'Frond D', idS: 'Frond M', xRoot: 191, xTip: 208, dz: 20, nameN: 'Frond D · Azure Horizon Villa', nameS: 'Frond M · Signature Waterfront Villa' },
+      { id: 'Frond E', idS: 'Frond L', xRoot: 194, xTip: 210, dz: 23, nameN: 'Frond E · Crown Pearl Villa', nameS: 'Frond L · Emerald Cove Villa' },
+      { id: 'Frond F', idS: 'Frond K', xRoot: 197, xTip: 211, dz: 25, nameN: 'Frond F · Sapphire Bay Villa', nameS: 'Frond K · Golden Sands Villa' },
+      { id: 'Frond G', idS: 'Frond J', xRoot: 200, xTip: 211, dz: 23, nameN: 'Frond G · Aquamarine Villa', nameS: 'Frond J · Royal Palm Villa' },
+      { id: 'Frond H', idS: 'Frond I', xRoot: 203, xTip: 210, dz: 16, nameN: 'Frond H · Apex Lagoon Villa', nameS: 'Frond I · Imperial Lagoon Villa' },
+    ];
 
-    for (let x = 178; x <= 222; x++) {
-      for (let z = 20; z <= 64; z++) {
+    for (let fIdx = 0; fIdx < frondDefs.length; fIdx++) {
+      const f = frondDefs[fIdx];
+      const villaStep = Math.round(f.xRoot + (f.xTip - f.xRoot) * 0.55);
+
+      for (let x = f.xRoot; x <= f.xTip; x++) {
+        const u = (x - f.xRoot) / (f.xTip - f.xRoot);
+        const curveOffset = 3 + (f.dz - 3) * Math.pow(u, 1.3);
+        const northZ = Math.round(42 - curveOffset);
+        const southZ = Math.round(42 + curveOffset);
+
+        // Render both North and South frond curves
+        for (const [targetZ, isNorth] of [[northZ, true], [southZ, false]] as [number, boolean][]) {
+          // 1. Seabed & Land foundation
+          for (let dz = -1; dz <= 1; dz++) {
+            const z = targetZ + dz;
+            this.setBlock(x, -1, z, 'sand');
+            this.setBlock(x, 0, z, 'sand');
+
+            if (dz === 0) {
+              // Central private villa access road
+              this.setBlock(x, 1, z, 'smooth_stone');
+            } else {
+              // Flanking golden sand beaches sloping into turquoise water
+              this.setBlock(x, 1, z, 'sand');
+            }
+          }
+
+          // 2. Circular tip cul-de-sac at the end of each frond
+          if (x === f.xTip) {
+            for (let dx = -1; dx <= 1; dx++) {
+              for (let dz = -1; dz <= 1; dz++) {
+                this.setBlock(x + dx, -1, targetZ + dz, 'sand');
+                this.setBlock(x + dx, 0, targetZ + dz, 'sand');
+                this.setBlock(x + dx, 1, targetZ + dz, (dx === 0 && dz === 0) ? 'smooth_stone' : 'sand');
+              }
+            }
+            // Cul-de-sac turning circle palm tree & golden navigation beacon
+            this.buildPalmTree(x, 1, targetZ);
+            this.setBlock(x + 1, 1, targetZ, 'gold_block');
+            this.setBlock(x + 1, 2, targetZ, 'sea_lantern');
+          }
+
+          // 3. Luxury Beachfront Billionaire Villa at midpoint of each frond
+          if (x === villaStep) {
+            const vx = x;
+            const vz = targetZ;
+            const zDir = isNorth ? -1 : 1;
+
+            // Villa Foundation & Floors
+            for (let dx = -2; dx <= 2; dx++) {
+              for (let dy = 1; dy <= 4; dy++) {
+                const bz = vz + zDir;
+                const bx = vx + dx;
+                if (dy === 1) {
+                  this.setBlock(bx, dy, bz, 'quartz_block');
+                } else if (dy === 2) {
+                  // Ground floor: quartz columns and floor-to-ceiling cyber-glass
+                  const isEdge = (Math.abs(dx) === 2);
+                  this.setBlock(bx, dy, bz, isEdge ? 'quartz_block' : 'cyber_glass');
+                } else if (dy === 3) {
+                  // Upper master suite
+                  const isWindow = (Math.abs(dx) <= 1);
+                  this.setBlock(bx, dy, bz, isWindow ? 'cyber_glass' : 'quartz_block');
+                } else if (dy === 4) {
+                  // Flat modernist roof deck
+                  this.setBlock(bx, dy, bz, 'smooth_stone');
+                }
+              }
+            }
+
+            // Private Turquoise Infinity Plunge Pool overlooking the lagoon
+            const poolZ = vz + zDir * 2;
+            for (let dx = -1; dx <= 1; dx++) {
+              this.setBlock(vx + dx, 0, poolZ, 'prismarine_bricks');
+              this.setBlock(vx + dx, 1, poolZ, 'water');
+              this.setBlock(vx + dx, 1, poolZ + zDir, 'cyber_glass'); // Infinity glass lip
+            }
+
+            // Beachfront Sun Deck, Loungers & Parasol
+            this.setBlock(vx - 2, 1, vz, 'oak_planks');
+            this.setBlock(vx - 2, 2, vz, 'redstone_block'); // Sun lounger
+            this.setBlock(vx + 2, 1, vz, 'oak_planks');
+            this.setBlock(vx + 2, 2, vz, 'gold_block'); // Parasol
+            this.setBlock(vx + 2, 3, vz, 'quartz_block');
+
+            // Date palm shading the villa
+            this.buildPalmTree(vx - 3, 1, vz);
+          }
+        }
+      }
+    }
+
+    // Discovery Signs on central billionaire fronds
+    this.setBlock(196, 2, 26, 'gold_block', {
+      type: 'sign',
+      title: "Frond C · Billionaire's Row Beachfront Villa 🏖️",
+      text: 'Ultra-exclusive private residence on Palm Jumeirah. Private infinity pool overlooking turquoise lagoons, floor-to-ceiling glass, and yacht mooring.'
+    });
+
+    this.setBlock(200, 2, 62, 'gold_block', {
+      type: 'sign',
+      title: 'Frond M · Signature Royal Beachfront Villa 🏖️',
+      text: 'Iconic southern frond billionaire estate featuring private white-sand beach, infinity plunge pool, and panoramic view of the Dubai skyline.'
+    });
+  }
+
+  // E. Detached Outer Crescent Breakwater Barrier Reef Island (X in [180, 222], Z in [16, 68])
+  private buildDetachedCrescentBreakwater() {
+    const cx = 196;
+    const cz = 42;
+    const rx = 26;
+    const rz = 26;
+
+    for (let x = 180; x <= 222; x++) {
+      for (let z = 16; z <= 68; z++) {
         const d = Math.hypot((x - cx) / rx, (z - cz) / rz);
-        if (d >= 0.88 && d <= 1.04) {
+        if (d >= 0.90 && d <= 1.05) {
           // North and South maritime tidal channels
-          const isNorthGap = (z >= 27 && z <= 28 && x >= 184 && x <= 189);
-          const isSouthGap = (z >= 56 && z <= 57 && x >= 184 && x <= 189);
+          const isNorthGap = (z >= 26 && z <= 28 && x >= 184 && x <= 189);
+          const isSouthGap = (z >= 56 && z <= 58 && x >= 184 && x <= 189);
           if (isNorthGap || isSouthGap) continue;
 
           // Skip Atlantis plinth (handled in Atlantis method)
@@ -4045,42 +4161,47 @@ export class WorldBuilder {
           this.setBlock(x, -1, z, 'sand');
           this.setBlock(x, 0, z, 'stone_bricks');
 
-          if (d >= 0.98) {
-            // Outer seawall facing Arabian Gulf waves
+          if (d >= 0.99) {
+            // Outer wave-breaking armour seawall facing open Arabian Gulf waves
             this.setBlock(x, 1, z, 'stone_bricks');
-            this.setBlock(x, 2, z, 'stone_bricks'); // Protective breakwater wall
-          } else if (d >= 0.92) {
-            // Walking path / promenade
+            this.setBlock(x, 2, z, (x % 2 === 0) ? 'stone_bricks' : 'cobblestone');
+          } else if (d >= 0.94) {
+            // Central Crescent Walking Promenade
             this.setBlock(x, 1, z, 'smooth_stone');
+            if ((x + z) % 6 === 0) {
+              this.setBlock(x, 2, z, 'iron_block');
+              this.setBlock(x, 3, z, 'sea_lantern');
+            }
           } else {
-            // Inner lagoon beach
+            // Inner lagoon beach gently sloping into the calm turquoise water
             this.setBlock(x, 1, z, 'sand');
-          }
-
-          // Illuminated beacon lanterns every 8 blocks
-          if ((x + z) % 8 === 0 && d >= 0.94 && d < 0.98) {
-            this.setBlock(x, 2, z, 'iron_block');
-            this.setBlock(x, 3, z, 'sea_lantern');
           }
         }
       }
     }
 
-    // North & South Crescent Lighthouse Beacons
-    this.setBlock(178, 1, 23, 'stone_bricks');
-    this.setBlock(178, 2, 23, 'quartz_pillar');
-    this.setBlock(178, 3, 23, 'sea_lantern');
-    this.setBlock(178, 4, 23, 'beacon');
+    // North & South Crescent Terminal Horn Lighthouses
+    // Detached horn tips at X = 180 (4 blocks clear of Dubai coastline at X = 176)
+    for (const [lx, lz] of [[180, 17], [180, 67]]) {
+      this.setBlock(lx, 1, lz, 'stone_bricks');
+      this.setBlock(lx, 2, lz, 'stone_bricks');
+      this.setBlock(lx, 3, lz, 'quartz_pillar');
+      this.setBlock(lx, 4, lz, 'quartz_pillar');
+      this.setBlock(lx, 5, lz, 'sea_lantern');
+      this.setBlock(lx, 6, lz, 'beacon');
+      this.setBlock(lx, 7, lz, 'gold_block');
+    }
 
-    this.setBlock(178, 1, 61, 'stone_bricks');
-    this.setBlock(178, 2, 61, 'quartz_pillar');
-    this.setBlock(178, 3, 61, 'sea_lantern');
-    this.setBlock(178, 4, 61, 'beacon');
+    this.setBlock(180, 3, 18, 'gold_block', {
+      type: 'sign',
+      title: 'North Crescent Lighthouse & Sea Strait ⚓',
+      text: 'Navigational beacon marking the open sea strait between the North Crescent Horn and the Dubai mainland coastline.'
+    });
   }
 
-  // E. Atlantis, The Palm & The Royal Atlantis Luxury Palace Resort
-  private buildAtlantisThePalmResort() {
-    // Foundation plinth (Y = 0 to 1): X in [215, 223], Z in [36, 48]
+  // F. Atlantis, The Palm & The Royal Atlantis Luxury Palace Resort (X in [215, 223], Z in [36, 48])
+  private buildAtlantisPalaceResort() {
+    // 1. Foundation Plinth (Y = -1 to 1)
     for (let x = 215; x <= 223; x++) {
       for (let z = 36; z <= 48; z++) {
         this.setBlock(x, -1, z, 'sand');
@@ -4089,15 +4210,16 @@ export class WorldBuilder {
       }
     }
 
-    // 1. North Wing (Z in [36, 40], X in [216, 221]) - Stepped luxury palace suites
+    // 2. North Stepped Moorish Palace Wing (Z in [36, 40], X in [216, 221])
     for (let x = 216; x <= 221; x++) {
       for (let z = 36; z <= 40; z++) {
-        // Tier 1 (Y = 2 to 5)
+        // Tier 1 (Y = 2 to 5): Terracotta adobe with cyber-glass arched viewing windows
         this.setBlock(x, 2, z, 'terracotta_adobe');
         this.setBlock(x, 3, z, (x === 216 || z === 36) ? 'cyber_glass' : 'terracotta_adobe');
         this.setBlock(x, 4, z, 'terracotta_adobe');
         this.setBlock(x, 5, z, 'quartz_block');
-        // Tier 2 (Y = 6 to 9)
+
+        // Tier 2 (Y = 6 to 9): Executive terraced suites with gold trim
         if (x >= 217 && x <= 220 && z >= 37 && z <= 39) {
           this.setBlock(x, 6, z, 'quartz_block');
           this.setBlock(x, 7, z, (x === 217) ? 'cyber_glass' : 'quartz_block');
@@ -4106,7 +4228,7 @@ export class WorldBuilder {
         }
       }
     }
-    // North Spire Tower at (218, 38)
+    // North Royal Minaret Spire at (218, 38) rising Y = 10 to 18
     for (let y = 10; y <= 16; y++) {
       this.setBlock(218, y, 38, 'quartz_pillar');
     }
@@ -4114,7 +4236,7 @@ export class WorldBuilder {
     this.setBlock(218, 18, 38, 'sea_lantern');
     this.setBlock(218, 19, 38, 'beacon');
 
-    // 2. South Wing (Z in [44, 48], X in [216, 221]) - Symmetrical mirror
+    // 3. South Stepped Moorish Palace Wing (Z in [44, 48], X in [216, 221]) - Symmetrical mirror
     for (let x = 216; x <= 221; x++) {
       for (let z = 44; z <= 48; z++) {
         // Tier 1 (Y = 2 to 5)
@@ -4122,6 +4244,7 @@ export class WorldBuilder {
         this.setBlock(x, 3, z, (x === 216 || z === 48) ? 'cyber_glass' : 'terracotta_adobe');
         this.setBlock(x, 4, z, 'terracotta_adobe');
         this.setBlock(x, 5, z, 'quartz_block');
+
         // Tier 2 (Y = 6 to 9)
         if (x >= 217 && x <= 220 && z >= 45 && z <= 47) {
           this.setBlock(x, 6, z, 'quartz_block');
@@ -4131,7 +4254,7 @@ export class WorldBuilder {
         }
       }
     }
-    // South Spire Tower at (218, 46)
+    // South Royal Minaret Spire at (218, 46) rising Y = 10 to 18
     for (let y = 10; y <= 16; y++) {
       this.setBlock(218, y, 46, 'quartz_pillar');
     }
@@ -4139,48 +4262,40 @@ export class WorldBuilder {
     this.setBlock(218, 18, 46, 'sea_lantern');
     this.setBlock(218, 19, 46, 'beacon');
 
-    // 3. The Grand Arabian Archway (Z in [41, 43], X in [217, 220])
-    // Grand open portal from Y = 2 to 7 with reflecting pool beneath
+    // 4. The Monumental Grand Arabian Archway (Z in [41, 43], X in [217, 220])
+    // Soaring keyhole vault open from Y = 2 to 7 with reflecting pool beneath
     for (let x = 217; x <= 220; x++) {
       for (let z = 41; z <= 43; z++) {
         this.setBlock(x, 1, z, 'prismarine_bricks');
         this.setBlock(x, 2, z, (z === 42) ? 'water' : 'quartz_block');
-        // Clear space inside the grand archway
-        this.setBlock(x, 3, z, 'air');
-        this.setBlock(x, 4, z, 'air');
-        this.setBlock(x, 5, z, 'air');
-        this.setBlock(x, 6, z, 'air');
-        this.setBlock(x, 7, z, 'air');
+        // Clear open interior framing unobstructed view into Arabian Gulf
+        for (let y = 3; y <= 7; y++) {
+          this.setBlock(x, y, z, 'air');
+        }
       }
-      // Archway Pillars
-      this.setBlock(x, 2, 40, 'quartz_pillar');
-      this.setBlock(x, 3, 40, 'quartz_pillar');
-      this.setBlock(x, 4, 40, 'quartz_pillar');
-      this.setBlock(x, 5, 40, 'quartz_pillar');
-      this.setBlock(x, 6, 40, 'quartz_pillar');
+      // Archway Supporting Columns
+      for (let y = 2; y <= 6; y++) {
+        this.setBlock(x, y, 40, 'quartz_pillar');
+        this.setBlock(x, y, 44, 'quartz_pillar');
+      }
       this.setBlock(x, 7, 40, 'gold_block');
-
-      this.setBlock(x, 2, 44, 'quartz_pillar');
-      this.setBlock(x, 3, 44, 'quartz_pillar');
-      this.setBlock(x, 4, 44, 'quartz_pillar');
-      this.setBlock(x, 5, 44, 'quartz_pillar');
-      this.setBlock(x, 6, 44, 'quartz_pillar');
       this.setBlock(x, 7, 44, 'gold_block');
     }
 
-    // 4. The Royal Bridge Suite (Spanning Y = 8 to 11 across Z in [41, 43], X in [217, 220])
+    // 5. The Royal Bridge Suite (Spanning Y = 8 to 12 across Z in [41, 43], X in [217, 220])
     for (let x = 217; x <= 220; x++) {
       for (let z = 41; z <= 43; z++) {
-        this.setBlock(x, 8, z, 'gold_block'); // Suite floor
-        this.setBlock(x, 9, z, (x === 217 || x === 220) ? 'cyber_glass' : 'air'); // Panoramic salon
+        this.setBlock(x, 8, z, 'gold_block'); // Bridge Suite floor
+        this.setBlock(x, 9, z, (x === 217 || x === 220) ? 'cyber_glass' : 'air'); // Solarium
         this.setBlock(x, 10, z, (x === 217 || x === 220) ? 'cyber_glass' : 'gold_block');
-        this.setBlock(x, 11, z, 'quartz_block'); // Ornate crown roof
+        this.setBlock(x, 11, z, 'quartz_block');
+        this.setBlock(x, 12, z, 'gold_block'); // Ornate crown cresting
       }
     }
-    this.setBlock(218, 9, 42, 'sea_lantern'); // Suite chandelier
-    this.setBlock(219, 12, 42, 'gold_block'); // Pinnacle
+    this.setBlock(218, 9, 42, 'sea_lantern'); // Chandelier
+    this.setBlock(219, 13, 42, 'beacon'); // Royal pinnacle
 
-    // 5. Aquaventure Cascades (Terraced waterfalls at Z = 35 and Z = 49)
+    // 6. Aquaventure Waterpark Cascades (Stepped water slides at Z = 35 and Z = 49)
     for (const cz of [35, 49]) {
       this.setBlock(217, 4, cz, 'prismarine_bricks');
       this.setBlock(217, 3, cz, 'water');
@@ -4188,13 +4303,13 @@ export class WorldBuilder {
       this.setBlock(215, 1, cz, 'water');
     }
 
-    // 6. Atlantis Entrance Plaza & Fountain (X = 213..215, Z = 40..44)
+    // 7. Atlantis Arrival Courtyard & Royal Palm Court (X in [213, 215], Z in [40, 44])
     for (let x = 213; x <= 215; x++) {
       for (let z = 40; z <= 44; z++) {
         this.setBlock(x, 1, z, 'quartz_block');
       }
     }
-    // Royal Fountain Basin
+    // Central Royal Fountain
     this.setBlock(214, 2, 42, 'prismarine_bricks');
     this.setBlock(214, 3, 42, 'sea_lantern');
     this.setBlock(214, 4, 42, 'water');
@@ -4209,9 +4324,9 @@ export class WorldBuilder {
     });
   }
 
-  // F. Subsea Transparent Cyber-Glass Transit Tunnel
-  private buildUnderwaterTransitTunnel() {
-    for (let x = 208; x <= 212; x++) {
+  // G. Subsea Transparent Cyber-Glass Transit Tunnel (X in [202, 213], Z = 42)
+  private buildSubseaGlassTunnel() {
+    for (let x = 202; x <= 212; x++) {
       // Submerged tunnel floor at Y = 1
       this.setBlock(x, 1, 42, (x % 2 === 0) ? 'gold_block' : 'smooth_stone');
       this.setBlock(x, 1, 41, 'stone_bricks');
@@ -4222,17 +4337,17 @@ export class WorldBuilder {
       this.setBlock(x, 2, 43, 'cyber_glass');
       this.setBlock(x, 3, 41, 'cyber_glass');
       this.setBlock(x, 3, 43, 'cyber_glass');
-      this.setBlock(x, 3, 42, 'cyber_glass'); // Glass arched ceiling
+      this.setBlock(x, 3, 42, 'cyber_glass'); // Glass arched vault
 
       // Clear walkable interior at Y = 2
       this.setBlock(x, 2, 42, 'air');
 
-      // Embedded marine lighting
+      // Embedded seabed illumination at Y = 0
       if (x % 2 === 0) {
         this.setBlock(x, 0, 42, 'sea_lantern');
       }
 
-      // Water surrounding and covering the glass tunnel on the outside!
+      // Active water blocks covering and surrounding the glass tube outside
       this.setBlock(x, 2, 40, 'water');
       this.setBlock(x, 2, 44, 'water');
       this.setBlock(x, 3, 40, 'water');
@@ -4249,27 +4364,26 @@ export class WorldBuilder {
     this.setBlock(213, 3, 43, 'gold_block');
     this.setBlock(213, 3, 42, 'sea_lantern');
 
-    this.setBlock(208, 2, 41, 'gold_block', {
+    this.setBlock(202, 2, 41, 'gold_block', {
       type: 'sign',
       title: 'Palm Subsea Glass Transit Tunnel 🌊',
-      text: 'Walk underwater through the deep lagoon channel connecting the Palm Trunk to Atlantis! Look up through reinforced cyber-glass into the turquoise Arabian Gulf.'
+      text: 'Walk underwater through the deep lagoon channel connecting the Palm Crown Hub directly to Atlantis! Look up through reinforced cyber-glass into the turquoise Arabian Gulf.'
     });
   }
 
-  // G. Moored Luxury Superyachts, Traditional Dhow & Glowing Coral Reefs
-  private buildLagoonYachtsAndMarineLife() {
+  // H. Moored Luxury Superyachts, Traditional Dhow & Glowing Coral Reefs
+  private buildLagoonYachtsAndCoralReefs() {
     // 1. Superyacht "Majesty 140" at (196, 32)
     const yx1 = 196;
     const yz1 = 32;
     for (let dx = -4; dx <= 4; dx++) {
       for (let dz = -1; dz <= 1; dz++) {
         const isBow = (dx === 4 && Math.abs(dz) === 1);
-        if (isBow) continue; // Streamlined yacht bow
+        if (isBow) continue;
         this.setBlock(yx1 + dx, 0, yz1 + dz, 'quartz_block'); // Hull
         this.setBlock(yx1 + dx, 1, yz1 + dz, 'oak_planks'); // Teak deck
       }
     }
-    // Yacht Cabin & Wheelhouse (Y = 2 to 3)
     for (let dx = -2; dx <= 2; dx++) {
       this.setBlock(yx1 + dx, 2, yz1, 'cyber_glass');
       this.setBlock(yx1 + dx, 3, yz1, 'quartz_block');
@@ -4301,11 +4415,10 @@ export class WorldBuilder {
       this.setBlock(dx0 + dx, 0, dz0, 'spruce_log');
       this.setBlock(dx0 + dx, 1, dz0, 'oak_planks');
     }
-    // Dhow Mast & Lateen Triangular Sail
     for (let y = 1; y <= 6; y++) {
       this.setBlock(dx0, y, dz0, 'spruce_log');
     }
-    // Triangular white cloth sail
+    // Triangular lateen sail
     this.setBlock(dx0 + 1, 3, dz0, 'quartz_block');
     this.setBlock(dx0 + 1, 4, dz0, 'quartz_block');
     this.setBlock(dx0 + 2, 4, dz0, 'quartz_block');
@@ -10431,367 +10544,281 @@ export class WorldBuilder {
   // ⚡ LIGHTNING McQUEEN STREET & RADIATOR SPRINGS PISTON CUP RACEWAY ⚡
   // -------------------------------------------------------------
   private buildLightningMcQueenStreet() {
-    // 1. Feeder Avenue from Hollywood Blvd (161, -54) & Vegas Blvd (144, -54) into Raceway Grid
-    for (let x = 144; x <= 153; x++) {
-      for (let z = -56; z <= -52; z++) {
+    // 1. Feeder Avenue from Hollywood Blvd Grand Gateway (164, -54) into Raceway West Entrance (174, -51)
+    for (let x = 164; x <= 174; x++) {
+      for (let z = -53; z <= -49; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        if (z === -54 && x % 4 <= 1) {
+        if (z === -51 && x % 3 <= 1) {
           this.setBlock(x, 1, z, 'gold_block'); // Yellow center divider
         }
       }
-      this.setBlock(x, 1, -57, 'stone_bricks'); // Curb
-      this.setBlock(x, 1, -51, 'stone_bricks'); // Curb
-      if (x % 6 === 0 && x <= 150) {
-        this.setBlock(x, 2, -57, 'iron_block');
-        this.setBlock(x, 3, -57, 'sea_lantern');
-        this.setBlock(x, 2, -51, 'iron_block');
-        this.setBlock(x, 3, -51, 'sea_lantern');
-      }
+      this.setBlock(x, 1, -54, 'stone_bricks'); // Curb
+      this.setBlock(x, 1, -48, 'stone_bricks'); // Curb
     }
 
-    // 2. High-Speed Raceway Circuit (Continuous 7-8 block wide loop with clear corners & kerbs)
-    // A. Main Start/Finish Straight: X in [154, 198], Z in [-27, -21] (center Z = -24)
-    for (let x = 154; x <= 198; x++) {
-      for (let z = -27; z <= -21; z++) {
+    // 2. High-Speed Raceway Circuit (Continuous 7-block wide loop in open desert quadrant X: 174..226, Z: -54..-12)
+    // A. Main Start/Finish Straight: X in [174, 226], Z in [-18, -12] (center Z = -15)
+    for (let x = 174; x <= 226; x++) {
+      for (let z = -18; z <= -12; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        // Yellow dashed center divider
-        if (z === -24 && x % 4 <= 1) {
+        if (z === -15 && x % 4 <= 1) {
           this.setBlock(x, 1, z, 'gold_block');
         }
       }
-      // North and South red/white rumble kerbs
-      this.setBlock(x, 1, -28, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      this.setBlock(x, 1, -20, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      // South (outer) and North (inner) rumble kerbs
+      this.setBlock(x, 1, -11, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 1, -19, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
     }
 
-    // Checkered Start/Finish Line at X = 168 (spanning full track Z in [-27, -21])
-    for (let z = -27; z <= -21; z++) {
-      for (let x = 168; x <= 169; x++) {
+    // Checkered Start/Finish Line at X = 190 (spanning Z in [-18, -12])
+    for (let z = -18; z <= -12; z++) {
+      for (let x = 190; x <= 191; x++) {
         const isWhite = (x + z) % 2 === 0;
         this.setBlock(x, 1, z, isWhite ? 'quartz_block' : 'coal_block');
       }
     }
 
     // Starting Grid Slots (White box markers for racers behind start line)
-    for (const gx of [164, 160]) {
-      this.setBlock(gx, 1, -25, 'quartz_block');
-      this.setBlock(gx, 1, -23, 'quartz_block');
-    }
+    // McQueen inside slot (186, -16), Doc Hudson outside slot (186, -14)
+    this.setBlock(186, 1, -17, 'quartz_block');
+    this.setBlock(186, 1, -16, 'gold_block');
+    this.setBlock(186, 1, -14, 'lapis_block');
+    this.setBlock(186, 1, -13, 'quartz_block');
 
-    // B. East Turn (Turns 1 & 2 / Willy's Butte Hairpin): X in [191, 197], Z in [-71, -21] (center X = 194)
-    for (let z = -71; z <= -21; z++) {
-      for (let x = 191; x <= 197; x++) {
+    // B. East Turn (Turns 1 & 2 / Hairpin Bank): X in [220, 226], Z in [-54, -12] (center X = 223)
+    for (let z = -54; z <= -12; z++) {
+      for (let x = 220; x <= 226; x++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        if (x === 194 && Math.abs(z) % 4 <= 1) {
+        if (x === 223 && Math.abs(z) % 4 <= 1) {
           this.setBlock(x, 1, z, 'gold_block');
         }
       }
-      // Kerbs along the East apex
-      this.setBlock(190, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      this.setBlock(198, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      // Protective outer tire barriers along the sharp bank
-      this.setBlock(199, 2, z, 'coal_block');
+      // Kerbs along East apex
+      this.setBlock(219, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(227, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      // Protective outer tire barriers
+      this.setBlock(228, 2, z, 'coal_block');
       if (Math.abs(z) % 2 === 0) {
-        this.setBlock(199, 3, z, 'coal_block');
+        this.setBlock(228, 3, z, 'coal_block');
       }
     }
 
-    // C. Canyon Back Straight: X in [154, 198], Z in [-71, -65] (center Z = -68)
-    for (let x = 154; x <= 198; x++) {
-      for (let z = -71; z <= -65; z++) {
+    // C. Canyon Back Straight: X in [174, 226], Z in [-54, -48] (center Z = -51)
+    for (let x = 174; x <= 226; x++) {
+      for (let z = -54; z <= -48; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        if (z === -68 && x % 4 <= 1) {
+        if (z === -51 && x % 4 <= 1) {
           this.setBlock(x, 1, z, 'gold_block');
         }
       }
-      this.setBlock(x, 1, -72, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      this.setBlock(x, 1, -64, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      // Outer barrier
-      this.setBlock(x, 2, -73, 'coal_block');
+      this.setBlock(x, 1, -55, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 1, -47, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 2, -56, 'coal_block');
     }
 
-    // D. West Straight / Turn 3 & 4: X in [155, 161], Z in [-71, -21] (center X = 158)
-    for (let z = -71; z <= -21; z++) {
-      for (let x = 155; x <= 161; x++) {
+    // D. West S-Curve / Willy's Butte Hairpin: X in [174, 180], Z in [-54, -12] (center X = 177)
+    for (let z = -54; z <= -12; z++) {
+      for (let x = 174; x <= 180; x++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        if (x === 158 && Math.abs(z) % 4 <= 1) {
+        if (x === 177 && Math.abs(z) % 4 <= 1) {
           this.setBlock(x, 1, z, 'gold_block');
         }
       }
-      this.setBlock(162, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      this.setBlock(154, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      // Outer safety barrier on west perimeter
-      this.setBlock(153, 2, z, 'coal_block');
+      this.setBlock(181, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(173, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(172, 2, z, 'coal_block');
       if (Math.abs(z) % 2 === 0) {
-        this.setBlock(153, 3, z, 'coal_block');
+        this.setBlock(172, 3, z, 'coal_block');
       }
     }
 
-    // E. Smooth Wide Corner Junctions (Paved 4-Corner Intersections)
-    // South-East (Turn 1): X in [188, 198], Z in [-28, -21]
-    for (let x = 188; x <= 198; x++) {
-      for (let z = -28; z <= -21; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-      }
+    // E. Smooth Wide Corner Junction Plazas
+    for (let x = 216; x <= 226; x++) {
+      for (let z = -19; z <= -12; z++) this.setBlock(x, 1, z, 'asphalt_road');
+      for (let z = -54; z <= -47; z++) this.setBlock(x, 1, z, 'asphalt_road');
     }
-    // North-East (Turn 2): X in [188, 198], Z in [-71, -64]
-    for (let x = 188; x <= 198; x++) {
-      for (let z = -71; z <= -64; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-      }
-    }
-    // North-West (Turn 3): X in [154, 164], Z in [-71, -64]
-    for (let x = 154; x <= 164; x++) {
-      for (let z = -71; z <= -64; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-      }
-    }
-    // South-West (Turn 4): X in [154, 164], Z in [-28, -21]
-    for (let x = 154; x <= 164; x++) {
-      for (let z = -28; z <= -21; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-      }
+    for (let x = 174; x <= 184; x++) {
+      for (let z = -19; z <= -12; z++) this.setBlock(x, 1, z, 'asphalt_road');
+      for (let z = -54; z <= -47; z++) this.setBlock(x, 1, z, 'asphalt_road');
     }
 
-    // F. Iconic Willy's Butte Infield Monument & Desert Drift Loop (X: 172..180, Z: -51..-43)
-    for (let x = 172; x <= 180; x++) {
-      for (let z = -51; z <= -43; z++) {
-        const distFromCenter = Math.sqrt((x - 176) ** 2 + (z - -47) ** 2);
-        if (distFromCenter <= 4.2) {
-          // Tiered red canyon rock formation
+    // F. Iconic Willy's Butte Infield Monument & Desert Drift Loop (Center: X = 200, Z = -33)
+    for (let x = 195; x <= 205; x++) {
+      for (let z = -38; z <= -28; z++) {
+        const distFromCenter = Math.sqrt((x - 200) ** 2 + (z - -33) ** 2);
+        if (distFromCenter <= 5.2) {
           this.setBlock(x, 1, z, 'red_terracotta');
           this.setBlock(x, 2, z, 'red_terracotta');
-          if (distFromCenter <= 3.2) {
+          if (distFromCenter <= 4.0) {
             this.setBlock(x, 3, z, 'terracotta_adobe');
             this.setBlock(x, 4, z, 'terracotta_adobe');
           }
-          if (distFromCenter <= 2.2) {
+          if (distFromCenter <= 2.8) {
             this.setBlock(x, 5, z, 'sandstone');
             this.setBlock(x, 6, z, 'sandstone');
           }
-          if (distFromCenter <= 1.2) {
-            this.setBlock(x, 7, z, 'gold_block'); // Piston Cup beacon plateau!
+          if (distFromCenter <= 1.4) {
+            this.setBlock(x, 7, z, 'gold_block');
+            this.setBlock(x, 8, z, 'beacon');
           }
         }
       }
     }
-    // Doc's Willy's Butte Drift Marker Sign
-    this.setBlock(176, 2, -42, 'gold_block', {
+    // Willy's Butte Drift Marker Sign
+    this.setBlock(200, 2, -26, 'gold_block', {
       type: 'sign',
       title: "🌵 Willy's Butte · Doc's Dirt Drift Loop 🏁",
       text: 'Doc Hudson\'s Championship Secret:\n"When you\'re entering the turn in the dirt, turn right to go left! Give it too much throttle, you lose the rear; balance the slide, and you slingshot out ahead!"\n\nSite of the legendary Lightning vs. Doc Hudson race.'
     });
 
-    // 3. Grand Start/Finish Gantry & Triumphal Neon Arch (X = 168, Z in [-30, -18])
-    for (const pz of [-29, -19]) {
+    // 3. Grand Start/Finish Gantry & Electronic Racing Lights (X = 190, Z in [-20, -10])
+    for (const pz of [-20, -10]) {
       for (let y = 1; y <= 7; y++) {
-        this.setBlock(168, y, pz, (y % 2 === 0) ? 'redstone_block' : 'gold_block');
-        this.setBlock(169, y, pz, 'iron_block');
+        this.setBlock(190, y, pz, (y % 2 === 0) ? 'redstone_block' : 'gold_block');
+        this.setBlock(191, y, pz, 'iron_block');
       }
     }
-    // Overhead bridge span at Y = 7 and Y = 8
-    for (let z = -28; z <= -20; z++) {
-      this.setBlock(168, 7, z, 'gold_block');
-      this.setBlock(169, 7, z, 'iron_block');
-      this.setBlock(168, 8, z, (Math.abs(z - (-24)) <= 1) ? 'sea_lantern' : 'redstone_block');
+    for (let z = -20; z <= -10; z++) {
+      this.setBlock(190, 7, z, 'gold_block');
+      this.setBlock(191, 7, z, 'iron_block');
+      this.setBlock(190, 8, z, (Math.abs(z - (-15)) <= 1) ? 'sea_lantern' : 'redstone_block');
     }
-    // Center Piston Cup Golden Trophy atop the arch
-    this.setBlock(168, 9, -24, 'gold_block');
-    this.setBlock(168, 10, -24, 'beacon');
-    this.setBlock(167, 9, -24, 'gold_block');
-    this.setBlock(169, 9, -24, 'gold_block');
+    this.setBlock(190, 9, -15, 'gold_block');
+    this.setBlock(190, 10, -15, 'beacon');
 
-    // Starting Signal Lights (Red -> Red -> Red -> Green!)
-    this.setBlock(168, 6, -26, 'redstone_block');
-    this.setBlock(168, 6, -25, 'redstone_block');
-    this.setBlock(168, 6, -23, 'gold_block');
-    this.setBlock(168, 6, -22, 'emerald_block');
+    // Electronic Starting Signal Lights (Red -> Red -> Yellow -> Green!)
+    this.setBlock(190, 6, -17, 'redstone_block');
+    this.setBlock(190, 6, -16, 'redstone_block');
+    this.setBlock(190, 6, -14, 'gold_block');
+    this.setBlock(190, 6, -13, 'emerald_block');
 
     // Official Landmark Sign at Start/Finish Gantry
-    this.setBlock(168, 2, -19, 'gold_block', {
+    this.setBlock(190, 2, -9, 'gold_block', {
       type: 'sign',
       title: '⚡ LIGHTNING McQUEEN STREET · PISTON CUP SPEEDWAY #95 ⚡',
-      text: '"Ka-Chow!" Welcome to Lightning McQueen Way! World-famous Radiator Springs Piston Cup Championship Raceway.\n\n"I am speed! Faster than fast, quicker than quick! Float like a Cadillac, sting like a Beemer!"\n\n• Press [E] to jump into Lightning McQueen and race in 3D!\n• Press [H] for Ka-Chow! horn · Hold [Shift] for Nitro Boost!'
+      text: '"Ka-Chow!" Welcome to Lightning McQueen Way! World-famous Radiator Springs Piston Cup Championship Raceway.\n\n"I am speed! Faster than fast, quicker than quick! Float like a Cadillac, sting like a Beemer!"\n\n• Press [E] to jump into Lightning McQueen and race in 3D!\n• Press [H] for Ka-Chow! horn · Hold [Shift] for Nitro Boost!\n• Challenge Doc Hudson to the 2-lap Willy\'s Butte showdown!'
     });
 
-    // 4. Flo's V8 Café (Retro Neon Drive-In Diner & Gas Pumps) at X in [173, 181], Z in [-18, -11]
-    // Diner Checkered Foundation & Interior
-    for (let x = 173; x <= 181; x++) {
-      for (let z = -18; z <= -11; z++) {
+    // 4. Flo's V8 Café at X in [196, 204], Z in [-10, -3]
+    for (let x = 196; x <= 204; x++) {
+      for (let z = -10; z <= -3; z++) {
         const isChecker = (x + z) % 2 === 0;
         this.setBlock(x, 1, z, isChecker ? 'quartz_block' : 'coal_block');
-        // Back and side walls
-        if (x === 173 || x === 181 || z === -11) {
+        if (x === 196 || x === 204 || z === -3) {
           for (let y = 2; y <= 4; y++) {
-            this.setBlock(x, y, z, (y === 3 && z === -11) ? 'cyber_glass' : 'red_terracotta');
+            this.setBlock(x, y, z, (y === 3 && z === -3) ? 'cyber_glass' : 'red_terracotta');
           }
         }
-        // Streamline Diner Canopy Roof
         this.setBlock(x, 5, z, 'smooth_stone');
       }
     }
-
-    // Monumental Giant "V8" Illuminated Neon Engine Sign on Flo's Roof (X = 177, Z = -14)
-    // Left diagonal of 'V'
-    this.setBlock(175, 6, -14, 'sea_lantern');
-    this.setBlock(175, 7, -14, 'sea_lantern');
-    this.setBlock(176, 5, -14, 'sea_lantern');
-    // Bottom point of 'V'
-    this.setBlock(177, 4, -14, 'sea_lantern');
-    // Right diagonal of 'V'
-    this.setBlock(178, 5, -14, 'sea_lantern');
-    this.setBlock(179, 6, -14, 'sea_lantern');
-    this.setBlock(179, 7, -14, 'sea_lantern');
-    // Figure '8' loops beside 'V'
+    // Neon "V8" Sign
+    this.setBlock(198, 6, -6, 'sea_lantern');
+    this.setBlock(198, 7, -6, 'sea_lantern');
+    this.setBlock(199, 5, -6, 'sea_lantern');
+    this.setBlock(200, 4, -6, 'sea_lantern');
+    this.setBlock(201, 5, -6, 'sea_lantern');
+    this.setBlock(202, 6, -6, 'sea_lantern');
+    this.setBlock(202, 7, -6, 'sea_lantern');
     for (let y = 5; y <= 8; y++) {
-      this.setBlock(181, y, -14, (y === 5 || y === 8 || y === 6.5) ? 'gold_block' : 'sea_lantern');
+      this.setBlock(204, y, -6, (y === 5 || y === 8 || y === 6.5) ? 'gold_block' : 'sea_lantern');
     }
-
-    // Vintage Drive-In Gasoline Pumps in front of Flo's
-    for (const px of [175, 179]) {
-      this.setBlock(px, 1, -19, 'iron_block');
-      this.setBlock(px, 2, -19, 'redstone_block'); // Pump housing
-      this.setBlock(px, 3, -19, 'glowstone');      // Lit fuel octane dial
+    // Vintage Gas Pumps
+    for (const px of [198, 202]) {
+      this.setBlock(px, 1, -11, 'iron_block');
+      this.setBlock(px, 2, -11, 'redstone_block');
+      this.setBlock(px, 3, -11, 'glowstone');
     }
-
-    this.setBlock(177, 2, -18, 'gold_block', {
+    this.setBlock(200, 2, -10, 'gold_block', {
       type: 'sign',
       title: "Flo's V8 Café · Radiator Springs ⛽",
       text: "Finest fuel in the whole Mother Road! Grab a can of high-octane blend and watch Lightning McQueen tear down the main straight!\n\n\"Float like a Cadillac, sting like a Beemer!\""
     });
 
-    // 5. Luigi's Casa Della Tires & Guido's Pit Stop (X in [183, 189], Z in [-18, -12])
-    for (let x = 183; x <= 189; x++) {
-      for (let z = -18; z <= -12; z++) {
+    // 5. Luigi's Casa Della Tires at X in [207, 213], Z in [-10, -4]
+    for (let x = 207; x <= 213; x++) {
+      for (let z = -10; z <= -4; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
       }
     }
-    // The Iconic Leaning Tower of Tires (Stacked coal tire blocks tilted upwards to Y = 9)
-    const tireX = 186;
-    const tireZ = -15;
+    // Leaning Tower of Tires
+    const tireX = 210;
+    const tireZ = -7;
     this.setBlock(tireX, 2, tireZ, 'coal_block');
     this.setBlock(tireX, 3, tireZ, 'coal_block');
     this.setBlock(tireX + 1, 4, tireZ, 'coal_block');
     this.setBlock(tireX + 1, 5, tireZ, 'coal_block');
     this.setBlock(tireX + 2, 6, tireZ, 'coal_block');
     this.setBlock(tireX + 2, 7, tireZ, 'coal_block');
-    this.setBlock(tireX + 3, 8, tireZ, 'coal_block');
-    this.setBlock(tireX + 3, 9, tireZ, 'beacon'); // Shimmering beacon atop tire tower!
+    this.setBlock(tireX + 2, 8, tireZ, 'beacon');
 
-    // Italian Tricolore Ribbon on Luigi's Shop
-    this.setBlock(183, 3, -18, 'emerald_block');
-    this.setBlock(184, 3, -18, 'quartz_block');
-    this.setBlock(185, 3, -18, 'redstone_block');
-
-    this.setBlock(186, 2, -18, 'gold_block', {
+    this.setBlock(210, 2, -10, 'gold_block', {
       type: 'sign',
       title: "Luigi's Casa Della Tires · Guido's Pit Stop 🛞",
       text: "Home of the famous Leaning Tower of Tires! Guido holds the all-time world record pit stop: four Lightyear racing tires changed in under 2.5 seconds!\n\n\"Peet stop!\""
     });
 
-    // 6. Tow Mater's Towing & Salvage Yard at (171, -34)
-    for (let x = 169; x <= 174; x++) {
-      for (let z = -36; z <= -31; z++) {
+    // 6. Tow Mater's Salvage Yard at X in [178, 184], Z in [-10, -4]
+    for (let x = 178; x <= 184; x++) {
+      for (let z = -10; z <= -4; z++) {
         this.setBlock(x, 1, z, 'terracotta_adobe');
       }
     }
-    // Mater's rustic salvage workshop shed & wooden crane boom
-    this.setBlock(169, 2, -35, 'log');
-    this.setBlock(169, 3, -35, 'log');
-    this.setBlock(169, 4, -35, 'log');
-    this.setBlock(170, 5, -34, 'oak_planks');
-    this.setBlock(171, 6, -33, 'iron_block'); // Crane hook
-    this.setBlock(171, 5, -33, 'iron_block');
-    // Scrap tire piles
-    this.setBlock(173, 2, -35, 'coal_block');
-    this.setBlock(174, 2, -35, 'coal_block');
-    this.setBlock(173, 3, -35, 'coal_block');
+    this.setBlock(179, 2, -7, 'log');
+    this.setBlock(179, 3, -7, 'log');
+    this.setBlock(179, 4, -7, 'log');
+    this.setBlock(180, 5, -6, 'oak_planks');
+    this.setBlock(181, 6, -5, 'iron_block');
+    this.setBlock(181, 5, -5, 'iron_block');
+    this.setBlock(183, 2, -7, 'coal_block');
+    this.setBlock(184, 2, -7, 'coal_block');
 
-    this.setBlock(172, 2, -31, 'terracotta_adobe', {
+    this.setBlock(181, 2, -10, 'terracotta_adobe', {
       type: 'sign',
       title: 'Tow Mater Towing & Salvage 🛻',
       text: '"Dad gum! I\'m the world\'s best backward driver! Just ask Lightning McQueen—we\'re best friends! Ain\'t no need to see where I\'m goin\', I just need to know where I\'ve been!"\n\nRadiator Springs Official Towing & Recovery.'
     });
 
-    // 7. Doc Hudson #51 Fabulous Hudson Hornet Pit Crew Chief Box (178, -33)
-    for (let x = 176; x <= 181; x++) {
-      for (let z = -35; z <= -31; z++) {
+    // 7. Doc Hudson #51 Pit Crew Chief Box at X in [187, 193], Z in [-10, -4]
+    for (let x = 187; x <= 193; x++) {
+      for (let z = -10; z <= -4; z++) {
         this.setBlock(x, 1, z, 'smooth_stone');
       }
     }
-    // Doc's Midnight Blue and Gold Command Pit Box
-    for (let x = 176; x <= 181; x++) {
-      this.setBlock(x, 2, -35, 'lapis_block');
-      this.setBlock(x, 3, -35, 'gold_block');
-      this.setBlock(x, 4, -35, 'lapis_block');
+    for (let x = 187; x <= 193; x++) {
+      this.setBlock(x, 2, -6, 'lapis_block');
+      this.setBlock(x, 3, -6, 'gold_block');
+      this.setBlock(x, 4, -6, 'lapis_block');
     }
-    // Piston Cup Championship Trophy & Strategy Radio Antenna
-    this.setBlock(178, 5, -35, 'beacon');
-    this.setBlock(179, 5, -35, 'iron_block');
-    this.setBlock(179, 6, -35, 'iron_block');
-    this.setBlock(179, 7, -35, 'sea_lantern');
+    this.setBlock(190, 5, -6, 'beacon');
+    this.setBlock(191, 5, -6, 'iron_block');
+    this.setBlock(191, 6, -6, 'sea_lantern');
 
-    this.setBlock(178, 2, -31, 'gold_block', {
+    this.setBlock(190, 2, -10, 'gold_block', {
       type: 'sign',
       title: 'Doc Hudson #51 Pit Crew Box 🏁',
       text: 'Crew Chief Doc Hudson (The Fabulous Hudson Hornet):\n"When you\'re turning hard into the dirt, turn right to go left! Give it too much throttle, you lose the rear."\n\n3-Time Piston Cup Champion (1951, 1952, 1953).'
     });
 
-    // 8. Trackside Sponsorship Billboards along Canyon Back Straight
-    // A. Rust-eze Bumper Ointment #95 Billboard at (182, -73)
-    for (let x = 180; x <= 186; x++) {
-      this.setBlock(x, 2, -73, 'iron_block');
-      for (let y = 3; y <= 5; y++) {
-        const isFrame = (x === 180 || x === 186 || y === 3 || y === 5);
-        this.setBlock(x, y, -73, isFrame ? 'gold_block' : 'red_terracotta');
-      }
-    }
-    this.setBlock(183, 4, -73, 'sea_lantern');
-    this.setBlock(183, 2, -72, 'gold_block', {
-      type: 'sign',
-      title: 'Rust-eze Medicated Bumper Ointment #95 🌟',
-      text: '"With a little Rust-eze, you can look like Lightning!"\n\nOfficial primary sponsor of Lightning McQueen and the Rust-eze Racing Center.'
-    });
-
-    // B. Dinoco 400 Championship Billboard at (166, -73)
-    for (let x = 164; x <= 170; x++) {
-      this.setBlock(x, 2, -73, 'iron_block');
-      for (let y = 3; y <= 5; y++) {
-        const isFrame = (x === 164 || x === 170 || y === 3 || y === 5);
-        this.setBlock(x, y, -73, isFrame ? 'quartz_block' : 'lapis_block');
-      }
-    }
-    this.setBlock(167, 4, -73, 'diamond_block');
-    this.setBlock(167, 2, -72, 'diamond_block', {
-      type: 'sign',
-      title: 'The Dinoco 400 · Piston Cup Championship 🏆',
-      text: 'The premier event of the racing season at the Los Angeles International Speedway! May the best racer win the legendary Piston Cup.'
-    });
-
-    // 9. Spectator Grandstand Bleachers along South Main Straight (X in [166, 186], Z in [-34, -30])
-    for (let x = 166; x <= 186; x++) {
-      // Row 1
-      this.setBlock(x, 2, -30, 'stone_bricks');
-      this.setBlock(x, 2, -31, 'smooth_stone');
-      // Row 2
-      this.setBlock(x, 3, -32, 'stone_bricks');
-      this.setBlock(x, 3, -32, 'smooth_stone');
-      // Row 3
-      this.setBlock(x, 4, -33, 'stone_bricks');
-      this.setBlock(x, 4, -34, 'smooth_stone');
-      // Cheering fans holding #95 flags
+    // 8. Spectator Grandstand Bleachers along South Main Straight (X in [180, 220], Z in [-3, 1])
+    for (let x = 180; x <= 220; x++) {
+      this.setBlock(x, 2, -3, 'stone_bricks');
+      this.setBlock(x, 2, -2, 'smooth_stone');
+      this.setBlock(x, 3, -1, 'stone_bricks');
+      this.setBlock(x, 3, 0, 'smooth_stone');
+      this.setBlock(x, 4, 1, 'stone_bricks');
       if (x % 3 === 0) {
-        this.setBlock(x, 5, -34, 'redstone_block');
-        this.setBlock(x, 6, -34, 'gold_block'); // #95 banners
+        this.setBlock(x, 5, 1, 'redstone_block');
+        this.setBlock(x, 6, 1, 'gold_block'); // #95 banners
       }
     }
 
-    // 10. High-Intensity Stadium Floodlight Towers for Night Races (4 Safe Outside Corners)
+    // 9. High-Intensity Stadium Floodlight Towers (4 Safe Outside Corners)
     const floodlights = [
-      [152, -18],
-      [200, -18],
-      [200, -75],
-      [152, -75]
+      [172, -10],
+      [228, -10],
+      [228, -56],
+      [172, -56]
     ];
     for (const [fx, fz] of floodlights) {
       for (let y = 1; y <= 11; y++) {
