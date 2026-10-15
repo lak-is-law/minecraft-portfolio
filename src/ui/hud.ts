@@ -2,6 +2,7 @@ import { PORTFOLIO_DATA } from '../data/portfolioData';
 import { TargetInfo } from '../engine/player';
 import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
+import { RaceChallengeState } from '../world/lightningMcQueen';
 
 export interface HotbarSlot {
   id: string;
@@ -40,6 +41,7 @@ export class HUDManager {
   public onOpenFastTravel?: () => void;
   public onOpenResume?: () => void;
   public onBlockSelected?: (blockType: string) => void;
+  public onOpenBlockPalette?: () => void;
   public onTakeScreenshot?: () => void;
   public onTogglePerspective?: () => void;
   public onToggleSit?: () => void;
@@ -113,11 +115,14 @@ export class HUDManager {
         <button class="mc-chip-btn" id="btn-quick-map" title="Interactive World Map (Key: M)">[MAP: M]</button>
         <button class="mc-chip-btn" id="btn-quick-skills" title="Alchemy Potions Guide">[POTIONS]</button>
         <button class="mc-chip-btn" id="btn-quick-resume" title="Ancient Treasure Vault">[TREASURE]</button>
+        <button class="mc-chip-btn" id="btn-quick-blocks" title="Creative Block Palette (Key: B)">[BLOCKS: B]</button>
         <button class="mc-chip-btn" id="btn-quick-fly" title="Toggle Creative Flight">[FLY: OFF]</button>
         <button class="mc-chip-btn" id="btn-quick-weather" title="Cycle clear, rain, thunder, aurora, snowfall, and rainbow">[WEATHER: CLEAR]</button>
         <button class="mc-chip-btn" id="btn-quick-time" title="Toggle Day / Night (Key: T)">[TIME: DAY]</button>
         <button class="mc-chip-btn" id="btn-quick-season" title="Cycle spring, summer, autumn, and winter">[SEASON: SPRING]</button>
-        <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1P / 3P View (F5)">[VIEW: 1P]</button>
+        <button class="mc-chip-btn" id="btn-quick-perspective" title="Toggle 1P / 3P View (Key: F5 or C)">[VIEW: 1P]</button>
+        <button class="mc-chip-btn" id="btn-quick-sit" title="Sit & Rest (Key: X)">[SIT: X]</button>
+        <button class="mc-chip-btn" id="btn-quick-screenshot" title="Take Screenshot (Key: F2)">[PHOTO: F2]</button>
         <button class="mc-chip-btn" id="btn-quick-sound" title="Toggle Audio">[AUDIO: ON]</button>
         <button class="mc-chip-btn" id="btn-quick-unlock" title="Open Pause Menu (Key: ESC)">[PAUSE: ESC]</button>
       </div>
@@ -171,6 +176,7 @@ export class HUDManager {
     });
     document.getElementById('btn-quick-skills')?.addEventListener('click', () => this.onOpenSkills?.());
     document.getElementById('btn-quick-resume')?.addEventListener('click', () => this.onOpenResume?.());
+    document.getElementById('btn-quick-blocks')?.addEventListener('click', () => this.onOpenBlockPalette?.());
     document.getElementById('btn-quick-map')?.addEventListener('click', () => this.onOpenFastTravel?.());
     document.getElementById('btn-quick-weather')?.addEventListener('click', () => this.onCycleWeather?.());
     document.getElementById('btn-quick-time')?.addEventListener('click', () => this.onDayNightToggle?.());
@@ -194,25 +200,41 @@ export class HUDManager {
     document.getElementById('btn-quick-sit')?.addEventListener('click', () => {
       this.onToggleSit?.();
     });
-    // Minimap Zoom Controls
-    document.getElementById('btn-minimap-zoomin')?.addEventListener('click', (e) => {
+
+    // Minimap Zoom Controls with mobile touch isolation
+    const zoomInBtn = document.getElementById('btn-minimap-zoomin');
+    const zoomOutBtn = document.getElementById('btn-minimap-zoomout');
+
+    const handleZoomIn = (e: Event) => {
       e.stopPropagation();
+      e.preventDefault();
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const nextIdx = currentIdx >= 0 ? Math.min(this.zoomLevels.length - 1, currentIdx + 1) : 1;
       this.minimapZoom = this.zoomLevels[nextIdx];
       sound.playClick();
-    });
+    };
 
-    document.getElementById('btn-minimap-zoomout')?.addEventListener('click', (e) => {
+    const handleZoomOut = (e: Event) => {
       e.stopPropagation();
+      e.preventDefault();
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const prevIdx = currentIdx >= 0 ? Math.max(0, currentIdx - 1) : 1;
       this.minimapZoom = this.zoomLevels[prevIdx];
       sound.playClick();
-    });
+    };
+
+    zoomInBtn?.addEventListener('click', handleZoomIn);
+    zoomInBtn?.addEventListener('touchend', handleZoomIn);
+    zoomInBtn?.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+
+    zoomOutBtn?.addEventListener('click', handleZoomOut);
+    zoomOutBtn?.addEventListener('touchend', handleZoomOut);
+    zoomOutBtn?.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
 
     const minimapBox = document.getElementById('mc-minimap-box');
     const triggerOpenMap = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.mc-minimap-zoom-btn')) return;
       e.preventDefault();
       e.stopPropagation();
       if (document.pointerLockElement) {
@@ -227,6 +249,8 @@ export class HUDManager {
     let touchStartX = 0;
     let touchStartY = 0;
     minimapBox?.addEventListener('touchstart', (e: TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.mc-minimap-zoom-btn')) return;
       if (e.touches.length === 1) {
         touchStartTime = performance.now();
         touchStartX = e.touches[0].clientX;
@@ -235,6 +259,8 @@ export class HUDManager {
     }, { passive: true });
 
     minimapBox?.addEventListener('touchend', (e: TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.mc-minimap-zoom-btn')) return;
       const dt = performance.now() - touchStartTime;
       const t = e.changedTouches[0];
       if (t && dt < 450 && Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) < 18) {
@@ -523,8 +549,8 @@ export class HUDManager {
     drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
     // 9. Egypt (Sahara desert dunes)
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
-    // 10. UAE (Dubai Waterfront & Palm)
-    drawMiniCountry([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], '#0d9488');
+    // 10. UAE (Dubai Waterfront & Palm Jumeirah Archipelago)
+    drawMiniCountry([[150, 18], [222, 18], [222, 64], [150, 64], [150, 18]], '#0d9488');
     // 12. Sunflower Valley
     drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
     // Pier & Beach Boardwalk
@@ -782,7 +808,7 @@ export class HUDManager {
       if (tag.includes('CARNIVAL')) return '#f472b6';
       if (tag.includes('LONDON')) return '#dc2626';
       if (tag.includes('SEOUL')) return '#8b5cf6';
-      if (tag.includes('DUBAI')) return '#14b8a6';
+      if (tag.includes('DUBAI') || tag.includes('PALM')) return '#14b8a6';
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';
       if (tag.includes('HAWA MAHAL')) return '#fb923c';
@@ -974,5 +1000,126 @@ export class HUDManager {
     setTimeout(() => {
       if (toast) toast.style.display = 'none';
     }, 10000);
+  }
+
+  // -------------------------------------------------------------
+  // PISTON CUP RACING HUD & DOC HUDSON CHALLENGE OVERLAY
+  // -------------------------------------------------------------
+  public updateRacingHUD(
+    isDrivingMcQueen: boolean,
+    speed: number,
+    isShift: boolean,
+    isSpace: boolean,
+    raceState?: RaceChallengeState
+  ) {
+    let hud = document.getElementById('mc-racing-hud');
+    if (!hud) {
+      hud = document.createElement('div');
+      hud.id = 'mc-racing-hud';
+      hud.className = 'mc-racing-hud';
+      hud.innerHTML = `
+        <div class="mc-racing-cluster">
+          <div class="mc-racing-badge">⚡ LIGHTNING McQUEEN #95</div>
+          <div class="mc-racing-speed-val"><span id="mc-race-speed">0</span> <small>MPH</small></div>
+          <div class="mc-racing-nitro-label">NITRO BOOST</div>
+          <div class="mc-racing-nitro-bar"><div id="mc-race-nitro-fill" class="mc-racing-nitro-fill"></div></div>
+          <div class="mc-racing-controls-hint">W: Gas · S: Brake/Rev · SPACE: Drift · SHIFT: Nitro · E: Exit</div>
+        </div>
+
+        <div id="mc-race-challenge-panel" class="mc-race-challenge-panel" style="display: none;">
+          <div class="mc-challenge-header">🏆 WILLY'S BUTTE RACE · vs DOC HUDSON #51</div>
+          <div class="mc-challenge-stats">
+            <div class="mc-challenge-stat"><span class="mc-label">POSITION</span> <span id="mc-race-pos" class="mc-pos-p1">P1</span></div>
+            <div class="mc-challenge-stat"><span class="mc-label">LAP</span> <span id="mc-race-lap">1/2</span></div>
+            <div class="mc-challenge-stat"><span class="mc-label">TIME</span> <span id="mc-race-time">00:00.0</span></div>
+          </div>
+        </div>
+
+        <div id="mc-race-big-banner" class="mc-race-big-banner" style="display: none;"></div>
+      `;
+      document.body.appendChild(hud);
+    }
+
+    if (!isDrivingMcQueen) {
+      hud.style.display = 'none';
+      return;
+    }
+
+    hud.style.display = 'block';
+
+    // Speedometer MPH
+    const mph = Math.round(Math.abs(speed) * 4.6);
+    const speedEl = document.getElementById('mc-race-speed');
+    if (speedEl) speedEl.textContent = `${mph}`;
+
+    // Nitro Bar
+    const nitroFill = document.getElementById('mc-race-nitro-fill');
+    if (nitroFill) {
+      const nitroPct = isShift ? 100 : Math.min(100, Math.max(25, (Math.abs(speed) / 26.0) * 100));
+      nitroFill.style.width = `${nitroPct}%`;
+      if (isShift) {
+        nitroFill.classList.add('boosting');
+      } else {
+        nitroFill.classList.remove('boosting');
+      }
+    }
+
+    // Doc Hudson Challenge Panel
+    const challengePanel = document.getElementById('mc-race-challenge-panel');
+    const bigBanner = document.getElementById('mc-race-big-banner');
+
+    if (raceState && raceState.active) {
+      if (challengePanel) challengePanel.style.display = 'block';
+
+      if (raceState.state === 'countdown') {
+        const curSec = Math.ceil(raceState.countdownTimer);
+        if (bigBanner) {
+          bigBanner.style.display = 'block';
+          bigBanner.innerHTML = `<span class="mc-countdown-number ${curSec <= 1 ? 'go' : ''}">${curSec > 0 ? curSec : 'GO!'}</span>`;
+        }
+      } else if (raceState.state === 'racing') {
+        if (bigBanner) bigBanner.style.display = 'none';
+
+        const posEl = document.getElementById('mc-race-pos');
+        if (posEl) {
+          posEl.textContent = `P${raceState.playerPosition}`;
+          posEl.className = raceState.playerPosition === 1 ? 'mc-pos-p1' : 'mc-pos-p2';
+        }
+
+        const lapEl = document.getElementById('mc-race-lap');
+        if (lapEl) {
+          lapEl.textContent = `${Math.min(raceState.totalLaps, raceState.playerLap)}/${raceState.totalLaps}`;
+        }
+
+        const timeEl = document.getElementById('mc-race-time');
+        if (timeEl) {
+          const totalSec = Math.floor(raceState.elapsedTime);
+          const mins = Math.floor(totalSec / 60).toString().padStart(2, '0');
+          const secs = (totalSec % 60).toString().padStart(2, '0');
+          const dec = Math.floor((raceState.elapsedTime % 1) * 10);
+          timeEl.textContent = `${mins}:${secs}.${dec}`;
+        }
+      } else if (raceState.state === 'finished') {
+        if (bigBanner) {
+          bigBanner.style.display = 'block';
+          if (raceState.winner === 'player') {
+            bigBanner.innerHTML = `
+              <div class="mc-finish-banner victory">
+                <div class="mc-finish-title">🏆 VICTORY! KA-CHOW! ⚡</div>
+                <div class="mc-finish-sub">You out-drifted The Fabulous Hudson Hornet around Willy's Butte!</div>
+              </div>`;
+          } else {
+            bigBanner.innerHTML = `
+              <div class="mc-finish-banner defeat">
+                <div class="mc-finish-title">🏁 DOC HUDSON WINS! 🏁</div>
+                <div class="mc-finish-sub">"When you're entering the dirt, turn right to go left! Try again, rookie!"</div>
+              </div>`;
+          }
+        }
+      }
+    } else {
+      if (challengePanel) challengePanel.style.display = 'none';
+      if (bigBanner) bigBanner.style.display = 'none';
+    }
   }
 }

@@ -932,6 +932,96 @@ export class SoundEngine {
     osc.start(t);
     osc.stop(t + 0.15);
   }
+
+  // Racing countdown beep: low pitch for 3, 2, 1; high bright chime for GO!
+  public playRaceCountdown(isGo: boolean = false) {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    if (isGo) {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(880, t); // High A5
+      osc.frequency.exponentialRampToValueAtTime(1760, t + 0.35); // A6
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.4);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, t); // A4
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.18);
+    }
+  }
+
+  // Nitro turbo boost whoosh & burn
+  public playNitroBoost() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const noiseGain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(140, t);
+    osc.frequency.exponentialRampToValueAtTime(380, t + 0.3);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(800, t);
+    filter.frequency.exponentialRampToValueAtTime(2200, t + 0.35);
+    filter.Q.value = 2.5;
+
+    noiseGain.gain.setValueAtTime(0.2, t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+    osc.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.35);
+  }
+
+  // Piston Cup race victory fanfare
+  public playRaceVictory() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    const t = this.ctx.currentTime;
+
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + idx * 0.1);
+
+      gain.gain.setValueAtTime(0.24, t + idx * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.1 + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+
+      osc.start(t + idx * 0.1);
+      osc.stop(t + idx * 0.1 + 0.45);
+    });
+  }
 }
 
 export const sound = new SoundEngine();

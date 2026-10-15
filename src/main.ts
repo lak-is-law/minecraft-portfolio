@@ -5,7 +5,7 @@ import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
 import { Player, TargetInfo } from './engine/player';
 import { HUDManager } from './ui/hud';
-import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml, getCitizenAvatarHtml } from './ui/modals';
+import { ModalManager, getLakshyaAvatarHtml, getRogerAvatarHtml, getAnimalAvatarHtml, getLightningMcQueenAvatarHtml, getDocHudsonAvatarHtml, getCitizenAvatarHtml } from './ui/modals';
 import { PORTFOLIO_DATA, Project } from './data/portfolioData';
 import { sound } from './engine/audio';
 import { npcChatManager } from './engine/npcChat';
@@ -65,7 +65,7 @@ class Game {
       canvas,
       antialias: true,
       powerPreference: 'high-performance',
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: true
     });
     this.renderer.setSize(window.visualViewport?.width ?? window.innerWidth, window.visualViewport?.height ?? window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -234,6 +234,16 @@ class Game {
     this.hud.onOpenResume = () => {
       this.modals.openResumeChestModal();
     };
+
+    const openBlockPalette = () => {
+      this.modals.openBlockPaletteModal(this.player.selectedBlockType, (blockType) => {
+        this.player.selectedBlockType = blockType;
+        this.hud.pushChatMessage('Hotbar', `Equipped ${blockType.toUpperCase()} block!`);
+      });
+    };
+    this.hud.onOpenBlockPalette = openBlockPalette;
+    this.player.onOpenBlockPalette = openBlockPalette;
+    this.modals.onOpenBlockPaletteRequest = openBlockPalette;
 
     this.hud.onTakeScreenshot = () => {
       this.player.takeScreenshot();
@@ -587,16 +597,16 @@ class Game {
         if (qPos) {
           this.world.spawnHammerSparkles(qPos.x, qPos.y + 1.2, qPos.z);
         }
-        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! Roaring at Radiator Springs Speedway [X: 130, Y: 2, Z: -18]! "I am speed!"');
+        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! Roaring at Radiator Springs Raceway [X: 168, Y: 2, Z: -24]! "I am speed!"');
         this.modals.openNPCDialogModal({
           id: 'lightning_mcqueen',
           name: 'Lightning McQueen #95',
           title: '7-Time Piston Cup Champion · Rust-eze Racing',
           badge: '[CHAMPION #95]',
           badgeColor: '#dc2626',
-          locationBadge: 'Radiator Springs Speedway [X: 130, Z: -18]',
+          locationBadge: 'Radiator Springs Raceway [X: 168, Z: -24]',
           avatarHtml: getLightningMcQueenAvatarHtml(),
-          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway [X: 130, Y: 2, Z: -18]! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
+          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway [X: 168, Y: 2, Z: -24]! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -610,13 +620,22 @@ class Game {
               styleClass: 'mc-btn-gold',
               action: () => {
                 this.player.startDrivingMcQueen();
-                this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SHIFT for Nitro Boost, H for Ka-Chow!, SPACE to exit.');
+                this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SPACE to Power Drift, SHIFT for Nitro, E to exit.');
+              }
+            },
+            {
+              label: '🏆 Challenge Doc Hudson to Willy\'s Butte Race!',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.player.startDrivingMcQueen();
+                this.world.mcQueenManager?.startRaceChallenge();
+                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! 3... 2... 1... GO!');
               }
             },
             {
               label: '📍 Where is this raceway located?',
               styleClass: 'mc-btn-stone',
-              response: '⚡ "You\'re at Radiator Springs Speedway & Hollywood Boulevard [X: 130, Y: 2, Z: -18]! Just east is Neo York Times Square, to the west is the Spawn Citadel, and north is the Hollywood Sign!"'
+              response: '⚡ "You\'re at Radiator Springs Raceway & Lightning McQueen Street [X: 168, Y: 2, Z: -24]! Willy\'s Butte sits in the center loop, Flo\'s V8 Café is on the pit straight, and Doc Hudson\'s pit box is right across the track!"'
             },
             {
               label: '🏁 Hear Racing Wisdom (Doc Hudson)',
@@ -642,6 +661,54 @@ class Game {
               label: '🛞 Learn about Guido\'s World Record Pit Stop',
               styleClass: 'mc-btn-stone',
               response: '"At the Piston Cup tiebreaker, Chick Hicks\' crew laughed when Luigi and Guido rolled out. Then Guido performed the legendary sub-2.5-second 4-tire change! Luigi yelled \'Peet stop!\' and I rejoined in 1st place! Never underestimate the Radiator Springs crew!"'
+            }
+          ]
+        });
+      } else if (inter.id === 'doc_hudson') {
+        sound.playRaceCarEngine(1.1);
+        const hPos = this.world.getHudsonPosition();
+        if (hPos) {
+          this.world.spawnHammerSparkles(hPos.x, hPos.y + 1.2, hPos.z);
+        }
+        this.hud.pushChatMessage('Doc Hudson #51', '🏁 "You wanna challenge the Fabulous Hudson Hornet? Step onto the track, kid!"');
+        this.modals.openNPCDialogModal({
+          id: 'doc_hudson',
+          name: 'Doc Hudson #51',
+          title: '3-Time Piston Cup Champion · The Fabulous Hudson Hornet',
+          badge: '[CHAMPION #51]',
+          badgeColor: '#1e40af',
+          locationBadge: 'Doc\'s Pit Crew Box [X: 178, Z: -31]',
+          avatarHtml: getDocHudsonAvatarHtml(),
+          text: '🏁 "Folks call me Doc Hudson. Back in \'51, \'52, and \'53, they called me the Fabulous Hudson Hornet.\n\nDriving fast in a straight line is easy. Knowing how to slide through the dirt and slingshot past the pack—that\'s real racing. Think you\'ve got what it takes to beat me around Willy\'s Butte?"',
+          onOptionSelect: (opt, d) => {
+            this.hud.pushChatMessage('You', opt.label);
+            if (opt.response) {
+              const snippet = opt.response.split('\n')[0].trim();
+              this.hud.pushChatMessage(d.name, snippet);
+            }
+          },
+          options: [
+            {
+              label: '🏆 Accept Race Challenge: 2 Laps vs Doc Hudson!',
+              styleClass: 'mc-btn-gold',
+              action: () => {
+                this.player.startDrivingMcQueen();
+                this.world.mcQueenManager?.startRaceChallenge();
+                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! 3... 2... 1... GO!');
+              }
+            },
+            {
+              label: '🧠 Teach me "Turn Right to Go Left"',
+              styleClass: 'mc-btn-blue',
+              action: () => {
+                sound.playTireDrift();
+              },
+              response: '"When you\'re entering the hairpin slide, you counter-steer. If you\'re drifting hard to the left, turn your wheel right! Give it too much gas, you spin out into the cactus; balance the throttle, and the rear tires bite and launch you forward!"\n\n— The Fabulous Hudson Hornet #51 Racing Academy'
+            },
+            {
+              label: '🏆 What about your 3 Piston Cups?',
+              styleClass: 'mc-btn-stone',
+              response: '"1951, 1952, 1953. Back then we didn\'t have telemetry computers or fancy simulators—just raw Hudson Twin H-Power, grit, and driving feel. They\'re just empty cups, kid. It\'s the race that matters."'
             }
           ]
         });
@@ -688,12 +755,12 @@ class Game {
               action: () => {
                 sound.playDogBark();
               },
-              response: '*Woof!* Roger sits upright with pride:\n\n"Lakshya is a full-stack engineer and creative technologist who builds high-performance real-time applications! He created TODAR 2.0 (defense radar), TrackYourFlight (flight telemetry), and this entire interactive 3D Minecraft realm in TypeScript & WebGL!\n\nHe writes clean code, solves complex algorithms, and always tests his software!"'
+              response: '*Woof!* Roger sits upright with pride:\n\n"Lakshya is a full-stack engineer and creative technologist who builds high-performance real-time applications! He created TODAR 2.0 (smart expense tracker), TrackYourFlight (flight telemetry), and this entire interactive 3D Minecraft realm in TypeScript & WebGL!\n\nHe writes clean code, solves complex algorithms, and always tests his software!"'
             },
             {
               label: '🏆 Roger, what are Lakshya\'s top achievements?',
               styleClass: 'mc-btn-gold',
-              response: '*Arf arf!* Roger does an excited tap-dance on the grass:\n\n• 🥇 1st Place Winner at UCSI University Hackathon\n• 🎓 B.Tech CSE at SRMIST (8.89 CGPA)\n• 🤝 Head of Alumni Relations (DAA) managing 25,000+ members\n• 🚀 5+ production-grade web applications & open-source projects!'
+              response: '*Arf arf!* Roger does an excited tap-dance on the grass:\n\n• 🥇 1st Place Winner at UCSI University Hackathon\n• 🎓 B.Tech CSE at SRMIST (8.89 / 10.0 · CGPA 4.37 / 5.0)\n• 🤝 Head of Alumni Relations (DAA) managing 25,000+ members\n• 🚀 5+ production-grade web applications & open-source projects!'
             },
             {
               label: '🐾 Pet Roger gently',
@@ -977,7 +1044,7 @@ class Game {
             {
               label: '🎓 Tell me about your education & background',
               styleClass: 'mc-btn-blue',
-              response: 'I am pursuing my B.Tech in Computer Science and Engineering at SRMIST (CGPA: 8.89). My coursework emphasizes Algorithms, Distributed Systems, Software Engineering, and AI/ML.\n\nI combine rigorous systems fundamentals with interactive front-end and real-time graphics engineering!'
+              response: `I am pursuing my B.Tech in Computer Science and Engineering at SRMIST (${PORTFOLIO_DATA.profile.gpa} · 8.89 / 10.0). My coursework emphasizes Algorithms, Distributed Systems, Software Engineering, and AI/ML.\n\nI combine rigorous systems fundamentals with interactive front-end and real-time graphics engineering!`
             },
             {
               label: '🏢 Walk me through your work experience & leadership',
@@ -997,7 +1064,7 @@ class Game {
             {
               label: '📬 How can I reach out or hire you?',
               styleClass: 'mc-btn-gold',
-              response: 'I\'d love to connect! You can reach me directly via:\n\n• Email: lakshyaagarwalw006@gmail.com\n• LinkedIn: linkedin.com/in/lakshya-agarwal-006\n• Resume: resume.lakshya.uk\n• GitHub: github.com/lak-is-law\n\nOr click [RESUME CHEST] in the pause menu to download my full PDF!'
+              response: `I'd love to connect! You can reach me directly via:\n\n• Email: ${PORTFOLIO_DATA.profile.email}\n• LinkedIn: ${PORTFOLIO_DATA.profile.linkedinUrl}\n• Portfolio: ${PORTFOLIO_DATA.profile.portfolioUrl}\n• Resume: ${PORTFOLIO_DATA.profile.resumeUrl}\n• GitHub: ${PORTFOLIO_DATA.profile.githubUrl}\n\nOr click [RESUME CHEST] in the pause menu to download my full PDF!`
             },
             {
               label: '🗺️ Open Fast Travel Realm Map [M]',
@@ -1135,6 +1202,18 @@ class Game {
     this.hud.updateF3(this.player.position, this.player.yaw, this.player.pitch, this.fps);
     this.hud.updateMinimap(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     this.hud.updateFlyStatus(this.player.isFlying);
+
+    // Update Racing HUD for Lightning McQueen & Doc Hudson Challenge
+    const isDrivingMcQueen = this.player.ridingVehicle === 'lightning_mcqueen';
+    const isShift = !!this.player.keys['ShiftLeft'] || !!this.player.keys['ShiftRight'];
+    const isSpace = !!this.player.keys['Space'];
+    this.hud.updateRacingHUD(
+      isDrivingMcQueen,
+      this.player.mcQueenSpeed,
+      isShift,
+      isSpace,
+      this.world.mcQueenManager?.raceState
+    );
 
     // 6. Render
     this.renderer.render(this.scene, this.camera);

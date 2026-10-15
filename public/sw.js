@@ -28,6 +28,14 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(request))
+      .catch(async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === 'navigate') {
+          const shell = await caches.match('/');
+          if (shell) return shell;
+        }
+        return new Response('Network unavailable', { status: 503, statusText: 'Offline' });
+      })
   );
 });

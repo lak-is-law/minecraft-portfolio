@@ -46,7 +46,7 @@ export class Player {
   private lastAnnouncedStation: string | null = null;
   private rickshawSpeed: number = 0;
   private rickshawHeading: number = 0;
-  private mcQueenSpeed: number = 0;
+  public mcQueenSpeed: number = 0;
   private mcQueenHeading: number = 0;
   private mcQueenDriftSoundTimer: number = 0;
   private mcQueenEngineSoundTimer: number = 0;
@@ -57,7 +57,7 @@ export class Player {
   public eyeHeight: number = 1.62;
 
   // Input states
-  private keys: { [key: string]: boolean } = {};
+  public keys: { [key: string]: boolean } = {};
   private lastSpaceTime: number = 0;
   private jumpBufferTimer: number = 0;
   private lastWTime: number = 0;
@@ -104,6 +104,7 @@ export class Player {
   public onInteract?: (target: TargetInfo) => void;
   public onHammerBanner?: (project: Project) => void;
   public onHotbarSelect?: (slotIndex: number) => void;
+  public onOpenBlockPalette?: () => void;
   public onWorldNotice?: (msg: string) => void;
   public onBeforeScreenshot?: () => void;
   public onFlyStateChange?: (isFlying: boolean) => void;
@@ -322,8 +323,12 @@ export class Player {
         this.toggleFlight();
       }
 
-      // Space / Shift vehicle dismount
-      if (this.ridingVehicle && (e.code === 'Space' || ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && this.ridingVehicle !== 'lightning_mcqueen'))) {
+      // Space / Shift vehicle dismount (Space acts as handbrake while McQueen is moving)
+      if (this.ridingVehicle && this.ridingVehicle !== 'lightning_mcqueen' && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) {
+        this.dismountVehicle();
+        return;
+      }
+      if (this.ridingVehicle === 'lightning_mcqueen' && e.code === 'Space' && Math.abs(this.mcQueenSpeed) < 1.0) {
         this.dismountVehicle();
         return;
       }
@@ -419,10 +424,15 @@ export class Player {
         }
       }
 
-      // 'F5' for cycling camera perspective (1P -> 3P Back -> 3P Front)
-      if (e.code === 'F5') {
+      // 'F5' or 'KeyC' for cycling camera perspective (1P -> 3P Back -> 3P Front)
+      if (e.code === 'F5' || e.code === 'KeyC') {
         e.preventDefault();
         this.cycleCameraMode();
+      }
+
+      // 'KeyB' for Creative Block Palette
+      if (e.code === 'KeyB') {
+        this.onOpenBlockPalette?.();
       }
 
       // 'KeyX' for sit/rest pose (Photos 1, 2, 3, 4)
@@ -1068,12 +1078,27 @@ export class Player {
         this.world.mcQueenManager.isPlayerDriving = false;
       }
       this.ridingVehicle = null;
-      this.position.x += Math.cos(this.yaw) * 1.8;
-      this.position.z -= Math.sin(this.yaw) * 1.8;
+      const sideX = -Math.cos(this.mcQueenHeading);
+      const sideZ = Math.sin(this.mcQueenHeading);
+      this.position.x += sideX * 2.0;
+      this.position.z += sideZ * 2.0;
       this.position.y += 0.5;
       sound.playStep('stone');
       if (this.onWorldNotice) {
         this.onWorldNotice('🏁 Alighted from Lightning McQueen #95.');
+      }
+      return;
+    }
+    if (this.ridingVehicle === 'auto_rickshaw') {
+      this.ridingVehicle = null;
+      const sideX = -Math.cos(this.rickshawHeading);
+      const sideZ = Math.sin(this.rickshawHeading);
+      this.position.x += sideX * 1.8;
+      this.position.z += sideZ * 1.8;
+      this.position.y += 0.5;
+      sound.playStep('stone');
+      if (this.onWorldNotice) {
+        this.onWorldNotice('🛺 Alighted from Auto-Rickshaw.');
       }
       return;
     }
@@ -1101,7 +1126,14 @@ export class Player {
   public startDrivingRickshaw() {
     this.ridingVehicle = 'auto_rickshaw';
     this.isFlying = false;
-    this.rickshawHeading = this.yaw;
+    if (this.world.autoRickshawMesh) {
+      this.rickshawHeading = this.world.autoRickshawMesh.rotation.y;
+    } else {
+      this.rickshawHeading = this.yaw + Math.PI;
+    }
+    this.yaw = this.rickshawHeading - Math.PI;
+    this.cameraMode = 1; // Chase camera for comfortable driving
+    this.rickshawSpeed = 0;
     sound.playHorn();
     if (this.onWorldNotice) {
       this.onWorldNotice('🛺 Driving Bajaj Auto-Rickshaw! WASD to drive, H to honk, SPACE to exit.');
@@ -1137,6 +1169,7 @@ export class Player {
       const dir = this.rickshawSpeed > 0 ? 1 : -1;
       if (isA) this.rickshawHeading += steerSpeed * dt * dir;
       if (isD) this.rickshawHeading -= steerSpeed * dt * dir;
+      this.yaw = this.rickshawHeading - Math.PI;
     }
 
     const forwardX = Math.sin(this.rickshawHeading);
@@ -1159,18 +1192,23 @@ export class Player {
 
   public startDrivingMcQueen() {
     this.ridingVehicle = 'lightning_mcqueen';
+    this.cameraMode = 1; // Dedicated chase camera
     if (this.world.mcQueenManager) {
       this.world.mcQueenManager.isPlayerDriving = true;
+      const qPos = this.world.mcQueenManager.getPosition();
+      this.position.copy(qPos);
+      this.mcQueenHeading = this.world.mcQueenManager.group.rotation.y;
+    } else {
+      this.mcQueenHeading = this.yaw;
     }
     this.isFlying = false;
-    this.mcQueenHeading = this.yaw;
     this.mcQueenSpeed = 0;
     this.mcQueenDriftSoundTimer = 0;
     this.mcQueenEngineSoundTimer = 0;
     sound.playKaChow();
     sound.playRaceCarEngine(1.2);
     if (this.onWorldNotice) {
-      this.onWorldNotice('⚡ Driving Lightning McQueen #95! WASD to race, hold SHIFT for Nitro Boost, H for Ka-Chow!, SPACE to exit.');
+      this.onWorldNotice('⚡ Driving Lightning McQueen #95! WASD to race, SPACE for Power Drift, SHIFT for Nitro, E to exit.');
     }
   }
 
@@ -1178,40 +1216,61 @@ export class Player {
     if (!this.world.mcQueenManager) return;
 
     const isShift = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
-    const maxSpeed = isShift ? 34.0 : 25.0; // blocks/sec (Nitro Boost up to 34!)
-    const accel = isShift ? 48.0 : 30.0;
-    const brake = 42.0;
-    const steerSpeed = 3.2;
+    const isSpace = !!this.keys['Space'];
+    const maxSpeed = isShift ? 36.0 : 26.0; // Nitro Boost up to 36!
+    const accel = isShift ? 52.0 : 32.0;
+    const brake = 45.0;
 
     const isW = !!this.keys['KeyW'] || this.touchMove.forward;
     const isS = !!this.keys['KeyS'] || this.touchMove.backward;
     const isA = !!this.keys['KeyA'] || this.touchMove.left;
     const isD = !!this.keys['KeyD'] || this.touchMove.right;
 
+    // Acceleration & Braking / Reverse
     if (isW) {
       this.mcQueenSpeed = Math.min(maxSpeed, this.mcQueenSpeed + accel * dt);
+      if (isShift && Math.random() < 0.12) {
+        sound.playNitroBoost();
+      }
     } else if (isS) {
-      this.mcQueenSpeed = Math.max(-7.0, this.mcQueenSpeed - brake * dt);
+      if (this.mcQueenSpeed > 0.5) {
+        // High-performance racing brake
+        this.mcQueenSpeed = Math.max(0, this.mcQueenSpeed - brake * dt);
+      } else {
+        // Reverse gear
+        this.mcQueenSpeed = Math.max(-8.5, this.mcQueenSpeed - 16.0 * dt);
+      }
     } else {
+      // Natural rolling resistance
+      const friction = isSpace ? 18.0 : 10.5;
       if (this.mcQueenSpeed > 0) {
-        this.mcQueenSpeed = Math.max(0, this.mcQueenSpeed - 9.5 * dt);
+        this.mcQueenSpeed = Math.max(0, this.mcQueenSpeed - friction * dt);
       } else if (this.mcQueenSpeed < 0) {
-        this.mcQueenSpeed = Math.min(0, this.mcQueenSpeed + 9.5 * dt);
+        this.mcQueenSpeed = Math.min(0, this.mcQueenSpeed + friction * dt);
       }
     }
 
+    // Steering input
     let steerInput = 0;
     if (isA) steerInput += 1;
     if (isD) steerInput -= 1;
 
     const isMoving = Math.abs(this.mcQueenSpeed) > 0.1;
-    const isDrifting = isMoving && Math.abs(steerInput) > 0 && Math.abs(this.mcQueenSpeed) > 14.0;
+    // Power drifting on Space or hard cornering at high speed
+    const isDrifting = isMoving && (isSpace || (Math.abs(steerInput) > 0 && Math.abs(this.mcQueenSpeed) > 15.0));
 
     if (isMoving) {
-      const dir = this.mcQueenSpeed > 0 ? 1 : -1;
-      this.mcQueenHeading += steerInput * steerSpeed * dt * dir;
-      // Smoothly sync player camera yaw with racecar heading
-      this.yaw = THREE.MathUtils.lerp(this.yaw, this.mcQueenHeading, dt * 6.0);
+      const dir = this.mcQueenSpeed >= 0 ? 1 : -1;
+      // Speed-sensitive steering: nimble at low speeds, stable at high speeds
+      const speedNorm = Math.min(1.0, Math.abs(this.mcQueenSpeed) / 28.0);
+      let effectiveSteerSpeed = THREE.MathUtils.lerp(3.5, 2.3, speedNorm);
+
+      if (isDrifting) {
+        effectiveSteerSpeed *= 1.35; // Power slide
+      }
+
+      this.mcQueenHeading += steerInput * effectiveSteerSpeed * dt * dir;
+      this.yaw = this.mcQueenHeading;
     }
 
     const forwardX = Math.sin(this.mcQueenHeading);
@@ -1235,8 +1294,8 @@ export class Player {
     // Dynamic racing engine audio
     if (isMoving) {
       this.mcQueenEngineSoundTimer += dt;
-      if (this.mcQueenEngineSoundTimer > 0.28) {
-        const rev = Math.min(2.2, Math.abs(this.mcQueenSpeed) / 14.0);
+      if (this.mcQueenEngineSoundTimer > 0.26) {
+        const rev = Math.min(2.4, Math.max(0.8, Math.abs(this.mcQueenSpeed) / 12.0));
         sound.playRaceCarEngine(rev);
         this.mcQueenEngineSoundTimer = 0;
       }
@@ -1245,7 +1304,7 @@ export class Player {
     // Drift screech audio
     if (isDrifting) {
       this.mcQueenDriftSoundTimer += dt;
-      if (this.mcQueenDriftSoundTimer > 0.2) {
+      if (this.mcQueenDriftSoundTimer > 0.18) {
         sound.playTireDrift();
         this.mcQueenDriftSoundTimer = 0;
       }
@@ -1285,6 +1344,40 @@ export class Player {
   }
 
   private updateCameraTransform() {
+    // Dedicated Racing Chase Camera for Lightning McQueen (#95)
+    if (this.ridingVehicle === 'lightning_mcqueen') {
+      if (this.playerAvatar) this.playerAvatar.visible = false;
+      if (this.handGroup) this.handGroup.visible = false;
+      if (this.firstPersonLegs) this.firstPersonLegs.visible = false;
+
+      // McQueen forward direction vector in world coordinates
+      const forward = new THREE.Vector3(Math.sin(this.mcQueenHeading), 0, Math.cos(this.mcQueenHeading));
+      const behind = forward.clone().negate();
+
+      // Dynamic distance and elevation based on speed & nitro
+      const isShift = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
+      const speedRatio = Math.min(1.2, Math.abs(this.mcQueenSpeed) / 28.0);
+      const chaseDist = 5.6 + speedRatio * 1.8 + (isShift ? 0.6 : 0);
+      const chaseHeight = 1.95 + speedRatio * 0.35;
+
+      const idealCamPos = this.position.clone().addScaledVector(behind, chaseDist);
+      idealCamPos.y = this.position.y + chaseHeight;
+
+      // Smooth camera trailing with spring interpolation
+      this.camera.position.lerp(idealCamPos, 0.22);
+
+      // Target to look at: slightly in front of the hood onto the asphalt
+      const lookTarget = this.position.clone().addScaledVector(forward, 4.0);
+      lookTarget.y = this.position.y + 0.85;
+      this.camera.lookAt(lookTarget);
+
+      // Dynamic Racing FOV effect
+      const targetFOV = 74 + speedRatio * 14 + (isShift ? 6 : 0);
+      this.camera.fov += (targetFOV - this.camera.fov) * 0.18;
+      this.camera.updateProjectionMatrix();
+      return;
+    }
+
     const curEye = this.isSneaking ? 1.35 : (this.isSitting ? 1.05 : this.eyeHeight);
     const targetPos = new THREE.Vector3(this.position.x, this.position.y + curEye, this.position.z);
     const euler = new THREE.Euler(this.pitch, this.yaw, 0, 'YXZ');
@@ -1298,12 +1391,12 @@ export class Player {
       if (this.firstPersonLegs) this.firstPersonLegs.visible = this.isSitting;
     } else {
       // Third Person (3P)
-      if (this.playerAvatar) this.playerAvatar.visible = (this.ridingVehicle !== 'lightning_mcqueen');
+      if (this.playerAvatar) this.playerAvatar.visible = true;
       if (this.handGroup) this.handGroup.visible = false;
       if (this.firstPersonLegs) this.firstPersonLegs.visible = false;
 
-      const dist = (this.ridingVehicle === 'lightning_mcqueen') ? 5.2 : 3.6;
-      const heightOffset = (this.ridingVehicle === 'lightning_mcqueen') ? 0.75 : 0.45;
+      const dist = 3.6;
+      const heightOffset = 0.45;
       const dir = new THREE.Vector3(0, 0, -1).applyEuler(euler);
 
       if (this.cameraMode === 1) {
@@ -1851,9 +1944,9 @@ export class Player {
       }
     }, { passive: true });
 
-    // Desktop direct tap / click raycast when clicking on 3D scene
+    // Desktop direct tap / click raycast when clicking on 3D scene (only when pointer lock is not engaged)
     window.addEventListener('click', (e: MouseEvent) => {
-      if (document.body.classList.contains('modal-open')) return;
+      if (this.isLocked || document.body.classList.contains('modal-open')) return;
       const target = e.target instanceof Element ? e.target : null;
       if (target?.closest('#mc-touch-controls, #mc-hotbar, #mc-quick-nav, #mc-minimap, #modal-container, #pause-overlay')) return;
       this.tryInteractAtScreenCoords(e.clientX, e.clientY);

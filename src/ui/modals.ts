@@ -93,13 +93,40 @@ export function getLightningMcQueenAvatarHtml(): string {
   </svg>`;
 }
 
+export function getDocHudsonAvatarHtml(): string {
+  return `<svg viewBox="0 0 32 32" width="56" height="56" style="image-rendering: pixelated; border-radius: 4px;">
+    <rect width="32" height="32" fill="#070f1a"/>
+    <rect x="2" y="11" width="28" height="15" rx="3" fill="#10243d"/>
+    <rect x="4" y="7" width="24" height="6" fill="#0c1d32"/>
+    <rect x="6" y="8" width="20" height="5" fill="#f1f5f9"/>
+    <rect x="15" y="8" width="2" height="5" fill="#94a3b8"/>
+    <rect x="9" y="9" width="4" height="4" fill="#b45309"/>
+    <rect x="10" y="10" width="2" height="2" fill="#0a0a0a"/>
+    <rect x="19" y="9" width="4" height="4" fill="#b45309"/>
+    <rect x="20" y="10" width="2" height="2" fill="#0a0a0a"/>
+    <rect x="8" y="7" width="6" height="2" fill="#10243d"/>
+    <rect x="18" y="7" width="6" height="2" fill="#10243d"/>
+    <rect x="6" y="21" width="20" height="4" fill="#020617"/>
+    <rect x="8" y="22" width="16" height="2" fill="#e2e8f0"/>
+    <rect x="14" y="21" width="4" height="4" fill="#dc2626"/>
+    <rect x="4" y="15" width="4" height="3" fill="#facc15"/>
+    <rect x="24" y="15" width="4" height="3" fill="#facc15"/>
+    <rect x="1" y="20" width="3" height="6" fill="#f8fafc"/>
+    <rect x="28" y="20" width="3" height="6" fill="#f8fafc"/>
+    <rect x="2" y="22" width="1" height="2" fill="#10243d"/>
+    <rect x="29" y="22" width="1" height="2" fill="#10243d"/>
+  </svg>`;
+}
+
 export class ModalManager {
   private modalContainer: HTMLElement;
   public isOpen: boolean = false;
   private openTime: number = 0;
   public onTeleportRequest?: (coords: [number, number, number]) => void;
+  public onOpenBlockPaletteRequest?: () => void;
   public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[]; trains?: any[] };
   private mapAnimId: number | null = null;
+  private mapMouseUpCleanup: (() => void) | null = null;
 
   constructor() {
     this.modalContainer = document.getElementById('modal-container')!;
@@ -118,6 +145,9 @@ export class ModalManager {
         const info = this.getPlayerInfo?.();
         this.openFastTravelModal(info?.position, info?.yaw, info?.dragons, (info as any)?.trains);
       }
+      if (e.code === 'KeyB' && !this.isOpen) {
+        this.onOpenBlockPaletteRequest?.();
+      }
     });
 
     const handleBackdropClose = (e: MouseEvent | PointerEvent) => {
@@ -134,6 +164,10 @@ export class ModalManager {
     if (this.mapAnimId !== null) {
       cancelAnimationFrame(this.mapAnimId);
       this.mapAnimId = null;
+    }
+    if (this.mapMouseUpCleanup) {
+      this.mapMouseUpCleanup();
+      this.mapMouseUpCleanup = null;
     }
     this.isOpen = false;
     this.modalContainer.innerHTML = '';
@@ -281,7 +315,7 @@ export class ModalManager {
           <div class="mc-slot" title="Netherite Pickaxe: AI Systems & Distributed Telemetry">
             <div class="mc-slot-item">${ASSETS.pickaxe}</div>
           </div>
-          <div class="mc-slot" title="Golden Apple: CGPA 4.37 / 5.0 (SRMIST Chennai)">
+          <div class="mc-slot" title="Golden Apple: CGPA 8.89 / 10.0 · 4.37 / 5.0 (SRMIST Chennai)">
             <div class="mc-slot-item">${ASSETS.apple}</div>
           </div>
           <div class="mc-slot" title="Ender Pearl: Email (contact@lakshya.uk)">
@@ -301,11 +335,14 @@ export class ModalManager {
         <div class="mc-chest-loot-action">
           <div class="mc-resume-preview-info">
             <h3>Lakshya: Master Resume Documents</h3>
-            <p>Software Engineer & Designer (SRMIST Chennai, CGPA: 4.37 / 5.0)</p>
+            <p>Software Engineer & Designer (SRMIST Chennai · 8.89 / 10.0 · CGPA: 4.37 / 5.0)</p>
           </div>
           <div class="mc-chest-btn-row">
-            <a href="/Lakshya.Resume.pdf" download="Lakshya_Resume.pdf" class="mc-btn mc-btn-green" id="mc-download-resume">
-              [DOWNLOAD] Software Resume (PDF)
+            <a href="/Lakshya.Resume.pdf" download="Lakshya_Resume_SWE.pdf" class="mc-btn mc-btn-green" id="mc-download-resume">
+              [DOWNLOAD] SWE Resume (PDF)
+            </a>
+            <a href="/Lakshya.Resume.RB.pdf" download="Lakshya_Resume_Brand_PR.pdf" class="mc-btn mc-btn-gold" id="mc-download-pr-resume">
+              [DOWNLOAD] Brand & PR Resume (PDF)
             </a>
             <a href="https://resume.lakshya.uk" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-blue">
               [WEB] Live resume.lakshya.uk
@@ -324,6 +361,9 @@ export class ModalManager {
     this.modalContainer.style.display = 'flex';
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
     document.getElementById('mc-download-resume')?.addEventListener('click', () => {
+      sound.playLevelUp();
+    });
+    document.getElementById('mc-download-pr-resume')?.addEventListener('click', () => {
       sound.playLevelUp();
     });
   }
@@ -408,7 +448,7 @@ export class ModalManager {
       { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
       { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Mercado stalls & Mayan Cenote.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
       { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Pyramids of Khufu & Khafre, Nile River Felucca, Avenue of Sphinxes, and Luxor Temple Pylons.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
-      { number: '08', name: 'Dubai · Burj Khalifa', subtitle: 'United Arab Emirates', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46 and Palm Jumeirah lagoon.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
+      { number: '08', name: 'Dubai · Burj Khalifa & Palm Jumeirah', subtitle: 'United Arab Emirates 🇦🇪', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46, overlooking the grand Palm Jumeirah archipelago, luxury frond villas, and Atlantis resort.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
       { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock with Westminster chime, Great Bell, and Tower Bridge walkways.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −58' },
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
@@ -590,7 +630,7 @@ export class ModalManager {
       }
       if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
           tag.includes('HOLLYWOOD') || tag.includes('McQUEEN') || tag.includes('MEXICO') ||
-          tag.includes('DUBAI') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
+          tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
           tag.includes('VARANASI') || tag.includes('CITADEL')) {
         return 'cities';
       }
@@ -625,7 +665,7 @@ export class ModalManager {
       if (tag.includes('CARNIVAL')) return '#f472b6';
       if (tag.includes('LONDON')) return '#dc2626';
       if (tag.includes('SEOUL')) return '#8b5cf6';
-      if (tag.includes('DUBAI')) return '#14b8a6';
+      if (tag.includes('DUBAI') || tag.includes('PALM')) return '#14b8a6';
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';
       if (tag.includes('HAWA MAHAL')) return '#fb923c';
@@ -1404,9 +1444,13 @@ export class ModalManager {
       initialPanY = panY;
     });
 
-    window.addEventListener('mouseup', () => {
+    const handleMouseUp = () => {
       isPointerDown = false;
-    });
+    };
+    window.addEventListener('mouseup', handleMouseUp);
+    this.mapMouseUpCleanup = () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
 
     // Mouse Wheel Zoom
     canvas.addEventListener('wheel', (e) => {
@@ -1861,4 +1905,99 @@ export class ModalManager {
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
   }
+
+  // 12. Creative Block Palette Modal
+  public openBlockPaletteModal(selectedBlock: string, onSelectBlock: (blockType: string) => void) {
+    this.onModalOpen();
+
+    const blockCategories = [
+      {
+        name: 'Building & Architecture',
+        blocks: [
+          { id: 'cobblestone', name: 'Cobblestone', color: '#64748b' },
+          { id: 'oak_planks', name: 'Oak Planks', color: '#b45309' },
+          { id: 'stone_bricks', name: 'Stone Bricks', color: '#78716c' },
+          { id: 'bricks', name: 'Red Bricks', color: '#991b1b' },
+          { id: 'sandstone', name: 'Sandstone', color: '#fde047' },
+          { id: 'quartz_block', name: 'Smooth Quartz', color: '#f8fafc' },
+        ]
+      },
+      {
+        name: 'Precious Minerals & Metals',
+        blocks: [
+          { id: 'gold_block', name: 'Gold Block', color: '#eab308' },
+          { id: 'diamond_block', name: 'Diamond Block', color: '#06b6d4' },
+          { id: 'emerald_block', name: 'Emerald Block', color: '#10b981' },
+          { id: 'redstone_block', name: 'Redstone Block', color: '#ef4444' },
+          { id: 'amethyst_block', name: 'Amethyst Block', color: '#a855f7' },
+          { id: 'obsidian', name: 'Obsidian', color: '#1e1b4b' },
+        ]
+      },
+      {
+        name: 'Functional & Illumination',
+        blocks: [
+          { id: 'bookshelf', name: 'Bookshelf', color: '#854d0e' },
+          { id: 'glowstone', name: 'Glowstone', color: '#facc15' },
+          { id: 'glass', name: 'Clear Glass', color: '#bae6fd' },
+          { id: 'white_wool', name: 'White Wool', color: '#e2e8f0' },
+        ]
+      }
+    ];
+
+    const contentHtml = blockCategories.map(cat => {
+      const items = cat.blocks.map(b => `
+        <button class="mc-palette-item ${b.id === selectedBlock ? 'active' : ''}" data-block="${b.id}" type="button" title="Select ${b.name}">
+          <div class="mc-palette-swatch" style="background-color: ${b.color};"></div>
+          <span class="mc-palette-label">${b.name}</span>
+        </button>
+      `).join('');
+
+      return `
+        <div class="mc-palette-section">
+          <h4 class="mc-palette-category-title">${cat.name}</h4>
+          <div class="mc-palette-grid">
+            ${items}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    this.modalContainer.innerHTML = `
+      <div class="mc-dialog mc-palette-dialog">
+        <div class="mc-dialog-header">
+          <div>
+            <h2 class="mc-dialog-title">Creative Block Palette</h2>
+            <span class="mc-dialog-subtitle">Select a block material to place with [Right Click] or [PLACE]</span>
+          </div>
+          <button class="mc-close-btn" id="mc-modal-close" title="Close (ESC)" type="button">X</button>
+        </div>
+
+        <div class="mc-dialog-body mc-palette-body">
+          ${contentHtml}
+        </div>
+
+        <div class="mc-dialog-footer">
+          <span class="mc-palette-footer-hint">Selected block is immediately equipped to your active slot</span>
+          <button class="mc-btn mc-btn-stone" id="mc-modal-done" type="button">Done (ESC)</button>
+        </div>
+      </div>
+    `;
+
+    this.modalContainer.style.display = 'flex';
+    document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
+    document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
+
+    document.querySelectorAll('.mc-palette-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const blockType = target.getAttribute('data-block');
+        if (blockType) {
+          onSelectBlock(blockType);
+          sound.playBlockPlace();
+          this.close();
+        }
+      });
+    });
+  }
 }
+

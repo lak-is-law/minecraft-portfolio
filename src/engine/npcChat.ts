@@ -121,6 +121,24 @@ export class NPCChatManager {
         tagColor: '#dc2626',
         emoji: '🏎️'
       },
+      {
+        id: 'doc_hudson',
+        name: 'Doc Hudson #51',
+        role: '3-Time Piston Cup Champion · Crew Chief 🏁',
+        areaName: 'Doc Hudson Pit Crew Box · Radiator Springs',
+        coords: { x: 178, y: 2.0, z: -31 },
+        directionFromSpawn: 'East towards Radiator Springs Raceway Infield',
+        nearbyLandmarks: ["Willy's Butte", "Flo's V8 Café", "Tow Mater Salvage", "Piston Cup Gantry"],
+        ambientMessages: [
+          '🏁 "When you\'re entering the turn in the dirt, turn right to go left!" — Doc Hudson #51 [X: 178, Z: -31]',
+          '🏁 Doc Hudson revs his classic Twin H-Power engine at his Pit Box [X: 178, Z: -31]! Press [E] to challenge him to a race!',
+          '🏁 "They\'re just empty cups, kid. It\'s the race that matters." — The Fabulous Hudson Hornet [X: 178, Z: -31]'
+        ],
+        proximityGreeting: '🏁 "Hey rookie. Think you can beat the Fabulous Hudson Hornet around Willy\'s Butte? Press [E] to challenge me!"',
+        detailedLocationText: '🏁 "The Fabulous Hudson Hornet"\n\n📍 Location: Doc Hudson Pit Box & Willy\'s Butte [X: 178, Y: 2, Z: -31]\n\n"3-Time Piston Cup Champion (1951, 1952, 1953). Master of the dirt slide: Turn right to go left! Press [E] to talk with Doc and start a head-to-head 2-lap race challenge!"',
+        tagColor: '#1e40af',
+        emoji: '🏁'
+      },
 
       // -------------------------------------------------------------
       // SAFARI ZOO WILDLIFE
@@ -655,13 +673,13 @@ export class NPCChatManager {
         areaName: 'Dubai · Burj Khalifa Observation Deck',
         coords: { x: 164, y: 2.0, z: 38 },
         directionFromSpawn: 'Far East (Dubai Skyline)',
-        nearbyLandmarks: ['Burj Khalifa 828m Spire', 'Palm Jumeirah Lagoon', 'Skydeck Y=46'],
+        nearbyLandmarks: ['Burj Khalifa 828m Spire', 'Palm Jumeirah Archipelago', 'The Palm Tower', 'Atlantis Resort'],
         ambientMessages: [
-          'Looking out from the foot of Burj Khalifa [X: 164, Y: 2, Z: 38] up to the needle spire!',
+          'Looking out from the foot of Burj Khalifa [X: 164, Y: 2, Z: 38] up to the needle spire and east to Palm Jumeirah!',
           'Checking the high-speed skydeck elevator at Dubai Burj Khalifa [X: 164, Y: 2, Z: 38]!'
         ],
-        proximityGreeting: 'Rashid Al-Maktoum greets you at Burj Khalifa [X: 164, Y: 2, Z: 38]! "Marhaban! Ready to ascend to the clouds?"',
-        detailedLocationText: '📍 Location: Dubai · Burj Khalifa & Skydeck [X: 164, Y: 2, Z: 38]\n\n"The soaring spider-lily skyscraper far east of Citadel! Take the glass express lift all the way to the panoramic skydeck at Y=46 overlooking the Palm Jumeirah lagoon."',
+        proximityGreeting: 'Rashid Al-Maktoum greets you at Burj Khalifa [X: 164, Y: 2, Z: 38]! "Marhaban! Ready to ascend to the clouds and behold the grand Palm Jumeirah archipelago?"',
+        detailedLocationText: '📍 Location: Dubai · Burj Khalifa & Palm Jumeirah [X: 164, Y: 2, Z: 38]\n\n"The soaring spider-lily skyscraper far east of Citadel! Take the glass express lift all the way to the panoramic skydeck at Y=46 overlooking the grand Palm Jumeirah archipelago, luxury frond villas, and Atlantis The Palm in the turquoise Arabian Gulf."',
         tagColor: '#38bdf8',
         emoji: '🏙️'
       },
@@ -681,6 +699,74 @@ export class NPCChatManager {
         detailedLocationText: '📍 Location: Crossroads Wildlife Park Main Entrance [X: -40, Y: 2, Z: 2]\n\n"The welcoming threshold to the entire safari reserve directly west of Citadel! Paths lead north to Giant Panda Valley, west to Lion Kopje, and south to Elephant Oasis and Giraffe Canopy."',
         tagColor: '#10b981',
         emoji: '🥼'
+      },
+      {
+        id: 'citizen_Dr__Elena_Vance',
+        name: 'Dr. Elena Vance',
+        role: 'Chief Trauma Surgeon',
+        areaName: 'Crossroads General Hospital & ER',
+        coords: { x: 44, y: 2.0, z: 61 },
+        directionFromSpawn: 'South-East towards Civic Quarter',
+        nearbyLandmarks: ['Emergency Ambulance Bay', 'Rooftop LifeFlight Helipad', 'ICU Ward'],
+        ambientMessages: [
+          'Triaging incoming patient transfers at Crossroads General Hospital [X: 44, Y: 2, Z: 61]!',
+          'LifeFlight helicopter standing by on the hospital roof! All trauma teams ready at [X: 44, Y: 2, Z: 61].'
+        ],
+        proximityGreeting: 'Dr. Elena Vance adjusts her stethoscope outside Crossroads General Hospital [X: 44, Y: 2, Z: 61]! "Welcome to the trauma center!"',
+        detailedLocationText: '📍 Location: Crossroads General Hospital [X: 44, Y: 2, Z: 61]\n\n"Our medical center features an active emergency ambulance bay, first-floor triage and dispensary, a second-floor ICU recovery ward, and an emergency LifeFlight helipad on the roof."',
+        tagColor: '#06b6d4',
+        emoji: '🩺'
+      },
+      {
+        id: 'citizen_Sgt__James_Reynolds',
+        name: 'Sgt. James Reynolds',
+        role: 'Precinct Watch Commander',
+        areaName: 'Crossroads 1st Precinct Police Headquarters',
+        coords: { x: 76, y: 2.0, z: 43 },
+        directionFromSpawn: 'East-South-East (Civic Quarter)',
+        nearbyLandmarks: ['Police Interceptor Squad Car', 'Holding Cells', 'Communications Mast'],
+        ambientMessages: [
+          'Patrol car engine warming up at the 1st Precinct Police Station [X: 76, Y: 2, Z: 43]!',
+          'Dispatch reports all island sectors clear and secure from the 1st Precinct [X: 76, Y: 2, Z: 43]!'
+        ],
+        proximityGreeting: 'Sgt. James Reynolds salutes sharply outside the 1st Precinct [X: 76, Y: 2, Z: 43]! "Stay safe out there, citizen!"',
+        detailedLocationText: '📍 Location: Crossroads 1st Precinct Police Station [X: 76, Y: 2, Z: 43]\n\n"Headquarters for municipal public safety! Features our black-and-white pursuit interceptor cruiser, secure holding cells, detective bullpen, and rooftop radio communications mast."',
+        tagColor: '#3b82f6',
+        emoji: '👮'
+      },
+      {
+        id: 'citizen_Principal_Clara_Sterling',
+        name: 'Principal Clara Sterling',
+        role: 'Academy Headmistress',
+        areaName: 'Crossroads Academy Public Magnet School',
+        coords: { x: 44, y: 2.0, z: 43 },
+        directionFromSpawn: 'South-East towards Civic Quarter',
+        nearbyLandmarks: ['Ornate Clock & Bell Tower', 'Yellow School Bus', 'Playground Basketball Court'],
+        ambientMessages: [
+          'The Academy school bell rings across Crossroads [X: 44, Y: 2, Z: 43]! Time for class!',
+          'Greeting students getting off the yellow school bus at Crossroads Academy [X: 44, Y: 2, Z: 43]!'
+        ],
+        proximityGreeting: 'Principal Clara Sterling welcomes you warmly to Crossroads Academy [X: 44, Y: 2, Z: 43]! "Welcome to our school!"',
+        detailedLocationText: '📍 Location: Crossroads Academy [X: 44, Y: 2, Z: 43]\n\n"Our academy campus features a 3-story illuminated clock and belfry bell tower, the classic yellow school bus in the drop-off loop, STEM classrooms with chalkboards, a science lab, and an outdoor basketball court."',
+        tagColor: '#a855f7',
+        emoji: '👩‍🏫'
+      },
+      {
+        id: 'citizen_Capt__Bartholomew_Drake',
+        name: 'Capt. Bartholomew Drake',
+        role: 'Royal Galleon Captain',
+        areaName: 'South Coast Harbor & Royal Galleon',
+        coords: { x: 38, y: 2.0, z: 114 },
+        directionFromSpawn: 'South to Harbor Bay',
+        nearbyLandmarks: ['Triple-Masted Sailing Galleon', 'Marina Bay & Merlion', 'Grand Carnival Pier'],
+        ambientMessages: [
+          'Anchors aweigh! Inspecting rigging aboard the Royal Galleon at South Coast Harbor [X: 38, Y: 2, Z: 114]!',
+          'Full sails catching the ocean wind aboard the flagship galleon at [X: 38, Y: 2, Z: 114]!'
+        ],
+        proximityGreeting: 'Captain Drake touches his tricorn hat at South Coast Pier [X: 38, Y: 2, Z: 114]! "Ahoy traveler! Feast your eyes on the finest sailing ship in the seven seas!"',
+        detailedLocationText: '📍 Location: South Coast Harbor & Royal Galleon [X: 38, Y: 2, Z: 114]\n\n"Moored in the deep harbor waters near Palm Paradise and Singapore Merlion! A historic triple-masted galleon with broadside cannons, towering masts, crow\'s nests, and billowing 3D canvas sails."',
+        tagColor: '#ef4444',
+        emoji: '⚓'
       }
     ];
 

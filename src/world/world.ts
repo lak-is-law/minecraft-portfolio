@@ -430,6 +430,17 @@ export class VoxelWorld {
       }));
     }
 
+    if (this.mcQueenManager && this.mcQueenManager.hudsonGroup) {
+      const hPos = this.mcQueenManager.getHudsonPosition();
+      const hCenter = new THREE.Vector3(hPos.x, hPos.y + 0.6, hPos.z);
+      testTarget(hCenter, 2.5, 1.8, 3.8, () => ({
+        type: 'npc',
+        id: 'doc_hudson',
+        position: hPos.clone(),
+        title: 'Doc Hudson #51'
+      }));
+    }
+
     if (this.animalManager && this.animalManager.animals) {
       for (const animal of this.animalManager.animals) {
         const aPos = animal.group.position;
@@ -2031,6 +2042,11 @@ export class VoxelWorld {
     return this.mcQueenManager.getRideTransform();
   }
 
+  public getHudsonPosition(): THREE.Vector3 | null {
+    if (!this.mcQueenManager) return null;
+    return this.mcQueenManager.getHudsonPosition();
+  }
+
   // -------------------------------------------------------------
   // LIVING WORLD CITIZENS: CULTURALLY AUTHENTIC RESIDENTS
   // -------------------------------------------------------------
@@ -2099,7 +2115,13 @@ export class VoxelWorld {
       { name: 'Rashid Al-Maktoum', role: 'Dubai Skydeck Pilot', x: 164, y: 2, z: 38, heading: -Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xffffff, pantsColor: 0xffffff, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'turban', hatColor: 0xffffff },
 
       // 10. Crossroads Wildlife Park (Zoo)
-      { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -40, y: 2, z: 2, heading: Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 }
+      { name: 'Dr. Maya Lin', role: 'Head Wildlife Zoologist', x: -40, y: 2, z: 2, heading: Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0x059669, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 },
+
+      // 11. Revamped Civic Quarter & Harbor Citizens
+      { name: 'Dr. Elena Vance', role: 'Chief Trauma Surgeon', x: 44, y: 2, z: 61, heading: 0, skinColor: 0xffe0bd, shirtColor: 0x06b6d4, pantsColor: 0xffffff, hairColor: 0x78350f, tagColor: '#06b6d4', hatType: 'none' },
+      { name: 'Sgt. James Reynolds', role: 'Precinct Watch Commander', x: 76, y: 2, z: 43, heading: 0, skinColor: 0xd4a373, shirtColor: 0x1e3a8a, pantsColor: 0x0f172a, hairColor: 0x334155, tagColor: '#3b82f6', hatType: 'cap', hatColor: 0x1e3a8a },
+      { name: 'Principal Clara Sterling', role: 'Academy Headmistress', x: 44, y: 2, z: 43, heading: 0, skinColor: 0xffdbac, shirtColor: 0x9333ea, pantsColor: 0x1e293b, hairColor: 0x94a3b8, tagColor: '#a855f7', hatType: 'none' },
+      { name: 'Capt. Bartholomew Drake', role: 'Royal Galleon Captain', x: 38, y: 2, z: 114, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xdc2626, pantsColor: 0x18181b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0x991b1b }
     ];
 
     for (const c of citizens) {

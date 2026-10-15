@@ -328,7 +328,7 @@ export class DragonManager {
       {
         id: 'emerald_dragon',
         name: 'Imperial Jade Dragon',
-        region: 'East',
+        region: 'North',
         bodyColor: 0x047857,
         wingColor: 0xd97706,
         eyeColor: 0xef4444,

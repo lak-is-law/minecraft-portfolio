@@ -2357,3 +2357,302 @@ body.touch-device .mc-chat-msg {
 
 /* Keep the rotating splash clear of the portfolio title. */
 #mc-splash-text { display: none; }
+
+/* ==========================================================
+   CREATIVE BLOCK PALETTE MODAL
+   ========================================================== */
+.mc-palette-dialog {
+  max-width: 640px;
+  width: 95vw;
+}
+
+.mc-palette-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.mc-palette-section {
+  margin-bottom: 14px;
+}
+
+.mc-palette-category-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #38bdf8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mc-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.mc-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #18181b;
+  border: 2px solid #3f3f46;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #f8fafc;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+}
+
+.mc-palette-item:hover {
+  background: #27272a;
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+.mc-palette-item.active {
+  border-color: #22c55e;
+  background: #064e3b;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.mc-palette-swatch {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: inset 1px 1px rgba(255, 255, 255, 0.25), inset -1px -1px rgba(0, 0, 0, 0.4);
+}
+
+.mc-palette-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mc-palette-footer-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: #94a3b8;
+}
+
+/* ============================================================= */
+/* ⚡ PISTON CUP RACING HUD & DOC HUDSON CHALLENGE OVERLAYS ⚡ */
+/* ============================================================= */
+.mc-racing-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1200;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Speedometer & Nitro Cluster (Bottom Right) */
+.mc-racing-cluster {
+  position: absolute;
+  bottom: 30px;
+  right: 32px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 3px solid #dc2626;
+  border-radius: 8px;
+  padding: 14px 18px;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+}
+
+.mc-racing-badge {
+  font-size: 8px;
+  color: #facc15;
+  text-shadow: 1px 1px 0 #000;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.mc-racing-speed-val {
+  font-size: 34px;
+  font-weight: 900;
+  color: #f8fafc;
+  text-shadow: 2px 2px 0 #000, 0 0 12px rgba(254, 240, 138, 0.6);
+  line-height: 1.1;
+}
+
+.mc-racing-speed-val small {
+  font-size: 11px;
+  color: #facc15;
+  margin-left: 2px;
+}
+
+.mc-racing-nitro-label {
+  font-size: 7px;
+  color: #fb923c;
+  margin-top: 6px;
+  margin-bottom: 3px;
+  letter-spacing: 1px;
+}
+
+.mc-racing-nitro-bar {
+  width: 100%;
+  height: 8px;
+  background: #1e1b18;
+  border: 1.5px solid #78350f;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.mc-racing-nitro-fill {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #ea580c, #facc15);
+  transition: width 0.15s ease-out;
+}
+
+.mc-racing-nitro-fill.boosting {
+  background: linear-gradient(90deg, #f97316, #38bdf8, #ffffff);
+  box-shadow: 0 0 10px #38bdf8;
+  animation: nitroPulse 0.2s infinite alternate;
+}
+
+@keyframes nitroPulse {
+  from { filter: brightness(1.0); }
+  to { filter: brightness(1.5); }
+}
+
+.mc-racing-controls-hint {
+  font-size: 6px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Challenge Telemetry Header (Top Center) */
+.mc-race-challenge-panel {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 15, 29, 0.92);
+  border: 2px solid #facc15;
+  border-radius: 6px;
+  padding: 10px 22px;
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.4);
+  text-align: center;
+}
+
+.mc-challenge-header {
+  font-size: 8.5px;
+  color: #facc15;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 0 #000;
+  letter-spacing: 1px;
+}
+
+.mc-challenge-stats {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: center;
+}
+
+.mc-challenge-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 14px;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-challenge-stat .mc-label {
+  font-size: 7px;
+  color: #94a3b8;
+}
+
+.mc-pos-p1 {
+  color: #22c55e !important;
+  font-weight: 900;
+  text-shadow: 0 0 8px #22c55e;
+}
+
+.mc-pos-p2 {
+  color: #ef4444 !important;
+  font-weight: 900;
+}
+
+/* Large Center Countdown / Finish Banner */
+.mc-race-big-banner {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.mc-countdown-number {
+  font-size: 96px;
+  color: #facc15;
+  text-shadow: 4px 4px 0 #000, 0 0 35px rgba(250, 204, 21, 0.8);
+  animation: countdownPop 0.8s ease-out;
+}
+
+.mc-countdown-number.go {
+  color: #22c55e;
+  text-shadow: 4px 4px 0 #000, 0 0 40px rgba(34, 197, 94, 0.9);
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(1.6); opacity: 0; }
+  30% { transform: scale(1.0); opacity: 1; }
+  85% { transform: scale(1.0); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+.mc-finish-banner {
+  background: rgba(15, 23, 42, 0.95);
+  border: 4px solid #facc15;
+  border-radius: 10px;
+  padding: 24px 36px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+  animation: bannerFadeIn 0.4s ease-out;
+}
+
+.mc-finish-banner.victory {
+  border-color: #22c55e;
+  box-shadow: 0 0 35px rgba(34, 197, 94, 0.6);
+}
+
+.mc-finish-banner.defeat {
+  border-color: #ef4444;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
+}
+
+.mc-finish-title {
+  font-size: 20px;
+  color: #facc15;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.mc-finish-sub {
+  font-size: 8.5px;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+@keyframes bannerFadeIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1.0); opacity: 1; }
+}
+
