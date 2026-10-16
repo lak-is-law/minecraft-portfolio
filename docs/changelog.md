@@ -50,3 +50,4 @@
 - 2026-10-16 14:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-10-16 17:25: refactor(physics): AABB collision detection against voxel grid
 - 2026-10-16 19:03: refactor(physics): AABB collision detection against voxel grid
+- 2026-10-16 21:30: docs(engine): document voxel coordinate transformation pipeline
