@@ -789,9 +789,9 @@ export class LightningMcQueenManager {
       new THREE.Vector3(196, 2.05, -51), // Canyon Back Straight mid
       new THREE.Vector3(184, 2.05, -51), // Canyon Back Straight braking zone
       new THREE.Vector3(178, 2.05, -50), // Turn 3 entry
-      new THREE.Vector3(175, 2.05, -44), // West Hairpin apex 1
-      new THREE.Vector3(175, 2.05, -33), // West Hairpin mid (Willy's Butte)
-      new THREE.Vector3(175, 2.05, -22), // West Hairpin apex 2
+      new THREE.Vector3(176, 2.05, -44), // West Hairpin apex 1
+      new THREE.Vector3(176, 2.05, -33), // West Hairpin mid (Willy's Butte)
+      new THREE.Vector3(176, 2.05, -22), // West Hairpin apex 2
       new THREE.Vector3(178, 2.05, -16), // Turn 4 exit
       new THREE.Vector3(184, 2.05, -15)  // Main Straight entry
     ];

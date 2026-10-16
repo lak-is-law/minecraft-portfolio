@@ -11022,19 +11022,20 @@ export class WorldBuilder {
     }
 
     // =========================================================================
-    // 3. FENCE THE TRACK: HIGH-VISIBILITY CRASH BARRIERS & CATCH FENCES
     // =========================================================================
-    // Cars CANNOT fly off into the ocean or leave the raceway!
+    // 3. FENCE THE TRACK: HIGH-VISIBILITY CRASH BARRIERS & CATCH FENCES (FULLY BOUNDED)
+    // =========================================================================
+    // Cars are 100% contained in an unobstructed, fully bounded racing channel!
 
-    // A. Outer South Barrier Wall & Catch Fence: Z = -19, X in [171, 229]
+    // A. Outer South Barrier Wall & Catch Fence: Z = -11, X in [171, 229]
     for (let x = 171; x <= 229; x++) {
-      buildPierSupport(x, -19);
-      this.setBlock(x, 1, -19, (x % 2 === 0) ? 'redstone_block' : 'quartz_block'); // Rumble kerb
-      this.setBlock(x, 2, -19, 'stone_bricks'); // Solid concrete crash barrier
-      this.setBlock(x, 3, -19, 'iron_bars');    // Protective catch fence
+      buildPierSupport(x, -11);
+      this.setBlock(x, 1, -11, (x % 2 === 0) ? 'redstone_block' : 'quartz_block'); // Rumble kerb
+      this.setBlock(x, 2, -11, 'stone_bricks'); // Solid concrete crash barrier
+      this.setBlock(x, 3, -11, 'iron_bars');    // Protective catch fence
       if (x % 8 === 0) {
-        this.setBlock(x, 4, -19, 'iron_block');
-        this.setBlock(x, 5, -19, 'sea_lantern'); // Stadium floodlight
+        this.setBlock(x, 4, -11, 'iron_block');
+        this.setBlock(x, 5, -11, 'sea_lantern'); // Stadium floodlight
       }
     }
 
@@ -11064,8 +11065,6 @@ export class WorldBuilder {
 
     // D. Outer West Barrier Wall & Catch Fence: X = 171, Z in [-55, -11]
     for (let z = -55; z <= -11; z++) {
-      // Leave opening at Z in [-53, -49] for Hollywood Boulevard feeder avenue
-      if (z >= -53 && z <= -49) continue;
       this.setBlock(171, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
       this.setBlock(171, 2, z, 'stone_bricks');
       this.setBlock(171, 3, z, 'iron_bars');
@@ -11075,13 +11074,13 @@ export class WorldBuilder {
       }
     }
 
-    // E. Inner Infield Rumble Kerbs & Heavy Tire Safety Barriers
-    // South Infield edge: Z = -11, X in [181, 219]
+    // E. Inner Infield Rumble Kerbs & Heavy Tire Safety Barriers (Closed Loop around Willy's Butte)
+    // South Infield edge: Z = -19, X in [181, 219]
     for (let x = 181; x <= 219; x++) {
-      buildPierSupport(x, -11);
-      this.setBlock(x, 1, -11, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
-      this.setBlock(x, 2, -11, 'coal_block'); // Stacked racing tires
-      this.setBlock(x, 3, -11, 'iron_bars');  // Catch fence
+      buildPierSupport(x, -19);
+      this.setBlock(x, 1, -19, (x % 2 === 0) ? 'redstone_block' : 'quartz_block');
+      this.setBlock(x, 2, -19, 'coal_block'); // Stacked racing tires
+      this.setBlock(x, 3, -19, 'iron_bars');  // Catch fence
     }
     // East Infield edge: X = 219, Z in [-47, -19]
     for (let z = -47; z <= -19; z++) {
@@ -11102,6 +11101,26 @@ export class WorldBuilder {
       this.setBlock(181, 1, z, (Math.abs(z) % 2 === 0) ? 'redstone_block' : 'quartz_block');
       this.setBlock(181, 2, z, 'coal_block');
       this.setBlock(181, 3, z, 'iron_bars');
+    }
+
+    // F. Clear all racetrack lanes from Y = 2 to Y = 10 so there are ZERO obstacles
+    for (let y = 2; y <= 10; y++) {
+      for (let x = 172; x <= 228; x++) {
+        for (let z = -18; z <= -12; z++) this.removeBlock(x, y, z);
+        for (let z = -54; z <= -48; z++) this.removeBlock(x, y, z);
+      }
+      for (let z = -54; z <= -12; z++) {
+        for (let x = 172; x <= 180; x++) this.removeBlock(x, y, z);
+        for (let x = 220; x <= 228; x++) this.removeBlock(x, y, z);
+      }
+      for (let x = 172; x <= 184; x++) {
+        for (let z = -20; z <= -12; z++) this.removeBlock(x, y, z);
+        for (let z = -54; z <= -46; z++) this.removeBlock(x, y, z);
+      }
+      for (let x = 216; x <= 228; x++) {
+        for (let z = -20; z <= -12; z++) this.removeBlock(x, y, z);
+        for (let z = -54; z <= -46; z++) this.removeBlock(x, y, z);
+      }
     }
 
     // 4. Iconic Willy's Butte Infield Monument & Desert Drift Loop (Center: X = 200, Z = -33)
@@ -11277,10 +11296,10 @@ export class WorldBuilder {
 
     // 9. High-Intensity Stadium Floodlight Towers (4 Safe Outside Corners)
     const floodlights = [
-      [172, -10],
-      [228, -10],
-      [228, -56],
-      [172, -56]
+      [170, -10],
+      [230, -10],
+      [230, -56],
+      [170, -56]
     ];
     for (const [fx, fz] of floodlights) {
       for (let y = 1; y <= 11; y++) {

@@ -127,6 +127,7 @@ export class ModalManager {
   public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[]; trains?: any[] };
   private mapAnimId: number | null = null;
   private mapMouseUpCleanup: (() => void) | null = null;
+  private mapResizeCleanup: (() => void) | null = null;
 
   constructor() {
     this.modalContainer = document.getElementById('modal-container')!;
@@ -169,7 +170,13 @@ export class ModalManager {
       this.mapMouseUpCleanup();
       this.mapMouseUpCleanup = null;
     }
+    if (this.mapResizeCleanup) {
+      this.mapResizeCleanup();
+      this.mapResizeCleanup = null;
+    }
+    delete (window as any).__mcMapPanTo;
     this.isOpen = false;
+    this.modalContainer.classList.remove('map-fullscreen');
     this.modalContainer.innerHTML = '';
     this.modalContainer.style.display = 'none';
     document.body.classList.remove('modal-open');
