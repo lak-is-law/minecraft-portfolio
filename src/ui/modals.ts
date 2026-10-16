@@ -452,7 +452,7 @@ export class ModalManager {
       { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
       { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Mercado stalls & Mayan Cenote.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
       { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Pyramids of Khufu & Khafre, Nile River Felucca, Avenue of Sphinxes, and Luxor Temple Pylons.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
-      { number: '08', name: 'Dubai · Burj Khalifa & Palm Jumeirah', subtitle: 'United Arab Emirates 🇦🇪', detail: 'Towering 828m spider-lily skyscraper with skydeck at Y=46, overlooking the grand Palm Jumeirah archipelago, luxury frond villas, and Atlantis resort.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
+      { number: '08', name: 'Dubai · Burj Khalifa & Arabian Gulf Archipelago', subtitle: 'United Arab Emirates 🇦🇪', detail: 'Towering 828m spider-lily skyscraper overlooking the colossal Palm Jumeirah archipelago, 16 massive curved fronds, Atlantis palace, Burj Al Arab 7-star sail island, Bluewaters & Ain Dubai, and The World Islands.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
       { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock with Westminster chime, Great Bell, and Tower Bridge walkways.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −58' },
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
@@ -605,11 +605,11 @@ export class ModalManager {
 
     const cx = width / 2;
     const cy = height / 2;
-    const baseScale = 2.05;
-    const worldLimit = 205;
+    const baseScale = 1.65;
+    const worldLimit = 390;
 
     let userZoom = 1.0;
-    let panX = 0;
+    let panX = -40; // slight offset toward eastern archipelago
     let panY = 0;
     let activeFilter: 'all' | 'monuments' | 'cities' | 'transit' | 'nature' = 'all';
 
@@ -629,13 +629,14 @@ export class ModalManager {
       if (tag.includes('TAJ') || tag.includes('GREAT WALL') || tag.includes('EIFFEL') ||
           tag.includes('LONDON') || tag.includes('PYRAMID') || tag.includes('GIZA') ||
           tag.includes('TEMPLE') || tag.includes('ISRO') || tag.includes('HAWA MAHAL') ||
-          tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE')) {
+          tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE') ||
+          tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS')) {
         return 'monuments';
       }
       if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
           tag.includes('HOLLYWOOD') || tag.includes('McQUEEN') || tag.includes('MEXICO') ||
           tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
-          tag.includes('VARANASI') || tag.includes('CITADEL')) {
+          tag.includes('VARANASI') || tag.includes('CITADEL') || tag.includes('WORLD ISLANDS')) {
         return 'cities';
       }
       if (tag.includes('AIRPORT') || tag.includes('RAILWAY') || tag.includes('MARINA') || tag.includes('DHABA')) {
@@ -669,7 +670,7 @@ export class ModalManager {
       if (tag.includes('CARNIVAL')) return '#f472b6';
       if (tag.includes('LONDON')) return '#dc2626';
       if (tag.includes('SEOUL')) return '#8b5cf6';
-      if (tag.includes('DUBAI') || tag.includes('PALM')) return '#14b8a6';
+      if (tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS') || tag.includes('WORLD ISLANDS')) return '#14b8a6';
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';
       if (tag.includes('HAWA MAHAL')) return '#fb923c';
@@ -716,92 +717,253 @@ export class ModalManager {
       });
     });
 
-    // Main Draw Function
+    // Main Draw Function - Hand-Crafted Adventure Game World Map
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
       const effectiveScale = baseScale * userZoom;
       const originX = cx + panX;
       const originZ = cy + panY;
+      const now = performance.now();
 
-      // 1. Deep Ocean Background
-      ctx.fillStyle = '#0284c7';
+      // 1. Deep Ocean with Gradient Depth & Subtle Currents
+      const oceanGrad = ctx.createRadialGradient(cx, cy, 140, cx, cy, Math.max(width, height) * 0.72);
+      oceanGrad.addColorStop(0, '#104b77');
+      oceanGrad.addColorStop(0.45, '#0b3456');
+      oceanGrad.addColorStop(1, '#061c31');
+      ctx.fillStyle = oceanGrad;
       ctx.fillRect(0, 0, width, height);
 
       // World boundary clipping
-      const mapHalfW = worldLimit * effectiveScale;
-      const mapHalfH = worldLimit * effectiveScale;
+      const mapHalfW = (worldLimit + 35) * effectiveScale;
+      const mapHalfH = (worldLimit + 35) * effectiveScale;
       const mapX = originX - mapHalfW;
       const mapY = originZ - mapHalfH;
       const mapW = mapHalfW * 2;
       const mapH = mapHalfH * 2;
 
-      // Coordinate Grid Lines (every 50 blocks)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      // Coordinate Grid Lines (every 50 blocks - gentle cartography grid)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1;
-      for (let wCoord = -200; wCoord <= 200; wCoord += 50) {
-        const gx = originX + wCoord * effectiveScale;
-        const gz = originZ + wCoord * effectiveScale;
+      for (let wx = -250; wx <= 350; wx += 50) {
+        const gx = originX + wx * effectiveScale;
         ctx.beginPath();
         ctx.moveTo(gx, 0); ctx.lineTo(gx, height);
         ctx.stroke();
+
+        if (userZoom >= 1.0) {
+          ctx.fillStyle = 'rgba(224, 242, 254, 0.22)';
+          ctx.font = '8px monospace';
+          ctx.fillText(`${wx}`, gx + 4, originZ + 12);
+        }
+      }
+      for (let wz = -250; wz <= 250; wz += 50) {
+        const gz = originZ + wz * effectiveScale;
         ctx.beginPath();
         ctx.moveTo(0, gz); ctx.lineTo(width, gz);
         ctx.stroke();
-
-        // Subtle coordinate markings
-        if (userZoom >= 1.0) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-          ctx.font = '8px monospace';
-          ctx.fillText(`${wCoord}`, gx + 3, originZ + 10);
-        }
       }
+
+      // Sea Waves & Ocean Currents
+      ctx.save();
+      const wavePhase = (now * 0.0008) % (Math.PI * 2);
+      ctx.strokeStyle = 'rgba(125, 211, 252, 0.12)';
+      ctx.lineWidth = 1.2;
+      for (let r = 215; r <= 245; r += 15) {
+        ctx.beginPath();
+        ctx.ellipse(originX, originZ, (r + Math.sin(wavePhase) * 3) * effectiveScale, (r + Math.cos(wavePhase) * 3) * effectiveScale, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // =========================================================================
+      // NAUTICAL FLOURISHES: SEA SERPENT & SAILING SHIPS (Matching Reference Map)
+      // =========================================================================
+      // 1. Sea Serpent / Leviathan in South Ocean (World X: 45, Z: 225)
+      const drawSeaSerpent = (sx: number, sz: number) => {
+        const mx = originX + sx * effectiveScale;
+        const my = originZ + sz * effectiveScale;
+        const s = effectiveScale * 0.82;
+        ctx.save();
+
+        // White foam wake
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(mx, my + 8 * s, 32 * s, 8 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Splash ripples
+        ctx.strokeStyle = '#bae6fd';
+        ctx.lineWidth = 1.6;
+        for (let i = -3; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.arc(mx + i * 8 * s, my + 8 * s, 6 * s, Math.PI * 0.9, Math.PI * 0.1, true);
+          ctx.stroke();
+        }
+
+        // Emerald-green scaly coils
+        ctx.fillStyle = '#059669';
+        ctx.strokeStyle = '#064e3b';
+        ctx.lineWidth = 1.5;
+        // Coil 1
+        ctx.beginPath();
+        ctx.ellipse(mx - 20 * s, my + 2 * s, 7 * s, 11 * s, -0.25, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Coil 2
+        ctx.beginPath();
+        ctx.ellipse(mx - 5 * s, my, 8 * s, 13 * s, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Serpent Head Rising
+        ctx.beginPath();
+        ctx.moveTo(mx + 12 * s, my + 6 * s);
+        ctx.quadraticCurveTo(mx + 25 * s, my - 9 * s, mx + 18 * s, my - 16 * s);
+        ctx.quadraticCurveTo(mx + 9 * s, my - 7 * s, mx + 12 * s, my + 6 * s);
+        ctx.fill();
+        ctx.stroke();
+
+        // Golden Dorsal Spines
+        ctx.fillStyle = '#fde047';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(mx + (17 - i * 4) * s, my - (14 - i * 4) * s);
+          ctx.lineTo(mx + (21 - i * 4) * s, my - (19 - i * 4) * s);
+          ctx.lineTo(mx + (18 - i * 4) * s, my - (9 - i * 4) * s);
+          ctx.fill();
+        }
+        // Glowing Eye
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath();
+        ctx.arc(mx + 19 * s, my - 13 * s, 2 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+      drawSeaSerpent(45, 225);
+
+      // 2. Sailing Caravels in North Waters
+      const drawCaravel = (sx: number, sz: number, rot: number) => {
+        const mx = originX + sx * effectiveScale;
+        const my = originZ + sz * effectiveScale;
+        const s = effectiveScale * 0.75;
+        ctx.save();
+        ctx.translate(mx, my);
+        ctx.rotate(rot);
+
+        // Water wake
+        ctx.strokeStyle = 'rgba(224, 242, 254, 0.4)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(-16 * s, 0); ctx.lineTo(-24 * s, -7 * s);
+        ctx.moveTo(-16 * s, 0); ctx.lineTo(-24 * s, 7 * s);
+        ctx.stroke();
+
+        // Wooden Hull
+        ctx.fillStyle = '#78350f';
+        ctx.strokeStyle = '#451a03';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(-15 * s, 4 * s);
+        ctx.lineTo(15 * s, 3 * s);
+        ctx.quadraticCurveTo(19 * s, 0, 15 * s, -3 * s);
+        ctx.lineTo(-15 * s, -4 * s);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Billowing White Canvas Sails
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 6 * s, 9 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(8 * s, 0, 4 * s, 6 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Red Pennant
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.moveTo(1 * s, -1 * s);
+        ctx.lineTo(-5 * s, -4 * s);
+        ctx.lineTo(1 * s, -3 * s);
+        ctx.fill();
+        ctx.restore();
+      };
+      drawCaravel(-225, -150, 0.35);
+      drawCaravel(220, -165, -0.45);
 
       ctx.save();
       ctx.beginPath();
       ctx.rect(mapX, mapY, mapW, mapH);
       ctx.clip();
 
-      // Rounded Square Island Outline matching 3D world (R = 200, cornerR = 55)
-      const drawIslandShape = (margin = 0) => {
-        ctx.beginPath();
-        const r = (200 - margin) * effectiveScale;
-        const cornerR = Math.max(6, (55 - margin) * effectiveScale);
-        const minX = originX - r;
-        const maxX = originX + r;
-        const minZ = originZ - r;
-        const maxZ = originZ + r;
+      // =========================================================================
+      // ORGANIC SCULPTED ISLAND CONTINENTAL OUTLINE & TURQUOISE SHALLOWS
+      // =========================================================================
+      const islandPoints: [number, number][] = [
+        [-20, -195], [20, -192], [65, -188], [115, -185], [155, -170], [175, -145],
+        [178, -120], [168, -85], [178, -55], [182, -20], [180, 10],
+        // Dubai waterfront promenade & Palm gateway
+        [178, 25], [176, 42], [178, 60],
+        [175, 80], [150, 95], [115, 105], [75, 108], [42, 112],
+        // Carnival pier & boardwalk peninsula
+        [38, 140], [35, 185], [15, 195], [-15, 195], [-35, 185], [-38, 140],
+        [-45, 110], [-85, 105], [-130, 95], [-165, 85], [-185, 60],
+        [-188, 30], [-178, 0], [-182, -40], [-188, -75], [-180, -115],
+        [-155, -155], [-115, -178], [-70, -188], [-20, -195]
+      ];
 
-        ctx.moveTo(minX + cornerR, minZ);
-        ctx.lineTo(maxX - cornerR, minZ);
-        ctx.quadraticCurveTo(maxX, minZ, maxX, minZ + cornerR);
-        ctx.lineTo(maxX, maxZ - cornerR);
-        ctx.quadraticCurveTo(maxX, maxZ, maxX - cornerR, maxZ);
-        ctx.lineTo(minX + cornerR, maxZ);
-        ctx.quadraticCurveTo(minX, maxZ, minX, maxZ - cornerR);
-        ctx.lineTo(minX, minZ + cornerR);
-        ctx.quadraticCurveTo(minX, minZ, minX + cornerR, minZ);
+      const makeIslandPath = (scaleOffset = 0) => {
+        ctx.beginPath();
+        islandPoints.forEach(([x, z], i) => {
+          const dist = Math.hypot(x, z);
+          const nx = dist > 0 ? (x / dist) * scaleOffset : 0;
+          const nz = dist > 0 ? (z / dist) * scaleOffset : 0;
+          const px = originX + (x + nx) * effectiveScale;
+          const pz = originZ + (z + nz) * effectiveScale;
+          if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+        });
         ctx.closePath();
       };
 
-      // Golden beach coastline
-      drawIslandShape(0);
-      ctx.fillStyle = '#fde047';
+      // 1. Turquoise Coral Reef Shallow Shelf
+      makeIslandPath(14);
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
       ctx.fill();
 
-      // Clip interior landmass
+      // 2. White Coastal Surf Foam Line
+      makeIslandPath(4);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 3.5 * effectiveScale;
+      ctx.stroke();
+
+      // 3. Golden Beach Shoreline Fringe
+      makeIslandPath(0);
+      ctx.fillStyle = '#dfc47b';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // 4. Clip strictly inside mainland for layered painterly biomes
       ctx.save();
-      drawIslandShape(5);
+      makeIslandPath(-3.5);
       ctx.clip();
 
-      // Base interior plains (Minecraft vibrant grass)
-      ctx.fillStyle = '#4c7c29';
-      ctx.fillRect(originX - 210 * effectiveScale, originZ - 210 * effectiveScale, 420 * effectiveScale, 420 * effectiveScale);
+      // Base Interior Plains (Lush vibrant grass)
+      ctx.fillStyle = '#427e28';
+      ctx.fillRect(originX - 220 * effectiveScale, originZ - 220 * effectiveScale, 440 * effectiveScale, 440 * effectiveScale);
 
-      // Render Realm Territorials with Flag Badges & Authentic Cartography Styling
-      const drawCountryTerritory = (poly: [number, number][], fillColor: string, strokeColor: string, label: string, labelPos: [number, number]) => {
+      // =========================================================================
+      // PAINTERLY BIOME REGIONS (Elevation, Relief Shading & Atmosphere)
+      // =========================================================================
+      const drawBiomeArea = (points: [number, number][], fillColor: string) => {
         ctx.beginPath();
-        poly.forEach(([x, z], i) => {
+        points.forEach(([x, z], i) => {
           const px = originX + x * effectiveScale;
           const pz = originZ + z * effectiveScale;
           if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
@@ -809,144 +971,180 @@ export class ModalManager {
         ctx.closePath();
         ctx.fillStyle = fillColor;
         ctx.fill();
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = Math.max(1.2, 2.0 * userZoom);
-        ctx.stroke();
-
-        if (label && userZoom >= 0.75) {
-          ctx.save();
-          const lx = originX + labelPos[0] * effectiveScale;
-          const ly = originZ + labelPos[1] * effectiveScale;
-          const fontSize = Math.max(8.5, Math.round(9.5 * Math.min(1.35, userZoom)));
-          ctx.font = `bold ${fontSize}px monospace`;
-          const tw = ctx.measureText(label).width;
-          // Clean parchment pill badge behind territory label
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-          ctx.fillRect(lx - tw / 2 - 4, ly - fontSize + 1, tw + 8, fontSize + 4);
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(lx - tw / 2 - 4, ly - fontSize + 1, tw + 8, fontSize + 4);
-
-          ctx.fillStyle = '#ffffff';
-          ctx.textAlign = 'center';
-          ctx.fillText(label, lx, ly + 2);
-          ctx.restore();
-        }
       };
 
-      // 1. INDIA
-      drawCountryTerritory([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], 'rgba(180, 83, 9, 0.42)', '#f97316', '🇮🇳 INDIA · TAJ MAHAL', [95, -130]);
-      // 2. CHINA
-      drawCountryTerritory([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], 'rgba(30, 63, 32, 0.45)', '#10b981', '🇨🇳 CHINA · GREAT WALL', [-115, -130]);
-      // 3. JAPAN
-      drawCountryTerritory([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], 'rgba(244, 114, 182, 0.48)', '#f43f5e', '🇯🇵 JAPAN · SHIBUYA & SAKURA', [-155, -75]);
-      // 4. SOUTH KOREA
-      drawCountryTerritory([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], 'rgba(2, 132, 199, 0.45)', '#0ea5e9', '🇰🇷 S. KOREA · SEOUL', [-60, -102]);
-      // 5. UK
-      drawCountryTerritory([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], 'rgba(220, 38, 38, 0.42)', '#ef4444', '🇬🇧 UK · LONDON', [-32, -68]);
-      // 6. FRANCE
-      drawCountryTerritory([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], 'rgba(56, 189, 248, 0.42)', '#38bdf8', '🇫🇷 FRANCE · PARIS', [28, -42]);
-      // 7. USA
-      drawCountryTerritory([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], 'rgba(51, 65, 85, 0.45)', '#3b82f6', '🇺🇸 USA · VEGAS & HOLLYWOOD', [120, -10]);
-      // 8. MEXICO
-      drawCountryTerritory([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], 'rgba(154, 52, 18, 0.42)', '#ea580c', '🇲🇽 MEXICO · CHICHÉN ITZÁ', [-125, 60]);
-      // 9. EGYPT
-      drawCountryTerritory([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], 'rgba(234, 179, 8, 0.42)', '#eab308', '🇪🇬 EGYPT · GIZA PYRAMIDS', [-155, 40]);
-      // 10. UAE
-      drawCountryTerritory([[150, 20], [185, 20], [185, 60], [150, 60], [150, 20]], 'rgba(13, 148, 136, 0.45)', '#14b8a6', '🇦🇪 UAE · BURJ KHALIFA', [168, 38]);
-      // 12. SUNFLOWER VALLEY
-      drawCountryTerritory([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], 'rgba(250, 204, 21, 0.38)', '#facc15', '🌻 SUNFLOWER VALLEY', [-45, 48]);
-      // 13. SAFARI ZOO
-      drawCountryTerritory([[-85, -20], [-45, -20], [-45, 20], [-85, 20], [-85, -20]], 'rgba(34, 197, 94, 0.38)', '#22c55e', '🐾 SAFARI WILDLIFE PARK', [-65, 0]);
-      // Beach & Carnival Pier
-      drawCountryTerritory([[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]], 'rgba(223, 196, 123, 0.35)', '#dfc47b', '🏖️ BEACH & BOARDWALK', [0, 95]);
-      drawCountryTerritory([[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]], 'rgba(219, 39, 119, 0.45)', '#ec4899', '🎡 CARNIVAL PIER', [5, 150]);
+      // 1. Sahara & Egypt Giza Desert Dunes (Warm Golden Sands)
+      drawBiomeArea([[-185, 18], [-130, 16], [-125, 68], [-175, 68], [-185, 45], [-185, 18]], '#eab308');
+      // Subtle sand dune wind ripples
+      ctx.strokeStyle = '#ca8a04';
+      ctx.lineWidth = 1.4;
+      for (let dz = 24; dz <= 60; dz += 8) {
+        ctx.beginPath();
+        ctx.moveTo(originX - 175 * effectiveScale, originZ + dz * effectiveScale);
+        ctx.quadraticCurveTo(originX - 150 * effectiveScale, originZ + (dz + 4) * effectiveScale, originX - 132 * effectiveScale, originZ + dz * effectiveScale);
+        ctx.stroke();
+      }
+
+      // 2. Mesoamerican Horn / Mexico (Terracotta Adobe)
+      drawBiomeArea([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
+
+      // 3. Sunflower Valley & Farmstead (Golden Fields)
+      drawBiomeArea([[-68, 25], [-22, 25], [-22, 70], [-68, 70], [-68, 25]], '#facc15');
+
+      // 4. China Great Wall & Pine Forests (Northern Arc)
+      drawBiomeArea([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#1c4524');
+
+      // 5. Japan Cherry Blossom / Sakura Forest (Pastel Pink)
+      drawBiomeArea([[-178, -58], [-158, -75], [-142, -95], [-132, -85], [-148, -65], [-168, -52], [-178, -58]], '#f472b6');
+
+      // 6. Imperial India Subcontinent (Terracotta Sandstone & Yamuna)
+      drawBiomeArea([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
+
+      // 7. United States & Radiator Springs (Red Rock Canyons)
+      drawBiomeArea([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#334155');
+      drawBiomeArea([[160, -38], [210, -38], [210, 8], [160, 8], [160, -38]], '#9a3412');
+
+      // 8. South Beach & Carnival Boardwalk
+      drawBiomeArea([[-40, 75], [40, 75], [40, 195], [-40, 195], [-40, 75]], '#dfc47b');
+      drawBiomeArea([[-25, 120], [35, 120], [35, 185], [-25, 185], [-25, 120]], '#db2777');
 
       // =========================================================================
-      // 11. SWISS CONFEDERATION · FROSTPEAK ALPS (Elevation Relief Shading)
+      // FROSTPEAK ALPS · 3D RELIEF SNOW MOUNTAINS (Matching Image 2 Reference)
       // =========================================================================
-      // Evergreen alpine spruce forest footing
-      drawCountryTerritory([[-32, -128], [24, -128], [18, -84], [-28, -84], [-32, -128]], 'rgba(22, 78, 50, 0.75)', '#164e32', '', [0, 0]);
-      // Rocky massif crags
-      drawCountryTerritory([[-28, -124], [20, -124], [15, -88], [-24, -88], [-28, -124]], 'rgba(71, 85, 105, 0.85)', '#475569', '', [0, 0]);
-      // Southeast shaded blue ice slopes
-      drawCountryTerritory([[-24, -122], [18, -122], [12, -92], [-18, -92], [-24, -122]], 'rgba(125, 211, 252, 0.85)', '#38bdf8', '', [0, 0]);
-      // Northwest sunlit alpine snow slopes
-      drawCountryTerritory([[-24, -122], [-4, -122], [-6, -92], [-20, -92], [-24, -122]], 'rgba(248, 250, 252, 0.95)', '#f1f5f9', '', [0, 0]);
-      // High summit glaciers & peaks
-      drawCountryTerritory([[-14, -118], [8, -118], [2, -98], [-10, -98], [-14, -118]], 'rgba(255, 255, 255, 0.98)', '#ffffff', '🇨🇭 SWITZERLAND · ALPS', [-3, -108]);
+      // Evergreen spruce foothill base
+      drawBiomeArea([[-36, -135], [28, -135], [22, -80], [-32, -80], [-36, -135]], '#143d22');
 
-      // Lake Serenity (natural frozen ice mirror in alpine bowl)
+      // Draw 3D Shaded Mountain Peaks with Sunlit/Shadowed Facets
+      const draw3DMountainPeak = (px: number, pz: number, baseW: number, peakH: number) => {
+        const mx = originX + px * effectiveScale;
+        const my = originZ + pz * effectiveScale;
+        const w = baseW * effectiveScale;
+        const h = peakH * effectiveScale;
+
+        // Shadow slope (Southeast)
+        ctx.fillStyle = '#64748b';
+        ctx.beginPath();
+        ctx.moveTo(mx, my - h);
+        ctx.lineTo(mx + w * 0.5, my);
+        ctx.lineTo(mx, my + h * 0.15);
+        ctx.closePath();
+        ctx.fill();
+
+        // Sunlit slope (Northwest)
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.moveTo(mx, my - h);
+        ctx.lineTo(mx - w * 0.5, my);
+        ctx.lineTo(mx, my + h * 0.15);
+        ctx.closePath();
+        ctx.fill();
+
+        // Summit pristine snowcap
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(mx, my - h);
+        ctx.lineTo(mx - w * 0.18, my - h * 0.55);
+        ctx.lineTo(mx + w * 0.18, my - h * 0.55);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      };
+
+      // Cluster of 8 Alpine Peaks
+      draw3DMountainPeak(-26, -125, 22, 28);
+      draw3DMountainPeak(-14, -132, 20, 32);
+      draw3DMountainPeak(0, -126, 24, 30);
+      draw3DMountainPeak(16, -120, 20, 26);
+      draw3DMountainPeak(24, -105, 18, 24);
+      draw3DMountainPeak(-4, -100, 22, 28);
+      draw3DMountainPeak(-20, -96, 20, 25);
+      draw3DMountainPeak(10, -92, 16, 20);
+
+      // Lake Serenity (Glacial ice bowl)
       ctx.fillStyle = '#bae6fd';
       ctx.beginPath();
       ctx.ellipse(originX - 10 * effectiveScale, originZ - 112 * effectiveScale, 11 * effectiveScale, 7 * effectiveScale, -0.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = Math.max(1.2, 1.8 * userZoom);
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Chalet de Lakshya timber ski lodge footprint
+      // Chalet ski lodge
       ctx.fillStyle = '#78350f';
       ctx.fillRect(originX - 22 * effectiveScale, originZ - 90 * effectiveScale, 10 * effectiveScale, 9 * effectiveScale);
-      ctx.strokeStyle = '#451a03';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(originX - 22 * effectiveScale, originZ - 90 * effectiveScale, 10 * effectiveScale, 9 * effectiveScale);
 
-      // SWISS FLAG BADGE 🇨🇭 (Frostpeak Alps Flagpole Mast at X: -18, Z: -86)
+      // Swiss Flag Badge
       const swissFlagX = originX - 18 * effectiveScale;
       const swissFlagZ = originZ - 86 * effectiveScale;
-      const sFlagW = Math.max(14, 20 * effectiveScale * 0.4 * Math.min(1.4, userZoom));
-      const sFlagH = sFlagW;
-      ctx.save();
-      // Flagpole mast shadow and pole
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(swissFlagX - sFlagW / 2 - 2, swissFlagZ - sFlagH / 2);
-      ctx.lineTo(swissFlagX - sFlagW / 2 - 2, swissFlagZ + sFlagH / 2 + 5);
-      ctx.stroke();
-      // Official Swiss Red Field (#d52b1e)
+      const sFlagW = Math.max(14, 20 * effectiveScale * 0.4);
       ctx.fillStyle = '#d52b1e';
-      ctx.fillRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagH / 2, sFlagW, sFlagH);
+      ctx.fillRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagW / 2, sFlagW, sFlagW);
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagH / 2, sFlagW, sFlagH);
-      // Swiss White Greek Cross (equilateral arms)
+      ctx.lineWidth = 0.8;
+      ctx.strokeRect(swissFlagX - sFlagW / 2, swissFlagZ - sFlagW / 2, sFlagW, sFlagW);
       ctx.fillStyle = '#ffffff';
       const sArm = sFlagW * 0.22;
       const sLen = sFlagW * 0.65;
       ctx.fillRect(swissFlagX - sArm / 2, swissFlagZ - sLen / 2, sArm, sLen);
       ctx.fillRect(swissFlagX - sLen / 2, swissFlagZ - sArm / 2, sLen, sArm);
-      ctx.restore();
 
-      // Yamuna canal in India
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
-      ctx.strokeStyle = '#bae6fd';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
+      // =========================================================================
+      // VOLCANIC PEAK & DRAGON CRATER (North-East, matching Image 2 top mountain)
+      // =========================================================================
+      const drawVolcanicDragonPeak = () => {
+        const vx = originX + 16 * effectiveScale;
+        const vy = originZ - 146 * effectiveScale;
+        const s = effectiveScale;
 
-      // Taj Mahal marble monument footprint (central dome & 4 corner minarets)
-      const tajX = originX + 75 * effectiveScale;
-      const tajZ = originZ - 150 * effectiveScale;
-      const tajSize = 16 * effectiveScale;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.2;
-      ctx.strokeRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
-      // 4 Minaret dots
-      ctx.fillStyle = '#f8fafc';
-      const minOff = tajSize * 0.6;
-      [[-minOff, -minOff], [minOff, -minOff], [minOff, minOff], [-minOff, minOff]].forEach(([mx, mz]) => {
+        // Dark volcanic basalt base
+        ctx.fillStyle = '#1e293b';
         ctx.beginPath();
-        ctx.arc(tajX + mx, tajZ + mz, 2.5 * userZoom, 0, Math.PI * 2);
+        ctx.moveTo(vx - 22 * s, vy + 14 * s);
+        ctx.lineTo(vx, vy - 20 * s);
+        ctx.lineTo(vx + 22 * s, vy + 14 * s);
+        ctx.closePath();
         ctx.fill();
-        ctx.stroke();
-      });
 
-      // Giza Stepped Pyramids (isometric 3D shaded triangles)
-      const drawEnlargedPyramid = (px: number, pz: number, sz: number, label: string) => {
+        // Glowing redstone magma caldera
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.ellipse(vx, vy - 14 * s, 8 * s, 4 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.arc(vx, vy - 14 * s, 3 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rising smoke plume
+        ctx.fillStyle = 'rgba(203, 213, 225, 0.45)';
+        const smokeWobble = Math.sin(now * 0.003) * 4 * s;
+        ctx.beginPath();
+        ctx.arc(vx + smokeWobble, vy - 24 * s, 6 * s, 0, Math.PI * 2);
+        ctx.arc(vx - smokeWobble * 0.5, vy - 32 * s, 8 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Golden Dragon Silhouette on the Volcano
+        ctx.fillStyle = '#eab308';
+        ctx.beginPath();
+        // Dragon Body
+        ctx.arc(vx + 6 * s, vy - 20 * s, 4 * s, 0, Math.PI * 2);
+        // Wings
+        ctx.moveTo(vx + 6 * s, vy - 22 * s);
+        ctx.lineTo(vx + 18 * s, vy - 32 * s);
+        ctx.lineTo(vx + 14 * s, vy - 18 * s);
+        ctx.moveTo(vx + 4 * s, vy - 22 * s);
+        ctx.lineTo(vx - 8 * s, vy - 30 * s);
+        ctx.lineTo(vx - 2 * s, vy - 18 * s);
+        ctx.fill();
+      };
+      drawVolcanicDragonPeak();
+
+      // =========================================================================
+      // 3D GIZA PYRAMIDS & EGYPTIAN OASIS (Southwest Desert)
+      // =========================================================================
+      const draw3DPyramid = (px: number, pz: number, sz: number) => {
         const rx = originX + px * effectiveScale;
         const rz = originZ + pz * effectiveScale;
         const s = sz * effectiveScale;
@@ -962,62 +1160,61 @@ export class ModalManager {
         ctx.fillStyle = '#b45309';
         ctx.beginPath();
         ctx.moveTo(rx, rz - s);
-        ctx.lineTo(rx, rz + s);
+        ctx.lineTo(rx - s, rz + s);
         ctx.lineTo(rx + s, rz + s);
         ctx.closePath();
         ctx.fill();
         ctx.strokeStyle = '#78350f';
         ctx.lineWidth = 1;
         ctx.stroke();
-
-        if (label && userZoom >= 1.2) {
-          ctx.fillStyle = '#fef08a';
-          ctx.font = 'bold 8px monospace';
-          ctx.textAlign = 'center';
-          ctx.fillText(label, rx, rz + s + 9);
-        }
       };
-      drawEnlargedPyramid(-155, 36, 12, 'KHUFU');
-      drawEnlargedPyramid(-142, 48, 9, 'KHAFRE');
-      drawEnlargedPyramid(-132, 58, 7, 'MENKAURE');
+      draw3DPyramid(-155, 36, 13); // Khufu
+      draw3DPyramid(-142, 48, 10); // Khafre
+      draw3DPyramid(-132, 58, 8);  // Menkaure
 
-      // Great Wall on China Ridge (stone ramparts with crenelated watchtowers)
-      ctx.strokeStyle = '#94a3b8';
+      // Desert Palm Oasis
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.ellipse(originX - 164 * effectiveScale, originZ + 58 * effectiveScale, 8 * effectiveScale, 5 * effectiveScale, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // =========================================================================
+      // MONUMENTS: TAJ MAHAL, GREAT WALL, BURJ KHALIFA, McQUEEN RACEWAY
+      // =========================================================================
+      // Yamuna canal in India
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(originX + 76 * effectiveScale, originZ - 122 * effectiveScale, 8 * effectiveScale, 47 * effectiveScale);
+
+      // Taj Mahal White Marble Monument
+      const tajX = originX + 75 * effectiveScale;
+      const tajZ = originZ - 150 * effectiveScale;
+      const tajSize = 16 * effectiveScale;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(tajX - tajSize / 2, tajZ - tajSize / 2, tajSize, tajSize);
+      // Minarets
+      ctx.fillStyle = '#f8fafc';
+      const minOff = tajSize * 0.6;
+      [[-minOff, -minOff], [minOff, -minOff], [minOff, minOff], [-minOff, minOff]].forEach(([mx, mz]) => {
+        ctx.beginPath();
+        ctx.arc(tajX + mx, tajZ + mz, 2.8 * userZoom, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      // Great Wall in China (Stone ramparts curving along the mountains)
+      ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = Math.max(3, 5 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.moveTo(originX - 150 * effectiveScale, originZ - 140 * effectiveScale);
       ctx.quadraticCurveTo(originX - 115 * effectiveScale, originZ - 132 * effectiveScale, originX - 80 * effectiveScale, originZ - 140 * effectiveScale);
       ctx.stroke();
-      ctx.strokeStyle = '#f1f5f9';
-      ctx.lineWidth = Math.max(1.5, 2.5 * effectiveScale * 0.5);
-      ctx.stroke();
 
-      // Hollywood Hills Ridge
-      const hollywoodX = originX + 165 * effectiveScale;
-      const hollywoodZ = originZ - 100 * effectiveScale;
-      ctx.fillStyle = 'rgba(91,61,43,.48)';
-      ctx.beginPath();
-      ctx.ellipse(hollywoodX, hollywoodZ + 6 * effectiveScale, 24 * effectiveScale, 12 * effectiveScale, -.2, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Hollywood Boulevard Walk of Fame
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = Math.max(2, 3.2 * effectiveScale * 0.5);
-      ctx.beginPath();
-      ctx.moveTo(originX + 161 * effectiveScale, originZ - 84 * effectiveScale);
-      ctx.lineTo(originX + 161 * effectiveScale, originZ - 54 * effectiveScale);
-      ctx.stroke();
-
-      // Hollywood Bowl acoustic concentric shell arc
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = Math.max(1.5, 2.4 * effectiveScale * 0.5);
-      ctx.beginPath();
-      ctx.arc(originX + 180 * effectiveScale, originZ - 76 * effectiveScale, 6 * effectiveScale, -Math.PI * 0.4, Math.PI * 0.4);
-      ctx.stroke();
-
-      // Lightning McQueen Speedway track (Asphalt track with checkered red-and-white borders)
+      // Lightning McQueen Raceway Track
       ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = Math.max(3.5, 6 * effectiveScale * 0.5);
+      ctx.lineWidth = Math.max(4, 6.5 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.ellipse(originX + 168 * effectiveScale, originZ - 24 * effectiveScale, 18 * effectiveScale, 10 * effectiveScale, 0, 0, Math.PI * 2);
       ctx.stroke();
@@ -1025,8 +1222,120 @@ export class ModalManager {
       ctx.lineWidth = Math.max(1.8, 3 * effectiveScale * 0.5);
       ctx.stroke();
 
-      // Main Arterial Routes (Double-line Minecraft gravel and paved highways)
-      const route = (points: [number, number][]) => {
+      // Dubai Palm Jumeirah & Arabian Gulf Archipelago (Large-Scale Realistic Cartography)
+      const pRootX = originX + 176 * effectiveScale;
+      const pRootZ = originZ + 42 * effectiveScale;
+      const pTrunkEndX = originX + 236 * effectiveScale;
+
+      ctx.save();
+      // 1. Palm Jumeirah Trunk & Crown
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = 5 * effectiveScale;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // Monorail Line along Trunk
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // 16 Parametric Curved Fronds (8 Pairs)
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = 2.8 * effectiveScale;
+      for (let f = 0; f < 8; f++) {
+        const rootFrondX = originX + (236 + f * 6.5) * effectiveScale;
+        const tipX = originX + (255 + f * 4.5) * effectiveScale;
+        const spreadZ = (14 + f * 5.8) * effectiveScale;
+        const ctrlX = originX + (242 + f * 6.0) * effectiveScale;
+
+        // North frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
+        ctx.stroke();
+
+        // South frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
+        ctx.stroke();
+      }
+
+      // Detached Crescent Breakwater Barrier (Radius ~72)
+      ctx.strokeStyle = '#c2a661';
+      ctx.lineWidth = 4 * effectiveScale;
+      ctx.beginPath();
+      const crescentCenterX = originX + 255 * effectiveScale;
+      ctx.arc(crescentCenterX, pRootZ, 72 * effectiveScale, -Math.PI * 0.38, Math.PI * 0.38);
+      ctx.stroke();
+
+      // Atlantis The Palm Plinth Marker
+      const atlantisX = originX + 320 * effectiveScale;
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.arc(atlantisX, pRootZ, 3.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Burj Al Arab Private Island & Bridge
+      const burjIslandX = originX + 220 * effectiveScale;
+      const burjIslandZ = originZ + 110 * effectiveScale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 1.2 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(originX + 174 * effectiveScale, originZ + 90 * effectiveScale);
+      ctx.quadraticCurveTo(originX + 195 * effectiveScale, originZ + 105 * effectiveScale, burjIslandX, burjIslandZ);
+      ctx.stroke();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.arc(burjIslandX, burjIslandZ, 6 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(burjIslandX, burjIslandZ, 2.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Bluewaters Island & Ain Dubai Wheel
+      const blueX = originX + 262 * effectiveScale;
+      const blueZ = originZ + 146 * effectiveScale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1.0 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(originX + 176 * effectiveScale, originZ + 120 * effectiveScale);
+      ctx.lineTo(blueX, blueZ);
+      ctx.stroke();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.ellipse(blueX, blueZ, 9 * effectiveScale, 7 * effectiveScale, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Ain Dubai Ring
+      ctx.strokeStyle = '#e0e7ff';
+      ctx.lineWidth = 1.5 * effectiveScale;
+      ctx.beginPath();
+      ctx.arc(blueX, blueZ, 5 * effectiveScale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 4. The World Islands Archipelago
+      ctx.fillStyle = '#e2cb87';
+      const worldIslands = [
+        [280, -55, 4.5], [290, -48, 3.5], [270, -28, 4.0], [285, -30, 3.8], [300, -35, 3.0]
+      ];
+      for (const [wx, wz, wr] of worldIslands) {
+        ctx.beginPath();
+        ctx.arc(originX + wx * effectiveScale, originZ + wz * effectiveScale, wr * effectiveScale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // =========================================================================
+      // ORGANIC WINDING TRAILS & RAILWAY (Meandering Sandstone Paths)
+      // =========================================================================
+      const drawOrganicTrail = (points: [number, number][]) => {
         ctx.beginPath();
         points.forEach(([x, z], i) => {
           const px = originX + x * effectiveScale;
@@ -1037,28 +1346,30 @@ export class ModalManager {
       };
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      // Dark stone casing
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = Math.max(3.2, 5.5 * userZoom);
-      route([[0, -22], [0, -65]]);
-      route([[20, 0], [77, 0], [100, 0], [150, 0]]);
-      route([[2, -60], [40, -84], [74, -106]]);
-      route([[-2, -55], [-38, -70], [-70, -85]]);
-      route([[-20, 0], [-50, 25], [-79, 50]]);
-      route([[0, 22], [0, 58], [0, 119], [0, 160]]);
-      route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
-      // Light smooth stone / sandstone surface
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = Math.max(1.8, 3.0 * userZoom);
-      route([[0, -22], [0, -65]]);
-      route([[20, 0], [77, 0], [100, 0], [150, 0]]);
-      route([[2, -60], [40, -84], [74, -106]]);
-      route([[-2, -55], [-38, -70], [-70, -85]]);
-      route([[-20, 0], [-50, 25], [-79, 50]]);
-      route([[0, 22], [0, 58], [0, 119], [0, 160]]);
-      route([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
 
-      // Island Express Railway Loop (True twin rail tracks with wooden sleeper cross-ties)
+      // Earthy trail border
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = Math.max(3.5, 5.5 * userZoom);
+      drawOrganicTrail([[0, -22], [0, -65]]);
+      drawOrganicTrail([[20, 0], [77, 0], [100, 0], [150, 0]]);
+      drawOrganicTrail([[2, -60], [40, -84], [74, -106]]);
+      drawOrganicTrail([[-2, -55], [-38, -70], [-70, -85]]);
+      drawOrganicTrail([[-20, 0], [-50, 25], [-79, 50]]);
+      drawOrganicTrail([[0, 22], [0, 58], [0, 119], [0, 160]]);
+      drawOrganicTrail([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
+
+      // Warm sandstone trail surface
+      ctx.strokeStyle = '#e8c872';
+      ctx.lineWidth = Math.max(2, 3.2 * userZoom);
+      drawOrganicTrail([[0, -22], [0, -65]]);
+      drawOrganicTrail([[20, 0], [77, 0], [100, 0], [150, 0]]);
+      drawOrganicTrail([[2, -60], [40, -84], [74, -106]]);
+      drawOrganicTrail([[-2, -55], [-38, -70], [-70, -85]]);
+      drawOrganicTrail([[-20, 0], [-50, 25], [-79, 50]]);
+      drawOrganicTrail([[0, 22], [0, 58], [0, 119], [0, 160]]);
+      drawOrganicTrail([[60, 42], [72, 42], [118, 42], [118, 72], [130, 80]]);
+
+      // Island Express Railway Loop (Golden rails with wooden ties)
       const railWaypoints = [
         [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
         [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
@@ -1066,7 +1377,6 @@ export class ModalManager {
         [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
       ];
       ctx.save();
-      // Wooden sleeper ties
       ctx.strokeStyle = '#78350f';
       ctx.lineWidth = Math.max(3.5, 5.0 * userZoom);
       ctx.setLineDash([3, 5]);
@@ -1078,28 +1388,27 @@ export class ModalManager {
       });
       ctx.closePath();
       ctx.stroke();
-      // Golden steel rails
       ctx.strokeStyle = '#fbbf24';
       ctx.lineWidth = Math.max(1.5, 2.2 * userZoom);
       ctx.setLineDash([]);
       ctx.stroke();
       ctx.restore();
 
-      // Central Crossroads Citadel Moat & 4 Grand Bridges
+      // Central Crossroads Citadel Moat & 4 Drawbridges
       ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = Math.max(3, 5 * effectiveScale * 0.5);
+      ctx.lineWidth = Math.max(3.5, 6 * effectiveScale * 0.5);
       ctx.beginPath();
       ctx.arc(originX, originZ, 20 * effectiveScale, 0, Math.PI * 2);
       ctx.stroke();
 
-      // 4 Moat Bridges
+      // 4 Stone Bridges
       ctx.fillStyle = '#cbd5e1';
       ctx.fillRect(originX - 3 * effectiveScale, originZ - 23 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
       ctx.fillRect(originX - 3 * effectiveScale, originZ + 17 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
       ctx.fillRect(originX + 17 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
       ctx.fillRect(originX - 23 * effectiveScale, originZ - 3 * effectiveScale, 6 * effectiveScale, 6 * effectiveScale);
 
-      // Central Citadel Hub Plinth & Beacon
+      // Central Citadel Keep & Shimmering Sky Beacon
       ctx.fillStyle = '#475569';
       ctx.beginPath();
       ctx.arc(originX, originZ, 16 * effectiveScale, 0, Math.PI * 2);
@@ -1109,9 +1418,18 @@ export class ModalManager {
       ctx.arc(originX, originZ, 4.5 * effectiveScale, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.restore(); // restore island clipping
+      // Skyward Beacon Beam
+      const beamGrad = ctx.createRadialGradient(originX, originZ, 2, originX, originZ, 18 * effectiveScale);
+      beamGrad.addColorStop(0, 'rgba(56, 189, 248, 0.7)');
+      beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+      ctx.fillStyle = beamGrad;
+      ctx.beginPath();
+      ctx.arc(originX, originZ, 18 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
 
-      // Live Soaring Dragons
+      ctx.restore(); // restore mainland clipping
+
+      // Live Dragons
       if (dragons) {
         for (const d of dragons) {
           const dx = originX + d.position.x * effectiveScale;
@@ -1153,111 +1471,171 @@ export class ModalManager {
         }
       }
 
-      // Landmark Pins with Category Filter & Collision-Free Display
+      // =========================================================================
+      // RED DESTINATION BANNER FLAGS ON POLES (EXACT MATCH TO REFERENCE IMAGE 2)
+      // =========================================================================
       const majorHubTags = [
         'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'NEO YORK',
-        'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN'
+        'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN', 'ALPS'
       ];
+
+      const drawRedBannerFlag = (
+        lx: number,
+        lz: number,
+        tag: string,
+        name: string,
+        isHovered: boolean
+      ) => {
+        const flagHeight = Math.max(20, 26 * Math.min(1.3, userZoom));
+        const bannerW = Math.max(16, 22 * Math.min(1.3, userZoom));
+        const bannerH = flagHeight * 0.46;
+
+        // Animated gentle flutter
+        const flutter = Math.sin(now * 0.005 + lx * 0.1) * 1.8;
+
+        ctx.save();
+
+        // 1. Ground shadow plinth
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(lx, lz + 2, 6, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Mast Pole
+        ctx.strokeStyle = isHovered ? '#facc15' : '#1e293b';
+        ctx.lineWidth = isHovered ? 2.5 : 2.0;
+        ctx.beginPath();
+        ctx.moveTo(lx, lz);
+        ctx.lineTo(lx, lz - flagHeight);
+        ctx.stroke();
+
+        // 3. Golden Sphere Finial
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.arc(lx, lz - flagHeight, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Glowing Aura on Hover
+        if (isHovered) {
+          ctx.fillStyle = 'rgba(250, 204, 21, 0.35)';
+          ctx.beginPath();
+          ctx.arc(lx + bannerW * 0.4, lz - flagHeight + bannerH * 0.5, bannerW * 0.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 5. Red Banner Triangular Flag (waves to the right)
+        ctx.fillStyle = isHovered ? '#ff3838' : '#dc2626';
+        ctx.beginPath();
+        ctx.moveTo(lx, lz - flagHeight);
+        ctx.lineTo(lx + bannerW, lz - flagHeight + bannerH * 0.5 + flutter);
+        ctx.lineTo(lx, lz - flagHeight + bannerH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Banner lower shadow crease
+        ctx.fillStyle = 'rgba(127, 29, 29, 0.55)';
+        ctx.beginPath();
+        ctx.moveTo(lx, lz - flagHeight + bannerH * 0.5);
+        ctx.lineTo(lx + bannerW, lz - flagHeight + bannerH * 0.5 + flutter);
+        ctx.lineTo(lx, lz - flagHeight + bannerH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Crisp White Border
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // 6. Nameplate Banner
+        const isMajor = majorHubTags.some(t => tag.includes(t));
+        if (isHovered || (isMajor && userZoom >= 0.82)) {
+          const cleanName = isHovered ? name : tag.replace(/[\[\]]/g, '');
+          ctx.font = isHovered ? 'bold 10px monospace' : 'bold 8px monospace';
+          const tw = ctx.measureText(cleanName).width;
+          const badgeX = lx - tw / 2;
+          const badgeY = lz - flagHeight - 14;
+
+          ctx.fillStyle = isHovered ? '#0f172a' : 'rgba(15, 23, 42, 0.9)';
+          ctx.fillRect(badgeX - 6, badgeY - 2, tw + 12, 16);
+          ctx.strokeStyle = isHovered ? '#facc15' : '#38bdf8';
+          ctx.lineWidth = isHovered ? 1.5 : 1;
+          ctx.strokeRect(badgeX - 6, badgeY - 2, tw + 12, 16);
+
+          ctx.fillStyle = isHovered ? '#facc15' : '#f8fafc';
+          ctx.textAlign = 'center';
+          ctx.fillText(cleanName, lx, badgeY + 10);
+          ctx.textAlign = 'left';
+        }
+
+        ctx.restore();
+      };
 
       for (const lm of PORTFOLIO_DATA.landmarks) {
         const cat = getLandmarkCategory(lm.tag);
-        if (activeFilter !== 'all' && activeFilter !== cat) {
-          continue;
-        }
+        if (activeFilter !== 'all' && activeFilter !== cat) continue;
 
         const lx = originX + lm.coords[0] * effectiveScale;
         const lz = originZ + lm.coords[2] * effectiveScale;
-        const col = getPinColor(lm.tag);
-        const isHovered = hoveredLm && hoveredLm.name === lm.name;
+        const isHovered = hoveredLm !== null && hoveredLm.name === lm.name;
 
-        // Glowing outer halo
-        ctx.fillStyle = col + (isHovered ? '88' : '33');
-        ctx.beginPath();
-        ctx.arc(lx, lz, isHovered ? 12 : 7, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pin diamond
-        ctx.fillStyle = col;
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = isHovered ? 2 : 1.2;
-        ctx.beginPath();
-        const pinSize = isHovered ? 7 : 5;
-        ctx.moveTo(lx, lz - pinSize);
-        ctx.lineTo(lx + pinSize, lz);
-        ctx.lineTo(lx, lz + pinSize);
-        ctx.lineTo(lx - pinSize, lz);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Major realm hubs display an elegant badge if not hovering another landmark
-        const isMajorHub = majorHubTags.some(t => lm.tag.includes(t));
-        if (isMajorHub && userZoom >= 0.85 && !isHovered) {
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-          ctx.font = 'bold 9px monospace';
-          const txt = lm.tag.replace(/[\[\]]/g, '');
-          const tw = ctx.measureText(txt).width;
-          ctx.fillRect(lx - tw / 2 - 3, lz + 8, tw + 6, 13);
-          ctx.strokeStyle = col;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(lx - tw / 2 - 2, lz + 8, tw + 4, 11);
-          ctx.fillStyle = col;
-          ctx.fillText(txt, lx - tw / 2, lz + 17);
-        }
+        drawRedBannerFlag(lx, lz, lm.tag, lm.name, isHovered);
       }
 
-      // Live Player Indicator
+      // =========================================================================
+      // LIVE PLAYER INDICATOR (Player Avatar & Rotating Vision FOV)
+      // =========================================================================
       const px = playerPos?.x || 0;
       const pz = playerPos?.z || 0;
       const pScreenX = originX + px * effectiveScale;
       const pScreenZ = originZ + pz * effectiveScale;
       const yaw = playerYaw || 0;
 
-      // Pulsing beacon ring
-      const time = performance.now() * 0.003;
-      const pulseR = 12 + Math.sin(time) * 4;
+      // Pulsing Beacon
+      const pulseR = 12 + Math.sin(now * 0.005) * 4;
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(pScreenX, pScreenZ, pulseR, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Directional Vision FOV cone
+      // Vision FOV Cone
       ctx.save();
       ctx.translate(pScreenX, pScreenZ);
       ctx.rotate(-yaw);
 
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.24)';
+      const fovGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 42 * Math.min(1.5, userZoom));
+      fovGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
+      fovGrad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+      ctx.fillStyle = fovGrad;
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 36 * Math.min(1.5, userZoom), -Math.PI / 2 - 0.45, -Math.PI / 2 + 0.45);
+      ctx.arc(0, 0, 42 * Math.min(1.5, userZoom), -Math.PI / 2 - 0.48, -Math.PI / 2 + 0.48);
       ctx.closePath();
       ctx.fill();
 
-      // Rotating Player Arrow
+      // Direction Needle
       ctx.fillStyle = '#ef4444';
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(0, -12);
-      ctx.lineTo(7.5, 9);
-      ctx.lineTo(0, 4.5);
-      ctx.lineTo(-7.5, 9);
+      ctx.moveTo(0, -13);
+      ctx.lineTo(8, 9);
+      ctx.lineTo(0, 5);
+      ctx.lineTo(-8, 9);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-
       ctx.restore();
 
       // Player Label
       ctx.fillStyle = '#0f172a';
-      ctx.fillRect(pScreenX - 38, pScreenZ - 26, 76, 14);
+      ctx.fillRect(pScreenX - 42, pScreenZ - 28, 84, 15);
       ctx.strokeStyle = '#ef4444';
       ctx.lineWidth = 1;
-      ctx.strokeRect(pScreenX - 38, pScreenZ - 26, 76, 14);
+      ctx.strokeRect(pScreenX - 42, pScreenZ - 28, 84, 15);
       ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 8px monospace';
-      ctx.fillText('YOU [LAKSHYA]', pScreenX - 34, pScreenZ - 16);
+      ctx.font = 'bold 8.5px monospace';
+      ctx.fillText('YOU [LAKSHYA]', pScreenX - 38, pScreenZ - 17);
 
       // Hover Crosshairs
       if (hoverWorldX !== null && hoverWorldZ !== null) {
@@ -1283,43 +1661,110 @@ export class ModalManager {
 
       ctx.restore(); // restore clipping
 
-      // World Border Perimeter Frame
+      // =========================================================================
+      // ETHEREAL ATMOSPHERIC CORNER CLOUDS (Framing the Map Edges)
+      // =========================================================================
+      const drawCornerClouds = () => {
+        ctx.save();
+        const drawCloudCluster = (cx0: number, cy0: number, puffs: [number, number, number][]) => {
+          puffs.forEach(([ox, oy, r]) => {
+            const grad = ctx.createRadialGradient(cx0 + ox, cy0 + oy, r * 0.15, cx0 + ox, cy0 + oy, r);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0.88)');
+            grad.addColorStop(0.55, 'rgba(241, 245, 249, 0.65)');
+            grad.addColorStop(1, 'rgba(241, 245, 249, 0.0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx0 + ox, cy0 + oy, r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        };
+        // Top-Left NW clouds
+        drawCloudCluster(0, 0, [[40, 30, 80], [95, 20, 65], [150, 45, 75], [30, 95, 70]]);
+        // Top-Right NE clouds
+        drawCloudCluster(width, 0, [[-40, 30, 80], [-95, 20, 65], [-150, 45, 75], [-30, 95, 70]]);
+        // Bottom-Left SW clouds
+        drawCloudCluster(0, height, [[40, -30, 80], [95, -20, 65], [150, -45, 75], [30, -95, 70]]);
+        // Bottom-Right SE clouds
+        drawCloudCluster(width, height, [[-40, -30, 80], [-95, -20, 65], [-150, -45, 75], [-30, -95, 70]]);
+        ctx.restore();
+      };
+      drawCornerClouds();
+
+      // Cartographic Frame Border
       ctx.strokeStyle = '#0284c7';
       ctx.lineWidth = 2.5;
-      ctx.strokeRect(mapX, mapY, mapW, mapH);
+      ctx.strokeRect(0, 0, width, height);
 
-      // Compass Rose
-      const compX = 46;
-      const compY = height - 46;
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      // Antique Cartography Compass Rose (Bottom-Left)
+      const compX = 54;
+      const compY = height - 54;
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
       ctx.beginPath();
-      ctx.arc(compX, compY, 26, 0, Math.PI * 2);
+      ctx.arc(compX, compY, 32, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.8;
       ctx.stroke();
 
-      ctx.fillStyle = '#facc15';
-      ctx.font = 'bold 9px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('N', compX, compY - 14);
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('S', compX, compY + 20);
-      ctx.fillText('W', compX - 16, compY + 3);
-      ctx.fillText('E', compX + 16, compY + 3);
-      ctx.textAlign = 'left';
+      // Compass Star
+      const drawCompassStar = (cx0: number, cy0: number, r: number) => {
+        // Gold North needle
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(cx0, cy0 - r);
+        ctx.lineTo(cx0 + r * 0.28, cy0);
+        ctx.lineTo(cx0, cy0 - r * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ca8a04';
+        ctx.beginPath();
+        ctx.moveTo(cx0, cy0 - r);
+        ctx.lineTo(cx0 - r * 0.28, cy0);
+        ctx.lineTo(cx0, cy0 - r * 0.2);
+        ctx.closePath();
+        ctx.fill();
 
-      // Scale indicator
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-      ctx.fillRect(width - 150, height - 32, 140, 22);
+        // Slate South needle
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath();
+        ctx.moveTo(cx0, cy0 + r);
+        ctx.lineTo(cx0 + r * 0.28, cy0);
+        ctx.lineTo(cx0, cy0 + r * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#475569';
+        ctx.beginPath();
+        ctx.moveTo(cx0, cy0 + r);
+        ctx.lineTo(cx0 - r * 0.28, cy0);
+        ctx.lineTo(cx0, cy0 + r * 0.2);
+        ctx.closePath();
+        ctx.fill();
+      };
+      drawCompassStar(compX, compY, 24);
+
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('N', compX, compY - 18);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('S', compX, compY + 25);
+      ctx.fillText('W', compX - 22, compY + 3);
+      ctx.fillText('E', compX + 22, compY + 3);
+      ctx.textAlign = 'left';
+      ctx.restore();
+
+      // Scale Indicator (Bottom-Right)
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(width - 160, height - 36, 150, 26);
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
-      ctx.strokeRect(width - 150, height - 32, 140, 22);
+      ctx.strokeRect(width - 160, height - 36, 150, 26);
       ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 8px monospace';
+      ctx.font = 'bold 8.5px monospace';
       const scaleBarLen = Math.round(50 * effectiveScale);
-      ctx.fillRect(width - 142, height - 16, Math.min(124, scaleBarLen), 3);
-      ctx.fillText(`SCALE: 50 BLOCKS`, width - 142, height - 21);
+      ctx.fillRect(width - 150, height - 16, Math.min(130, scaleBarLen), 3);
+      ctx.fillText(`SCALE: 50 BLOCKS`, width - 150, height - 23);
     };
 
     // Continuous Animation Loop using requestAnimationFrame

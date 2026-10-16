@@ -507,13 +507,17 @@ export class HUDManager {
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Radar background: Ocean Water
-    ctx.fillStyle = '#0284c7';
-    ctx.fillRect(0, 0, w, h);
-
     const cx = 90;
     const cz = 90;
     const scale = 0.40 * this.minimapZoom;
+
+    // 1. Radar background: Deep Ocean Depth Gradient
+    const oceanGrad = ctx.createRadialGradient(cx, cz, 20, cx, cz, 110);
+    oceanGrad.addColorStop(0, '#104b77');
+    oceanGrad.addColorStop(0.5, '#0b3456');
+    oceanGrad.addColorStop(1, '#061c31');
+    ctx.fillStyle = oceanGrad;
+    ctx.fillRect(0, 0, w, h);
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
@@ -545,18 +549,29 @@ export class HUDManager {
       ctx.closePath();
     };
 
+    // Turquoise Coral Reef Shallow Shelf
+    drawIslandShape(-6);
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+    ctx.fill();
+
+    // Coastal Surf Foam
+    drawIslandShape(-1.5);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
     // Golden beach shoreline fringe
     drawIslandShape(0);
-    ctx.fillStyle = '#fde047';
+    ctx.fillStyle = '#dfc47b';
     ctx.fill();
 
     // Clip all terrain and biomes strictly inside the island landmass
     ctx.save();
-    drawIslandShape(5);
+    drawIslandShape(4);
     ctx.clip();
 
-    // Base interior plains (Minecraft vibrant grass)
-    ctx.fillStyle = '#4c7c29';
+    // Base interior plains (Rich vibrant grass)
+    ctx.fillStyle = '#427e28';
     ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
 
     // Draw Country Territories on Minimap Radar
@@ -868,19 +883,37 @@ export class HUDManager {
       const lx = cx + (lm.coords[0] - playerPos.x) * scale;
       const lz = cz + (lm.coords[2] - playerPos.z) * scale;
 
-      if (lx >= 4 && lx <= w - 4 && lz >= 4 && lz <= h - 4) {
-        const pinCol = getPinColor(lm.tag);
-        // Diamond pin
-        ctx.fillStyle = pinCol;
-        ctx.strokeStyle = '#0f172a';
+      if (lx >= 6 && lx <= w - 6 && lz >= 10 && lz <= h - 4) {
+        // Red Banner Flag matching fantasy game map
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(lx, lz + 1, 2.5, 1.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flagpole
+        ctx.strokeStyle = '#1e293b';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(lx, lz - 3);
-        ctx.lineTo(lx + 3, lz);
-        ctx.lineTo(lx, lz + 3);
-        ctx.lineTo(lx - 3, lz);
+        ctx.moveTo(lx, lz);
+        ctx.lineTo(lx, lz - 8);
+        ctx.stroke();
+
+        // Gold finial
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.arc(lx, lz - 8, 1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Red flag banner
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.moveTo(lx, lz - 8);
+        ctx.lineTo(lx + 6, lz - 5.5);
+        ctx.lineTo(lx, lz - 3);
         ctx.closePath();
         ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.5;
         ctx.stroke();
       }
     }
