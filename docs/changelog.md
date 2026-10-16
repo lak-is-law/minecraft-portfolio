@@ -56,3 +56,4 @@
 - 2026-10-14 22:16: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-16 11:14: feat(monument): LK brick monument voxel texture atlas
 - 2026-10-16 12:14: test(engine): benchmark frame time consistency under 60 FPS load
+- 2026-10-16 14:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
