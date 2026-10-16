@@ -749,12 +749,17 @@ export class ModalManager {
       if (tag.includes('RAILWAY') || tag.includes('MUMBAI')) return '#f97316';
       if (tag.includes('HOLLYWOOD')) return '#f59e0b';
       if (tag.includes('McQUEEN')) return '#ef4444';
-      if (tag.includes('GREAT WALL')) return '#10b981';
+      if (tag.includes('GREAT WALL') || tag.includes('PANDA')) return '#10b981';
+      if (tag.includes('FORBIDDEN CITY')) return '#eab308';
+      if (tag.includes('TERRACOTTA')) return '#d97706';
       if (tag.includes('PAVILION')) return '#f43f5e';
       if (tag.includes('PYRAMID') || tag.includes('GIZA')) return '#eab308';
       if (tag.includes('CARNIVAL')) return '#f472b6';
       if (tag.includes('LONDON')) return '#dc2626';
-      if (tag.includes('SEOUL')) return '#8b5cf6';
+      if (tag.includes('SEOUL') || tag.includes('GEUNJEONGJEON')) return '#8b5cf6';
+      if (tag.includes('KING SEJONG')) return '#38bdf8';
+      if (tag.includes('TOKYO TOWER')) return '#ef4444';
+      if (tag.includes('SENSO-JI')) return '#f43f5e';
       if (tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS') || tag.includes('WORLD ISLANDS')) return '#14b8a6';
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';
@@ -1074,7 +1079,7 @@ export class ModalManager {
       drawBiomeArea([[-80, -82], [-80, -132], [-65, -132], [-46, -122], [-46, -88], [-60, -82], [-80, -82]], '#0284c7');
 
       // 6. Imperial India Subcontinent (Terracotta Sandstone & Yamuna)
-      drawBiomeArea([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
+      drawBiomeArea([[35, -42], [92, -42], [130, -60], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -42]], '#b45309');
 
       // 7. United States & Radiator Springs (Red Rock Canyons)
       drawBiomeArea([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#334155');
@@ -1289,192 +1294,6 @@ export class ModalManager {
       ctx.stroke();
 
       // =========================================================================
-      // LIGHTNING McQUEEN RACEWAY · RADIATOR SPRINGS CIRCUIT (X: 172..228, Z: -54..-12)
-      // =========================================================================
-      const trackLeft = originX + 172 * effectiveScale;
-      const trackTop = originZ - 54 * effectiveScale;
-      const trackW = 56 * effectiveScale;
-      const trackH = 42 * effectiveScale;
-      const trackCornerR = 7 * effectiveScale;
-
-      // 1. Concrete & Timber Pier Pilings over water (East Hairpin Turn X > 194)
-      ctx.fillStyle = '#78350f';
-      for (let px = 196; px <= 228; px += 6) {
-        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 56 * effectiveScale, 3, 6);
-        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 12 * effectiveScale, 3, 6);
-      }
-
-      // 2. Main Asphalt Track Ribbon
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.roundRect(trackLeft, trackTop, trackW, trackH, trackCornerR);
-      ctx.fill();
-
-      // Outer Red & White Rumble Curbs
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = Math.max(2, 3.5 * effectiveScale);
-      ctx.stroke();
-
-      // 3. Desert Infield (Willy's Butte Sand Plateau & Red Mesa)
-      const infieldLeft = originX + 180 * effectiveScale;
-      const infieldTop = originZ - 46 * effectiveScale;
-      const infieldW = 40 * effectiveScale;
-      const infieldH = 26 * effectiveScale;
-      const infieldCornerR = 4 * effectiveScale;
-
-      ctx.fillStyle = '#d97706'; // Terracotta desert sand
-      ctx.beginPath();
-      ctx.roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldCornerR);
-      ctx.fill();
-
-      // Inner Red & White Kerb Border
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = Math.max(1.2, 2 * effectiveScale);
-      ctx.stroke();
-
-      // Willy's Butte Mesa Formation in Infield Center (X ~ 200, Z ~ -33)
-      ctx.fillStyle = '#b45309';
-      ctx.beginPath();
-      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 13 * effectiveScale, 8 * effectiveScale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#78350f';
-      ctx.beginPath();
-      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 8 * effectiveScale, 4.5 * effectiveScale, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 4. Gold Dash Racing Centerline
-      ctx.strokeStyle = '#eab308';
-      ctx.lineWidth = Math.max(1.2, 1.8 * effectiveScale);
-      ctx.setLineDash([4 * effectiveScale, 4 * effectiveScale]);
-      ctx.beginPath();
-      ctx.roundRect(trackLeft + 4 * effectiveScale, trackTop + 4 * effectiveScale, trackW - 8 * effectiveScale, trackH - 8 * effectiveScale, trackCornerR * 0.7);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // 5. Start / Finish Line Checkered Grid (X = 190, Z = -15)
-      const sfX = originX + 190 * effectiveScale;
-      const sfTop = originZ - 18 * effectiveScale;
-      const sfH = 6 * effectiveScale;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(sfX - 2, sfTop, 4, sfH);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(sfX - 2, sfTop, 4, sfH * 0.5);
-
-      // Flo's V8 Café & Pit Stop Marker
-      ctx.fillStyle = '#06b6d4';
-      ctx.fillRect(originX + 184 * effectiveScale, originZ - 10 * effectiveScale, 6 * effectiveScale, 4 * effectiveScale);
-
-      // Dubai Palm Jumeirah & Arabian Gulf Archipelago (Large-Scale Realistic Cartography)
-      const pRootX = originX + 176 * effectiveScale;
-      const pRootZ = originZ + 46 * effectiveScale;
-      const pTrunkEndX = originX + 236 * effectiveScale;
-
-      ctx.save();
-      // 1. Palm Jumeirah Trunk & Crown
-      ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = 5 * effectiveScale;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(pRootX, pRootZ);
-      ctx.lineTo(pTrunkEndX, pRootZ);
-      ctx.stroke();
-
-      // Monorail Line along Trunk
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.2 * effectiveScale;
-      ctx.beginPath();
-      ctx.moveTo(pRootX, pRootZ);
-      ctx.lineTo(pTrunkEndX, pRootZ);
-      ctx.stroke();
-
-      // 16 Parametric Curved Fronds (8 Pairs fanning within Z in [14, 78])
-      ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = 2.6 * effectiveScale;
-      for (let f = 0; f < 8; f++) {
-        const rootFrondX = originX + (236 + f * 6.5) * effectiveScale;
-        const tipX = originX + (255 + f * 4.5) * effectiveScale;
-        const spreadZ = (6 + f * 3.4) * effectiveScale;
-        const ctrlX = originX + (242 + f * 6.0) * effectiveScale;
-
-        // North frond
-        ctx.beginPath();
-        ctx.moveTo(rootFrondX, pRootZ);
-        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
-        ctx.stroke();
-
-        // South frond
-        ctx.beginPath();
-        ctx.moveTo(rootFrondX, pRootZ);
-        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
-        ctx.stroke();
-      }
-
-      // Detached Crescent Breakwater Barrier (Rx ~ 72, Rz ~ 34)
-      ctx.strokeStyle = '#c2a661';
-      ctx.lineWidth = 3.8 * effectiveScale;
-      ctx.beginPath();
-      const crescentCenterX = originX + 252 * effectiveScale;
-      ctx.ellipse(crescentCenterX, pRootZ, 72 * effectiveScale, 34 * effectiveScale, 0, -Math.PI * 0.42, Math.PI * 0.42);
-      ctx.stroke();
-
-      // Atlantis The Palm Plinth Marker
-      const atlantisX = originX + 324 * effectiveScale;
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath();
-      ctx.arc(atlantisX, pRootZ, 3.5 * effectiveScale, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 2. Burj Al Arab Private Island & Bridge
-      const burjIslandX = originX + 220 * effectiveScale;
-      const burjIslandZ = originZ + 110 * effectiveScale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = 1.2 * effectiveScale;
-      ctx.beginPath();
-      ctx.moveTo(originX + 174 * effectiveScale, originZ + 90 * effectiveScale);
-      ctx.quadraticCurveTo(originX + 195 * effectiveScale, originZ + 105 * effectiveScale, burjIslandX, burjIslandZ);
-      ctx.stroke();
-      ctx.fillStyle = '#dfc47b';
-      ctx.beginPath();
-      ctx.arc(burjIslandX, burjIslandZ, 6 * effectiveScale, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#38bdf8';
-      ctx.beginPath();
-      ctx.arc(burjIslandX, burjIslandZ, 2.5 * effectiveScale, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 3. Bluewaters Island & Ain Dubai Wheel
-      const blueX = originX + 262 * effectiveScale;
-      const blueZ = originZ + 146 * effectiveScale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.lineWidth = 1.0 * effectiveScale;
-      ctx.beginPath();
-      ctx.moveTo(originX + 176 * effectiveScale, originZ + 120 * effectiveScale);
-      ctx.lineTo(blueX, blueZ);
-      ctx.stroke();
-      ctx.fillStyle = '#dfc47b';
-      ctx.beginPath();
-      ctx.ellipse(blueX, blueZ, 9 * effectiveScale, 7 * effectiveScale, 0.3, 0, Math.PI * 2);
-      ctx.fill();
-      // Ain Dubai Ring
-      ctx.strokeStyle = '#e0e7ff';
-      ctx.lineWidth = 1.5 * effectiveScale;
-      ctx.beginPath();
-      ctx.arc(blueX, blueZ, 5 * effectiveScale, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // 4. The World Islands Archipelago (In deep Arabian Gulf east of Palm Jumeirah)
-      ctx.fillStyle = '#e2cb87';
-      const worldIslands = [
-        [360, 46, 5.0], [380, 68, 4.2], [350, 24, 4.0], [380, 28, 3.8]
-      ];
-      for (const [wx, wz, wr] of worldIslands) {
-        ctx.beginPath();
-        ctx.arc(originX + wx * effectiveScale, originZ + wz * effectiveScale, wr * effectiveScale, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // =========================================================================
       // ORGANIC WINDING TRAILS & RAILWAY (Meandering Sandstone Paths)
       // =========================================================================
       const drawOrganicTrail = (points: [number, number][]) => {
@@ -1571,6 +1390,359 @@ export class ModalManager {
 
       ctx.restore(); // restore mainland clipping
 
+      // =========================================================================
+      // LIGHTNING McQUEEN RACEWAY · RADIATOR SPRINGS CIRCUIT (X: 172..228, Z: -54..-12)
+      // =========================================================================
+      const trackLeft = originX + 172 * effectiveScale;
+      const trackTop = originZ - 54 * effectiveScale;
+      const trackW = 56 * effectiveScale;
+      const trackH = 42 * effectiveScale;
+      const trackCornerR = 7 * effectiveScale;
+
+      // 1. Concrete & Timber Pier Pilings over water (East Hairpin Turn X > 194)
+      ctx.fillStyle = '#78350f';
+      for (let px = 196; px <= 228; px += 6) {
+        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 56 * effectiveScale, 3, 6);
+        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 12 * effectiveScale, 3, 6);
+      }
+
+      // 2. Main Asphalt Track Ribbon
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.roundRect(trackLeft, trackTop, trackW, trackH, trackCornerR);
+      ctx.fill();
+
+      // Outer Red & White Rumble Curbs
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = Math.max(2, 3.5 * effectiveScale);
+      ctx.stroke();
+
+      // 3. Desert Infield (Willy's Butte Sand Plateau & Red Mesa)
+      const infieldLeft = originX + 180 * effectiveScale;
+      const infieldTop = originZ - 46 * effectiveScale;
+      const infieldW = 40 * effectiveScale;
+      const infieldH = 26 * effectiveScale;
+      const infieldCornerR = 4 * effectiveScale;
+
+      ctx.fillStyle = '#d97706'; // Terracotta desert sand
+      ctx.beginPath();
+      ctx.roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldCornerR);
+      ctx.fill();
+
+      // Inner Red & White Kerb Border
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = Math.max(1.2, 2 * effectiveScale);
+      ctx.stroke();
+
+      // Willy's Butte Mesa Formation in Infield Center (X ~ 200, Z ~ -33)
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 13 * effectiveScale, 8 * effectiveScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 8 * effectiveScale, 4.5 * effectiveScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. Gold Dash Racing Centerline
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = Math.max(1.2, 1.8 * effectiveScale);
+      ctx.setLineDash([4 * effectiveScale, 4 * effectiveScale]);
+      ctx.beginPath();
+      ctx.roundRect(trackLeft + 4 * effectiveScale, trackTop + 4 * effectiveScale, trackW - 8 * effectiveScale, trackH - 8 * effectiveScale, trackCornerR * 0.7);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 5. Start / Finish Line Checkered Grid (X = 190, Z = -15)
+      const sfX = originX + 190 * effectiveScale;
+      const sfTop = originZ - 18 * effectiveScale;
+      const sfH = 6 * effectiveScale;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(sfX - 2, sfTop, 4, sfH);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(sfX - 2, sfTop, 4, sfH * 0.5);
+
+      // Flo's V8 Café & Pit Stop Marker
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(originX + 184 * effectiveScale, originZ - 10 * effectiveScale, 6 * effectiveScale, 4 * effectiveScale);
+
+      // =========================================================================
+      // DUBAI PALM JUMEIRAH & ARABIAN GULF ARCHIPELAGO (Large-Scale Realistic Cartography)
+      // =========================================================================
+      const pRootX = originX + 176 * effectiveScale;
+      const pRootZ = originZ + 46 * effectiveScale;
+      const pTrunkEndX = originX + 236 * effectiveScale;
+      const crescentCenterX = originX + 252 * effectiveScale;
+
+      ctx.save();
+
+      // 0. Turquoise Shallow Coral Reef Lagoon Shelf around Palm Archipelago
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.32)';
+      ctx.beginPath();
+      ctx.ellipse(crescentCenterX, pRootZ, 80 * effectiveScale, 42 * effectiveScale, 0, -Math.PI * 0.72, Math.PI * 0.72);
+      ctx.lineTo(pRootX, pRootZ + 16 * effectiveScale);
+      ctx.lineTo(pRootX, pRootZ - 16 * effectiveScale);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lagoon surf wave foam
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.2 * effectiveScale;
+      ctx.stroke();
+
+      // 1. Palm Jumeirah Trunk & Flared Gateway Base (Z = 46)
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = 6 * effectiveScale;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // Palm Avenue Green Landscaping
+      ctx.strokeStyle = '#15803d';
+      ctx.lineWidth = 2.4 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(pRootX + 4 * effectiveScale, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // Monorail Line along Trunk
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // Palm Tower / Nakheel Mall on Trunk (213, 46)
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.arc(originX + 213 * effectiveScale, pRootZ, 3.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // 2. 16 Parametric Curved Fronds (8 Pairs fanning accurately within Z in [16, 76])
+      const frondDefs = [
+        { xRoot: 236, xTip: 288, dz: 30 },
+        { xRoot: 238, xTip: 292, dz: 26 },
+        { xRoot: 240, xTip: 296, dz: 22 },
+        { xRoot: 242, xTip: 300, dz: 18 },
+        { xRoot: 244, xTip: 302, dz: 14 },
+        { xRoot: 246, xTip: 302, dz: 11 },
+        { xRoot: 248, xTip: 298, dz: 8 },
+        { xRoot: 250, xTip: 292, dz: 5 }
+      ];
+
+      // Draw Frond Sand Bases
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = 3.2 * effectiveScale;
+      ctx.lineCap = 'round';
+      for (const f of frondDefs) {
+        const rootFrondX = originX + f.xRoot * effectiveScale;
+        const tipX = originX + f.xTip * effectiveScale;
+        const spreadZ = f.dz * effectiveScale;
+        const ctrlX = originX + (f.xRoot + 8) * effectiveScale;
+
+        // North frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
+        ctx.stroke();
+
+        // South frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
+        ctx.stroke();
+      }
+
+      // Draw Frond Villa Greenery Stripes
+      ctx.strokeStyle = '#16a34a';
+      ctx.lineWidth = 1.4 * effectiveScale;
+      for (const f of frondDefs) {
+        const rootFrondX = originX + f.xRoot * effectiveScale;
+        const tipX = originX + f.xTip * effectiveScale;
+        const spreadZ = f.dz * effectiveScale;
+        const ctrlX = originX + (f.xRoot + 8) * effectiveScale;
+
+        // North frond greenery
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
+        ctx.stroke();
+
+        // South frond greenery
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
+        ctx.stroke();
+      }
+
+      // 3. Detached Crescent Breakwater Barrier (Rx = 72, Rz = 34, Center = 252, 46, sweeps to X = 210)
+      ctx.strokeStyle = '#c2a661';
+      ctx.lineWidth = 4.2 * effectiveScale;
+      ctx.beginPath();
+      ctx.ellipse(crescentCenterX, pRootZ, 72 * effectiveScale, 34 * effectiveScale, 0, -Math.PI * 0.70, Math.PI * 0.70);
+      ctx.stroke();
+
+      // Crescent Outer Surf Break Line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.4 * effectiveScale;
+      ctx.beginPath();
+      ctx.ellipse(crescentCenterX, pRootZ, 75 * effectiveScale, 36 * effectiveScale, 0, -Math.PI * 0.70, Math.PI * 0.70);
+      ctx.stroke();
+
+      // 4. Atlantis The Palm Resort Plinth at Crescent Crown (324, 46)
+      const atlantisX = originX + 324 * effectiveScale;
+      ctx.fillStyle = '#f43f5e'; // Iconic Royal Rose Hotel
+      ctx.beginPath();
+      ctx.arc(atlantisX, pRootZ, 4.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a'; // Golden central bridge arch
+      ctx.beginPath();
+      ctx.arc(atlantisX, pRootZ, 2.0 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#881337';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // 5. Burj Al Arab Private Island (220, 110) & Causeway Bridge
+      const burjIslandX = originX + 220 * effectiveScale;
+      const burjIslandZ = originZ + 110 * effectiveScale;
+      // Curved Causeway Bridge from mainland (176, 92)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.lineWidth = 1.5 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(originX + 176 * effectiveScale, originZ + 92 * effectiveScale);
+      ctx.quadraticCurveTo(originX + 195 * effectiveScale, originZ + 106 * effectiveScale, burjIslandX, burjIslandZ);
+      ctx.stroke();
+
+      // Island sand base with shallow shelf
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+      ctx.beginPath();
+      ctx.arc(burjIslandX, burjIslandZ, 10 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.arc(burjIslandX, burjIslandZ, 7 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 7-Star Sail Silhouette
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(burjIslandX - 4 * effectiveScale, burjIslandZ + 4 * effectiveScale);
+      ctx.lineTo(burjIslandX + 4 * effectiveScale, burjIslandZ + 3 * effectiveScale);
+      ctx.quadraticCurveTo(burjIslandX + 6 * effectiveScale, burjIslandZ - 3 * effectiveScale, burjIslandX, burjIslandZ - 5 * effectiveScale);
+      ctx.closePath();
+      ctx.fill();
+      // Cantilevered Helipad
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.arc(burjIslandX + 3.5 * effectiveScale, burjIslandZ - 3 * effectiveScale, 1.8 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 6. Bluewaters Island & Ain Dubai Observation Wheel (262, 146)
+      const blueX = originX + 262 * effectiveScale;
+      const blueZ = originZ + 146 * effectiveScale;
+      // Pedestrian footbridge from mainland
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.2 * effectiveScale;
+      ctx.beginPath();
+      ctx.moveTo(originX + 176 * effectiveScale, originZ + 120 * effectiveScale);
+      ctx.lineTo(blueX, blueZ);
+      ctx.stroke();
+
+      // Bluewaters island base
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+      ctx.beginPath();
+      ctx.ellipse(blueX, blueZ, 14 * effectiveScale, 10 * effectiveScale, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.ellipse(blueX, blueZ, 10 * effectiveScale, 7.5 * effectiveScale, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ain Dubai Observation Wheel (Giant ring with 8 radial spokes)
+      ctx.strokeStyle = '#818cf8';
+      ctx.lineWidth = 1.8 * effectiveScale;
+      ctx.beginPath();
+      ctx.arc(blueX, blueZ, 6.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.stroke();
+      // Spokes
+      ctx.strokeStyle = 'rgba(224, 231, 255, 0.7)';
+      ctx.lineWidth = 0.8 * effectiveScale;
+      for (let a = 0; a < 8; a++) {
+        const rad = (a * Math.PI) / 4;
+        ctx.beginPath();
+        ctx.moveTo(blueX, blueZ);
+        ctx.lineTo(blueX + Math.cos(rad) * 6.5 * effectiveScale, blueZ + Math.sin(rad) * 6.5 * effectiveScale);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(blueX, blueZ, 1.5 * effectiveScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 7. The World Islands Archipelago (Vast Arabian Gulf Satellite Atolls)
+      const worldIslands = [
+        { name: 'Heart of Europe', x: 360, z: 46, r: 5.5 },
+        { name: 'Sweden Island', x: 380, z: 68, r: 4.8 },
+        { name: 'Floating Seahorse', x: 350, z: 24, r: 4.4 },
+        { name: 'Coral Atoll', x: 380, z: 28, r: 4.2 }
+      ];
+      for (const wi of worldIslands) {
+        const wx = originX + wi.x * effectiveScale;
+        const wz = originZ + wi.z * effectiveScale;
+        // Coral lagoon reef
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.35)';
+        ctx.beginPath();
+        ctx.arc(wx, wz, (wi.r + 3.0) * effectiveScale, 0, Math.PI * 2);
+        ctx.fill();
+        // Golden sand island
+        ctx.fillStyle = '#e2cb87';
+        ctx.beginPath();
+        ctx.arc(wx, wz, wi.r * effectiveScale, 0, Math.PI * 2);
+        ctx.fill();
+        // Luxury villa dot
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.arc(wx, wz, 1.2 * effectiveScale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 8. Cartographic Atlas Region Labels (Crisp and legible when zoomed in)
+      if (userZoom >= 0.75) {
+        ctx.save();
+        ctx.textAlign = 'center';
+
+        const drawAtlasLabel = (text: string, x: number, z: number, color = '#fef08a', bgColor = 'rgba(15, 23, 42, 0.75)') => {
+          const sx = originX + x * effectiveScale;
+          const sz = originZ + z * effectiveScale;
+          ctx.font = 'bold 9px monospace';
+          const tw = ctx.measureText(text).width;
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(sx - tw / 2 - 4, sz - 7, tw + 8, 14);
+          ctx.strokeStyle = 'rgba(250, 204, 21, 0.5)';
+          ctx.lineWidth = 0.8;
+          ctx.strokeRect(sx - tw / 2 - 4, sz - 7, tw + 8, 14);
+          ctx.fillStyle = color;
+          ctx.fillText(text, sx, sz + 3);
+        };
+
+        drawAtlasLabel('PALM JUMEIRAH', 260, 20);
+        drawAtlasLabel('ATLANTIS RESORT', 324, 54, '#f43f5e');
+        drawAtlasLabel('BURJ AL ARAB', 220, 122, '#38bdf8');
+        drawAtlasLabel('AIN DUBAI WHEEL', 262, 160, '#a5b4fc');
+        drawAtlasLabel('THE WORLD ISLANDS', 368, 80, '#e2cb87');
+        drawAtlasLabel('RADIATOR SPRINGS', 200, -60, '#f87171');
+        ctx.restore();
+      }
+
+      ctx.restore();
+
       // Live Dragons
       if (dragons) {
         for (const d of dragons) {
@@ -1618,7 +1790,9 @@ export class ModalManager {
       // =========================================================================
       const majorHubTags = [
         'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'SEOUL', 'NEO YORK',
-        'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN', 'ALPS'
+        'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN', 'ALPS',
+        'PALM JUMEIRAH', 'BURJ AL ARAB', 'BLUEWATERS', 'WORLD ISLANDS',
+        'FORBIDDEN CITY', 'PANDA RESERVE', 'TERRACOTTA', 'TOKYO TOWER', 'SENSO-JI', 'GEUNJEONGJEON', 'KING SEJONG'
       ];
 
       const drawRedBannerFlag = (

@@ -78,8 +78,8 @@ class Game {
     this.scene.background = new THREE.Color(0x78a7ff); // Minecraft blue sky
     this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.0035);
 
-    // 3. Camera (near 0.05 prevents face clipping, far 600 renders distant island landmarks across enlarged ocean)
-    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 600);
+    // 3. Camera (near 0.15 maximizes depth precision & eliminates distant Z-fighting, far 600 renders distant island landmarks)
+    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.15, 600);
 
     // 4. Managers
     this.textureManager = new TextureManager();
@@ -1123,7 +1123,19 @@ class Game {
     } else {
       this.scene.background = this.currentSkyColor.clone();
     }
-    if (this.scene.fog) this.scene.fog.color.copy(this.currentSkyColor);
+    if (this.scene.fog) {
+      this.scene.fog.color.copy(this.currentSkyColor);
+      if (this.scene.fog instanceof THREE.FogExp2) {
+        // Base ground fog density tuned for atmospheric depth at horizon
+        const baseDensity = gloom < 0.6 ? 0.0042 : 0.0035;
+        // As player ascends into flight (Y from 8 to 75), smoothly relax fog density
+        // so the landscape below remains crisp and vibrant instead of a murky soup
+        const playerY = this.player?.position.y ?? 2;
+        const flightRatio = THREE.MathUtils.clamp((playerY - 8) / 60, 0, 1);
+        const targetDensity = THREE.MathUtils.lerp(baseDensity, baseDensity * 0.48, flightRatio);
+        this.scene.fog.density = targetDensity;
+      }
+    }
     this.ambientLight.intensity = THREE.MathUtils.lerp(prev.ambient, next.ambient, eased);
     this.sunLight.intensity = THREE.MathUtils.lerp(prev.sun, next.sun, eased);
   }

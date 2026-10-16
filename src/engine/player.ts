@@ -3,7 +3,7 @@ import { VoxelWorld, ProjectBanner } from '../world/world';
 import { sound } from './audio';
 import { Project } from '../data/portfolioData';
 
-const SPAWN_POSITION = new THREE.Vector3(0, 2, 8);
+const SPAWN_POSITION = new THREE.Vector3(0, 2, -4);
 
 export const WORLD_BOUNDS = {
   minX: -260,
@@ -44,11 +44,12 @@ export class Player {
   public isSneaking: boolean = false;
   public isSprinting: boolean = false;
   public isLocked: boolean = false;
+  private flightRoll: number = 0;
   private isPointerLockFallback: boolean = false;
   private fallbackMousePosition: { x: number; y: number } | null = null;
 
   // Vehicle Riding State
-  public ridingVehicle: 'train' | 'auto_rickshaw' | 'lightning_mcqueen' | null = null;
+  public ridingVehicle: 'train' | 'auto_rickshaw' | 'lightning_mcqueen' | 'palm_monorail' | null = null;
   public ridingTrainIndex: number = 0;
   private lastAnnouncedStation: string | null = null;
   private rickshawSpeed: number = 0;
@@ -389,6 +390,12 @@ export class Player {
           this.startDrivingMcQueen();
           return;
         }
+        // Check Palm Monorail boarding within 7.5 blocks
+        const nearestMonorail = this.world.getNearestPalmMonorail(this.position);
+        if (nearestMonorail && nearestMonorail.distance < 7.5) {
+          this.startRidingPalmMonorail();
+          return;
+        }
         // Check train boarding within 7.5 blocks of any live train
         const nearestTrain = this.world.getNearestTrain(this.position);
         if (nearestTrain && nearestTrain.distance < 7.5) {
@@ -420,6 +427,11 @@ export class Player {
           sound.playHorn();
           if (this.onWorldNotice) {
             this.onWorldNotice('📢 *PEE-PEE!* (Horn OK Please)');
+          }
+        } else if (this.ridingVehicle === 'palm_monorail') {
+          sound.playTrainWhistle();
+          if (this.onWorldNotice) {
+            this.onWorldNotice('🚝 *CHOO-CHOO!* (Dubai Palm Monorail Express)');
           }
         }
       }
@@ -698,21 +710,41 @@ export class Player {
           this.onWorldNotice(`🚆 Arriving at ${currentStation} · Press SPACE to alight`);
         }
       }
-      this.updateCameraTransform();
+      this.updateCameraTransform(dt);
+      return;
+    }
+
+    // If riding Dubai Palm Monorail, follow monorail cabin seat position
+    if (this.ridingVehicle === 'palm_monorail') {
+      const transform = this.world.getPalmMonorailRideTransform();
+      if (transform) {
+        this.position.copy(transform.position);
+        this.velocity.set(0, 0, 0);
+      }
+      // Real-time station arrival announcements
+      const currentStation = this.world.getNearestMonorailStation(this.position, 16);
+      if (currentStation && currentStation !== this.lastAnnouncedStation) {
+        this.lastAnnouncedStation = currentStation;
+        sound.playTrainWhistle();
+        if (this.onWorldNotice) {
+          this.onWorldNotice(`🚝 Arriving at ${currentStation} · Press SPACE to alight`);
+        }
+      }
+      this.updateCameraTransform(dt);
       return;
     }
 
     // If driving Lightning McQueen, handle high-speed 3D racing physics
     if (this.ridingVehicle === 'lightning_mcqueen') {
       this.updateMcQueenDriving(dt);
-      this.updateCameraTransform();
+      this.updateCameraTransform(dt);
       return;
     }
 
     // If driving auto-rickshaw, handle WASD vehicle driving
     if (this.ridingVehicle === 'auto_rickshaw') {
       this.updateRickshawDriving(dt);
-      this.updateCameraTransform();
+      this.updateCameraTransform(dt);
       return;
     }
 
@@ -748,23 +780,38 @@ export class Player {
     // ==========================================
     if (this.isFlying) {
       const isFastFlight = !!this.keys['ControlLeft'] || !!this.keys['ControlRight'] || this.isSprinting;
-      const flySpeed = isFastFlight ? 20.0 : 10.5;
+      const maxFlySpeed = isFastFlight ? 20.0 : 10.5;
 
-      // Immediate response avoids the input lag caused by per-frame inertia.
-      this.velocity.x = isMoving ? moveDir.x * flySpeed : 0;
-      this.velocity.z = isMoving ? moveDir.z * flySpeed : 0;
+      // Smooth horizontal flight acceleration & aerodynamic glide damping
+      if (isMoving) {
+        const targetVx = moveDir.x * maxFlySpeed;
+        const targetVz = moveDir.z * maxFlySpeed;
+        const flyAccel = 32.0;
+        this.velocity.x += (targetVx - this.velocity.x) * Math.min(1, flyAccel * dt);
+        this.velocity.z += (targetVz - this.velocity.z) * Math.min(1, flyAccel * dt);
+      } else {
+        const flyFriction = 7.5;
+        this.velocity.x -= this.velocity.x * Math.min(1, flyFriction * dt);
+        this.velocity.z -= this.velocity.z * Math.min(1, flyFriction * dt);
+        if (Math.abs(this.velocity.x) < 0.04) this.velocity.x = 0;
+        if (Math.abs(this.velocity.z) < 0.04) this.velocity.z = 0;
+      }
 
-      // Holding Space climbs; releasing it stops vertical motion and hovers.
+      // Holding Space climbs; Shift descends; releasing smoothly hovers
       const ascending = this.keys['Space'] || this.touchMove.jump;
       const descending = this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.touchMove.sneak;
-      const targetFlyY = ascending === descending ? 0 : (ascending ? flySpeed * 0.8 : -flySpeed * 0.8);
-      this.velocity.y = targetFlyY;
+      const targetFlyVy = ascending === descending ? 0 : (ascending ? maxFlySpeed * 0.75 : -maxFlySpeed * 0.75);
+      const verticalAccel = 15.0;
+      this.velocity.y += (targetFlyVy - this.velocity.y) * Math.min(1, verticalAccel * dt);
+      if (!ascending && !descending && Math.abs(this.velocity.y) < 0.05) {
+        this.velocity.y = 0;
+      }
 
       // Proposed vertical position
       const proposedY = this.position.y + this.velocity.y * dt + this.flightTapBoost;
       this.flightTapBoost = 0;
 
-      // Ground detection beneath feet in flight mode
+      // Ground detection beneath feet in flight mode (strictly check feet down to proposed descent)
       let highestFloor = -999;
       const r = this.radius * 0.75;
       const minX = Math.floor(this.position.x - r);
@@ -772,7 +819,7 @@ export class Player {
       const minZ = Math.floor(this.position.z - r);
       const maxZ = Math.floor(this.position.z + r);
 
-      const checkStartY = Math.ceil(this.position.y + 0.5);
+      const checkStartY = Math.floor(this.position.y);
       const checkEndY = Math.max(-2, Math.floor(proposedY) - 1);
 
       for (let y = checkStartY; y >= checkEndY; y--) {
@@ -793,7 +840,7 @@ export class Player {
       }
 
       // Landing: if flying down towards ground and feet reach solid floor, land cleanly!
-      if (targetFlyY < 0 && proposedY <= highestFloor + 0.15 && highestFloor > -900) {
+      if (this.velocity.y < -0.1 && proposedY <= highestFloor + 0.15 && highestFloor > -900) {
         this.position.y = highestFloor;
         this.setFlying(false, true);
         sound.playStep('grass');
@@ -801,8 +848,8 @@ export class Player {
           this.onWorldNotice('Landed softly on the ground.');
         }
       } else {
-        // Enforce floor clamp so player never sinks inside terrain
-        if (highestFloor > -900 && proposedY < highestFloor) {
+        // Enforce floor clamp so player never sinks inside terrain while descending
+        if (highestFloor > -900 && proposedY < highestFloor && this.position.y >= highestFloor - 0.2) {
           this.position.y = highestFloor;
           this.velocity.y = 0;
         } else {
@@ -857,7 +904,7 @@ export class Player {
         }
       }
 
-      this.updateCameraTransform();
+      this.updateCameraTransform(dt);
       return;
     }
 
@@ -929,7 +976,7 @@ export class Player {
       }
     }
 
-    this.updateCameraTransform();
+    this.updateCameraTransform(dt);
   }
 
   // Robust Minecraft Voxel Collision & Ground Snapping with Anti-Tunneling
@@ -1097,6 +1144,17 @@ export class Player {
       }
       return;
     }
+    if (this.ridingVehicle === 'palm_monorail') {
+      this.ridingVehicle = null;
+      this.lastAnnouncedStation = null;
+      this.position.z += 1.8;
+      this.velocity.set(0, 0, 0);
+      sound.playStep('stone');
+      if (this.onWorldNotice) {
+        this.onWorldNotice('🚝 Alighted from Dubai Palm Monorail onto station platform.');
+      }
+      return;
+    }
     if (this.ridingVehicle === 'lightning_mcqueen') {
       if (this.world.mcQueenManager) {
         this.world.mcQueenManager.isPlayerDriving = false;
@@ -1144,6 +1202,16 @@ export class Player {
     const trainName = (index === 0) ? 'Crossroads Express' : 'Airport Shuttle';
     if (this.onWorldNotice) {
       this.onWorldNotice(`🚆 Boarded ${trainName}! Press SPACE or SHIFT to alight at any station.`);
+    }
+  }
+
+  public startRidingPalmMonorail() {
+    this.ridingVehicle = 'palm_monorail';
+    this.lastAnnouncedStation = null;
+    this.isFlying = false;
+    sound.playTrainWhistle();
+    if (this.onWorldNotice) {
+      this.onWorldNotice('🚝 Boarded Dubai Palm Monorail! Press SPACE or SHIFT to alight at any station.');
     }
   }
 
@@ -1384,7 +1452,7 @@ export class Player {
     );
   }
 
-  private updateCameraTransform() {
+  private updateCameraTransform(dt: number = 0.016) {
     // Dedicated Racing Chase Camera for Lightning McQueen (#95)
     if (this.ridingVehicle === 'lightning_mcqueen') {
       if (this.playerAvatar) this.playerAvatar.visible = false;
@@ -1419,9 +1487,17 @@ export class Player {
       return;
     }
 
+    // Aerodynamic banking roll in flight during strafing or lateral movement
+    let targetRoll = 0;
+    if (this.isFlying) {
+      if (this.keys['KeyA'] || this.touchMove.left) targetRoll += 0.026;
+      if (this.keys['KeyD'] || this.touchMove.right) targetRoll -= 0.026;
+    }
+    this.flightRoll += (targetRoll - this.flightRoll) * Math.min(1, 9 * dt);
+
     const curEye = this.isSneaking ? 1.35 : (this.isSitting ? 1.05 : this.eyeHeight);
     const targetPos = new THREE.Vector3(this.position.x, this.position.y + curEye, this.position.z);
-    const euler = new THREE.Euler(this.pitch, this.yaw, 0, 'YXZ');
+    const euler = new THREE.Euler(this.pitch, this.yaw, this.flightRoll, 'YXZ');
 
     if (this.cameraMode === 0) {
       // First Person (1P)
@@ -1442,8 +1518,14 @@ export class Player {
 
       if (this.cameraMode === 1) {
         // Third Person Behind
-        this.camera.position.copy(targetPos).addScaledVector(dir, -dist);
-        this.camera.position.y += heightOffset;
+        const idealCamPos = targetPos.clone().addScaledVector(dir, -dist);
+        idealCamPos.y += heightOffset;
+        if (this.isFlying) {
+          // Smooth trailing behind avatar in flight mode eliminates rigid camera jarring
+          this.camera.position.lerp(idealCamPos, Math.min(1, 14 * dt));
+        } else {
+          this.camera.position.copy(idealCamPos);
+        }
         this.camera.quaternion.setFromEuler(euler);
       } else {
         // Third Person Front (looking at Lakshya)
@@ -1453,9 +1535,16 @@ export class Player {
       }
     }
 
-    // Sprint FOV effect
-    const targetFOV = this.isSprinting ? 80 : 70;
-    this.camera.fov += (targetFOV - this.camera.fov) * 0.15;
+    // Dynamic Sprint & Flight FOV effect
+    let targetFOV = 70;
+    if (this.isFlying) {
+      const horizSpeed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.z * this.velocity.z);
+      // Smooth dynamic FOV scaling from 70° at hover up to 81° at fast flight
+      targetFOV = 70 + Math.min(11, (horizSpeed / 20.0) * 11);
+    } else if (this.isSprinting) {
+      targetFOV = 80;
+    }
+    this.camera.fov += (targetFOV - this.camera.fov) * Math.min(1, 10 * dt);
     this.camera.updateProjectionMatrix();
   }
 

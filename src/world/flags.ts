@@ -21,6 +21,10 @@ export type CountryFlagId =
   | 'uae'
   | 'switzerland';
 
+export interface AddFlagOptions {
+  skipMast?: boolean;
+}
+
 export class FlagManager {
   private scene: THREE.Scene;
   private flags: FlagInstance[] = [];
@@ -360,7 +364,7 @@ export class FlagManager {
     const { canvas, ctx } = this.createCanvas(512, 340);
     const colW = 512 / 3;
 
-    // Green, White, Red tricolor
+    // Green (Verde Esperanza), White (Blanco Unidad), Red (Rojo Sangre de los Héroes)
     ctx.fillStyle = '#006847';
     ctx.fillRect(0, 0, colW, 340);
 
@@ -370,43 +374,233 @@ export class FlagManager {
     ctx.fillStyle = '#ce1126';
     ctx.fillRect(colW * 2, 0, colW, 340);
 
-    // Central Mexican Coat of Arms (Eagle on Cactus with Snake)
+    // Official Mexican Coat of Arms (Escudo Nacional de México)
     const cx = 256;
     const cy = 170;
     ctx.save();
-    // Golden Laurel wreath base
-    ctx.strokeStyle = '#ca8a04';
-    ctx.lineWidth = 4;
+
+    // 1. Lake Texcoco / Blue Water Glyphs at base
+    ctx.fillStyle = '#0284c7';
     ctx.beginPath();
-    ctx.arc(cx, cy + 12, 38, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.ellipse(cx, cy + 50, 42, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wave ripples in lake
+    ctx.strokeStyle = '#bae6fd';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx - 18, cy + 50, 10, 0, Math.PI);
+    ctx.arc(cx + 18, cy + 50, 10, 0, Math.PI);
     ctx.stroke();
 
-    // Prickly Pear Cactus
-    ctx.fillStyle = '#15803d';
+    // 2. Aztec Stone / Rock Island (glifo de la piedra)
+    ctx.fillStyle = '#64748b';
     ctx.beginPath();
-    ctx.ellipse(cx, cy + 24, 18, 10, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Mexican Golden Eagle Silhouette
-    ctx.fillStyle = '#92400e';
-    ctx.beginPath();
-    ctx.moveTo(cx - 16, cy + 10);
-    ctx.lineTo(cx - 28, cy - 14); // Left wing
-    ctx.lineTo(cx - 12, cy - 8);
-    ctx.lineTo(cx, cy - 28);      // Head & Crown
-    ctx.lineTo(cx + 12, cy - 8);
-    ctx.lineTo(cx + 28, cy - 14); // Right wing
-    ctx.lineTo(cx + 16, cy + 10);
+    ctx.moveTo(cx - 28, cy + 48);
+    ctx.lineTo(cx - 22, cy + 34);
+    ctx.lineTo(cx + 22, cy + 34);
+    ctx.lineTo(cx + 28, cy + 48);
     ctx.closePath();
     ctx.fill();
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    // Serpent in beak
+    // 3. Prickly Pear Cactus (Nopal) with branches & red tunas (fruits)
+    const drawCactusPad = (px: number, py: number, rx: number, ry: number, rot: number) => {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(rot);
+      ctx.fillStyle = '#15803d';
+      ctx.strokeStyle = '#14532d';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Cactus fruit (tuna roja)
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(0, -ry, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    // Central trunk pad
+    drawCactusPad(cx, cy + 24, 13, 11, 0);
+    // Left branch pad
+    drawCactusPad(cx - 16, cy + 18, 11, 9, -0.4);
+    // Right branch pad
+    drawCactusPad(cx + 16, cy + 18, 11, 9, 0.4);
+    // Upper left pad
+    drawCactusPad(cx - 22, cy + 6, 9, 8, -0.2);
+    // Upper right pad
+    drawCactusPad(cx + 22, cy + 6, 9, 8, 0.2);
+
+    // 4. Encircling Oak & Laurel Wreath (Rama de Encino y Laurel)
     ctx.strokeStyle = '#15803d';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(cx + 2, cy - 24);
-    ctx.quadraticCurveTo(cx + 14, cy - 20, cx + 8, cy - 12);
+    ctx.arc(cx, cy + 16, 52, 0.45 * Math.PI, 0.95 * Math.PI);
     ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy + 16, 52, 0.05 * Math.PI, 0.55 * Math.PI);
+    ctx.stroke();
+
+    // Wreath leaves & golden laurel highlights
+    ctx.fillStyle = '#ca8a04';
+    for (let a = 0.5 * Math.PI; a <= 0.95 * Math.PI; a += 0.09) {
+      const lx = cx + Math.cos(a) * 52;
+      const ly = cy + 16 + Math.sin(a) * 52;
+      ctx.beginPath();
+      ctx.ellipse(lx, ly, 4.5, 2.5, a + 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (let a = 0.05 * Math.PI; a <= 0.5 * Math.PI; a += 0.09) {
+      const lx = cx + Math.cos(a) * 52;
+      const ly = cy + 16 + Math.sin(a) * 52;
+      ctx.beginPath();
+      ctx.ellipse(lx, ly, 4.5, 2.5, a - 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Ribbon tying the wreath at the bottom (tricolor bow)
+    ctx.fillStyle = '#006847';
+    ctx.fillRect(cx - 10, cy + 65, 6, 5);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx - 4, cy + 65, 8, 5);
+    ctx.fillStyle = '#ce1126';
+    ctx.fillRect(cx + 4, cy + 65, 6, 5);
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(cx - 10, cy + 65, 20, 5);
+
+    // 5. Rattlesnake (Serpiente de Cascabel) coiled and held in eagle's beak & talon
+    ctx.strokeStyle = '#166534';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + 4, cy - 14); // in eagle's beak
+    ctx.quadraticCurveTo(cx + 22, cy - 8, cx + 18, cy + 4);
+    ctx.quadraticCurveTo(cx + 14, cy + 16, cx + 4, cy + 12);
+    ctx.quadraticCurveTo(cx - 8, cy + 8, cx - 2, cy + 22);
+    ctx.stroke();
+
+    // Snake rattle (cascabel)
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.arc(cx - 2, cy + 24, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 6. Mexican Golden Eagle (Águila Real Mexicana)
+    // Tail plumage
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, cy + 10);
+    ctx.lineTo(cx - 16, cy + 26);
+    ctx.lineTo(cx - 2, cy + 26);
+    ctx.closePath();
+    ctx.fill();
+
+    // Eagle Left Leg (standing on cactus pad) & Sharp Talons
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, cy + 14);
+    ctx.lineTo(cx - 6, cy + 24);
+    ctx.stroke();
+    // Talons
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(cx - 6, cy + 24, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eagle Right Leg (gripping the coiled serpent)
+    ctx.strokeStyle = '#eab308';
+    ctx.beginPath();
+    ctx.moveTo(cx + 4, cy + 8);
+    ctx.lineTo(cx + 6, cy + 14);
+    ctx.stroke();
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(cx + 6, cy + 14, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Muscular Body & Breast Plumage
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.ellipse(cx - 2, cy + 2, 14, 18, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Left Wing (Extended with majestic feathers)
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy + 4);
+    ctx.lineTo(cx - 36, cy - 18); // Wingtip
+    ctx.lineTo(cx - 30, cy - 6);
+    ctx.lineTo(cx - 24, cy + 2);
+    ctx.lineTo(cx - 12, cy + 8);
+    ctx.closePath();
+    ctx.fill();
+
+    // Primary wing feathers
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy);
+    ctx.lineTo(cx - 34, cy - 14);
+    ctx.moveTo(cx - 8, cy + 4);
+    ctx.lineTo(cx - 28, cy - 2);
+    ctx.stroke();
+
+    // Right Wing (Raised upward towards the sky)
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.moveTo(cx + 4, cy + 2);
+    ctx.lineTo(cx + 34, cy - 22); // High wingtip
+    ctx.lineTo(cx + 26, cy - 8);
+    ctx.lineTo(cx + 18, cy + 2);
+    ctx.lineTo(cx + 8, cy + 8);
+    ctx.closePath();
+    ctx.fill();
+
+    // Right wing feather detailing
+    ctx.beginPath();
+    ctx.moveTo(cx + 6, cy);
+    ctx.lineTo(cx + 30, cy - 16);
+    ctx.moveTo(cx + 8, cy + 4);
+    ctx.lineTo(cx + 22, cy - 4);
+    ctx.stroke();
+
+    // Neck & Head turned fiercely to the hoist (Left)
+    ctx.fillStyle = '#b45309';
+    ctx.beginPath();
+    ctx.moveTo(cx - 4, cy - 6);
+    ctx.lineTo(cx - 14, cy - 20); // Crown / crest feathers
+    ctx.lineTo(cx - 8, cy - 24);
+    ctx.lineTo(cx + 2, cy - 14);
+    ctx.closePath();
+    ctx.fill();
+
+    // Sharp Curved Hook Beak
+    ctx.fillStyle = '#eab308';
+    ctx.beginPath();
+    ctx.moveTo(cx - 12, cy - 20);
+    ctx.lineTo(cx - 22, cy - 16); // Beak tip hook
+    ctx.lineTo(cx - 14, cy - 13);
+    ctx.closePath();
+    ctx.fill();
+
+    // Eagle Eye
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(cx - 10, cy - 18, 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx - 10.5, cy - 18.5, 0.7, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
 
@@ -511,6 +705,7 @@ export class FlagManager {
   // 3D REAL WAVING CLOTH FLAG GENERATION
   // --------------------------------------------------------------------------
 
+
   /**
    * Spawns an authentic 3D waving cloth flag attached to a flagpole.
    * @param country Identifier of national flag
@@ -519,6 +714,7 @@ export class FlagManager {
    * @param poleZ Z coordinate of flagpole mast
    * @param dir Direction the flag extends ('east' extends +X, 'west' extends -X, 'north' extends -Z, 'south' extends +Z)
    * @param scaleMultiplier Size multiplier (default 1.0 -> 3.6m wide x 2.4m high)
+   * @param options Optional configuration like skipMast for pre-existing monumental poles
    */
   public addFlag(
     country: CountryFlagId,
@@ -526,12 +722,13 @@ export class FlagManager {
     poleY: number,
     poleZ: number,
     dir: 'east' | 'west' | 'north' | 'south' = 'east',
-    scaleMultiplier = 1.0
+    scaleMultiplier = 1.0,
+    options?: AddFlagOptions
   ): FlagInstance {
     const width = 3.6 * scaleMultiplier;
     const height = 2.4 * scaleMultiplier;
-    const segX = 28;
-    const segY = 16;
+    const segX = Math.round(28 * Math.min(scaleMultiplier, 2));
+    const segY = Math.round(16 * Math.min(scaleMultiplier, 2));
 
     // Plane geometry translated so that local X = 0 is the hoist edge attached to the pole
     const geometry = new THREE.PlaneGeometry(width, height, segX, segY);
@@ -561,47 +758,66 @@ export class FlagManager {
       mesh.rotation.y = -Math.PI / 2;
     }
 
-    // ------------------------------------------------------------------------
-    // Sleek, Authentic Thin Stainless Steel Flagpole Mast
-    // ------------------------------------------------------------------------
-    const baseY = (poleY > 20) ? 19.5 : (poleZ < -110 && poleX > 60 ? 4.0 : 1.0);
-    const poleHeight = (poleY + 0.45) - baseY;
-    const mastY = baseY + poleHeight / 2;
+    if (!options?.skipMast) {
+      // ------------------------------------------------------------------------
+      // Sleek, Authentic Thin Stainless Steel Flagpole Mast
+      // ------------------------------------------------------------------------
+      const baseY = (poleY > 20) ? 19.5 : (poleZ < -110 && poleX > 60 ? 4.0 : 1.0);
+      const poleHeight = (poleY + 0.45) - baseY;
+      const mastY = baseY + poleHeight / 2;
 
-    const mastGeo = new THREE.CylinderGeometry(0.045, 0.07, poleHeight, 16);
-    const mastMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
-      metalness: 0.92,
-      roughness: 0.18
-    });
-    const mastMesh = new THREE.Mesh(mastGeo, mastMat);
-    mastMesh.position.set(poleX, mastY, poleZ);
-    this.scene.add(mastMesh);
+      const mastGeo = new THREE.CylinderGeometry(0.045, 0.07, poleHeight, 16);
+      const mastMat = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        metalness: 0.92,
+        roughness: 0.18
+      });
+      const mastMesh = new THREE.Mesh(mastGeo, mastMat);
+      mastMesh.position.set(poleX, mastY, poleZ);
+      this.scene.add(mastMesh);
 
-    // Polished Golden Spherical Finial Ball at top of mast
-    const finialGeo = new THREE.SphereGeometry(0.12 * scaleMultiplier, 16, 16);
-    const finialMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      metalness: 0.95,
-      roughness: 0.15
-    });
-    const finialMesh = new THREE.Mesh(finialGeo, finialMat);
-    finialMesh.position.set(poleX, poleY + 0.45, poleZ);
-    this.scene.add(finialMesh);
+      // Polished Golden Spherical Finial Ball at top of mast
+      const finialGeo = new THREE.SphereGeometry(0.12 * scaleMultiplier, 16, 16);
+      const finialMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        metalness: 0.95,
+        roughness: 0.15
+      });
+      const finialMesh = new THREE.Mesh(finialGeo, finialMat);
+      finialMesh.position.set(poleX, poleY + 0.45, poleZ);
+      this.scene.add(finialMesh);
 
-    // Circular Metal Collar / Pedestal at base
-    const baseGeo = new THREE.CylinderGeometry(0.2, 0.28, 0.35, 16);
-    const baseMesh = new THREE.Mesh(baseGeo, mastMat);
-    baseMesh.position.set(poleX, baseY + 0.175, poleZ);
-    this.scene.add(baseMesh);
+      // Circular Metal Collar / Pedestal at base
+      const baseGeo = new THREE.CylinderGeometry(0.2, 0.28, 0.35, 16);
+      const baseMesh = new THREE.Mesh(baseGeo, mastMat);
+      baseMesh.position.set(poleX, baseY + 0.175, poleZ);
+      this.scene.add(baseMesh);
 
-    // Thin White Halyard Rope
-    const ropeGeo = new THREE.CylinderGeometry(0.006, 0.006, poleHeight - 0.2, 8);
-    const ropeMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
-    const ropeMesh = new THREE.Mesh(ropeGeo, ropeMat);
-    const ropeOffset = (dir === 'east' || dir === 'west') ? new THREE.Vector3(0, 0, 0.06) : new THREE.Vector3(0.06, 0, 0);
-    ropeMesh.position.set(poleX + ropeOffset.x, mastY, poleZ + ropeOffset.z);
-    this.scene.add(ropeMesh);
+      // Thin White Halyard Rope
+      const ropeGeo = new THREE.CylinderGeometry(0.006, 0.006, poleHeight - 0.2, 8);
+      const ropeMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+      const ropeMesh = new THREE.Mesh(ropeGeo, ropeMat);
+      const ropeOffset = (dir === 'east' || dir === 'west') ? new THREE.Vector3(0, 0, 0.06) : new THREE.Vector3(0.06, 0, 0);
+      ropeMesh.position.set(poleX + ropeOffset.x, mastY, poleZ + ropeOffset.z);
+      this.scene.add(ropeMesh);
+    } else {
+      // Sleek halyard bracket mounts connecting flag grommets to existing structure
+      const bracketMat = new THREE.MeshStandardMaterial({
+        color: 0xcfd8dc,
+        metalness: 0.85,
+        roughness: 0.2
+      });
+      const bracketGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.3, 12);
+      bracketGeo.rotateZ(Math.PI / 2);
+
+      const topBracket = new THREE.Mesh(bracketGeo, bracketMat);
+      topBracket.position.set(poleX, poleY - 0.1, poleZ);
+      this.scene.add(topBracket);
+
+      const bottomBracket = new THREE.Mesh(bracketGeo, bracketMat);
+      bottomBracket.position.set(poleX, poleY - height + 0.1, poleZ);
+      this.scene.add(bottomBracket);
+    }
 
     this.scene.add(mesh);
 
@@ -635,6 +851,8 @@ export class FlagManager {
       const base = flag.basePositions;
       const count = pos.length / 3;
 
+      const scaleAmp = Math.min(1.8, Math.max(1.0, flag.width / 3.6));
+
       for (let i = 0; i < count; i++) {
         const bx = base[i * 3];
         const by = base[i * 3 + 1];
@@ -643,11 +861,11 @@ export class FlagManager {
         const u = Math.max(0, Math.min(1, bx / flag.width));
 
         // Primary aerodynamic traveling wind wave + high-frequency ripple
-        const primaryWave = Math.sin(u * 5.2 - time * 4.6 + flag.phase) * (0.24 * u);
-        const flutterWave = Math.cos(u * 9.0 - time * 6.8 + flag.phase * 1.6) * (0.07 * u * u);
+        const primaryWave = Math.sin(u * 5.2 - time * 4.6 + flag.phase) * (0.24 * u * scaleAmp);
+        const flutterWave = Math.cos(u * 9.0 - time * 6.8 + flag.phase * 1.6) * (0.07 * u * u * scaleAmp);
 
         // Vertical breathing flutter
-        const verticalFlutter = Math.sin(u * 3.6 - time * 3.8 + flag.phase) * (0.04 * u);
+        const verticalFlutter = Math.sin(u * 3.6 - time * 3.8 + flag.phase) * (0.04 * u * scaleAmp);
 
         // Natural cloth foreshortening
         const zDisplace = primaryWave + flutterWave;

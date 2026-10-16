@@ -803,9 +803,19 @@ export class HUDManager {
       const pRootZ = originZ + 46 * scale;
       const pTrunkEndX = originX + 236 * scale;
 
-      // 1. Palm Trunk
+      // Turquoise Coral Reef Lagoon Shallows
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+      ctx.beginPath();
+      const crescentCenterX = originX + 252 * scale;
+      ctx.ellipse(crescentCenterX, pRootZ, 78 * scale, 40 * scale, 0, -Math.PI * 0.72, Math.PI * 0.72);
+      ctx.lineTo(pRootX, pRootZ + 12 * scale);
+      ctx.lineTo(pRootX, pRootZ - 12 * scale);
+      ctx.closePath();
+      ctx.fill();
+
+      // 1. Palm Trunk & Flared Gateway Base
       ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = Math.max(2.5, 4.5 * scale);
+      ctx.lineWidth = Math.max(2.5, 5.0 * scale);
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(pRootX, pRootZ);
@@ -814,20 +824,37 @@ export class HUDManager {
 
       // Monorail cyan line
       ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
+      ctx.lineWidth = Math.max(0.8, 1.4 * scale);
       ctx.beginPath();
       ctx.moveTo(pRootX, pRootZ);
       ctx.lineTo(pTrunkEndX, pRootZ);
       ctx.stroke();
 
-      // 16 Parametric Curved Fronds (8 pairs fanning within Z in [14, 78])
+      // Palm Tower / Nakheel Mall on Trunk (213, 46)
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.arc(originX + 213 * scale, pRootZ, Math.max(1.8, 2.6 * scale), 0, Math.PI * 2);
+      ctx.fill();
+
+      // 16 Parametric Curved Fronds (8 pairs fanning accurately within Z in [16, 76])
+      const frondDefs = [
+        { xRoot: 236, xTip: 288, dz: 30 },
+        { xRoot: 238, xTip: 292, dz: 26 },
+        { xRoot: 240, xTip: 296, dz: 22 },
+        { xRoot: 242, xTip: 300, dz: 18 },
+        { xRoot: 244, xTip: 302, dz: 14 },
+        { xRoot: 246, xTip: 302, dz: 11 },
+        { xRoot: 248, xTip: 298, dz: 8 },
+        { xRoot: 250, xTip: 292, dz: 5 }
+      ];
+
       ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = Math.max(1.2, 2.2 * scale);
-      for (let f = 0; f < 8; f++) {
-        const rootFrondX = originX + (236 + f * 6.5) * scale;
-        const tipX = originX + (255 + f * 4.5) * scale;
-        const spreadZ = (6 + f * 3.4) * scale;
-        const ctrlX = originX + (242 + f * 6.0) * scale;
+      ctx.lineWidth = Math.max(1.2, 2.4 * scale);
+      for (const f of frondDefs) {
+        const rootFrondX = originX + f.xRoot * scale;
+        const tipX = originX + f.xTip * scale;
+        const spreadZ = f.dz * scale;
+        const ctrlX = originX + (f.xRoot + 8) * scale;
 
         // North frond
         ctx.beginPath();
@@ -842,66 +869,75 @@ export class HUDManager {
         ctx.stroke();
       }
 
-      // Detached Crescent Breakwater Barrier (Rx = 72, Rz = 34, Center = 252, 46)
+      // Detached Crescent Breakwater Barrier (Rx = 72, Rz = 34, Center = 252, 46, sweeps to X = 210)
       ctx.strokeStyle = '#c2a661';
-      ctx.lineWidth = Math.max(2.0, 3.2 * scale);
+      ctx.lineWidth = Math.max(2.2, 3.8 * scale);
       ctx.beginPath();
-      const crescentCenterX = originX + 252 * scale;
-      ctx.ellipse(crescentCenterX, pRootZ, 72 * scale, 34 * scale, 0, -Math.PI * 0.42, Math.PI * 0.42);
+      ctx.ellipse(crescentCenterX, pRootZ, 72 * scale, 34 * scale, 0, -Math.PI * 0.70, Math.PI * 0.70);
       ctx.stroke();
 
       // Atlantis The Palm Resort Plinth Marker
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
-      ctx.arc(originX + 324 * scale, pRootZ, Math.max(2, 3.2 * scale), 0, Math.PI * 2);
+      ctx.arc(originX + 324 * scale, pRootZ, Math.max(2.5, 4.0 * scale), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(originX + 324 * scale, pRootZ, Math.max(1.2, 1.8 * scale), 0, Math.PI * 2);
       ctx.fill();
 
       // 2. Burj Al Arab Private Island (220, 110) & Causeway
       const burjX = originX + 220 * scale;
       const burjZ = originZ + 110 * scale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = Math.max(0.8, 1.4 * scale);
       ctx.beginPath();
       ctx.moveTo(originX + 176 * scale, originZ + 90 * scale);
       ctx.quadraticCurveTo(originX + 195 * scale, originZ + 105 * scale, burjX, burjZ);
       ctx.stroke();
       ctx.fillStyle = '#dfc47b';
       ctx.beginPath();
-      ctx.arc(burjX, burjZ, Math.max(3, 5 * scale), 0, Math.PI * 2);
+      ctx.arc(burjX, burjZ, Math.max(3.5, 5.5 * scale), 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#38bdf8';
+      // Sail silhouette
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(burjX, burjZ, Math.max(1.5, 2.2 * scale), 0, Math.PI * 2);
+      ctx.arc(burjX, burjZ, Math.max(2, 3.2 * scale), 0, Math.PI * 2);
+      ctx.fill();
+      // Helipad marker
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.arc(burjX + 2 * scale, burjZ - 2 * scale, Math.max(1, 1.5 * scale), 0, Math.PI * 2);
       ctx.fill();
 
       // 3. Bluewaters Island & Ain Dubai Wheel (262, 146)
       const blueX = originX + 262 * scale;
       const blueZ = originZ + 146 * scale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.lineWidth = Math.max(0.8, 1.0 * scale);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
       ctx.beginPath();
       ctx.moveTo(originX + 176 * scale, originZ + 120 * scale);
       ctx.lineTo(blueX, blueZ);
       ctx.stroke();
       ctx.fillStyle = '#dfc47b';
       ctx.beginPath();
-      ctx.ellipse(blueX, blueZ, Math.max(4, 7 * scale), Math.max(3, 5 * scale), 0.3, 0, Math.PI * 2);
+      ctx.ellipse(blueX, blueZ, Math.max(4.5, 7.5 * scale), Math.max(3.5, 5.5 * scale), 0.3, 0, Math.PI * 2);
       ctx.fill();
       // Ain Dubai observation wheel ring
       ctx.strokeStyle = '#e0e7ff';
-      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.lineWidth = Math.max(1.2, 1.8 * scale);
       ctx.beginPath();
-      ctx.arc(blueX, blueZ, Math.max(2.5, 4.2 * scale), 0, Math.PI * 2);
+      ctx.arc(blueX, blueZ, Math.max(3, 4.8 * scale), 0, Math.PI * 2);
       ctx.stroke();
 
       // 4. The World Islands Archipelago
       ctx.fillStyle = '#e2cb87';
       const worldIslands = [
-        [360, 46, 4.2], [380, 68, 3.6], [350, 24, 3.4], [380, 28, 3.2]
+        [360, 46, 4.5], [380, 68, 3.8], [350, 24, 3.5], [380, 28, 3.2]
       ];
       for (const [wx, wz, wr] of worldIslands) {
         ctx.beginPath();
-        ctx.arc(originX + wx * scale, originZ + wz * scale, Math.max(1.8, wr * scale), 0, Math.PI * 2);
+        ctx.arc(originX + wx * scale, originZ + wz * scale, Math.max(2, wr * scale), 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -1040,12 +1076,17 @@ export class HUDManager {
       if (tag.includes('RAILWAY') || tag.includes('MUMBAI')) return '#f97316';
       if (tag.includes('HOLLYWOOD')) return '#f59e0b';
       if (tag.includes('McQUEEN')) return '#ef4444';
-      if (tag.includes('GREAT WALL')) return '#10b981';
+      if (tag.includes('GREAT WALL') || tag.includes('PANDA')) return '#10b981';
+      if (tag.includes('FORBIDDEN CITY')) return '#eab308';
+      if (tag.includes('TERRACOTTA')) return '#d97706';
       if (tag.includes('PAVILION')) return '#f43f5e';
       if (tag.includes('PYRAMID') || tag.includes('GIZA')) return '#eab308';
       if (tag.includes('CARNIVAL')) return '#f472b6';
       if (tag.includes('LONDON')) return '#dc2626';
-      if (tag.includes('SEOUL')) return '#8b5cf6';
+      if (tag.includes('SEOUL') || tag.includes('GEUNJEONGJEON')) return '#8b5cf6';
+      if (tag.includes('KING SEJONG')) return '#38bdf8';
+      if (tag.includes('TOKYO TOWER')) return '#ef4444';
+      if (tag.includes('SENSO-JI')) return '#f43f5e';
       if (tag.includes('DUBAI') || tag.includes('PALM')) return '#14b8a6';
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';

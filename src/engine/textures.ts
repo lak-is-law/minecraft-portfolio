@@ -11,8 +11,9 @@ function createPixelTexture(drawFn: (ctx: CanvasRenderingContext2D, size: number
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.magFilter = THREE.NearestFilter;
-  texture.minFilter = THREE.NearestFilter;
-  texture.generateMipmaps = false;
+  texture.minFilter = THREE.NearestMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }

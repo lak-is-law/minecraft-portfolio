@@ -484,15 +484,15 @@ export class NPCChatManager {
         name: 'Aarav Sharma',
         role: 'Varanasi Ghat Pundit',
         areaName: 'Varanasi Ghats & Riverfront Steps',
-        coords: { x: 74, y: 2.0, z: -112 },
-        directionFromSpawn: 'North-East (Imperial India)',
-        nearbyLandmarks: ['Riverfront Ghats', 'Taj Mahal Canal', 'Sacred Banyan Grove'],
+        coords: { x: 45, y: 2.0, z: -125 },
+        directionFromSpawn: 'North-East (Varanasi Ghats)',
+        nearbyLandmarks: ['Riverfront Ghats', 'River Yamuna Steps', 'Sacred Banyan Grove'],
         ambientMessages: [
-          'Chanting sacred Sanskrit verses by the Varanasi Ghat steps [X: 74, Y: 2, Z: -112]!',
-          'Lighting brass evening diyas along the holy riverfront at [X: 74, Y: 2, Z: -112] in Varanasi.'
+          'Chanting sacred Sanskrit verses by the Varanasi Ghat steps [X: 45, Y: 2, Z: -125]!',
+          'Lighting brass evening diyas along the holy riverfront at [X: 45, Y: 2, Z: -125] in Varanasi.'
         ],
-        proximityGreeting: 'Aarav Sharma folds his hands in Namaste at Varanasi Ghats [X: 74, Y: 2, Z: -112]!',
-        detailedLocationText: '📍 Location: Varanasi Ghats & Holy Steps [X: 74, Y: 2, Z: -112]\n\n"Welcome to the sacred stone riverfront steps in the Imperial India realm, northeast of Citadel! Here river stone steps meet shaded banyans where travelers gather for peaceful reflection."',
+        proximityGreeting: 'Aarav Sharma folds his hands in Namaste at Varanasi Ghats [X: 45, Y: 2, Z: -125]!',
+        detailedLocationText: '📍 Location: Varanasi Ghats & Holy Steps [X: 45, Y: 2, Z: -125]\n\n"Welcome to the sacred stone riverfront steps in the Imperial India realm, northeast of Citadel! Here river stone steps meet shaded banyans where travelers gather for peaceful reflection."',
         tagColor: '#f97316',
         emoji: '🕉️'
       },
@@ -501,15 +501,15 @@ export class NPCChatManager {
         name: 'Rajesh Kumar',
         role: 'Dhaba Chai Master',
         areaName: 'Sher-e-Punjab Highway Dhaba',
-        coords: { x: 44, y: 2.0, z: -76 },
+        coords: { x: 55, y: 2.0, z: -74 },
         directionFromSpawn: 'North-East (Grand Trunk Highway)',
         nearbyLandmarks: ['Tata Decorated Truck', 'Smoking Tandoor Oven', 'Highway Charpais'],
         ambientMessages: [
-          'Brewing piping-hot ginger-cardamom cutting chai at Highway Dhaba [X: 44, Y: 2, Z: -76]!',
-          'Fresh butter rotis coming straight out of the clay tandoor at [X: 44, Y: 2, Z: -76]! Chai ready!'
+          'Brewing piping-hot ginger-cardamom cutting chai at Highway Dhaba [X: 55, Y: 2, Z: -74]!',
+          'Fresh butter rotis coming straight out of the clay tandoor at [X: 55, Y: 2, Z: -74]! Chai ready!'
         ],
-        proximityGreeting: 'Rajesh Kumar pours a tall glass of cutting chai at Highway Dhaba [X: 44, Y: 2, Z: -76]! "Namaste ji, chai lijiye!"',
-        detailedLocationText: '📍 Location: Sher-e-Punjab Highway Dhaba [X: 44, Y: 2, Z: -76]\n\n"You are at the Grand Trunk Highway roadside eatery northeast of Citadel! Pull up a woven charpai cot, listen to the decorated Tata truck\'s musical horn, and enjoy fresh tandoori food."',
+        proximityGreeting: 'Rajesh Kumar pours a tall glass of cutting chai at Highway Dhaba [X: 55, Y: 2, Z: -74]! "Namaste ji, chai lijiye!"',
+        detailedLocationText: '📍 Location: Sher-e-Punjab Highway Dhaba [X: 55, Y: 2, Z: -74]\n\n"You are at the Grand Trunk Highway roadside eatery northeast of Citadel! Pull up a woven charpai cot, listen to the decorated Tata truck\'s musical horn, and enjoy fresh tandoori food."',
         tagColor: '#ef4444',
         emoji: '☕'
       },
@@ -518,15 +518,15 @@ export class NPCChatManager {
         name: 'Dr. Vikram Nair',
         role: 'ISRO Aerospace Director',
         areaName: 'ISRO Spaceport · Chandrayaan-3 Site',
-        coords: { x: 112, y: 2.0, z: -88 },
+        coords: { x: 112, y: 2.0, z: -78 },
         directionFromSpawn: 'North-East (ISRO Telemetry Pad)',
         nearbyLandmarks: ['Vikram Lunar Lander', 'Pragyan Rover', 'Telemetry Control Antenna'],
         ambientMessages: [
-          'Monitoring real-time telemetry from Vikram Lander at ISRO Spaceport [X: 112, Y: 2, Z: -88]!',
-          'Transmitting commands to Pragyan Rover from the Lunar Launch Site [X: 112, Y: 2, Z: -88]!'
+          'Monitoring real-time telemetry from Vikram Lander at ISRO Spaceport [X: 112, Y: 2, Z: -78]!',
+          'Transmitting commands to Pragyan Rover from the Lunar Launch Site [X: 112, Y: 2, Z: -78]!'
         ],
-        proximityGreeting: 'Dr. Vikram Nair checks satellite telemetry at ISRO Spaceport [X: 112, Y: 2, Z: -88]! "All systems nominal!"',
-        detailedLocationText: '📍 Location: ISRO Spaceport & Lunar Landing Site [X: 112, Y: 2, Z: -88]\n\n"Commemorating India\'s historic Chandrayaan-3 soft touchdown at Shiv Shakti Point! Located northeast of Citadel, featuring the life-size block-built Vikram lander and deployed solar arrays."',
+        proximityGreeting: 'Dr. Vikram Nair checks satellite telemetry at ISRO Spaceport [X: 112, Y: 2, Z: -78]! "All systems nominal!"',
+        detailedLocationText: '📍 Location: ISRO Spaceport & Lunar Landing Site [X: 112, Y: 2, Z: -78]\n\n"Commemorating India\'s historic Chandrayaan-3 soft touchdown at Shiv Shakti Point! Located northeast of Citadel, featuring the life-size block-built Vikram lander and deployed solar arrays."',
         tagColor: '#38bdf8',
         emoji: '🚀'
       },
@@ -563,6 +563,227 @@ export class NPCChatManager {
         detailedLocationText: '📍 Location: Tokyo · Harajuku Fashion Alley [X: -148, Y: 2, Z: -84]\n\n"The bustling creative hub just steps from Shibuya Scramble Crossing! Bright pastel storefronts and anime concept art studios."',
         tagColor: '#f43f5e',
         emoji: '🎨'
+      },
+      {
+        id: 'citizen_Chef_Ren',
+        name: 'Chef Ren',
+        role: 'Tokyo Ramen Master',
+        areaName: 'Tokyo · Yokocho Ramen & Izakaya Bar',
+        coords: { x: -142, y: 2.0, z: -74 },
+        directionFromSpawn: 'North-West (Tokyo Realm)',
+        nearbyLandmarks: ['Tokyo Yokocho Ramen Bar', 'Steaming Tonkotsu Cauldrons', 'Red Chōchin Lanterns'],
+        ambientMessages: [
+          'Simmering 18-hour rich pork bone tonkotsu broth at Tokyo Yokocho [X: -142, Y: 2, Z: -74]!',
+          'Pulling fresh ramen noodles and torching chashu pork slices at [X: -142, Y: 2, Z: -74] in Tokyo!'
+        ],
+        proximityGreeting: 'Chef Ren bows cheerfully behind the ramen counter [X: -142, Y: 2, Z: -74]! "Irasshaimase! Grab a stool, bowl of piping hot ramen coming right up!"',
+        detailedLocationText: '📍 Location: Tokyo · Yokocho Ramen & Izakaya [X: -142, Y: 2, Z: -74]\n\n"A cozy traditional ramen bar with hanging red paper lanterns, bar stools, simmering broth cauldrons, and savory yakitori skewers."',
+        tagColor: '#f97316',
+        emoji: '🍜'
+      },
+      {
+        id: 'citizen_Master_Kenzo',
+        name: 'Master Kenzo',
+        role: 'Sensō-ji Temple Priest',
+        areaName: 'Tokyo · Sensō-ji Kaminarimon Gate',
+        coords: { x: -155, y: 2.0, z: -64 },
+        directionFromSpawn: 'North-West (Tokyo Asakusa)',
+        nearbyLandmarks: ['Kaminarimon Thunder Gate', 'Giant Red Chōchin Lantern', 'Jokoro Incense Cauldron'],
+        ambientMessages: [
+          'Tending to the sacred Jokoro incense cauldron before Kaminarimon Gate [X: -155, Y: 2, Z: -64]!',
+          'Offering blessings for peace and good fortune under the giant red lantern at [X: -155, Y: 2, Z: -64] in Asakusa.'
+        ],
+        proximityGreeting: 'Master Kenzo presses his palms together in gasshō greeting [X: -155, Y: 2, Z: -64]! "Yokoso. May the cleansing incense smoke bring peace and clarity to your journey."',
+        detailedLocationText: '📍 Location: Tokyo · Sensō-ji Kaminarimon Gate [X: -155, Y: 2, Z: -64]\n\n"Ancient Asakusa Buddhist gate guarded by the Wind and Thunder Gods, featuring a monumental hanging red paper lantern and aromatic Jokoro incense."',
+        tagColor: '#eab308',
+        emoji: '⛩️'
+      },
+      {
+        id: 'citizen_Aoi_Miyamoto',
+        name: 'Aoi Miyamoto',
+        role: 'Akihabara Game Dev',
+        areaName: 'Tokyo · Akihabara Electric Town',
+        coords: { x: -162, y: 2.0, z: -68 },
+        directionFromSpawn: 'North-West (Tokyo Akihabara)',
+        nearbyLandmarks: ['Akihabara Neon Facade', 'Pixel Art Billboards', 'Gachapon Capsule Dispensers'],
+        ambientMessages: [
+          'Compiling indie pixel-art RPG game shaders in Akihabara Electric Town [X: -162, Y: 2, Z: -68]!',
+          'Testing out the latest arcade gachapon dispensers at [X: -162, Y: 2, Z: -68]!'
+        ],
+        proximityGreeting: 'Aoi Miyamoto holds up her retro portable console [X: -162, Y: 2, Z: -68]! "Konnichiwa gamer! Check out the neon displays—Akiba is where tech dreams come to life!"',
+        detailedLocationText: '📍 Location: Tokyo · Akihabara Electric Town [X: -162, Y: 2, Z: -68]\n\n"The legendary neon tech and otaku capital, packed with pixel-art anime facades, retro game machines, and collectible gachapon dispensers."',
+        tagColor: '#c084fc',
+        emoji: '🕹️'
+      },
+      {
+        id: 'citizen_Min_Jun_Park',
+        name: 'Min-Jun Park',
+        role: 'Seoul Game Producer',
+        areaName: 'Seoul · Gwanghwamun Innovation Quarter',
+        coords: { x: -62, y: 2.0, z: -92 },
+        directionFromSpawn: 'North-West (Seoul Realm)',
+        nearbyLandmarks: ['Gwanghwamun Palace Gate', 'Geunjeongjeon Throne Hall', 'King Sejong Statue'],
+        ambientMessages: [
+          'Brainstorming Unreal Engine mobile titles near Gwanghwamun Gate [X: -62, Y: 2, Z: -92]!',
+          'Walking the historic palace grounds in Seoul for architectural concept art inspiration at [X: -62, Y: 2, Z: -92].'
+        ],
+        proximityGreeting: 'Min-Jun Park bows cordially [X: -62, Y: 2, Z: -92]! "Annyeonghaseyo! Welcome to Seoul—where 600 years of royal heritage meets ultra-fast high-tech!"',
+        detailedLocationText: '📍 Location: Seoul · Gwanghwamun Innovation Quarter [X: -62, Y: 2, Z: -92]\n\n"Directly south of Gyeongbokgung Palace gate! A vibrant meeting point of centuries of Joseon royal heritage and world-class game development studios."',
+        tagColor: '#60a5fa',
+        emoji: '🎮'
+      },
+      {
+        id: 'citizen_Ji_Eun_Kim',
+        name: 'Ji-Eun Kim',
+        role: 'Hanbok Artisan',
+        areaName: 'Seoul · Bukchon Hanok Village',
+        coords: { x: -68, y: 2.0, z: -96 },
+        directionFromSpawn: 'North-West (Seoul Realm)',
+        nearbyLandmarks: ['Bukchon Hanok Houses', 'Onggi Fermentation Jars', 'Gwanghwamun Portals'],
+        ambientMessages: [
+          'Embroidering royal silk Dancheong floral patterns on traditional Joseon Hanbok at [X: -68, Y: 2, Z: -96]!',
+          'Checking the traditional Onggi earthenware jars in the Hanok courtyard at [X: -68, Y: 2, Z: -96].'
+        ],
+        proximityGreeting: 'Ji-Eun Kim smiles gracefully wearing vibrant Hanbok silks [X: -68, Y: 2, Z: -96]! "Annyeonghaseyo! Every silk seam and curved roof tile tells a story of elegance and harmony."',
+        detailedLocationText: '📍 Location: Seoul · Bukchon Hanok Craft Village [X: -68, Y: 2, Z: -96]\n\n"Nestled beside Gyeongbokgung Palace, featuring authentic Korean timber Hanok residences, curved Giwa tile roofs, and courtyard Onggi jars."',
+        tagColor: '#34d399',
+        emoji: '🧵'
+      },
+      {
+        id: 'citizen_Captain_Park_Sung_ho',
+        name: 'Captain Park Sung-ho',
+        role: 'Joseon Royal Palace Guard',
+        areaName: 'Seoul · Gwanghwamun Royal Palace Gate',
+        coords: { x: -65, y: 2.0, z: -98 },
+        directionFromSpawn: 'North-West (Seoul Palace Gate)',
+        nearbyLandmarks: ['Gwanghwamun Three Portals', 'Geunjeongjeon Throne Hall', 'Haetae Statues'],
+        ambientMessages: [
+          'Standing vigil in full blue-and-red Joseon royal armor before Gwanghwamun Gate [X: -65, Y: 2, Z: -98]!',
+          'Sounding the royal drum for the traditional changing of the palace guard ceremony at [X: -65, Y: 2, Z: -98]!'
+        ],
+        proximityGreeting: 'Captain Park Sung-ho salutes with his ceremonial spear [X: -65, Y: 2, Z: -98]! "Pilseung! Halt traveler—you stand before Gwanghwamun, gateway to the Sovereign King\'s Throne!"',
+        detailedLocationText: '📍 Location: Seoul · Gwanghwamun Royal Palace Gate [X: -65, Y: 2, Z: -98]\n\n"The monumental three-portal entrance to Gyeongbokgung Palace, guarded by ceremonial royal sentries in vivid dynastic armor."',
+        tagColor: '#2563eb',
+        emoji: '🛡️'
+      },
+      {
+        id: 'citizen_Yuna_Song',
+        name: 'Yuna Song',
+        role: 'Hongdae K-Pop Dance Lead',
+        areaName: 'Seoul · Hongdae Busking & K-Pop Stage',
+        coords: { x: -55, y: 2.0, z: -86 },
+        directionFromSpawn: 'North-West (Seoul Hongdae)',
+        nearbyLandmarks: ['K-Pop Dance Rhythm Stage', 'Sound Amplifiers', 'Hongdae Pocha Street'],
+        ambientMessages: [
+          'Practicing synchronized chorus choreography on the illuminated rhythm stage [X: -55, Y: 2, Z: -86]!',
+          'Tuning the soundboard for tonight\'s open-air Hongdae street busking concert at [X: -55, Y: 2, Z: -86]!'
+        ],
+        proximityGreeting: 'Yuna Song flashes a K-Pop finger heart [X: -55, Y: 2, Z: -86]! "Annyeong! Ready to hit the rhythm stage? K-Pop energy never sleeps in Hongdae!"',
+        detailedLocationText: '📍 Location: Seoul · Hongdae K-Pop Busking Stage [X: -55, Y: 2, Z: -86]\n\n"The pulsating youth and music hub of Seoul, featuring neon light pads, concert audio systems, and street dance squads."',
+        tagColor: '#ec4899',
+        emoji: '🎤'
+      },
+      {
+        id: 'citizen_Halmeoni_Sun_hee',
+        name: 'Halmeoni Sun-hee',
+        role: 'Korean BBQ Master',
+        areaName: 'Seoul · Hongdae K-BBQ & Pocha',
+        coords: { x: -55, y: 2.0, z: -83 },
+        directionFromSpawn: 'North-West (Seoul Hongdae)',
+        nearbyLandmarks: ['Tabletop Charcoal Grills', 'Sizzling Bulgogi & Samgyeopsal', 'Onggi Fermented Kimchi'],
+        ambientMessages: [
+          'Sizzling thick cuts of Samgyeopsal over glowing tabletop charcoal [X: -55, Y: 2, Z: -83]!',
+          'Serving bowls of spicy doenjang-jjigae stew and crisp aged kimchi at [X: -55, Y: 2, Z: -83] in Seoul!'
+        ],
+        proximityGreeting: 'Halmeoni Sun-hee warmly hands you lettuce wraps [X: -55, Y: 2, Z: -83]! "Aigoo, sit down and eat! Freshly grilled bulgogi with homemade kimchi wrap will warm your soul!"',
+        detailedLocationText: '📍 Location: Seoul · Hongdae K-BBQ Pocha [X: -55, Y: 2, Z: -83]\n\n"Authentic street-style Korean BBQ restaurant with charcoal tabletop grills, exhaust hoods, chilled soju bottles, and savory banchan side dishes."',
+        tagColor: '#f59e0b',
+        emoji: '🥩'
+      },
+      {
+        id: 'citizen_Li_Wei',
+        name: 'Li Wei',
+        role: 'Imperial Great Wall Scholar',
+        areaName: 'China · Great Wall & Imperial Ridge',
+        coords: { x: -110, y: 3.0, z: -101 },
+        directionFromSpawn: 'North-West (China Great Wall)',
+        nearbyLandmarks: ['Great Wall Watchtowers', '5-Tier Dragon Pagoda', 'Paifang Celestial Arch'],
+        ambientMessages: [
+          'Documenting the 2,000-year architectural engineering of the Great Wall ramparts [X: -110, Y: 3, Z: -101]!',
+          'Examining imperial frontier signal beacons along the mountain crest at [X: -110, Y: 3, Z: -101] in China.'
+        ],
+        proximityGreeting: 'Li Wei bows with formal hands clasped [X: -110, Y: 3, Z: -101]! "Ni hao! He who has not climbed the Great Wall is not a true hero. Welcome to this ancient wonder!"',
+        detailedLocationText: '📍 Location: China · Great Wall & Imperial Ridge [X: -110, Y: 3, Z: -101]\n\n"Stone ramparts, fortified watchtowers, and the grand 5-tier dragon pagoda cresting the rugged mountain peaks."',
+        tagColor: '#f59e0b',
+        emoji: '🏯'
+      },
+      {
+        id: 'citizen_Master_Chen',
+        name: 'Master Chen',
+        role: 'Temple Calligraphy Master',
+        areaName: 'China · Temple of Heaven & Languages Embassy',
+        coords: { x: -122, y: 3.0, z: -81 },
+        directionFromSpawn: 'North-West (China Temple of Heaven)',
+        nearbyLandmarks: ['Circular Triple-Tier Pavilion', 'Vermilion Columns', 'Foreign Languages Library'],
+        ambientMessages: [
+          'Grinding black pine-soot ink for imperial calligraphy scrolls at [X: -122, Y: 3, Z: -81] in the Temple of Heaven!',
+          'Translating timeless literary classics across Mandarin, English, and Korean at [X: -122, Y: 3, Z: -81].'
+        ],
+        proximityGreeting: 'Master Chen dips a fine wolf-hair brush in ink [X: -122, Y: 3, Z: -81]! "Ni hao! A single brushstroke can bridge languages and civilizations. Welcome to the Temple of Heaven!"',
+        detailedLocationText: '📍 Location: China · Temple of Heaven Pavilion [X: -122, Y: 3, Z: -81]\n\n"A majestic circular 3-tiered imperial altar crowned in deep cobalt lapis tiles, dedicated to global language arts and wisdom."',
+        tagColor: '#ef4444',
+        emoji: '📜'
+      },
+      {
+        id: 'citizen_General_Zhang_Wei',
+        name: 'General Zhang Wei',
+        role: 'Imperial Palace Commander',
+        areaName: 'China · Forbidden City (Hall of Supreme Harmony)',
+        coords: { x: -92, y: 4.0, z: -107 },
+        directionFromSpawn: 'North-West (China Forbidden City)',
+        nearbyLandmarks: ['Hall of Supreme Harmony', 'Three-Tiered Marble Terrace', 'Golden Dragon Throne'],
+        ambientMessages: [
+          'Reviewing the imperial honor guard along the Danbi dragon marble ramp [X: -92, Y: 4, Z: -107]!',
+          'Standing vigil before the Hall of Supreme Harmony under golden glazed palace roofs at [X: -92, Y: 4, Z: -107].'
+        ],
+        proximityGreeting: 'General Zhang Wei salutes crisply in golden dragon armor [X: -92, Y: 4, Z: -107]! "Hail traveler! You stand before Taihedian—the grandest hall of the Forbidden City, heart of the Middle Kingdom!"',
+        detailedLocationText: '📍 Location: China · Forbidden City (Hall of Supreme Harmony) [X: -92, Y: 4, Z: -107]\n\n"The crowning architectural masterpiece of imperial China! Triple-tiered white marble terraces, carved dragon ramps, vermilion columns, and the Golden Dragon Throne."',
+        tagColor: '#eab308',
+        emoji: '👑'
+      },
+      {
+        id: 'citizen_Xiao_Mei',
+        name: 'Xiao Mei',
+        role: 'Panda Wildlife Caretaker',
+        areaName: 'China · Wolong Giant Panda Bamboo Reserve',
+        coords: { x: -130, y: 2.0, z: -114 },
+        directionFromSpawn: 'North-West (China Panda Valley)',
+        nearbyLandmarks: ['Wolong Panda Sanctuary', 'Mountain Stream Waterfall', 'Timber Climbing Decks'],
+        ambientMessages: [
+          'Carrying fresh bamboo shoots to mother panda Mei Xiang and cub Xiao Qi at [X: -130, Y: 2, Z: -114]!',
+          'Monitoring the playful pandas tumbling on the wooden climbing platforms at [X: -130, Y: 2, Z: -114] in Wolong Reserve.'
+        ],
+        proximityGreeting: 'Xiao Mei whispers happily [X: -130, Y: 2, Z: -114]! "Ni hao! Shh, look over there—Xiao Qi just climbed to the top of the wooden perch! Aren\'t giant pandas the most adorable national treasure?"',
+        detailedLocationText: '📍 Location: China · Wolong Giant Panda Bamboo Sanctuary [X: -130, Y: 2, Z: -114]\n\n"A lush mist-shrouded Sichuan mountain sanctuary with dense bamboo stalks, cascading waterfalls, and protected giant pandas."',
+        tagColor: '#10b981',
+        emoji: '🐼'
+      },
+      {
+        id: 'citizen_Sifu_Long',
+        name: 'Sifu Long',
+        role: 'Shaolin Kung Fu Master',
+        areaName: 'China · Shaolin Mountain Martial Arts Pavilion',
+        coords: { x: -136, y: 2.0, z: -129 },
+        directionFromSpawn: 'North-West (China Great Wall Mountain Pass)',
+        nearbyLandmarks: ['Muk Yan Jong Wooden Dummies', 'Plum Blossom Balance Posts', 'Bronze Temple Gong'],
+        ambientMessages: [
+          'Practicing Wing Chun centerline strikes on the Muk Yan Jong wooden dummy at [X: -136, Y: 2, Z: -129]!',
+          'Balancing in horse stance atop the plum blossom posts in the mountain breeze at [X: -136, Y: 2, Z: -129].'
+        ],
+        proximityGreeting: 'Sifu Long executes a Shaolin palm salute [X: -136, Y: 2, Z: -129]! "Ni hao. True kung fu is not about conquering others, but conquering oneself. Would you like to practice on the wooden dummy?"',
+        detailedLocationText: '📍 Location: China · Shaolin Martial Arts Pavilion [X: -136, Y: 2, Z: -129]\n\n"A mountain martial arts courtyard equipped with Wing Chun wooden dummies, plum blossom balance posts, and a bronze meditation gong."',
+        tagColor: '#d97706',
+        emoji: '🥋'
       },
       {
         id: 'citizen_Scarlett_Miller',

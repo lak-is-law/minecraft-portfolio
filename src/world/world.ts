@@ -56,9 +56,16 @@ export class VoxelWorld {
     { name: 'Citadel Gateway Station', pos: new THREE.Vector3(8, 5.0, 22), tag: '[CITADEL]' },
   ];
 
+  public static readonly MONORAIL_STATIONS = [
+    { name: 'Palm Gateway Station', pos: new THREE.Vector3(176, 5.5, 46) },
+    { name: 'Nakheel Mall & Palm Tower Station', pos: new THREE.Vector3(213, 5.5, 46) },
+    { name: 'Atlantis Aquaventure Station', pos: new THREE.Vector3(308, 5.5, 46) }
+  ];
+
   public npcMesh: THREE.Group | null = null;
   private railCurve: THREE.CatmullRomCurve3 | null = null;
   public liveTrains: THREE.Group[] = [];
+  public livePalmMonorail: THREE.Group | null = null;
   public autoRickshawMesh: THREE.Group | null = null;
   public animatedAirplanes: THREE.Group[] = [];
   private airplaneStrobes: THREE.Mesh[] = [];
@@ -98,6 +105,7 @@ export class VoxelWorld {
     this.builder.buildWorld();
     this.buildInstancedMeshes();
     this.createRailway();
+    this.createPalmMonorail();
     this.createAutoRickshaw();
     this.createProjectPedestalVisuals();
     this.createBigProjectWallBanners();
@@ -302,8 +310,8 @@ export class VoxelWorld {
     this.flagManager.addFlag('uae', 12, 8.5, -10, 'east');
 
     // 2. The 10 World Realms (Majestic Masts erected in each specific district)
-    // India: Imperial India & Taj Mahal Realm
-    this.flagManager.addFlag('india', 80, 8.5, -118, 'east');
+    // India: India Gate Grand Plaza & Ceremonial Avenue
+    this.flagManager.addFlag('india', 72, 8.5, -44, 'east');
     // USA: Las Vegas Boulevard in front of Hollywood & LK Tower
     this.flagManager.addFlag('usa', 138, 8.5, -46, 'east');
     // UK: London Realm near Big Ben & Tower Bridge
@@ -320,15 +328,15 @@ export class VoxelWorld {
     this.flagManager.addFlag('egypt', -150, 8.5, 44, 'west');
     // UAE: Dubai Realm at foot of Burj Khalifa
     this.flagManager.addFlag('uae', 165, 8.5, 37, 'east');
-    // Mexico: Mexico Realm near Zócalo & Chichén Itzá
-    this.flagManager.addFlag('mexico', -100, 8.5, 57, 'west');
+    // Mexico: Asta Bandera Monumental in Center of Zócalo Plaza (Grand 3D Waving Flag)
+    this.flagManager.addFlag('mexico', -104.5, 19.5, 60, 'east', 2.4, { skipMast: true });
 
     // 11. Swiss Confederation: Frostpeak Alps by Chalet de Lakshya & Citadel Plaza
     this.flagManager.addFlag('switzerland', -18, 8.5, -86, 'east');
     this.flagManager.addFlag('switzerland', 0, 8.5, -16, 'north');
 
-    // 3. Gateway of India (Monumental Flying Tiranga atop the Apollo Bunder Arch at Y = 26.5)
-    this.flagManager.addFlag('india', 75, 26.5, -150, 'east', 1.35);
+    // 3. Gateway of India (Monumental Flying Tiranga atop the Apollo Bunder Arch at Y = 20.5)
+    this.flagManager.addFlag('india', 40, 20.5, -95, 'east', 1.35);
   }
 
   // Check if player raycast hits any hammerable project banner
@@ -1206,6 +1214,7 @@ export class VoxelWorld {
 
   public update(time: number, playerPos: THREE.Vector3) {
     this.updateLiveTrains(time);
+    this.updateLivePalmMonorail(time);
     this.updateAnimatedAirplanes(time);
     this.updateWorldCitizens(time, playerPos);
 
@@ -1653,6 +1662,162 @@ export class VoxelWorld {
   }
 
   // -------------------------------------------------------------
+  // ANIMATED DUBAI PALM MONORAIL SYSTEM
+  // -------------------------------------------------------------
+  private createPalmMonorail() {
+    const monorail = new THREE.Group();
+
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.35 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2, metalness: 0.7 });
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.35,
+      transparent: true,
+      opacity: 0.75
+    });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+    const seatMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
+    const headlightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+    const redLightMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+
+    // Symmetrical 2-Car Aerodynamic Straddle Monorail Train (Length 8.4, Width 1.7, Height 1.9)
+    for (const carDir of [-1, 1]) {
+      const car = new THREE.Group();
+      car.position.x = carDir * 2.1;
+
+      // Chassis & Straddle Skirts wrapping around the track beam
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.32, 1.6), darkMat);
+      chassis.position.y = 0.35;
+      car.add(chassis);
+
+      // Straddle Skirt Grippers (left and right of beam)
+      for (const zSide of [-0.68, 0.68]) {
+        const skirt = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.55, 0.2), darkMat);
+        skirt.position.set(0, 0.15, zSide);
+        car.add(skirt);
+      }
+
+      // Streamlined Lower Hull
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(3.9, 0.6, 1.55), whiteMat);
+      hull.position.y = 0.8;
+      car.add(hull);
+
+      // Gold Accent Speedline
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.92, 0.12, 1.57), goldMat);
+      stripe.position.y = 0.65;
+      car.add(stripe);
+
+      // Aerodynamic Tapered Nose at the outer ends
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.82, 1.1, 4), whiteMat);
+      nose.rotation.z = carDir * -Math.PI / 2;
+      nose.rotation.y = Math.PI / 4;
+      nose.position.set(carDir * 2.3, 0.85, 0);
+      car.add(nose);
+
+      // Panoramic Cabin Glass Windows
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.68, 1.5), glassMat);
+      glass.position.y = 1.35;
+      car.add(glass);
+
+      // Streamlined Curved Roof
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.2, 1.55), whiteMat);
+      roof.position.y = 1.78;
+      car.add(roof);
+
+      // Passenger Seats inside
+      for (const sx of [-1.1, 0, 1.1]) {
+        for (const sz of [-0.42, 0.42]) {
+          const seat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.35, 0.38), seatMat);
+          seat.position.set(sx, 0.72, sz);
+          car.add(seat);
+        }
+      }
+
+      // Headlights / Tail lights at outer ends
+      for (const lz of [-0.45, 0.45]) {
+        const light = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.16), (carDir === 1) ? headlightMat : redLightMat);
+        light.position.set(carDir * 2.2, 0.78, lz);
+        car.add(light);
+      }
+
+      monorail.add(car);
+    }
+
+    // Overhead Interior Ambient Lighting
+    const cabinLight = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.08, 0.3), headlightMat);
+    cabinLight.position.set(0, 1.72, 0);
+    monorail.add(cabinLight);
+
+    monorail.position.set(176, 5.2, 46);
+    this.livePalmMonorail = monorail;
+    this.scene.add(monorail);
+  }
+
+  private updateLivePalmMonorail(time: number) {
+    if (!this.livePalmMonorail) return;
+
+    // Route: Palm Gateway (176) <--> Nakheel Mall (213) <--> Atlantis (308) along Z = 46 at Y = 5.2
+    const minX = 176;
+    const maxX = 308;
+    const totalDist = maxX - minX; // 132 blocks
+    const cycleTime = 36; // 36s round trip
+    const t = ((time % cycleTime) + cycleTime) % cycleTime;
+
+    let curX: number;
+    let heading: number;
+
+    if (t < 15) {
+      // Traveling east from Gateway to Atlantis
+      const u = t / 15;
+      const ease = u < 0.5 ? 2 * u * u : -1 + (4 - 2 * u) * u;
+      curX = minX + ease * totalDist;
+      heading = 0;
+    } else if (t < 18) {
+      // Dwell at Atlantis Station
+      curX = maxX;
+      heading = 0;
+    } else if (t < 33) {
+      // Traveling west from Atlantis to Gateway
+      const u = (t - 18) / 15;
+      const ease = u < 0.5 ? 2 * u * u : -1 + (4 - 2 * u) * u;
+      curX = maxX - ease * totalDist;
+      heading = Math.PI;
+    } else {
+      // Dwell at Gateway Station
+      curX = minX;
+      heading = Math.PI;
+    }
+
+    this.livePalmMonorail.position.set(curX, 5.2, 46);
+    this.livePalmMonorail.rotation.y = heading;
+  }
+
+  public getPalmMonorailRideTransform(): { position: THREE.Vector3, rotationY: number } | null {
+    if (!this.livePalmMonorail) return null;
+    const seatOffset = new THREE.Vector3(0, 1.25, 0);
+    const seatPos = this.livePalmMonorail.position.clone().add(seatOffset);
+    return { position: seatPos, rotationY: this.livePalmMonorail.rotation.y };
+  }
+
+  public getNearestPalmMonorail(playerPos: THREE.Vector3): { distance: number; position: THREE.Vector3 } | null {
+    if (!this.livePalmMonorail) return null;
+    return {
+      distance: playerPos.distanceTo(this.livePalmMonorail.position),
+      position: this.livePalmMonorail.position
+    };
+  }
+
+  public getNearestMonorailStation(pos: THREE.Vector3, threshold = 16): string | null {
+    for (const st of VoxelWorld.MONORAIL_STATIONS) {
+      if (pos.distanceTo(st.pos) <= threshold) {
+        return st.name;
+      }
+    }
+    return null;
+  }
+
+  // -------------------------------------------------------------
   // ANIMATED COMMERCIAL AIRPLANES: REALISTIC TAKEOFF & LANDING SYSTEM
   // -------------------------------------------------------------
   private createAnimatedAirplanes() {
@@ -2068,26 +2233,35 @@ export class VoxelWorld {
     }
 
     const citizens: CitizenConfig[] = [
-      // 1. Imperial India Realm: Saffron turbans, sherwanis, kurtas near Taj Mahal & Ghats
-      { name: 'Aarav Sharma', role: 'Varanasi Ghat Pundit', x: 74, y: 2, z: -112, heading: Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xe0e7ff, pantsColor: 0xf59e0b, hairColor: 0x111111, tagColor: '#f97316', hatType: 'turban', hatColor: 0xf97316 },
-      { name: 'Priya Patel', role: 'Classical Sitar Maestro', x: 86, y: 2, z: -116, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xd97706, pantsColor: 0xb45309, hairColor: 0x09090b, tagColor: '#f59e0b', hatType: 'none' },
-      { name: 'Rajesh Kumar', role: 'Dhaba Chai Master', x: 44, y: 2, z: -76, heading: 0, skinColor: 0xa0522d, shirtColor: 0xef4444, pantsColor: 0x1e293b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0xd97706 },
-      { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 78, y: 2, z: -116, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
-      { name: 'Dr. Vikram Nair', role: 'ISRO Aerospace Director', x: 112, y: 2, z: -88, heading: Math.PI * 0.75, skinColor: 0x935116, shirtColor: 0x3b82f6, pantsColor: 0x1e293b, hairColor: 0x27272a, tagColor: '#38bdf8', hatType: 'none' },
-      { name: 'Murugan Pillai', role: 'Mumbai Auto Captain', x: 45, y: 2, z: -83, heading: 0, skinColor: 0x8d5524, shirtColor: 0xca8a04, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#eab308', hatType: 'cap', hatColor: 0x854d0e },
+      // 1. Imperial India Realm: Saffron turbans, sherwanis, kurtas across heritage districts
+      { name: 'Aarav Sharma', role: 'Varanasi Ghat Pundit', x: 45, y: 2, z: -125, heading: Math.PI / 2, skinColor: 0x8d5524, shirtColor: 0xe0e7ff, pantsColor: 0xf59e0b, hairColor: 0x111111, tagColor: '#f97316', hatType: 'turban', hatColor: 0xf97316 },
+      { name: 'Priya Patel', role: 'Classical Sitar Maestro', x: 88, y: 2, z: -110, heading: -Math.PI / 2, skinColor: 0xc68642, shirtColor: 0xd97706, pantsColor: 0xb45309, hairColor: 0x09090b, tagColor: '#f59e0b', hatType: 'none' },
+      { name: 'Rajesh Kumar', role: 'Dhaba Chai Master', x: 55, y: 2, z: -74, heading: 0, skinColor: 0xa0522d, shirtColor: 0xef4444, pantsColor: 0x1e293b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'turban', hatColor: 0xd97706 },
+      { name: 'Kavita Iyer', role: 'Silk Sari Weaver', x: 115, y: 2, z: -126, heading: Math.PI, skinColor: 0xb57339, shirtColor: 0xec4899, pantsColor: 0xbe185d, hairColor: 0x09090b, tagColor: '#ec4899', hatType: 'none' },
+      { name: 'Dr. Vikram Nair', role: 'ISRO Aerospace Director', x: 112, y: 2, z: -78, heading: Math.PI * 0.75, skinColor: 0x935116, shirtColor: 0x3b82f6, pantsColor: 0x1e293b, hairColor: 0x27272a, tagColor: '#38bdf8', hatType: 'none' },
+      { name: 'Murugan Pillai', role: 'Mumbai Auto Captain', x: 43, y: 2, z: -80, heading: 0, skinColor: 0x8d5524, shirtColor: 0xca8a04, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#eab308', hatType: 'cap', hatColor: 0x854d0e },
 
-      // 2. Tokyo Shibuya Realm: Shibuya fashion, Harajuku, salaryman, student
+      // 2. Tokyo Shibuya Realm: Shibuya fashion, Harajuku, ramen chef, temple priest
       { name: 'Kenji Sato', role: 'Shibuya Tech Architect', x: -152, y: 2, z: -78, heading: Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x1e293b, pantsColor: 0x0f172a, hairColor: 0x18181b, tagColor: '#38bdf8', hatType: 'none' },
       { name: 'Hana Tanaka', role: 'Harajuku Anime Artist', x: -148, y: 2, z: -84, heading: -Math.PI * 0.75, skinColor: 0xffe0bd, shirtColor: 0xf43f5e, pantsColor: 0x4f46e5, hairColor: 0xec4899, tagColor: '#f43f5e', hatType: 'beret', hatColor: 0x18181b },
       { name: 'Daiki Takahashi', role: 'Shinkansen Conductor', x: -155, y: 2, z: -94, heading: 0, skinColor: 0xf1c27d, shirtColor: 0x1e3a8a, pantsColor: 0x1e3a8a, hairColor: 0x18181b, tagColor: '#2563eb', hatType: 'cap', hatColor: 0x1e3a8a },
+      { name: 'Chef Ren', role: 'Tokyo Ramen Master', x: -142, y: 2, z: -74, heading: Math.PI, skinColor: 0xffdbac, shirtColor: 0xffffff, pantsColor: 0x18181b, hairColor: 0x18181b, tagColor: '#f97316', hatType: 'none' },
+      { name: 'Master Kenzo', role: 'Sensō-ji Temple Priest', x: -155, y: 2, z: -64, heading: 0, skinColor: 0xffe0bd, shirtColor: 0xd97706, pantsColor: 0x78350f, hairColor: 0x94a3b8, tagColor: '#eab308', hatType: 'none' },
+      { name: 'Aoi Miyamoto', role: 'Akihabara Game Dev', x: -162, y: 2, z: -68, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xa855f7, pantsColor: 0x1e1b4b, hairColor: 0x38bdf8, tagColor: '#c084fc', hatType: 'cap', hatColor: 0x9333ea },
 
-      // 3. Seoul Gwanghwamun Realm: Modern K-pop & palace heritage
-      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 7, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
-      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 7, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+      // 3. Seoul Gwanghwamun Realm: Modern K-pop, palace royal guard & heritage
+      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 2, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 2, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+      { name: 'Captain Park Sung-ho', role: 'Joseon Royal Palace Guard', x: -65, y: 2, z: -98, heading: 0, skinColor: 0xf1c27d, shirtColor: 0x1e3a8a, pantsColor: 0x991b1b, hairColor: 0x18181b, tagColor: '#2563eb', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'Yuna Song', role: 'Hongdae K-Pop Dance Lead', x: -55, y: 2, z: -86, heading: Math.PI, skinColor: 0xffe0bd, shirtColor: 0xec4899, pantsColor: 0x18181b, hairColor: 0xf43f5e, tagColor: '#ec4899', hatType: 'beret', hatColor: 0xec4899 },
+      { name: 'Halmeoni Sun-hee', role: 'Korean BBQ Master', x: -55, y: 2, z: -83, heading: 0, skinColor: 0xffdbac, shirtColor: 0xf59e0b, pantsColor: 0x78350f, hairColor: 0x94a3b8, tagColor: '#f59e0b', hatType: 'none' },
 
-      // 4. China Great Wall & Temple Realm: Imperial scholars & historians
+      // 4. China Great Wall & Forbidden City Realm: Imperial scholars, commanders & wildlife caretakers
       { name: 'Li Wei', role: 'Imperial Great Wall Scholar', x: -110, y: 3, z: -101, heading: 0, skinColor: 0xffdbac, shirtColor: 0xd97706, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#f59e0b', hatType: 'none' },
       { name: 'Master Chen', role: 'Temple Calligraphy Master', x: -122, y: 3, z: -81, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0x991b1b, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#ef4444', hatType: 'none' },
+      { name: 'General Zhang Wei', role: 'Imperial Palace Commander', x: -92, y: 4, z: -107, heading: 0, skinColor: 0xf1c27d, shirtColor: 0xb45309, pantsColor: 0x991b1b, hairColor: 0x18181b, tagColor: '#eab308', hatType: 'cap', hatColor: 0xb45309 },
+      { name: 'Xiao Mei', role: 'Panda Wildlife Caretaker', x: -130, y: 2, z: -114, heading: -Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0x059669, pantsColor: 0x064e3b, hairColor: 0x111111, tagColor: '#10b981', hatType: 'cap', hatColor: 0x047857 },
+      { name: 'Sifu Long', role: 'Shaolin Kung Fu Master', x: -136, y: 2, z: -129, heading: 0, skinColor: 0xd4a373, shirtColor: 0xd97706, pantsColor: 0xd97706, hairColor: 0x18181b, tagColor: '#d97706', hatType: 'none' },
 
       // 4. Hollywood & Times Square USA Realm: Directors, film stars, reporters
       { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 133, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },

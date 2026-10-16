@@ -504,16 +504,8 @@ export class WorldBuilder {
           continue;
         }
 
-        // Solid land cells (H >= 1)
-        const lowestNeighbor = Math.min(
-          this.getTerrainHeight(x + 1, z),
-          this.getTerrainHeight(x - 1, z),
-          this.getTerrainHeight(x, z + 1),
-          this.getTerrainHeight(x, z - 1)
-        );
-        const bottomY = Math.max(-1, Math.min(h - 2, lowestNeighbor));
-
-        for (let y = bottomY; y < h; y++) {
+        // Solid land cells (H >= 1) - Solid foundation anchored down to Y = -1 above bedrock
+        for (let y = -1; y < h; y++) {
           let subType = 'dirt';
           const foothillLine = -76 + Math.sin(x * 0.14) * 4 + Math.cos(x * 0.28) * 2;
           const isAlpineMountain = (x >= -48 && x <= 40 && z <= foothillLine);
@@ -4884,8 +4876,10 @@ export class WorldBuilder {
       const groundY = this.getTerrainHeight(x, wallZ);
 
       // Deep foundation wall down to ensure no gaps on slopes
-      for (let y = Math.max(-1, groundY - 2); y <= groundY + 4; y++) {
-        for (let dz = -1; dz <= 1; dz++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        const localGround = this.getTerrainHeight(x, wallZ + dz);
+        const bottomY = Math.max(-1, Math.min(groundY - 2, localGround));
+        for (let y = bottomY; y <= groundY + 4; y++) {
           this.setBlock(x, y, wallZ + dz, (y % 4 === 0) ? 'mossy_stone_bricks' : 'stone_bricks');
         }
       }
@@ -4909,7 +4903,9 @@ export class WorldBuilder {
 
       for (let x = wx - 3; x <= wx + 3; x++) {
         for (let z = wz - 3; z <= wz + 3; z++) {
-          for (let y = towerBase - 2; y <= towerTop; y++) {
+          const localGround = this.getTerrainHeight(x, z);
+          const colBottom = Math.max(-1, Math.min(towerBase - 2, localGround));
+          for (let y = colBottom; y <= towerTop; y++) {
             const isPerimeter = (x === wx - 3 || x === wx + 3 || z === wz - 3 || z === wz + 3);
             if (isPerimeter || y === towerBase || y === towerTop) {
               this.setBlock(x, y, z, 'stone_bricks');
@@ -9711,65 +9707,115 @@ export class WorldBuilder {
   }
 
   private buildRailwayViaduct() {
-    // 1. Viaduct Piers & Elevated Arches along the Island Express Route (Y = 5.0)
-    const viaductPillars = [
-      { x: 74, z: 33, h: 5 },
-      { x: 92, z: 33, h: 5 },
-      { x: 104, z: 32, h: 5 },
-      { x: 116, z: 28, h: 5 },  // Neo York Skyway Station
-      { x: 124, z: 38, h: 5 },  // Eastern Bay Scenic Viaduct
-      { x: 128, z: 48, h: 5 },  // Airport Skyport Station (North Concourse)
-      { x: 144, z: 50, h: 5 },  // Airport East Approach Viaduct
-      { x: 158, z: 64, h: 5 },  // East Bay Viaduct (clear of ATC Tower at 142, 58)
-      { x: 174, z: 78, h: 5 },  // East Coastal Viaduct
-      { x: 180, z: 88, h: 5 },  // East Coastal Viaduct (clear of runway threshold at 165)
-      { x: 174, z: 98, h: 5 },  // South Coast Turn (clear of runway at Z=90)
-      { x: 144, z: 98, h: 5 },  // South Coastal Viaduct (clear of runway at Z=90)
-      { x: 112, z: 98, h: 5 },  // South Coastal Viaduct (clear of runway at Z=90)
-      { x: 80, z: 96, h: 5 },   // Harbor Bay Scenic Viaduct
-      { x: 50, z: 92, h: 5 },   // Grand Carnival Approach Viaduct
-      { x: 24, z: 88, h: 5 },   // South Coast Beach & Pier Station
-      { x: 12, z: 74, h: 5 },
-      { x: 8, z: 54, h: 5 },
-      { x: 6, z: 36, h: 5 },
-      { x: 8, z: 22, h: 5 },
-      { x: 22, z: 22, h: 5 },
-      { x: 38, z: 27, h: 5 },
-      { x: 48, z: 32, h: 5 }
+    // 1. Grand Continuous Elevated Viaduct along the Island Express Route (Y = 4 deck for Y = 5.0 tracks)
+    const waypoints = [
+      { x: 58, z: 33 },
+      { x: 74, z: 33 },
+      { x: 92, z: 33 },
+      { x: 104, z: 32 },
+      { x: 116, z: 28 },
+      { x: 124, z: 38 },
+      { x: 128, z: 48 },
+      { x: 144, z: 50 },
+      { x: 158, z: 64 },
+      { x: 174, z: 78 },
+      { x: 180, z: 88 },
+      { x: 174, z: 98 },
+      { x: 144, z: 98 },
+      { x: 112, z: 98 },
+      { x: 80, z: 96 },
+      { x: 50, z: 92 },
+      { x: 24, z: 88 },
+      { x: 12, z: 74 },
+      { x: 8, z: 54 },
+      { x: 6, z: 36 },
+      { x: 8, z: 22 },
+      { x: 22, z: 22 },
+      { x: 38, z: 27 },
+      { x: 48, z: 32 },
+      { x: 58, z: 33 }
     ];
 
-    for (const p of viaductPillars) {
-      // Pier Base (2x2 stone bricks)
-      for (let dx = 0; dx <= 1; dx++) {
-        for (let dz = 0; dz <= 1; dz++) {
-          for (let y = 1; y <= p.h; y++) {
-            this.setBlock(p.x + dx, y, p.z + dz, 'stone_bricks');
+    const viaductDeck = new Set<string>();
+    const pierPositions: { x: number; z: number }[] = [];
+    let accumulatedDist = 0;
+
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const p1 = waypoints[i];
+      const p2 = waypoints[i + 1];
+      const dist = Math.hypot(p2.x - p1.x, p2.z - p1.z);
+      const steps = Math.ceil(dist * 1.5);
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const cx = Math.round(p1.x + (p2.x - p1.x) * t);
+        const cz = Math.round(p1.z + (p2.z - p1.z) * t);
+        const k = `${cx},${cz}`;
+        if (!viaductDeck.has(k)) {
+          viaductDeck.add(k);
+          accumulatedDist += (dist / steps);
+          if (accumulatedDist >= 7) {
+            accumulatedDist = 0;
+            pierPositions.push({ x: cx, z: cz });
           }
         }
       }
-      // Arch Cap & Lantern
-      this.setBlock(p.x, p.h + 1, p.z, 'quartz_pillar');
-      this.setBlock(p.x + 1, p.h + 1, p.z + 1, 'quartz_pillar');
-      this.setBlock(p.x, p.h + 1, p.z + 1, 'glowstone');
     }
 
-    // 2. High-Clearance Elevated Viaduct over East Highway (X: 84 to 98, Z: 31 to 35)
-    for (let x = 84; x <= 98; x++) {
-      for (let z = 31; z <= 35; z++) {
-        // Deck structure at Y = 5 allowing vehicles/players to walk underneath at Y = 1 to 4
-        this.setBlock(x, 5, z, 'stone_bricks');
-        if (z === 31 || z === 35) {
-          this.setBlock(x, 6, z, 'iron_block'); // Safety guardrail
+    // Build Continuous Elevated Track Bed (Y = 4)
+    for (const posKey of viaductDeck) {
+      const [xStr, zStr] = posKey.split(',');
+      const x = parseInt(xStr, 10);
+      const z = parseInt(zStr, 10);
+
+      // 3-wide viaduct deck: center smooth_stone, edges stone_bricks
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (Math.abs(dx) + Math.abs(dz) <= 1) {
+            const isCenter = (dx === 0 && dz === 0);
+            this.setBlock(x + dx, 4, z + dz, isCenter ? 'smooth_stone' : 'stone_bricks');
+          }
         }
       }
+    }
+
+    // High-clearance East Highway section (X: 84 to 98, Z: 31 to 35)
+    for (let x = 84; x <= 98; x++) {
+      for (let z = 31; z <= 35; z++) {
+        this.setBlock(x, 4, z, 'stone_bricks');
+        this.setBlock(x, 5, z, (z === 33) ? 'smooth_stone' : 'stone_bricks');
+        if (z === 31 || z === 35) {
+          this.setBlock(x, 6, z, 'iron_block');
+        }
+      }
+    }
+
+    // Viaduct Support Piers rooted firmly down to ground / seabed
+    for (const p of pierPositions) {
+      // Don't block the East Highway roadway at Y=1
+      if (p.x >= 84 && p.x <= 98 && p.z >= 31 && p.z <= 35) continue;
+
+      const ground = this.getTerrainHeight(p.x, p.z);
+      const bottomY = Math.max(-1, Math.min(ground, 1));
+      for (let dx = 0; dx <= 1; dx++) {
+        for (let dz = 0; dz <= 1; dz++) {
+          for (let y = bottomY; y <= 3; y++) {
+            this.setBlock(p.x + dx, y, p.z + dz, (y === 3) ? 'smooth_stone' : 'stone_bricks');
+          }
+        }
+      }
+      this.setBlock(p.x, 4, p.z, 'quartz_pillar');
+      this.setBlock(p.x + 1, 4, p.z + 1, 'quartz_pillar');
     }
   }
 
   private buildRailwayStation(cx: number, cz: number) {
     // Crossroads Central Station Train Hall (Footprint: X in [cx - 12, cx + 12], Z in [cz - 7, cz + 7])
-    // 1. Through-Track Bed at Y = 5 for continuous elevated loop trains
+    // 1. Through-Track Bed at Y = 5 for continuous elevated loop trains (with solid foundation below)
     for (let x = cx - 12; x <= cx + 12; x++) {
       for (let z = cz - 1; z <= cz + 1; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(x, y, z, 'stone_bricks');
+        }
         this.setBlock(x, 5, z, 'smooth_stone');
       }
       this.setBlock(x, 5, cz, (x % 2 === 0) ? 'oak_planks' : 'iron_block');
@@ -11862,6 +11908,8 @@ export class WorldBuilder {
       for (let z = centerZ - 2; z <= centerZ + 2; z++) {
         const isCenter = (z === centerZ);
         this.setBlock(x, dy, z, isCenter && (x % 3 === 0) ? 'glowstone' : 'asphalt_road');
+        // Structural Box Girder Deck beneath roadway
+        this.setBlock(x, dy - 1, z, 'smooth_stone');
       }
 
       // Aerodynamic Cyber-Glass Wind Barrier & Railings
@@ -11869,10 +11917,13 @@ export class WorldBuilder {
       this.setBlock(x, dy + 1, centerZ + 3, 'cyber_glass');
       this.setBlock(x, dy, centerZ - 3, 'smooth_stone');
       this.setBlock(x, dy, centerZ + 3, 'smooth_stone');
+      this.setBlock(x, dy - 1, centerZ - 3, 'iron_block');
+      this.setBlock(x, dy - 1, centerZ + 3, 'iron_block');
 
-      // Pier Supports every 11 blocks
-      if (x % 11 === 0 && x > startX + 2 && x < endX - 2) {
-        for (let y = 1; y < dy; y++) {
+      // Pier Supports every 6 blocks rooted down to ground / seabed
+      if (x % 6 === 0 && x > startX + 2 && x < endX - 2) {
+        const pierGround = Math.max(-1, this.getTerrainHeight(x, centerZ));
+        for (let y = pierGround; y < dy; y++) {
           for (let z = centerZ - 2; z <= centerZ + 2; z++) {
             this.setBlock(x, y, z, (Math.abs(z - centerZ) === 2) ? 'quartz_pillar' : 'smooth_stone');
           }
@@ -11908,6 +11959,12 @@ export class WorldBuilder {
         this.setBlock(x, peakY, z, 'cyber_glass');
         if (x === peakX - 2 || x === peakX + 2 || z === centerZ - 8) {
           this.setBlock(x, peakY + 1, z, 'cyber_glass');
+        }
+        // Diagonal structural under-struts supporting cantilevered glass floor
+        const outDist = (centerZ - 4) - z;
+        this.setBlock(x, peakY - 1, z, 'iron_block');
+        if (outDist <= 2) {
+          this.setBlock(x, peakY - 2, z, 'quartz_pillar');
         }
       }
     }
