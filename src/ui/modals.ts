@@ -160,7 +160,7 @@ export class ModalManager {
     this.modalContainer.addEventListener('pointerup', handleBackdropClose);
   }
 
-  public close() {
+  public close(preventPauseOverlay: boolean = false) {
     if (this.mapAnimId !== null) {
       cancelAnimationFrame(this.mapAnimId);
       this.mapAnimId = null;
@@ -175,9 +175,13 @@ export class ModalManager {
     document.body.classList.remove('modal-open');
     sound.playClick();
 
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
     const pauseOverlay = document.getElementById('pause-overlay');
-    if (pauseOverlay && document.pointerLockElement === null && !isTouch) {
+    if (pauseOverlay) {
+      pauseOverlay.style.display = 'none';
+    }
+
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (!preventPauseOverlay && pauseOverlay && document.pointerLockElement === null && !isTouch) {
       pauseOverlay.style.display = 'flex';
     }
   }
@@ -453,7 +457,7 @@ export class ModalManager {
       { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
       { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
       { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
-      { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 168 / Z −24' },
+      { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 190 / Z −15' },
       { number: '14', name: 'Frostpeak Alps · Ski Lodge', subtitle: 'Switzerland 🇨🇭', detail: 'Snow-capped Swiss Alpine peaks, Chalet ski lodge, Lake Serenity ice rink, Swiss flag mast, and high summit observatory.', tag: '[ALPS]', tone: 'frost', direction: 'NORTH · X −2 / Z −100' },
       { number: '15', name: 'Sunflower Valley Farmstead', subtitle: 'Countryside', detail: 'Rustic 4-sail Dutch windmill, golden sunflower fields, and peaceful agricultural valley.', tag: '[VALLEY]', tone: 'citadel', direction: 'WEST · X −45 / Z 48' }
     ];

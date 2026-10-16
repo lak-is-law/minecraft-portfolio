@@ -73,13 +73,13 @@ class Game {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // 2. Scene & Fog (tuned for expansive 5x realm)
+    // 2. Scene & Fog (tuned for expansive realm and vast Arabian Gulf horizon)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x78a7ff); // Minecraft blue sky
-    this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.006);
+    this.scene.fog = new THREE.FogExp2(0x78a7ff, 0.0035);
 
-    // 3. Camera (near 0.05 prevents face clipping, far 450 renders distant landmarks across 5x realm)
-    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 450);
+    // 3. Camera (near 0.05 prevents face clipping, far 600 renders distant island landmarks across enlarged ocean)
+    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 600);
 
     // 4. Managers
     this.textureManager = new TextureManager();
@@ -597,16 +597,16 @@ class Game {
         if (qPos) {
           this.world.spawnHammerSparkles(qPos.x, qPos.y + 1.2, qPos.z);
         }
-        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! Roaring at Radiator Springs Raceway [X: 168, Y: 2, Z: -24]! "I am speed!"');
+        this.hud.pushChatMessage('Lightning McQueen', '⚡ Ka-Chow! Roaring at Radiator Springs Raceway [X: 190, Y: 2, Z: -15]! "I am speed!"');
         this.modals.openNPCDialogModal({
           id: 'lightning_mcqueen',
           name: 'Lightning McQueen #95',
           title: '7-Time Piston Cup Champion · Rust-eze Racing',
           badge: '[CHAMPION #95]',
           badgeColor: '#dc2626',
-          locationBadge: 'Radiator Springs Raceway [X: 168, Z: -24]',
+          locationBadge: 'Radiator Springs Raceway [X: 190, Z: -15]',
           avatarHtml: getLightningMcQueenAvatarHtml(),
-          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway [X: 168, Y: 2, Z: -24]! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
+          text: '⚡ "Ka-Chow!" Lightning McQueen flashes his iconic pearlescent grin, revs his 750-horsepower V8 engine, and lets out twin exhaust flame pops!\n\n"Hey racer! Welcome to Lightning McQueen Street & Radiator Springs Raceway [X: 190, Y: 2, Z: -15]! Float like a Cadillac, sting like a Beemer. What are you waiting for? Jump in and let\'s tear up the asphalt!"',
           onOptionSelect: (opt, d) => {
             this.hud.pushChatMessage('You', opt.label);
             if (opt.response) {
@@ -619,7 +619,9 @@ class Game {
               label: '🏎️ Jump in & Drive Lightning McQueen! [E]',
               styleClass: 'mc-btn-gold',
               action: () => {
+                this.modals.close(true);
                 this.player.startDrivingMcQueen();
+                try { document.body.requestPointerLock?.(); } catch (_) {}
                 this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SPACE to Power Drift, SHIFT for Nitro, E to exit.');
               }
             },
@@ -627,15 +629,17 @@ class Game {
               label: '🏆 Challenge Doc Hudson to Willy\'s Butte Race!',
               styleClass: 'mc-btn-gold',
               action: () => {
+                this.modals.close(true);
                 this.player.startDrivingMcQueen();
                 this.world.mcQueenManager?.startRaceChallenge();
-                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! 3... 2... 1... GO!');
+                try { document.body.requestPointerLock?.(); } catch (_) {}
+                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! Red... Yellow... Green... GO!');
               }
             },
             {
               label: '📍 Where is this raceway located?',
               styleClass: 'mc-btn-stone',
-              response: '⚡ "You\'re at Radiator Springs Raceway & Lightning McQueen Street [X: 168, Y: 2, Z: -24]! Willy\'s Butte sits in the center loop, Flo\'s V8 Café is on the pit straight, and Doc Hudson\'s pit box is right across the track!"'
+              response: '⚡ "You\'re at Radiator Springs Raceway & Lightning McQueen Street [X: 190, Y: 2, Z: -15]! Willy\'s Butte sits in the center loop, Flo\'s V8 Café is on the pit straight, and Doc Hudson\'s pit box is right across the track!"'
             },
             {
               label: '🏁 Hear Racing Wisdom (Doc Hudson)',
@@ -677,7 +681,7 @@ class Game {
           title: '3-Time Piston Cup Champion · The Fabulous Hudson Hornet',
           badge: '[CHAMPION #51]',
           badgeColor: '#1e40af',
-          locationBadge: 'Doc\'s Pit Crew Box [X: 178, Z: -31]',
+          locationBadge: 'Doc\'s Pit Crew Box [X: 190, Z: -8]',
           avatarHtml: getDocHudsonAvatarHtml(),
           text: '🏁 "Folks call me Doc Hudson. Back in \'51, \'52, and \'53, they called me the Fabulous Hudson Hornet.\n\nDriving fast in a straight line is easy. Knowing how to slide through the dirt and slingshot past the pack—that\'s real racing. Think you\'ve got what it takes to beat me around Willy\'s Butte?"',
           onOptionSelect: (opt, d) => {
@@ -692,9 +696,11 @@ class Game {
               label: '🏆 Accept Race Challenge: 2 Laps vs Doc Hudson!',
               styleClass: 'mc-btn-gold',
               action: () => {
+                this.modals.close(true);
                 this.player.startDrivingMcQueen();
                 this.world.mcQueenManager?.startRaceChallenge();
-                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! 3... 2... 1... GO!');
+                try { document.body.requestPointerLock?.(); } catch (_) {}
+                this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! Red... Yellow... Green... GO!');
               }
             },
             {

@@ -933,8 +933,8 @@ export class SoundEngine {
     osc.stop(t + 0.15);
   }
 
-  // Racing countdown beep: low pitch for 3, 2, 1; high bright chime for GO!
-  public playRaceCountdown(isGo: boolean = false) {
+  // Racing countdown beep: pitch ascends for Red 1, Red 2, Yellow, then high fanfare for Green (GO!)
+  public playRaceCountdown(stageOrGo: number | boolean = false) {
     if (!this.enabled) return;
     this.initContext();
     if (!this.ctx) return;
@@ -943,25 +943,30 @@ export class SoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
+    const isGo = stageOrGo === true || stageOrGo === 4;
+
     if (isGo) {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(880, t); // High A5
-      osc.frequency.exponentialRampToValueAtTime(1760, t + 0.35); // A6
-      gain.gain.setValueAtTime(0.28, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.frequency.exponentialRampToValueAtTime(1760, t + 0.38); // A6
+      gain.gain.setValueAtTime(0.32, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.4);
+      osc.stop(t + 0.45);
     } else {
+      const stage = typeof stageOrGo === 'number' ? stageOrGo : 1;
+      // Stage 1 (Red): 440Hz, Stage 2 (Red 2): 554Hz, Stage 3 (Yellow): 659Hz
+      const freq = stage === 2 ? 554 : stage === 3 ? 659 : 440;
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, t); // A4
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.24, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.18);
+      osc.stop(t + 0.22);
     }
   }
 

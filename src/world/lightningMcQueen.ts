@@ -679,13 +679,15 @@ function createDocHudsonFrontGrilleTexture(): THREE.CanvasTexture {
 export interface RaceChallengeState {
   active: boolean;
   state: 'countdown' | 'racing' | 'finished';
-  countdownTimer: number; // 3..2..1..0
+  countdownTimer: number; // 4.2 -> 0.0
+  countdownStage: number; // 1 (Red 1), 2 (Red 2), 3 (Yellow), 4 (Green/GO)
   playerLap: number; // 1, 2
   docLap: number;
   totalLaps: number;
   playerProgress: number; // 0..1
   docProgress: number; // 0..1
   playerPosition: number; // 1 for P1, 2 for P2
+  playerSectors: number[]; // [1, 2, 3] sectors cleared
   elapsedTime: number;
   winner: 'player' | 'doc' | null;
   finishBannerTimer: number;
@@ -747,19 +749,23 @@ export class LightningMcQueenManager {
   public raceState: RaceChallengeState = {
     active: false,
     state: 'countdown',
-    countdownTimer: 3.5,
+    countdownTimer: 4.2,
+    countdownStage: 1,
     playerLap: 1,
     docLap: 1,
     totalLaps: 2,
     playerProgress: 0,
     docProgress: 0,
     playerPosition: 1,
+    playerSectors: [],
     elapsedTime: 0,
     winner: null,
     finishBannerTimer: 0
   };
 
-  private lastCountdownSecond: number = -1;
+  private lastCountdownStage: number = 0;
+  private playerCheckpoints: Set<number> = new Set();
+  private docCheckpoints: Set<number> = new Set();
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
@@ -770,24 +776,24 @@ export class LightningMcQueenManager {
     this.hudsonBodyMesh = new THREE.Group();
 
     // 1. Build authentic, wide, unobstructed race circuit spline
-    // Perfect alignment with the repaired raceway track centerline
+    // Perfect alignment with the repaired raceway track centerline (X in [172, 228], Z in [-54, -12])
     const waypoints = [
-      new THREE.Vector3(168, 1.4, -24), // Start / Finish line
-      new THREE.Vector3(184, 1.4, -24), // Main Straight acceleration
-      new THREE.Vector3(192, 1.4, -26), // Turn 1 entry
-      new THREE.Vector3(194, 1.4, -36), // East curve apex 1
-      new THREE.Vector3(194, 1.4, -46), // East curve apex 2 (Willy's Butte Hairpin)
-      new THREE.Vector3(194, 1.4, -58), // East curve apex 3
-      new THREE.Vector3(192, 1.4, -66), // Turn 2 exit
-      new THREE.Vector3(184, 1.4, -68), // Canyon Back Straight entry
-      new THREE.Vector3(176, 1.4, -68), // Canyon Back Straight mid
-      new THREE.Vector3(164, 1.4, -68), // Canyon Back Straight end
-      new THREE.Vector3(160, 1.4, -66), // Turn 3 entry
-      new THREE.Vector3(158, 1.4, -58), // West straight apex 1
-      new THREE.Vector3(158, 1.4, -46), // West straight mid
-      new THREE.Vector3(158, 1.4, -36), // West straight apex 2
-      new THREE.Vector3(160, 1.4, -26), // Turn 4 exit
-      new THREE.Vector3(164, 1.4, -24)  // Main Straight entry
+      new THREE.Vector3(190, 2.05, -15), // Start / Finish line (Gantry)
+      new THREE.Vector3(208, 2.05, -15), // Main Straight acceleration
+      new THREE.Vector3(218, 2.05, -16), // Turn 1 entry
+      new THREE.Vector3(224, 2.05, -22), // Ocean Turn apex 1
+      new THREE.Vector3(224, 2.05, -33), // Ocean Turn mid
+      new THREE.Vector3(224, 2.05, -44), // Ocean Turn apex 2
+      new THREE.Vector3(218, 2.05, -50), // Turn 2 exit
+      new THREE.Vector3(208, 2.05, -51), // Canyon Back Straight
+      new THREE.Vector3(196, 2.05, -51), // Canyon Back Straight mid
+      new THREE.Vector3(184, 2.05, -51), // Canyon Back Straight braking zone
+      new THREE.Vector3(178, 2.05, -50), // Turn 3 entry
+      new THREE.Vector3(175, 2.05, -44), // West Hairpin apex 1
+      new THREE.Vector3(175, 2.05, -33), // West Hairpin mid (Willy's Butte)
+      new THREE.Vector3(175, 2.05, -22), // West Hairpin apex 2
+      new THREE.Vector3(178, 2.05, -16), // Turn 4 exit
+      new THREE.Vector3(184, 2.05, -15)  // Main Straight entry
     ];
     this.trackCurve = new THREE.CatmullRomCurve3(waypoints, true, 'centripetal', 0.5);
     this.trackLength = this.trackCurve.getLength();
@@ -818,13 +824,16 @@ export class LightningMcQueenManager {
     this.hudsonGroup.add(this.hudsonBodyMesh);
     this.scene.add(this.hudsonGroup);
 
-    // Initial position on start line
-    const startPoint = this.trackCurve.getPointAt(0);
-    this.group.position.copy(startPoint);
+    // Initial position on starting grid (Inside Pole Position for McQueen)
+    this.group.position.set(186, 2.05, -16.5);
+    this.group.rotation.y = Math.PI / 2;
+    this.trackProgress = 0.98;
 
-    // Initial position for Doc Hudson at his Pit Box facing the track
-    this.hudsonGroup.position.set(178.5, 1.4, -31.5);
-    this.hudsonGroup.rotation.y = 0; // Facing the raceway main straight
+    // Initial position on starting grid (Lane 2 for Doc Hudson)
+    this.hudsonGroup.position.set(186, 2.05, -13.5);
+    this.hudsonGroup.rotation.y = Math.PI / 2;
+    this.hudsonTrackProgress = 0.94;
+    this.isHudsonRacing = true; // Both cars active on track!
   }
 
   // -------------------------------------------------------------
@@ -1205,25 +1214,29 @@ export class LightningMcQueenManager {
   public startRaceChallenge() {
     this.raceState.active = true;
     this.raceState.state = 'countdown';
-    this.raceState.countdownTimer = 3.5;
+    this.raceState.countdownTimer = 4.2;
+    this.raceState.countdownStage = 1;
     this.raceState.playerLap = 1;
     this.raceState.docLap = 1;
     this.raceState.totalLaps = 2;
     this.raceState.playerProgress = 0;
-    this.raceState.docProgress = 0.02;
+    this.raceState.docProgress = 0.98;
     this.raceState.playerPosition = 1;
+    this.raceState.playerSectors = [];
     this.raceState.elapsedTime = 0;
     this.raceState.winner = null;
     this.raceState.finishBannerTimer = 0;
-    this.lastCountdownSecond = -1;
+    this.lastCountdownStage = 0;
+    this.playerCheckpoints.clear();
+    this.docCheckpoints.clear();
 
     // Line up cars on the starting grid
-    // McQueen on Pole (Inside lane X: 168, Z: -25)
-    this.group.position.set(168, 1.4, -25);
+    // McQueen on Pole (Inside lane X: 186, Z: -16.5)
+    this.group.position.set(186, 2.05, -16.5);
     this.group.rotation.y = Math.PI / 2;
 
-    // Doc Hudson in Outside lane (Grid slot 2 X: 164, Z: -23)
-    this.hudsonGroup.position.set(164, 1.4, -23);
+    // Doc Hudson in Outside lane (Grid slot 2 X: 186, Z: -13.5)
+    this.hudsonGroup.position.set(186, 2.05, -13.5);
     this.hudsonGroup.rotation.y = Math.PI / 2;
     this.hudsonTrackProgress = 0.98; // Just behind start line
     this.isHudsonRacing = true;
@@ -1232,11 +1245,12 @@ export class LightningMcQueenManager {
   public cancelRaceChallenge() {
     this.raceState.active = false;
     this.raceState.state = 'finished';
-    this.isHudsonRacing = false;
+    this.isHudsonRacing = true;
 
-    // Return Doc to pit box
-    this.hudsonGroup.position.set(178.5, 1.4, -31.5);
-    this.hudsonGroup.rotation.y = 0;
+    // Reset cars to starting grid slots
+    this.hudsonGroup.position.set(186, 2.05, -13.5);
+    this.hudsonGroup.rotation.y = Math.PI / 2;
+    this.hudsonTrackProgress = 0.94;
   }
 
   // -------------------------------------------------------------
@@ -1359,6 +1373,7 @@ export class LightningMcQueenManager {
     const aheadPoint = this.trackCurve.getPointAt(aheadProgress);
 
     const tangent = aheadPoint.clone().sub(currentPoint).normalize();
+    const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
     const targetHeading = Math.atan2(tangent.x, tangent.z);
 
     // Dynamic racing speed: fast on straights, controlled braking in curves
@@ -1384,7 +1399,11 @@ export class LightningMcQueenManager {
       }
     }
 
-    this.group.position.lerp(currentPoint, 0.7);
+    // McQueen takes Inside Lane (-1.25 offset along normal)
+    const mcQueenPos = currentPoint.clone().addScaledVector(normal, -1.25);
+    mcQueenPos.y = 2.05;
+    this.group.position.lerp(mcQueenPos, 0.7);
+    this.group.position.y = 2.05;
     this.group.rotation.y = targetHeading + this.driftAngle;
     this.bodyMesh.rotation.z = this.bodyRoll;
 
@@ -1424,7 +1443,9 @@ export class LightningMcQueenManager {
     }
 
     if (this.raceState.active && this.raceState.state === 'countdown') {
-      // Rev engine during countdown
+      // Freeze Doc Hudson in starting grid slot 2 during countdown
+      this.hudsonGroup.position.set(186, 2.05, -13.5);
+      this.hudsonGroup.rotation.y = Math.PI / 2;
       return;
     }
 
@@ -1433,12 +1454,20 @@ export class LightningMcQueenManager {
     const oldProgress = this.hudsonTrackProgress;
     this.hudsonTrackProgress = (this.hudsonTrackProgress + (this.hudsonSpeed * dt) / totalDist) % 1.0;
 
-    // Lap tracking for Doc Hudson
+    // Checkpoint registering for Doc Hudson (Sectors 1, 2, 3)
+    if (this.hudsonTrackProgress >= 0.20 && this.hudsonTrackProgress <= 0.40) this.docCheckpoints.add(1);
+    if (this.hudsonTrackProgress >= 0.45 && this.hudsonTrackProgress <= 0.65) this.docCheckpoints.add(2);
+    if (this.hudsonTrackProgress >= 0.70 && this.hudsonTrackProgress <= 0.90) this.docCheckpoints.add(3);
+
+    // Lap tracking for Doc Hudson across finish line
     if (this.raceState.active && oldProgress > 0.85 && this.hudsonTrackProgress < 0.15) {
-      this.raceState.docLap++;
-      if (this.raceState.docLap > this.raceState.totalLaps && !this.raceState.winner) {
-        this.raceState.winner = 'doc';
-        this.raceState.state = 'finished';
+      if (this.docCheckpoints.has(1) && this.docCheckpoints.has(2) && this.docCheckpoints.has(3)) {
+        this.raceState.docLap++;
+        this.docCheckpoints.clear();
+        if (this.raceState.docLap > this.raceState.totalLaps && !this.raceState.winner) {
+          this.raceState.winner = 'doc';
+          this.raceState.state = 'finished';
+        }
       }
     }
 
@@ -1447,6 +1476,7 @@ export class LightningMcQueenManager {
     const aheadPoint = this.trackCurve.getPointAt(aheadProgress);
 
     const tangent = aheadPoint.clone().sub(currentPoint).normalize();
+    const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
     const targetHeading = Math.atan2(tangent.x, tangent.z);
 
     const lookAheadProgress = (this.hudsonTrackProgress + 0.05) % 1.0;
@@ -1454,10 +1484,30 @@ export class LightningMcQueenManager {
     const lookAheadTangent = lookAheadPoint.clone().sub(aheadPoint).normalize();
     const curvature = Math.abs(tangent.angleTo(lookAheadTangent));
 
+    // Dynamic competitive target speed for Doc Hudson
+    let targetDocSpeed = 22.5;
+    if (this.raceState.active && this.raceState.state === 'racing') {
+      const playerTotalScore = (this.raceState.playerLap - 1) + this.raceState.playerProgress;
+      const docTotalScore = (this.raceState.docLap - 1) + this.hudsonTrackProgress;
+      const scoreDiff = playerTotalScore - docTotalScore; // > 0 if player is leading
+
+      if (scoreDiff > 0.04) {
+        // Player is leading! Doc summons legendary Twin H-Power supercharger
+        targetDocSpeed = 27.5;
+      } else if (scoreDiff < -0.06) {
+        // Doc is leading comfortably, ease off throttle to maintain exciting battle
+        targetDocSpeed = 22.0;
+      } else {
+        // Wheel-to-wheel dogfight!
+        targetDocSpeed = 25.0;
+      }
+    }
+
     // Doc's legendary technique: "Turn right to go left!"
     if (curvature > 0.15) {
       // Doc's masterful smooth power slide
-      this.hudsonSpeed = THREE.MathUtils.lerp(this.hudsonSpeed, 19.5, dt * 3.0);
+      const cornerSpeed = Math.min(targetDocSpeed, 19.5);
+      this.hudsonSpeed = THREE.MathUtils.lerp(this.hudsonSpeed, cornerSpeed, dt * 3.2);
       this.hudsonDriftAngle = THREE.MathUtils.lerp(this.hudsonDriftAngle, (tangent.x > 0 ? 0.32 : -0.32), dt * 6.5);
       this.hudsonBodyRoll = THREE.MathUtils.lerp(this.hudsonBodyRoll, (tangent.x > 0 ? -0.1 : 0.1), dt * 5.0);
 
@@ -1465,12 +1515,16 @@ export class LightningMcQueenManager {
       this.emitTireSmoke(this.hudsonGroup.position, 1.2);
     } else {
       // Twin H-Power full throttle down the straightaways!
-      this.hudsonSpeed = THREE.MathUtils.lerp(this.hudsonSpeed, 25.0, dt * 2.2);
+      this.hudsonSpeed = THREE.MathUtils.lerp(this.hudsonSpeed, targetDocSpeed, dt * 2.4);
       this.hudsonDriftAngle = THREE.MathUtils.lerp(this.hudsonDriftAngle, 0, dt * 4.0);
       this.hudsonBodyRoll = THREE.MathUtils.lerp(this.hudsonBodyRoll, 0, dt * 4.0);
     }
 
-    this.hudsonGroup.position.lerp(currentPoint, 0.75);
+    // Doc Hudson sticks to the Outside Lane (+1.25 offset along normal)
+    const docTargetPos = currentPoint.clone().addScaledVector(normal, 1.25);
+    docTargetPos.y = 2.05;
+    this.hudsonGroup.position.lerp(docTargetPos, 0.75);
+    this.hudsonGroup.position.y = 2.05;
     this.hudsonGroup.rotation.y = targetHeading + this.hudsonDriftAngle;
     this.hudsonBodyMesh.rotation.z = this.hudsonBodyRoll;
 
@@ -1493,18 +1547,36 @@ export class LightningMcQueenManager {
   private updateRaceChallengeLogic(dt: number) {
     if (this.raceState.state === 'countdown') {
       this.raceState.countdownTimer -= dt;
-      const curSec = Math.ceil(this.raceState.countdownTimer);
 
-      if (curSec !== this.lastCountdownSecond && curSec > 0) {
-        this.lastCountdownSecond = curSec;
-        sound.playRaceCountdown(false);
+      // Starting Light Stages:
+      // > 3.0: Stage 1 (Red 1 - READY...)
+      // > 2.0: Stage 2 (Red 2 - SET...)
+      // > 1.0: Stage 3 (Yellow - PREPARE...)
+      // <= 1.0: Stage 4 (Green - GO!)
+      let stage = 1;
+      if (this.raceState.countdownTimer <= 1.0) {
+        stage = 4;
+      } else if (this.raceState.countdownTimer <= 2.0) {
+        stage = 3;
+      } else if (this.raceState.countdownTimer <= 3.0) {
+        stage = 2;
+      } else {
+        stage = 1;
+      }
+
+      this.raceState.countdownStage = stage;
+
+      if (stage !== this.lastCountdownStage) {
+        this.lastCountdownStage = stage;
+        sound.playRaceCountdown(stage);
+        if (stage === 4) {
+          sound.playKaChow();
+        }
       }
 
       if (this.raceState.countdownTimer <= 0) {
         this.raceState.state = 'racing';
         this.raceState.countdownTimer = 0;
-        sound.playRaceCountdown(true);
-        sound.playKaChow();
       }
       return;
     }
@@ -1519,14 +1591,25 @@ export class LightningMcQueenManager {
       this.raceState.playerProgress = trackProg;
       this.raceState.docProgress = this.hudsonTrackProgress;
 
-      // Check player lap completion
+      // Checkpoint registering for Player (Sectors 1, 2, 3)
+      if (trackProg >= 0.20 && trackProg <= 0.40) this.playerCheckpoints.add(1);
+      if (trackProg >= 0.45 && trackProg <= 0.65) this.playerCheckpoints.add(2);
+      if (trackProg >= 0.70 && trackProg <= 0.90) this.playerCheckpoints.add(3);
+      this.raceState.playerSectors = Array.from(this.playerCheckpoints).sort();
+
+      // Check player lap completion across start/finish line (u = 0)
       if (oldPlayerProg > 0.85 && trackProg < 0.15) {
-        this.raceState.playerLap++;
-        if (this.raceState.playerLap > this.raceState.totalLaps && !this.raceState.winner) {
-          this.raceState.winner = 'player';
-          this.raceState.state = 'finished';
-          sound.playRaceVictory();
-          sound.playKaChow();
+        if (this.playerCheckpoints.has(1) && this.playerCheckpoints.has(2) && this.playerCheckpoints.has(3)) {
+          this.raceState.playerLap++;
+          this.playerCheckpoints.clear();
+          this.raceState.playerSectors = [];
+          sound.playLevelUp();
+          if (this.raceState.playerLap > this.raceState.totalLaps && !this.raceState.winner) {
+            this.raceState.winner = 'player';
+            this.raceState.state = 'finished';
+            sound.playRaceVictory();
+            sound.playKaChow();
+          }
         }
       }
 
@@ -1597,6 +1680,12 @@ export class LightningMcQueenManager {
     isBoost: boolean,
     steerInput: number
   ) {
+    if (this.raceState.active && this.raceState.state === 'countdown') {
+      this.group.position.set(186, 2.05, -16.5);
+      this.group.rotation.y = Math.PI / 2;
+      return;
+    }
+
     this.group.position.copy(pos);
     this.group.rotation.y = heading;
 

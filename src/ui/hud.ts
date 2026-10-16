@@ -133,16 +133,27 @@ export class HUDManager {
     minimapEl.innerHTML = `
       <div class="mc-minimap-box" id="mc-minimap-box" title="Click or Tap to Maximise World Map (Key: M)">
         <div class="mc-minimap-top-bar">
-          <span class="mc-minimap-title" id="minimap-title-btn">[MAP]</span>
-          <span class="mc-minimap-coords" id="minimap-coords">X:0 Z:0</span>
-          <span class="mc-minimap-heading" id="minimap-heading">N</span>
-          <div class="mc-minimap-zoom-group">
-            <button class="mc-minimap-zoom-btn" id="btn-minimap-zoomin" title="Zoom In" type="button">+</button>
-            <button class="mc-minimap-zoom-btn" id="btn-minimap-zoomout" title="Zoom Out" type="button">-</button>
+          <div class="mc-minimap-header-left">
+            <span class="mc-minimap-badge" id="minimap-title-btn" title="Click to enlarge (Key: M)">🗺️ MAP</span>
+            <span class="mc-minimap-heading" id="minimap-heading">N</span>
+          </div>
+          <div class="mc-minimap-header-right">
+            <div class="mc-minimap-zoom-group">
+              <button class="mc-minimap-btn" id="btn-minimap-zoomout" title="Zoom Out" type="button">−</button>
+              <span class="mc-minimap-zoom-lvl" id="minimap-zoom-lvl">1.0x</span>
+              <button class="mc-minimap-btn" id="btn-minimap-zoomin" title="Zoom In" type="button">+</button>
+            </div>
+            <button class="mc-minimap-btn mc-minimap-expand-btn" id="btn-minimap-expand" title="Open World Map (Key: M)" type="button">⛶</button>
           </div>
         </div>
-        <canvas id="minimap-canvas" width="320" height="320"></canvas>
-        <div class="mc-minimap-footer" id="minimap-footer">📍 <span id="minimap-nearest-landmark">Crossroads Citadel</span></div>
+        <div class="mc-minimap-canvas-wrapper">
+          <canvas id="minimap-canvas" width="360" height="360"></canvas>
+          <div class="mc-minimap-coords-overlay" id="minimap-coords">X:0 Z:0</div>
+        </div>
+        <div class="mc-minimap-footer" id="minimap-footer">
+          <span class="mc-minimap-pin-icon">📍</span>
+          <span class="mc-minimap-landmark" id="minimap-nearest-landmark">Crossroads Citadel</span>
+        </div>
       </div>
     `;
   }
@@ -201,9 +212,27 @@ export class HUDManager {
       this.onToggleSit?.();
     });
 
-    // Minimap Zoom Controls with mobile touch isolation
+    // Minimap Zoom Controls & Expand Actions with touch isolation
     const zoomInBtn = document.getElementById('btn-minimap-zoomin');
     const zoomOutBtn = document.getElementById('btn-minimap-zoomout');
+    const expandBtn = document.getElementById('btn-minimap-expand');
+
+    const updateZoomUi = () => {
+      const zoomLvlEl = document.getElementById('minimap-zoom-lvl');
+      if (zoomLvlEl) {
+        zoomLvlEl.textContent = `${this.minimapZoom.toFixed(1)}x`;
+      }
+      const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
+      if (zoomInBtn instanceof HTMLButtonElement) {
+        zoomInBtn.disabled = currentIdx === this.zoomLevels.length - 1;
+        zoomInBtn.style.opacity = zoomInBtn.disabled ? '0.4' : '1';
+      }
+      if (zoomOutBtn instanceof HTMLButtonElement) {
+        zoomOutBtn.disabled = currentIdx === 0;
+        zoomOutBtn.style.opacity = zoomOutBtn.disabled ? '0.4' : '1';
+      }
+    };
+    updateZoomUi();
 
     const handleZoomIn = (e: Event) => {
       e.stopPropagation();
@@ -211,6 +240,7 @@ export class HUDManager {
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const nextIdx = currentIdx >= 0 ? Math.min(this.zoomLevels.length - 1, currentIdx + 1) : 1;
       this.minimapZoom = this.zoomLevels[nextIdx];
+      updateZoomUi();
       sound.playClick();
     };
 
@@ -220,6 +250,7 @@ export class HUDManager {
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const prevIdx = currentIdx >= 0 ? Math.max(0, currentIdx - 1) : 1;
       this.minimapZoom = this.zoomLevels[prevIdx];
+      updateZoomUi();
       sound.playClick();
     };
 
@@ -234,7 +265,7 @@ export class HUDManager {
     const minimapBox = document.getElementById('mc-minimap-box');
     const triggerOpenMap = (e: Event) => {
       const target = e.target as HTMLElement | null;
-      if (target?.closest('.mc-minimap-zoom-btn')) return;
+      if (target?.closest('.mc-minimap-zoom-group, #btn-minimap-zoomin, #btn-minimap-zoomout')) return;
       e.preventDefault();
       e.stopPropagation();
       if (document.pointerLockElement) {
@@ -243,6 +274,16 @@ export class HUDManager {
       this.onOpenFastTravel?.();
     };
 
+    expandBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerOpenMap(e);
+    });
+    expandBtn?.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      triggerOpenMap(e);
+    });
+    expandBtn?.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+
     minimapBox?.addEventListener('click', triggerOpenMap);
 
     let touchStartTime = 0;
@@ -250,7 +291,7 @@ export class HUDManager {
     let touchStartY = 0;
     minimapBox?.addEventListener('touchstart', (e: TouchEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target?.closest('.mc-minimap-zoom-btn')) return;
+      if (target?.closest('.mc-minimap-zoom-group, #btn-minimap-zoomin, #btn-minimap-zoomout, #btn-minimap-expand')) return;
       if (e.touches.length === 1) {
         touchStartTime = performance.now();
         touchStartX = e.touches[0].clientX;
@@ -260,7 +301,7 @@ export class HUDManager {
 
     minimapBox?.addEventListener('touchend', (e: TouchEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target?.closest('.mc-minimap-zoom-btn')) return;
+      if (target?.closest('.mc-minimap-zoom-group, #btn-minimap-zoomin, #btn-minimap-zoomout, #btn-minimap-expand')) return;
       const dt = performance.now() - touchStartTime;
       const t = e.changedTouches[0];
       if (t && dt < 450 && Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) < 18) {
@@ -454,8 +495,8 @@ export class HUDManager {
     const ctx = this.minimapCtx;
     if (!canvas || !ctx) return;
 
-    const w = 160;
-    const h = 160;
+    const w = 180;
+    const h = 180;
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     const targetW = Math.round(w * pixelRatio);
     const targetH = Math.round(h * pixelRatio);
@@ -470,9 +511,9 @@ export class HUDManager {
     ctx.fillStyle = '#0284c7';
     ctx.fillRect(0, 0, w, h);
 
-    const cx = 80;
-    const cz = 80;
-    const scale = 0.38 * this.minimapZoom;
+    const cx = 90;
+    const cz = 90;
+    const scale = 0.40 * this.minimapZoom;
 
     const originX = cx - playerPos.x * scale;
     const originZ = cz - playerPos.z * scale;
@@ -549,8 +590,8 @@ export class HUDManager {
     drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
     // 9. Egypt (Sahara desert dunes)
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
-    // 10. UAE (Dubai Waterfront & Palm Jumeirah Archipelago)
-    drawMiniCountry([[150, 18], [222, 18], [222, 64], [150, 64], [150, 18]], '#0d9488');
+    // 10. UAE (Dubai Waterfront, Palm Jumeirah Archipelago, Burj Al Arab, Bluewaters & The World Islands)
+    drawMiniCountry([[150, -60], [340, -60], [340, 160], [150, 160], [150, -60]], '#0d9488');
     // 12. Sunflower Valley
     drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
     // Pier & Beach Boardwalk
@@ -774,9 +815,15 @@ export class HUDManager {
     ctx.arc(originX, originZ, 3.5 * scale, 0, Math.PI * 2);
     ctx.fill();
 
-    // Crosshair grid lines
-    ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+    // Radar Range Rings and Crosshair Grid Lines
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.14)';
     ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cz, 38, 0, Math.PI * 2);
+    ctx.arc(cx, cz, 72, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.beginPath();
     ctx.moveTo(cx, 0); ctx.lineTo(cx, h);
     ctx.moveTo(0, cz); ctx.lineTo(w, cz);
@@ -891,22 +938,25 @@ export class HUDManager {
     ctx.rotate(-yaw);
 
     // Subtle radar vision cone pointing forward (towards -Z / top of arrow)
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+    const coneGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 32);
+    coneGrad.addColorStop(0, 'rgba(56, 189, 248, 0.38)');
+    coneGrad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+    ctx.fillStyle = coneGrad;
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.arc(0, 0, 26, -Math.PI / 2 - 0.48, -Math.PI / 2 + 0.48);
+    ctx.arc(0, 0, 32, -Math.PI / 2 - 0.45, -Math.PI / 2 + 0.45);
     ctx.closePath();
     ctx.fill();
 
     // Player Direction Arrow
     ctx.fillStyle = '#ef4444';
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1.3;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(0, -8);
-    ctx.lineTo(5.5, 6);
+    ctx.moveTo(0, -9);
+    ctx.lineTo(6, 6);
     ctx.lineTo(0, 3);
-    ctx.lineTo(-5.5, 6);
+    ctx.lineTo(-6, 6);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -919,8 +969,27 @@ export class HUDManager {
 
     ctx.restore();
 
+    // Cardinal Direction Compass Markers on Minimap Perimeter
+    ctx.save();
+    ctx.font = "bold 8px 'Press Start 2P', monospace";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // North (Gold with contrast shadow)
+    ctx.fillStyle = '#facc15';
+    ctx.shadowColor = '#000000';
+    ctx.shadowBlur = 3;
+    ctx.fillText('N', cx, 11);
+
+    // South, East, West (Crisp slate-white)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.fillText('S', cx, h - 10);
+    ctx.fillText('W', 11, cz);
+    ctx.fillText('E', w - 11, cz);
+    ctx.restore();
+
     // Radar frame border
-    ctx.strokeStyle = '#0284c7';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
 
@@ -1032,6 +1101,13 @@ export class HUDManager {
             <div class="mc-challenge-stat"><span class="mc-label">POSITION</span> <span id="mc-race-pos" class="mc-pos-p1">P1</span></div>
             <div class="mc-challenge-stat"><span class="mc-label">LAP</span> <span id="mc-race-lap">1/2</span></div>
             <div class="mc-challenge-stat"><span class="mc-label">TIME</span> <span id="mc-race-time">00:00.0</span></div>
+            <div class="mc-challenge-stat"><span class="mc-label">SECTORS</span>
+              <span id="mc-race-sectors" class="mc-sectors-row">
+                <span class="mc-sector-pip" id="mc-sec-1">S1</span>
+                <span class="mc-sector-pip" id="mc-sec-2">S2</span>
+                <span class="mc-sector-pip" id="mc-sec-3">S3</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -1072,13 +1148,45 @@ export class HUDManager {
       if (challengePanel) challengePanel.style.display = 'block';
 
       if (raceState.state === 'countdown') {
-        const curSec = Math.ceil(raceState.countdownTimer);
+        const stage = raceState.countdownStage || 1;
         if (bigBanner) {
           bigBanner.style.display = 'block';
-          bigBanner.innerHTML = `<span class="mc-countdown-number ${curSec <= 1 ? 'go' : ''}">${curSec > 0 ? curSec : 'GO!'}</span>`;
+          bigBanner.innerHTML = `
+            <div class="mc-starting-gantry">
+              <div class="mc-gantry-title">🏁 STARTING GRID · READY SET GO 🏁</div>
+              <div class="mc-gantry-lights">
+                <div class="mc-gantry-lamp-box ${stage >= 1 ? 'lit red' : ''}">
+                  <div class="mc-gantry-bulb"></div>
+                  <span class="mc-lamp-lbl">RED</span>
+                </div>
+                <div class="mc-gantry-lamp-box ${stage >= 2 ? 'lit red' : ''}">
+                  <div class="mc-gantry-bulb"></div>
+                  <span class="mc-lamp-lbl">RED</span>
+                </div>
+                <div class="mc-gantry-lamp-box ${stage >= 3 ? 'lit yellow' : ''}">
+                  <div class="mc-gantry-bulb"></div>
+                  <span class="mc-lamp-lbl">YELLOW</span>
+                </div>
+                <div class="mc-gantry-lamp-box ${stage >= 4 ? 'lit green' : ''}">
+                  <div class="mc-gantry-bulb"></div>
+                  <span class="mc-lamp-lbl">GREEN</span>
+                </div>
+              </div>
+              <div class="mc-gantry-action ${stage >= 4 ? 'go' : ''}">
+                ${stage === 1 ? '🔴 READY...' : stage === 2 ? '🔴 SET...' : stage === 3 ? '🟡 REV ENGINES!' : '🟢 GO! GO! GO! ⚡'}
+              </div>
+            </div>
+          `;
         }
       } else if (raceState.state === 'racing') {
-        if (bigBanner) bigBanner.style.display = 'none';
+        if (bigBanner) {
+          if (raceState.elapsedTime < 1.4) {
+            bigBanner.style.display = 'block';
+            bigBanner.innerHTML = `<span class="mc-countdown-number go">GO! GO! GO! ⚡</span>`;
+          } else {
+            bigBanner.style.display = 'none';
+          }
+        }
 
         const posEl = document.getElementById('mc-race-pos');
         if (posEl) {
@@ -1088,7 +1196,8 @@ export class HUDManager {
 
         const lapEl = document.getElementById('mc-race-lap');
         if (lapEl) {
-          lapEl.textContent = `${Math.min(raceState.totalLaps, raceState.playerLap)}/${raceState.totalLaps}`;
+          const isFinal = raceState.playerLap === raceState.totalLaps;
+          lapEl.textContent = `${Math.min(raceState.totalLaps, raceState.playerLap)}/${raceState.totalLaps}${isFinal ? ' (FINAL)' : ''}`;
         }
 
         const timeEl = document.getElementById('mc-race-time');
@@ -1099,6 +1208,14 @@ export class HUDManager {
           const dec = Math.floor((raceState.elapsedTime % 1) * 10);
           timeEl.textContent = `${mins}:${secs}.${dec}`;
         }
+
+        // Sectors indicator
+        const s1 = document.getElementById('mc-sec-1');
+        const s2 = document.getElementById('mc-sec-2');
+        const s3 = document.getElementById('mc-sec-3');
+        if (s1) s1.className = (raceState.playerSectors?.includes(1)) ? 'mc-sector-pip active' : 'mc-sector-pip';
+        if (s2) s2.className = (raceState.playerSectors?.includes(2)) ? 'mc-sector-pip active' : 'mc-sector-pip';
+        if (s3) s3.className = (raceState.playerSectors?.includes(3)) ? 'mc-sector-pip active' : 'mc-sector-pip';
       } else if (raceState.state === 'finished') {
         if (bigBanner) {
           bigBanner.style.display = 'block';

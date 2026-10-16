@@ -5,6 +5,13 @@ import { Project } from '../data/portfolioData';
 
 const SPAWN_POSITION = new THREE.Vector3(0, 2, 8);
 
+export const WORLD_BOUNDS = {
+  minX: -260,
+  maxX: 400,
+  minZ: -260,
+  maxZ: 260,
+};
+
 export interface TargetInfo {
   blockPos: THREE.Vector3;
   faceNormal: THREE.Vector3;
@@ -802,7 +809,6 @@ export class Player {
       }
 
       // Horizontal movement with obstacle collision in flight mode
-      const WORLD_BORDER = 225;
       const moveX = this.velocity.x * dt;
       if (Math.abs(moveX) > 0.0001) {
         const nextX = this.position.x + moveX;
@@ -824,12 +830,18 @@ export class Player {
       }
 
       // World border clamp
-      if (Math.abs(this.position.x) > WORLD_BORDER) {
-        this.position.x = Math.sign(this.position.x) * WORLD_BORDER;
+      if (this.position.x < WORLD_BOUNDS.minX) {
+        this.position.x = WORLD_BOUNDS.minX;
+        this.velocity.x = 0;
+      } else if (this.position.x > WORLD_BOUNDS.maxX) {
+        this.position.x = WORLD_BOUNDS.maxX;
         this.velocity.x = 0;
       }
-      if (Math.abs(this.position.z) > WORLD_BORDER) {
-        this.position.z = Math.sign(this.position.z) * WORLD_BORDER;
+      if (this.position.z < WORLD_BOUNDS.minZ) {
+        this.position.z = WORLD_BOUNDS.minZ;
+        this.velocity.z = 0;
+      } else if (this.position.z > WORLD_BOUNDS.maxZ) {
+        this.position.z = WORLD_BOUNDS.maxZ;
         this.velocity.z = 0;
       }
 
@@ -995,12 +1007,15 @@ export class Player {
     }
 
     // 2. Horizontal resolution: X axis
-    const WORLD_BORDER = 225;
+    // 2. Horizontal resolution: X axis
     const moveX = this.velocity.x * dt;
     if (Math.abs(moveX) > 0.0001) {
       let nextX = this.position.x + moveX;
-      if (Math.abs(nextX) > WORLD_BORDER) {
-        nextX = Math.sign(nextX) * WORLD_BORDER;
+      if (nextX < WORLD_BOUNDS.minX) {
+        nextX = WORLD_BOUNDS.minX;
+        this.velocity.x = 0;
+      } else if (nextX > WORLD_BOUNDS.maxX) {
+        nextX = WORLD_BOUNDS.maxX;
         this.velocity.x = 0;
       }
       if (!this.checkHorizontalObstacle(nextX, this.position.y, this.position.z)) {
@@ -1020,8 +1035,11 @@ export class Player {
     const moveZ = this.velocity.z * dt;
     if (Math.abs(moveZ) > 0.0001) {
       let nextZ = this.position.z + moveZ;
-      if (Math.abs(nextZ) > WORLD_BORDER) {
-        nextZ = Math.sign(nextZ) * WORLD_BORDER;
+      if (nextZ < WORLD_BOUNDS.minZ) {
+        nextZ = WORLD_BOUNDS.minZ;
+        this.velocity.z = 0;
+      } else if (nextZ > WORLD_BOUNDS.maxZ) {
+        nextZ = WORLD_BOUNDS.maxZ;
         this.velocity.z = 0;
       }
       if (!this.checkHorizontalObstacle(this.position.x, this.position.y, nextZ)) {
@@ -1037,11 +1055,15 @@ export class Player {
     }
 
     // Hard boundary clamp on final position
-    if (Math.abs(this.position.x) > WORLD_BORDER) {
-      this.position.x = Math.sign(this.position.x) * WORLD_BORDER;
+    if (this.position.x < WORLD_BOUNDS.minX) {
+      this.position.x = WORLD_BOUNDS.minX;
+    } else if (this.position.x > WORLD_BOUNDS.maxX) {
+      this.position.x = WORLD_BOUNDS.maxX;
     }
-    if (Math.abs(this.position.z) > WORLD_BORDER) {
-      this.position.z = Math.sign(this.position.z) * WORLD_BORDER;
+    if (this.position.z < WORLD_BOUNDS.minZ) {
+      this.position.z = WORLD_BOUNDS.minZ;
+    } else if (this.position.z > WORLD_BOUNDS.maxZ) {
+      this.position.z = WORLD_BOUNDS.maxZ;
     }
 
     // Void safety barrier: only trigger below bedrock
@@ -1193,6 +1215,10 @@ export class Player {
   public startDrivingMcQueen() {
     this.ridingVehicle = 'lightning_mcqueen';
     this.cameraMode = 1; // Dedicated chase camera
+    const pauseOverlay = document.getElementById('pause-overlay');
+    if (pauseOverlay) {
+      pauseOverlay.style.display = 'none';
+    }
     if (this.world.mcQueenManager) {
       this.world.mcQueenManager.isPlayerDriving = true;
       const qPos = this.world.mcQueenManager.getPosition();
@@ -1205,6 +1231,8 @@ export class Player {
     this.mcQueenSpeed = 0;
     this.mcQueenDriftSoundTimer = 0;
     this.mcQueenEngineSoundTimer = 0;
+    this.pitch = 0.12;
+    this.yaw = this.mcQueenHeading + Math.PI;
     sound.playKaChow();
     sound.playRaceCarEngine(1.2);
     if (this.onWorldNotice) {
@@ -1214,6 +1242,16 @@ export class Player {
 
   private updateMcQueenDriving(dt: number) {
     if (!this.world.mcQueenManager) return;
+
+    // Freeze car during race countdown starting lights sequence
+    if (this.world.mcQueenManager.raceState?.active && this.world.mcQueenManager.raceState.state === 'countdown') {
+      this.mcQueenSpeed = 0;
+      this.position.set(186, 2.05, -16.5);
+      this.mcQueenHeading = Math.PI / 2;
+      this.yaw = this.mcQueenHeading + Math.PI;
+      this.world.updateMcQueen(this.position, this.mcQueenHeading, 0, false, false, 0);
+      return;
+    }
 
     const isShift = !!this.keys['ShiftLeft'] || !!this.keys['ShiftRight'];
     const isSpace = !!this.keys['Space'];
@@ -1270,7 +1308,7 @@ export class Player {
       }
 
       this.mcQueenHeading += steerInput * effectiveSteerSpeed * dt * dir;
-      this.yaw = this.mcQueenHeading;
+      this.yaw = this.mcQueenHeading + Math.PI;
     }
 
     const forwardX = Math.sin(this.mcQueenHeading);
@@ -1282,12 +1320,12 @@ export class Player {
       this.position.x = proposedX;
       this.position.z = proposedZ;
     } else {
-      this.mcQueenSpeed = 0;
+      this.mcQueenSpeed = -this.mcQueenSpeed * 0.35; // Elastic bumper bounce off catch fence
       sound.playBlockBreak();
     }
 
-    const gy = this.world.builder.getTerrainHeight(this.position.x, this.position.z);
-    this.position.y = Math.max(1.2, gy + 1.1);
+    const groundY = this.world.getGroundHeight(this.position.x, this.position.z, this.position.y);
+    this.position.y = Math.max(2.05, groundY);
 
     this.world.updateMcQueen(this.position, this.mcQueenHeading, this.mcQueenSpeed, isDrifting, isShift, steerInput);
 

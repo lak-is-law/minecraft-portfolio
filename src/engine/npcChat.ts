@@ -108,16 +108,16 @@ export class NPCChatManager {
         name: 'Lightning McQueen #95',
         role: '7-Time Piston Cup Champion ⚡',
         areaName: 'Lightning McQueen Street & Piston Cup Raceway',
-        coords: { x: 168, y: 2.0, z: -24 },
+        coords: { x: 190, y: 2.0, z: -15 },
         directionFromSpawn: 'East towards Hollywood & Radiator Springs Raceway',
         nearbyLandmarks: ["Flo's V8 Café", "Luigi's Casa Della Tires", "Tow Mater Salvage", "Piston Cup Gantry Arch"],
         ambientMessages: [
-          '⚡ Ka-Chow! Tearing down Lightning McQueen Street [X: 168, Y: 2, Z: -24]! Press [E] to race in 3D!',
-          '⚡ "I am speed! Faster than fast, quicker than quick!" Lapping Radiator Springs Raceway [X: 168, Y: 2, Z: -24]!',
-          '⚡ Twin exhaust flame pops on Lightning McQueen Street [X: 168, Y: 2, Z: -24]! Hold [Shift] for Nitro Boost!'
+          '⚡ Ka-Chow! Tearing down Lightning McQueen Street [X: 190, Y: 2, Z: -15]! Press [E] to race in 3D!',
+          '⚡ "I am speed! Faster than fast, quicker than quick!" Lapping Radiator Springs Raceway [X: 190, Y: 2, Z: -15]!',
+          '⚡ Twin exhaust flame pops on Lightning McQueen Street [X: 190, Y: 2, Z: -15]! Hold [Shift] for Nitro Boost!'
         ],
-        proximityGreeting: '⚡ Ka-Chow! Lightning McQueen revs up at Lightning McQueen Street [X: 168, Y: 2, Z: -24]! "Jump in, racer!"',
-        detailedLocationText: '⚡ "Ka-Chow!!"\n\n📍 Location: Lightning McQueen Street & Radiator Springs Raceway [X: 168, Y: 2, Z: -24]\n\n"Tearing up the track right next to Flo\'s V8 Café, Luigi\'s tire tower, and Doc Hudson\'s pit box! Press [E] anytime to board and tear up the asphalt with 3D racing physics and nitro boost!"',
+        proximityGreeting: '⚡ Ka-Chow! Lightning McQueen revs up at Lightning McQueen Street [X: 190, Y: 2, Z: -15]! "Jump in, racer!"',
+        detailedLocationText: '⚡ "Ka-Chow!!"\n\n📍 Location: Lightning McQueen Street & Radiator Springs Raceway [X: 190, Y: 2, Z: -15]\n\n"Tearing up the track right next to Flo\'s V8 Café, Luigi\'s tire tower, and Doc Hudson\'s pit box! Press [E] anytime to board and tear up the asphalt with 3D racing physics and nitro boost!"',
         tagColor: '#dc2626',
         emoji: '🏎️'
       },
@@ -126,16 +126,16 @@ export class NPCChatManager {
         name: 'Doc Hudson #51',
         role: '3-Time Piston Cup Champion · Crew Chief 🏁',
         areaName: 'Doc Hudson Pit Crew Box · Radiator Springs',
-        coords: { x: 178, y: 2.0, z: -31 },
+        coords: { x: 190, y: 2.0, z: -8 },
         directionFromSpawn: 'East towards Radiator Springs Raceway Infield',
         nearbyLandmarks: ["Willy's Butte", "Flo's V8 Café", "Tow Mater Salvage", "Piston Cup Gantry"],
         ambientMessages: [
-          '🏁 "When you\'re entering the turn in the dirt, turn right to go left!" — Doc Hudson #51 [X: 178, Z: -31]',
-          '🏁 Doc Hudson revs his classic Twin H-Power engine at his Pit Box [X: 178, Z: -31]! Press [E] to challenge him to a race!',
-          '🏁 "They\'re just empty cups, kid. It\'s the race that matters." — The Fabulous Hudson Hornet [X: 178, Z: -31]'
+          '🏁 "When you\'re entering the turn in the dirt, turn right to go left!" — Doc Hudson #51 [X: 190, Z: -8]',
+          '🏁 Doc Hudson revs his classic Twin H-Power engine at his Pit Box [X: 190, Z: -8]! Press [E] to challenge him to a race!',
+          '🏁 "They\'re just empty cups, kid. It\'s the race that matters." — The Fabulous Hudson Hornet [X: 190, Z: -8]'
         ],
         proximityGreeting: '🏁 "Hey rookie. Think you can beat the Fabulous Hudson Hornet around Willy\'s Butte? Press [E] to challenge me!"',
-        detailedLocationText: '🏁 "The Fabulous Hudson Hornet"\n\n📍 Location: Doc Hudson Pit Box & Willy\'s Butte [X: 178, Y: 2, Z: -31]\n\n"3-Time Piston Cup Champion (1951, 1952, 1953). Master of the dirt slide: Turn right to go left! Press [E] to talk with Doc and start a head-to-head 2-lap race challenge!"',
+        detailedLocationText: '🏁 "The Fabulous Hudson Hornet"\n\n📍 Location: Doc Hudson Pit Box & Willy\'s Butte [X: 190, Y: 2, Z: -8]\n\n"3-Time Piston Cup Champion (1951, 1952, 1953). Master of the dirt slide: Turn right to go left! Press [E] to talk with Doc and start a head-to-head 2-lap race challenge!"',
         tagColor: '#1e40af',
         emoji: '🏁'
       },
