@@ -1076,11 +1076,14 @@ export class ModalManager {
       // 3. Sunflower Valley & Farmstead (Golden Fields)
       drawBiomeArea([[-68, 25], [-22, 25], [-22, 70], [-68, 70], [-68, 25]], '#facc15');
 
-      // 4. China Great Wall & Pine Forests (Northern Arc)
-      drawBiomeArea([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#1c4524');
+      // 4. China Great Wall & Pine Forests (Northern Arc & Dragon Pagoda)
+      drawBiomeArea([[-134, -78], [-134, -98], [-140, -135], [-120, -172], [-84, -170], [-82, -135], [-82, -80], [-105, -78], [-134, -78]], '#1c4524');
 
       // 5. Japan Cherry Blossom / Sakura Forest (Pastel Pink)
-      drawBiomeArea([[-178, -58], [-158, -75], [-142, -95], [-132, -85], [-148, -65], [-168, -52], [-178, -58]], '#f472b6');
+      drawBiomeArea([[-178, -58], [-168, -52], [-148, -64], [-136, -78], [-136, -92], [-146, -98], [-162, -88], [-178, -68], [-178, -58]], '#f472b6');
+
+      // 6. South Korea Joseon Peninsula (Royal Blue Coastal Biome)
+      drawBiomeArea([[-80, -82], [-80, -132], [-65, -132], [-46, -122], [-46, -88], [-60, -82], [-80, -82]], '#0284c7');
 
       // 6. Imperial India Subcontinent (Terracotta Sandstone & Yamuna)
       drawBiomeArea([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
@@ -1293,8 +1296,8 @@ export class ModalManager {
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = Math.max(3, 5 * effectiveScale * 0.5);
       ctx.beginPath();
-      ctx.moveTo(originX - 150 * effectiveScale, originZ - 140 * effectiveScale);
-      ctx.quadraticCurveTo(originX - 115 * effectiveScale, originZ - 132 * effectiveScale, originX - 80 * effectiveScale, originZ - 140 * effectiveScale);
+      ctx.moveTo(originX - 134 * effectiveScale, originZ - 138 * effectiveScale);
+      ctx.quadraticCurveTo(originX - 108 * effectiveScale, originZ - 130 * effectiveScale, originX - 84 * effectiveScale, originZ - 138 * effectiveScale);
       ctx.stroke();
 
       // Lightning McQueen Raceway Track
@@ -1309,7 +1312,7 @@ export class ModalManager {
 
       // Dubai Palm Jumeirah & Arabian Gulf Archipelago (Large-Scale Realistic Cartography)
       const pRootX = originX + 176 * effectiveScale;
-      const pRootZ = originZ + 42 * effectiveScale;
+      const pRootZ = originZ + 46 * effectiveScale;
       const pTrunkEndX = originX + 236 * effectiveScale;
 
       ctx.save();
@@ -1330,13 +1333,13 @@ export class ModalManager {
       ctx.lineTo(pTrunkEndX, pRootZ);
       ctx.stroke();
 
-      // 16 Parametric Curved Fronds (8 Pairs)
+      // 16 Parametric Curved Fronds (8 Pairs fanning within Z in [14, 78])
       ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = 2.8 * effectiveScale;
+      ctx.lineWidth = 2.6 * effectiveScale;
       for (let f = 0; f < 8; f++) {
         const rootFrondX = originX + (236 + f * 6.5) * effectiveScale;
         const tipX = originX + (255 + f * 4.5) * effectiveScale;
-        const spreadZ = (14 + f * 5.8) * effectiveScale;
+        const spreadZ = (6 + f * 3.4) * effectiveScale;
         const ctrlX = originX + (242 + f * 6.0) * effectiveScale;
 
         // North frond
@@ -1352,16 +1355,16 @@ export class ModalManager {
         ctx.stroke();
       }
 
-      // Detached Crescent Breakwater Barrier (Radius ~72)
+      // Detached Crescent Breakwater Barrier (Rx ~ 72, Rz ~ 34)
       ctx.strokeStyle = '#c2a661';
-      ctx.lineWidth = 4 * effectiveScale;
+      ctx.lineWidth = 3.8 * effectiveScale;
       ctx.beginPath();
-      const crescentCenterX = originX + 255 * effectiveScale;
-      ctx.arc(crescentCenterX, pRootZ, 72 * effectiveScale, -Math.PI * 0.38, Math.PI * 0.38);
+      const crescentCenterX = originX + 252 * effectiveScale;
+      ctx.ellipse(crescentCenterX, pRootZ, 72 * effectiveScale, 34 * effectiveScale, 0, -Math.PI * 0.42, Math.PI * 0.42);
       ctx.stroke();
 
       // Atlantis The Palm Plinth Marker
-      const atlantisX = originX + 320 * effectiveScale;
+      const atlantisX = originX + 324 * effectiveScale;
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
       ctx.arc(atlantisX, pRootZ, 3.5 * effectiveScale, 0, Math.PI * 2);
@@ -1405,10 +1408,10 @@ export class ModalManager {
       ctx.arc(blueX, blueZ, 5 * effectiveScale, 0, Math.PI * 2);
       ctx.stroke();
 
-      // 4. The World Islands Archipelago
+      // 4. The World Islands Archipelago (In deep Arabian Gulf east of Palm Jumeirah)
       ctx.fillStyle = '#e2cb87';
       const worldIslands = [
-        [280, -55, 4.5], [290, -48, 3.5], [270, -28, 4.0], [285, -30, 3.8], [300, -35, 3.0]
+        [360, 46, 5.0], [380, 68, 4.2], [350, 24, 4.0], [380, 28, 3.8]
       ];
       for (const [wx, wz, wr] of worldIslands) {
         ctx.beginPath();
@@ -1560,7 +1563,7 @@ export class ModalManager {
       // RED DESTINATION BANNER FLAGS ON POLES (EXACT MATCH TO REFERENCE IMAGE 2)
       // =========================================================================
       const majorHubTags = [
-        'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'NEO YORK',
+        'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'SEOUL', 'NEO YORK',
         'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN', 'ALPS'
       ];
 

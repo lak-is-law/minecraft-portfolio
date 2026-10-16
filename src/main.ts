@@ -1,5 +1,6 @@
 import { ClimateEffects } from './world/climate';
 import { CelestialSky } from './world/celestial';
+import { CloudManager } from './world/clouds';
 import * as THREE from 'three';
 import { TextureManager } from './engine/textures';
 import { VoxelWorld } from './world/world';
@@ -46,9 +47,8 @@ class Game {
   ];
   private readonly currentSkyColor = new THREE.Color();
 
-  // Blocky Clouds
-  private cloudsMesh: THREE.InstancedMesh | null = null;
-  private cloudDummy = new THREE.Object3D();
+  // Procedural 3D Minecraft Cumulus Clouds
+  private clouds: CloudManager;
 
   // Performance tracking
   private lastTime: number = performance.now();
@@ -112,7 +112,7 @@ class Game {
     this.sunLight.castShadow = false;
     this.scene.add(this.sunLight);
 
-    this.createMinecraftClouds();
+    this.clouds = new CloudManager(this.scene);
     this.climate = new ClimateEffects(this.scene, this.sunLight, this.ambientLight);
     this.climate.onChange = (weather, season) => {
       this.hud.updateClimateStatus(weather, season);
@@ -124,34 +124,6 @@ class Game {
 
     // Start Loop
     this.animate();
-  }
-
-  // Create iconic blocky floating Minecraft clouds at Y = 28 across expanded realm
-  private createMinecraftClouds() {
-    const cloudCount = 350;
-    const cloudGeo = new THREE.BoxGeometry(12, 2, 10);
-    const cloudMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.72
-    });
-
-    this.cloudsMesh = new THREE.InstancedMesh(cloudGeo, cloudMat, cloudCount);
-
-    let idx = 0;
-    for (let x = -200; x <= 200; x += 22) {
-      for (let z = -200; z <= 200; z += 22) {
-        if (Math.sin(x * 0.15) * Math.cos(z * 0.15) > -0.25 && idx < cloudCount) {
-          this.cloudDummy.position.set(x + (Math.random() - 0.5) * 6, 32, z + (Math.random() - 0.5) * 6);
-          this.cloudDummy.updateMatrix();
-          this.cloudsMesh.setMatrixAt(idx, this.cloudDummy.matrix);
-          idx++;
-        }
-      }
-    }
-    this.cloudsMesh.count = idx;
-    this.cloudsMesh.instanceMatrix.needsUpdate = true;
-    this.scene.add(this.cloudsMesh);
   }
 
   private bindEvents() {
@@ -201,10 +173,14 @@ class Game {
       this.hud.pushChatMessage('System', `Transitioning to ${this.isNightMode ? 'midnight' : 'noon'}...`);
     };
 
-    // Keyboard shortcut [T] to toggle day & night
+    // Keyboard shortcuts [T] for day/night, [O] to toggle clouds
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyT' && !this.modals.isOpen) {
         this.hud.onDayNightToggle?.();
+      }
+      if (e.code === 'KeyO' && !this.modals.isOpen) {
+        const visible = this.clouds.toggle();
+        this.hud.pushChatMessage('Clouds', `Clouds ${visible ? 'Enabled (Volumetric 3D Cumulus)' : 'Disabled'}`);
       }
     });
 
@@ -1183,20 +1159,14 @@ class Game {
       npcChatManager.update(now * 0.001, this.player.position);
     }
 
-    // 3. Drift blocky clouds slowly & tint dynamically during stormy weather
-    if (this.cloudsMesh) {
-      this.cloudsMesh.position.x += dt * 0.8;
-      if (this.cloudsMesh.position.x > 80) {
-        this.cloudsMesh.position.x = -80;
-      }
-      const cloudMat = this.cloudsMesh.material as THREE.MeshBasicMaterial;
-      const targetCloudColor = this.climate.weather === 'thunderstorm'
-        ? new THREE.Color(0x384152)
-        : this.climate.weather === 'rain'
-        ? new THREE.Color(0x6b7280)
-        : new THREE.Color(0xffffff);
-      cloudMat.color.lerp(targetCloudColor, dt * 2.0);
-    }
+    // 3. Procedural 3D Cumulus Clouds: seamless toroidal drift & atmospheric lighting
+    this.clouds.update(
+      dt,
+      this.player.position,
+      this.dayNightAngle,
+      this.climate.weather,
+      this.climate.lightningFlash
+    );
 
     // 4. Update Day/Night and Climate
     const gloom = this.climate.weather === 'thunderstorm' ? 0.32 : this.climate.weather === 'rain' ? 0.58 : 1.0;

@@ -44,6 +44,10 @@ export class ClimateEffects {
   private wasRaining = false;
   private auroraCurrentOpacity = 0;
 
+  public get lightningFlash(): number {
+    return this.flashIntensity;
+  }
+
   constructor(
     private readonly scene: THREE.Scene,
     private readonly sunLight: THREE.DirectionalLight,

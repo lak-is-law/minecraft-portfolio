@@ -429,6 +429,7 @@ export class HUDManager {
         <div>Facing: ${facing} (Towards ${(deg).toFixed(1)} deg)</div>
         <div>Biome: minecraft:plains (Portfolio Overworld)</div>
         <div>Light: 15 (15 sky, 0 block)</div>
+        <div>Clouds: Volumetric 3D Cumulus [Y: 98-105] (Toggle [O])</div>
       </div>
       <div class="mc-f3-right">
         <div>Engine: Three.js WebGL Metal / Core</div>
@@ -589,12 +590,12 @@ export class HUDManager {
 
     // 1. India (Subcontinent Peninsula - terracotta sandstone)
     drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
-    // 2. China (Northern Pine Arc)
-    drawMiniCountry([[-185, -95], [-160, -145], [-120, -175], [-70, -170], [-45, -140], [-45, -95], [-85, -80], [-130, -75], [-185, -95]], '#1e3f20');
+    // 2. China (Northern Pine Arc & Dragon Pagoda)
+    drawMiniCountry([[-134, -78], [-134, -98], [-140, -135], [-120, -172], [-84, -170], [-82, -135], [-82, -80], [-105, -78], [-134, -78]], '#1e3f20');
     // 3. Japan (Archipelago - Sakura Blossom)
-    drawMiniCountry([[-175, -60], [-160, -75], [-145, -95], [-135, -85], [-150, -65], [-165, -55], [-175, -60]], '#f472b6');
-    // 4. South Korea (Peninsula)
-    drawMiniCountry([[-75, -85], [-50, -85], [-45, -115], [-65, -125], [-75, -105], [-75, -85]], '#0284c7');
+    drawMiniCountry([[-178, -58], [-168, -52], [-148, -64], [-136, -78], [-136, -92], [-146, -98], [-162, -88], [-178, -68], [-178, -58]], '#f472b6');
+    // 4. South Korea (Joseon Peninsula)
+    drawMiniCountry([[-80, -82], [-80, -132], [-65, -132], [-46, -122], [-46, -88], [-60, -82], [-80, -82]], '#0284c7');
     // 5. UK (British Isles)
     drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#dc2626');
     // 6. France (L’Hexagone)
@@ -606,7 +607,7 @@ export class HUDManager {
     // 9. Egypt (Sahara desert dunes)
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
     // 10. UAE (Dubai Waterfront, Palm Jumeirah Archipelago, Burj Al Arab, Bluewaters & The World Islands)
-    drawMiniCountry([[150, -60], [340, -60], [340, 160], [150, 160], [150, -60]], '#0d9488');
+    drawMiniCountry([[150, 10], [390, 10], [390, 160], [150, 160], [150, 10]], '#0d9488');
     // 12. Sunflower Valley
     drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
     // Pier & Beach Boardwalk
@@ -703,8 +704,8 @@ export class HUDManager {
     ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 3.5 * scale;
     ctx.beginPath();
-    ctx.moveTo(originX - 150 * scale, originZ - 140 * scale);
-    ctx.quadraticCurveTo(originX - 115 * scale, originZ - 132 * scale, originX - 80 * scale, originZ - 140 * scale);
+    ctx.moveTo(originX - 134 * scale, originZ - 138 * scale);
+    ctx.quadraticCurveTo(originX - 108 * scale, originZ - 130 * scale, originX - 84 * scale, originZ - 138 * scale);
     ctx.stroke();
 
     // Hollywood ridge in USA

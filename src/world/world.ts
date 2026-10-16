@@ -2082,8 +2082,12 @@ export class VoxelWorld {
       { name: 'Daiki Takahashi', role: 'Shinkansen Conductor', x: -155, y: 2, z: -94, heading: 0, skinColor: 0xf1c27d, shirtColor: 0x1e3a8a, pantsColor: 0x1e3a8a, hairColor: 0x18181b, tagColor: '#2563eb', hatType: 'cap', hatColor: 0x1e3a8a },
 
       // 3. Seoul Gwanghwamun Realm: Modern K-pop & palace heritage
-      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 13, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
-      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 15, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+      { name: 'Min-Jun Park', role: 'Seoul Game Producer', x: -62, y: 7, z: -92, heading: Math.PI / 3, skinColor: 0xffe0bd, shirtColor: 0x3b82f6, pantsColor: 0x18181b, hairColor: 0x27272a, tagColor: '#60a5fa', hatType: 'cap', hatColor: 0x18181b },
+      { name: 'Ji-Eun Kim', role: 'Hanbok Artisan', x: -68, y: 7, z: -96, heading: -Math.PI / 4, skinColor: 0xffdbac, shirtColor: 0x10b981, pantsColor: 0x047857, hairColor: 0x111111, tagColor: '#34d399', hatType: 'none' },
+
+      // 4. China Great Wall & Temple Realm: Imperial scholars & historians
+      { name: 'Li Wei', role: 'Imperial Great Wall Scholar', x: -110, y: 3, z: -101, heading: 0, skinColor: 0xffdbac, shirtColor: 0xd97706, pantsColor: 0x78350f, hairColor: 0x18181b, tagColor: '#f59e0b', hatType: 'none' },
+      { name: 'Master Chen', role: 'Temple Calligraphy Master', x: -122, y: 3, z: -81, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0x991b1b, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#ef4444', hatType: 'none' },
 
       // 4. Hollywood & Times Square USA Realm: Directors, film stars, reporters
       { name: 'Scarlett Miller', role: 'Hollywood Film Director', x: 133, y: 2, z: -30, heading: Math.PI, skinColor: 0xf5d0b5, shirtColor: 0x18181b, pantsColor: 0x27272a, hairColor: 0xb45309, tagColor: '#f59e0b', hatType: 'beret', hatColor: 0x18181b },

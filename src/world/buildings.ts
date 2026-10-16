@@ -61,6 +61,11 @@ export class WorldBuilder {
     this.buildAlpineSnowMountainRealm();
     this.buildSunflowerValleyAndFarmstead();
     this.buildPromenadeParklands();
+    this.buildMegaSuspensionBridge();
+    this.buildColossalRomanAqueduct();
+    this.buildNordicAtlanticSkyway();
+    this.buildGrandMaritimeCanal();
+    this.buildHyperColliderResearchFacility();
   }
 
   // Deterministic Biome Topography Elevation Engine
@@ -3898,36 +3903,36 @@ export class WorldBuilder {
       }
     }
 
-    // Monumental Palm Gateway Archway at (176, 42)
+    // Monumental Palm Gateway Archway at (176, 46)
     for (let y = 2; y <= 6; y++) {
-      this.setBlock(176, y, 36, 'quartz_pillar');
-      this.setBlock(176, y, 48, 'quartz_pillar');
+      this.setBlock(176, y, 40, 'quartz_pillar');
+      this.setBlock(176, y, 52, 'quartz_pillar');
     }
-    this.setBlock(176, 7, 36, 'gold_block');
-    this.setBlock(176, 7, 48, 'gold_block');
-    this.setBlock(176, 8, 36, 'sea_lantern');
-    this.setBlock(176, 8, 48, 'sea_lantern');
+    this.setBlock(176, 7, 40, 'gold_block');
+    this.setBlock(176, 7, 52, 'gold_block');
+    this.setBlock(176, 8, 40, 'sea_lantern');
+    this.setBlock(176, 8, 52, 'sea_lantern');
 
-    for (let z = 36; z <= 48; z++) {
-      this.setBlock(176, 7, z, (z === 42) ? 'sea_lantern' : 'gold_block');
-      this.setBlock(176, 8, z, (z === 42) ? 'gold_block' : 'quartz_block');
+    for (let z = 40; z <= 52; z++) {
+      this.setBlock(176, 7, z, (z === 46) ? 'sea_lantern' : 'gold_block');
+      this.setBlock(176, 8, z, (z === 46) ? 'gold_block' : 'quartz_block');
     }
 
-    this.setBlock(176, 2, 40, 'gold_block', {
+    this.setBlock(176, 2, 44, 'gold_block', {
       type: 'sign',
       title: 'Palm Jumeirah Gateway · مدخل نخلة جميرا 🌴',
       text: 'Welcome to the Eighth Wonder of the World! A monumental, large-scale archipelago spanning the Arabian Gulf with 16 massive curved fronds, The Palm Tower, Atlantis, Burj Al Arab, and Bluewaters.'
     });
   }
 
-  // B. The Flared Trunk, Monorail Spine & The Palm Tower (X in [176, 235], Z in [37, 47])
+  // B. The Flared Trunk, Monorail Spine & The Palm Tower (X in [176, 235], Z in [41, 51])
   private buildPalmTrunkAndFlaredBase() {
-    // 1. Flared Base & Linear Spine Paving (Width 11, halfW = 5)
+    // 1. Flared Base & Linear Spine Paving (Width 11, halfW = 5, Axis Z = 46)
     for (let x = 176; x <= 235; x++) {
       const halfW = (x <= 184) ? Math.round(5 - (x - 176) * 0.25) : 5;
 
       for (let dz = -halfW; dz <= halfW; dz++) {
-        const z = 42 + dz;
+        const z = 46 + dz;
         this.setBlock(x, 1, z, 'sand');
 
         const isOuterEdge = (Math.abs(dz) === halfW);
@@ -3940,7 +3945,8 @@ export class WorldBuilder {
         } else if (Math.abs(dz) === halfW - 1) {
           // Sidewalk promenade
           this.setBlock(x, 1, z, 'quartz_block');
-          if (x % 5 === 0 && x <= 232) {
+          // Space palm trees gracefully (every 12 blocks)
+          if (x % 12 === 0 && x >= 184 && x <= 228) {
             this.buildPalmTree(x, 1, z);
           }
         } else if (Math.abs(dz) === 2 || Math.abs(dz) === 3) {
@@ -3953,7 +3959,7 @@ export class WorldBuilder {
           // Inner median buffer
           this.setBlock(x, 1, z, 'smooth_stone');
         } else if (dz === 0) {
-          // Central Palm Monorail Line
+          // Central Palm Monorail Line along Z = 46
           this.setBlock(x, 1, z, 'stone_bricks');
           if (x % 4 === 0) {
             this.setBlock(x, 2, z, 'quartz_pillar'); // Monorail pier
@@ -3969,30 +3975,30 @@ export class WorldBuilder {
 
     // Monorail Passenger Train on track at X = 192..196
     for (let mx = 192; mx <= 196; mx++) {
-      this.setBlock(mx, 5, 42, 'cyber_glass');
-      this.setBlock(mx, 6, 42, 'quartz_block');
+      this.setBlock(mx, 5, 46, 'cyber_glass');
+      this.setBlock(mx, 6, 46, 'quartz_block');
     }
-    this.setBlock(196, 5, 42, 'sea_lantern'); // Train headlight
+    this.setBlock(196, 5, 46, 'sea_lantern'); // Train headlight
 
     // Shoreline Luxury Apartments along the trunk sides (X in [188, 202] and [222, 232])
     for (const bRange of [{ start: 188, end: 202 }, { start: 222, end: 232 }]) {
       for (let x = bRange.start; x <= bRange.end; x += 4) {
-        // North Shoreline Apt
-        this.setBlock(x, 2, 38, 'quartz_block');
-        this.setBlock(x, 3, 38, 'cyber_glass');
-        this.setBlock(x, 4, 38, 'quartz_block');
-        this.setBlock(x, 5, 38, 'gold_block');
-        // South Shoreline Apt
-        this.setBlock(x, 2, 46, 'quartz_block');
-        this.setBlock(x, 3, 46, 'cyber_glass');
-        this.setBlock(x, 4, 46, 'quartz_block');
-        this.setBlock(x, 5, 46, 'gold_block');
+        // North Shoreline Apt (Z = 42)
+        this.setBlock(x, 2, 42, 'quartz_block');
+        this.setBlock(x, 3, 42, 'cyber_glass');
+        this.setBlock(x, 4, 42, 'quartz_block');
+        this.setBlock(x, 5, 42, 'gold_block');
+        // South Shoreline Apt (Z = 50)
+        this.setBlock(x, 2, 50, 'quartz_block');
+        this.setBlock(x, 3, 50, 'cyber_glass');
+        this.setBlock(x, 4, 50, 'quartz_block');
+        this.setBlock(x, 5, 50, 'gold_block');
       }
     }
 
-    // 2. The Palm Tower & Nakheel Mall Complex (X in [208, 218], Z in [38, 46])
+    // 2. The Palm Tower & Nakheel Mall Complex (X in [208, 218], Z in [42, 50])
     const ptX = 213;
-    const ptZ = 42;
+    const ptZ = 46;
     // Ground floor concourse lobby (Y = 1 to 3)
     for (let dx = -4; dx <= 4; dx++) {
       for (let dz = -3; dz <= 3; dz++) {
@@ -4063,13 +4069,13 @@ export class WorldBuilder {
     });
   }
 
-  // C. The Palm Crown Hub (X in [235, 252], Z in [34, 50])
+  // C. The Palm Crown Hub (X in [235, 252], Z in [39, 53])
   private buildCentralCrownHub() {
     const hubX = 243;
-    const hubZ = 42;
+    const hubZ = 46;
 
     for (let x = 235; x <= 252; x++) {
-      for (let z = 34; z <= 50; z++) {
+      for (let z = 38; z <= 54; z++) {
         const d = Math.hypot((x - hubX) / 8, (z - hubZ) / 8);
         if (d <= 1.0) {
           this.setBlock(x, 1, z, (d <= 0.4) ? 'gold_block' : 'quartz_block');
@@ -4103,8 +4109,8 @@ export class WorldBuilder {
     this.setBlock(hubX, 4, hubZ, 'gold_block');
     this.setBlock(hubX, 5, hubZ, 'water'); // Cascading water
 
-    // Date Palm Circle surrounding the plaza
-    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+    // Date Palm Circle surrounding the plaza (4 elegant cardinal trees)
+    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
       const px = Math.round(hubX + 7 * Math.cos(angle));
       const pz = Math.round(hubZ + 7 * Math.sin(angle));
       this.buildPalmTree(px, 1, pz);
@@ -4117,17 +4123,17 @@ export class WorldBuilder {
     });
   }
 
-  // D. 16 Grand Symmetrical Curved Fronds (8 Pairs, 40-60 blocks long each)
+  // D. 16 Grand Symmetrical Curved Fronds (8 Pairs, fanning safely within Z in [14, 78])
   private build16ParametricCurvedFronds() {
     const frondDefs = [
-      { id: 'H', xRoot: 236, xTip: 286, dz: 62 }, // Outer Fronds
-      { id: 'G', xRoot: 238, xTip: 292, dz: 54 },
-      { id: 'F', xRoot: 240, xTip: 296, dz: 46 },
-      { id: 'E', xRoot: 242, xTip: 300, dz: 38 },
-      { id: 'D', xRoot: 244, xTip: 302, dz: 30 },
-      { id: 'C', xRoot: 246, xTip: 302, dz: 22 },
-      { id: 'B', xRoot: 248, xTip: 298, dz: 15 },
-      { id: 'A', xRoot: 250, xTip: 292, dz: 9 }  // Inner Fronds
+      { id: 'H', xRoot: 236, xTip: 288, dz: 30 }, // Outer Fronds (stays strictly >= 16)
+      { id: 'G', xRoot: 238, xTip: 292, dz: 26 },
+      { id: 'F', xRoot: 240, xTip: 296, dz: 22 },
+      { id: 'E', xRoot: 242, xTip: 300, dz: 18 },
+      { id: 'D', xRoot: 244, xTip: 302, dz: 14 },
+      { id: 'C', xRoot: 246, xTip: 302, dz: 11 },
+      { id: 'B', xRoot: 248, xTip: 298, dz: 8 },
+      { id: 'A', xRoot: 250, xTip: 292, dz: 5 }   // Inner Fronds
     ];
 
     for (let i = 0; i < frondDefs.length; i++) {
@@ -4136,10 +4142,10 @@ export class WorldBuilder {
 
       for (let x = f.xRoot; x <= f.xTip; x++) {
         const u = (x - f.xRoot) / length;
-        const curveOffset = 4 + (f.dz - 4) * Math.pow(u, 1.35);
+        const curveOffset = 3 + (f.dz - 3) * Math.pow(u, 1.35);
 
         for (const side of [-1, 1]) {
-          const centerZ = Math.round(42 + side * curveOffset);
+          const centerZ = Math.round(46 + side * curveOffset);
 
           // Pave frond width: central quartz drive + sand beach flanks
           for (let dz = -2; dz <= 2; dz++) {
@@ -4151,14 +4157,13 @@ export class WorldBuilder {
             }
           }
 
-          // Plant Date Palms along fronds
-          if (x % 7 === 0 && x < f.xTip - 6) {
-            this.buildPalmTree(x, 1, centerZ - 2);
-            this.buildPalmTree(x, 1, centerZ + 2);
+          // Plant Date Palms along fronds (well-spaced: every 14 blocks)
+          if (x % 14 === 0 && x >= f.xRoot + 12 && x <= f.xTip - 10) {
+            this.buildPalmTree(x, 1, centerZ + side * 2);
           }
 
           // Streetlights along the avenue
-          if (x % 9 === 0) {
+          if (x % 10 === 0) {
             this.setBlock(x, 2, centerZ + side * 1, 'iron_block');
             this.setBlock(x, 3, centerZ + side * 1, 'lantern');
           }
@@ -4168,25 +4173,25 @@ export class WorldBuilder {
       // Build Grand Luxury Beachfront Mansions along the frond tips & midpoints
       // Midpoint Mansion (u = 0.55)
       const midX = Math.round(f.xRoot + length * 0.55);
-      const midOffset = 4 + (f.dz - 4) * Math.pow(0.55, 1.35);
-      this.buildLuxuryBeachfrontMansion(midX, Math.round(42 - midOffset), -1, `Frond ${f.id} North`);
-      this.buildLuxuryBeachfrontMansion(midX, Math.round(42 + midOffset), 1, `Frond ${f.id} South`);
+      const midOffset = 3 + (f.dz - 3) * Math.pow(0.55, 1.35);
+      this.buildLuxuryBeachfrontMansion(midX, Math.round(46 - midOffset), -1, `Frond ${f.id} North`);
+      this.buildLuxuryBeachfrontMansion(midX, Math.round(46 + midOffset), 1, `Frond ${f.id} South`);
 
       // Tip Mansion (u = 0.90)
       const tipX = Math.round(f.xRoot + length * 0.88);
-      const tipOffset = 4 + (f.dz - 4) * Math.pow(0.88, 1.35);
-      this.buildLuxuryBeachfrontMansion(tipX, Math.round(42 - tipOffset), -1, `Frond ${f.id} Royal Apex`);
-      this.buildLuxuryBeachfrontMansion(tipX, Math.round(42 + tipOffset), 1, `Frond ${f.id} Royal Apex`);
+      const tipOffset = 3 + (f.dz - 3) * Math.pow(0.88, 1.35);
+      this.buildLuxuryBeachfrontMansion(tipX, Math.round(46 - tipOffset), -1, `Frond ${f.id} Royal Apex`);
+      this.buildLuxuryBeachfrontMansion(tipX, Math.round(46 + tipOffset), 1, `Frond ${f.id} Royal Apex`);
     }
 
     // Interactive Landmark Signs on Iconic Fronds
-    this.setBlock(266, 2, 28, 'quartz_block', {
+    this.setBlock(266, 2, 35, 'quartz_block', {
       type: 'sign',
       title: "Frond C · Billionaire's Row Beachfront Villa 🏖️",
       text: 'Ultra-exclusive private residence on Palm Jumeirah with private turquoise beach, infinity plunge pool, yacht slip, and panoramic skyline vistas.'
     });
 
-    this.setBlock(266, 2, 70, 'quartz_block', {
+    this.setBlock(266, 2, 72, 'quartz_block', {
       type: 'sign',
       title: 'Frond G · Signature Royal Beachfront Villa 🏖️',
       text: 'Iconic southern frond billionaire estate featuring 5-bedroom modern cubic design, private white sand beach, and sunset views over the Arabian Gulf.'
@@ -4226,18 +4231,18 @@ export class WorldBuilder {
     this.setBlock(x + 1, 2, z + side * 2, 'oak_planks');
   }
 
-  // E. Detached Outer Crescent Breakwater (Rx = 75, Rz = 70, Center at 245, 42)
+  // E. Detached Outer Crescent Breakwater (Rx = 72, Rz = 34, Center at 252, 46 - strictly Z in [12, 80])
   private buildDetachedCrescentBreakwater() {
-    const cX = 245;
-    const cZ = 42;
+    const cX = 252;
+    const cZ = 46;
 
-    for (let x = 200; x <= 325; x++) {
-      for (let z = -28; z <= 112; z++) {
-        const cd = Math.hypot((x - cX) / 75, (z - cZ) / 70);
+    for (let x = 210; x <= 325; x++) {
+      for (let z = 12; z <= 80; z++) {
+        const cd = Math.hypot((x - cX) / 72, (z - cZ) / 34);
         if (cd >= 0.94 && cd <= 1.05) {
           // Check tidal gap cuts
-          const isNorthGap = (z >= 0 && z <= 5 && x >= 215 && x <= 230);
-          const isSouthGap = (z >= 79 && z <= 84 && x >= 215 && x <= 230);
+          const isNorthGap = (z >= 24 && z <= 27 && x >= 222 && x <= 236);
+          const isSouthGap = (z >= 65 && z <= 68 && x >= 222 && x <= 236);
           if (isNorthGap || isSouthGap) continue;
 
           // Outer edge = protective stone seawall
@@ -4250,7 +4255,7 @@ export class WorldBuilder {
           } else if (cd >= 0.98) {
             // Running / cycling promenade
             this.setBlock(x, 1, z, 'smooth_stone');
-            if ((x + z) % 7 === 0) {
+            if ((x + z) % 15 === 0) {
               this.buildPalmTree(x, 1, z);
             }
           } else {
@@ -4261,10 +4266,10 @@ export class WorldBuilder {
       }
     }
 
-    // North Crescent Lighthouse at (208, -22)
-    this.buildLighthouseTower(208, -22, 'North Crescent Lighthouse & Strait ⚓');
-    // South Crescent Lighthouse at (208, 106)
-    this.buildLighthouseTower(208, 106, 'South Crescent Lighthouse & Strait ⚓');
+    // North Crescent Lighthouse at (222, 14)
+    this.buildLighthouseTower(222, 14, 'North Crescent Lighthouse & Strait ⚓');
+    // South Crescent Lighthouse at (222, 78)
+    this.buildLighthouseTower(222, 78, 'South Crescent Lighthouse & Strait ⚓');
   }
 
   private buildLighthouseTower(x: number, z: number, title: string) {
@@ -4293,30 +4298,30 @@ export class WorldBuilder {
     });
   }
 
-  // F. Atlantis, The Palm & The Royal Atlantis Mega-Resort (X in [310, 335], Z in [30, 54])
+  // F. Atlantis, The Palm & The Royal Atlantis Mega-Resort (X in [312, 335], Z in [36, 56])
   private buildAtlantisPalaceResort() {
     const atX = 320;
-    const atZ = 42;
+    const atZ = 46;
 
     // 1. Plinth Platform (Y = 1)
-    for (let x = 310; x <= 335; x++) {
-      for (let z = 30; z <= 54; z++) {
+    for (let x = 312; x <= 335; x++) {
+      for (let z = 36; z <= 56; z++) {
         this.setBlock(x, 1, z, 'sandstone');
       }
     }
 
-    // 2. North Palatial Wing (X in [314, 328], Z in [32, 38]) - Stepped tiers up to Y = 30
+    // 2. North Palatial Wing (X in [314, 328], Z in [36, 42]) - Stepped tiers up to Y = 30
     for (let x = 314; x <= 328; x++) {
-      for (let z = 32; z <= 38; z++) {
+      for (let z = 36; z <= 42; z++) {
         for (let y = 2; y <= 8; y++) {
-          this.setBlock(x, y, z, (x === 314 || z === 32) ? 'cyber_glass' : 'terracotta_adobe');
+          this.setBlock(x, y, z, (x === 314 || z === 36) ? 'cyber_glass' : 'terracotta_adobe');
         }
-        if (x >= 316 && x <= 326 && z >= 33 && z <= 37) {
+        if (x >= 316 && x <= 326 && z >= 37 && z <= 41) {
           for (let y = 9; y <= 16; y++) {
-            this.setBlock(x, y, z, (x === 316 || z === 33) ? 'cyber_glass' : 'terracotta_adobe');
+            this.setBlock(x, y, z, (x === 316 || z === 37) ? 'cyber_glass' : 'terracotta_adobe');
           }
         }
-        if (x >= 318 && x <= 324 && z >= 34 && z <= 36) {
+        if (x >= 318 && x <= 324 && z >= 38 && z <= 40) {
           for (let y = 17; y <= 24; y++) {
             this.setBlock(x, y, z, 'quartz_block');
           }
@@ -4325,24 +4330,24 @@ export class WorldBuilder {
     }
     // North Tower Pinnacles
     for (let y = 25; y <= 30; y++) {
-      this.setBlock(321, y, 35, 'quartz_pillar');
+      this.setBlock(321, y, 39, 'quartz_pillar');
     }
-    this.setBlock(321, 31, 35, 'gold_block');
-    this.setBlock(321, 32, 35, 'sea_lantern');
-    this.setBlock(321, 33, 35, 'beacon');
+    this.setBlock(321, 31, 39, 'gold_block');
+    this.setBlock(321, 32, 39, 'sea_lantern');
+    this.setBlock(321, 33, 39, 'beacon');
 
-    // 3. South Palatial Wing (X in [314, 328], Z in [46, 52]) - Stepped tiers up to Y = 30
+    // 3. South Palatial Wing (X in [314, 328], Z in [50, 56]) - Stepped tiers up to Y = 30
     for (let x = 314; x <= 328; x++) {
-      for (let z = 46; z <= 52; z++) {
+      for (let z = 50; z <= 56; z++) {
         for (let y = 2; y <= 8; y++) {
-          this.setBlock(x, y, z, (x === 314 || z === 52) ? 'cyber_glass' : 'terracotta_adobe');
+          this.setBlock(x, y, z, (x === 314 || z === 56) ? 'cyber_glass' : 'terracotta_adobe');
         }
-        if (x >= 316 && x <= 326 && z >= 47 && z <= 51) {
+        if (x >= 316 && x <= 326 && z >= 51 && z <= 55) {
           for (let y = 9; y <= 16; y++) {
-            this.setBlock(x, y, z, (x === 314 || z === 52) ? 'cyber_glass' : 'terracotta_adobe');
+            this.setBlock(x, y, z, (x === 314 || z === 56) ? 'cyber_glass' : 'terracotta_adobe');
           }
         }
-        if (x >= 318 && x <= 324 && z >= 48 && z <= 50) {
+        if (x >= 318 && x <= 324 && z >= 52 && z <= 54) {
           for (let y = 17; y <= 24; y++) {
             this.setBlock(x, y, z, 'quartz_block');
           }
@@ -4351,18 +4356,17 @@ export class WorldBuilder {
     }
     // South Tower Pinnacles
     for (let y = 25; y <= 30; y++) {
-      this.setBlock(321, y, 49, 'quartz_pillar');
+      this.setBlock(321, y, 53, 'quartz_pillar');
     }
-    this.setBlock(321, 31, 49, 'gold_block');
-    this.setBlock(321, 32, 49, 'sea_lantern');
-    this.setBlock(321, 33, 49, 'beacon');
+    this.setBlock(321, 31, 53, 'gold_block');
+    this.setBlock(321, 32, 53, 'sea_lantern');
+    this.setBlock(321, 33, 53, 'beacon');
 
-    // 4. The Monumental Grand Arabian Archway (Z in [39, 45], X in [316, 326])
-    // Soaring open keyhole vault from Y = 2 to 16 with reflecting pool beneath
+    // 4. The Monumental Grand Arabian Archway (Z in [43, 49], X in [316, 326])
     for (let x = 316; x <= 326; x++) {
-      for (let z = 39; z <= 45; z++) {
+      for (let z = 43; z <= 49; z++) {
         this.setBlock(x, 1, z, 'prismarine_bricks');
-        this.setBlock(x, 2, z, (Math.abs(z - 42) <= 1) ? 'water' : 'quartz_block');
+        this.setBlock(x, 2, z, (Math.abs(z - 46) <= 1) ? 'water' : 'quartz_block');
         // Clear open interior framing unobstructed view into Arabian Gulf
         for (let y = 3; y <= 16; y++) {
           this.setBlock(x, y, z, 'air');
@@ -4370,98 +4374,98 @@ export class WorldBuilder {
       }
       // Archway Supporting Colonnades
       for (let y = 2; y <= 15; y++) {
-        this.setBlock(x, y, 39, 'quartz_pillar');
-        this.setBlock(x, y, 45, 'quartz_pillar');
+        this.setBlock(x, y, 43, 'quartz_pillar');
+        this.setBlock(x, y, 49, 'quartz_pillar');
       }
-      this.setBlock(x, 16, 39, 'gold_block');
-      this.setBlock(x, 16, 45, 'gold_block');
+      this.setBlock(x, 16, 43, 'gold_block');
+      this.setBlock(x, 16, 49, 'gold_block');
     }
 
-    // 5. The Royal Bridge Suite (Spanning Y = 17 to 23 across Z in [39, 45], X in [317, 325])
+    // 5. The Royal Bridge Suite (Spanning Y = 17 to 23 across Z in [43, 49], X in [317, 325])
     for (let x = 317; x <= 325; x++) {
-      for (let z = 39; z <= 45; z++) {
+      for (let z = 43; z <= 49; z++) {
         this.setBlock(x, 17, z, 'gold_block'); // Bridge Suite floor
         this.setBlock(x, 18, z, (x === 317 || x === 325) ? 'cyber_glass' : 'air');
         this.setBlock(x, 19, z, (x === 317 || x === 325) ? 'cyber_glass' : 'air');
         this.setBlock(x, 20, z, (x === 317 || x === 325) ? 'cyber_glass' : 'quartz_block');
         this.setBlock(x, 21, z, 'quartz_block');
         this.setBlock(x, 22, z, 'gold_block'); // Ornate crown cresting
-        this.setBlock(x, 23, z, (x === 321 && z === 42) ? 'beacon' : 'gold_block');
+        this.setBlock(x, 23, z, (x === 321 && z === 46) ? 'beacon' : 'gold_block');
       }
     }
-    this.setBlock(321, 19, 42, 'sea_lantern'); // Grand Chandelier
+    this.setBlock(321, 19, 46, 'sea_lantern'); // Grand Chandelier
 
-    // 6. Aquaventure Waterpark Ziggurat Cascades (Stepped slides at Z = 30 and Z = 54)
-    for (const cz of [30, 54]) {
+    // 6. Aquaventure Waterpark Ziggurat Cascades
+    for (const cz of [34, 58]) {
       for (let step = 0; step <= 6; step++) {
         this.setBlock(324 - step, 8 - step, cz, 'prismarine_bricks');
         this.setBlock(324 - step, 9 - step, cz, 'water');
       }
     }
 
-    // 7. Atlantis Arrival Courtyard & Royal Palm Court (X in [306, 312], Z in [38, 46])
+    // 7. Atlantis Arrival Courtyard & Royal Palm Court (X in [306, 312], Z in [42, 50])
     for (let x = 306; x <= 312; x++) {
-      for (let z = 38; z <= 46; z++) {
+      for (let z = 42; z <= 50; z++) {
         this.setBlock(x, 1, z, 'quartz_block');
       }
     }
     // Royal Fountains
-    this.setBlock(308, 2, 42, 'prismarine_bricks');
-    this.setBlock(308, 3, 42, 'sea_lantern');
-    this.setBlock(308, 4, 42, 'water');
+    this.setBlock(308, 2, 46, 'prismarine_bricks');
+    this.setBlock(308, 3, 46, 'sea_lantern');
+    this.setBlock(308, 4, 46, 'water');
 
-    this.buildPalmTree(308, 1, 38);
-    this.buildPalmTree(308, 1, 46);
+    this.buildPalmTree(308, 1, 41);
+    this.buildPalmTree(308, 1, 51);
 
-    this.setBlock(307, 2, 41, 'sandstone', {
+    this.setBlock(307, 2, 45, 'sandstone', {
       type: 'sign',
       title: 'Atlantis, The Palm & The Royal Atlantis 👑',
       text: 'Monumental 5-star ocean-themed resort crowned by the legendary Royal Bridge Suite at Y = 17..23, Aquaventure waterpark ziggurat, and panoramic Arabian Gulf vistas.'
     });
   }
 
-  // G. 60-Block Subsea Transparent Cyber-Glass Transit Tunnel (X in [250, 310], Z in [41, 43])
+  // G. 60-Block Subsea Transparent Cyber-Glass Transit Tunnel (X in [250, 310], Z in [45, 47])
   private buildSubseaGlassTunnel() {
     for (let x = 250; x <= 308; x++) {
-      // Submerged tunnel floor at Y = 1
-      this.setBlock(x, 1, 42, (x % 2 === 0) ? 'gold_block' : 'smooth_stone');
-      this.setBlock(x, 1, 41, 'stone_bricks');
-      this.setBlock(x, 1, 43, 'stone_bricks');
+      // Submerged tunnel floor at Y = 1 along Z = 46
+      this.setBlock(x, 1, 46, (x % 2 === 0) ? 'gold_block' : 'smooth_stone');
+      this.setBlock(x, 1, 45, 'stone_bricks');
+      this.setBlock(x, 1, 47, 'stone_bricks');
 
       // Transparent Cyber-Glass Walls and Ceiling at Y = 2 and 3
-      this.setBlock(x, 2, 41, 'cyber_glass');
-      this.setBlock(x, 2, 43, 'cyber_glass');
-      this.setBlock(x, 3, 41, 'cyber_glass');
-      this.setBlock(x, 3, 43, 'cyber_glass');
-      this.setBlock(x, 3, 42, 'cyber_glass'); // Glass arched vault
+      this.setBlock(x, 2, 45, 'cyber_glass');
+      this.setBlock(x, 2, 47, 'cyber_glass');
+      this.setBlock(x, 3, 45, 'cyber_glass');
+      this.setBlock(x, 3, 47, 'cyber_glass');
+      this.setBlock(x, 3, 46, 'cyber_glass'); // Glass arched vault
 
       // Clear walkable interior at Y = 2
-      this.setBlock(x, 2, 42, 'air');
+      this.setBlock(x, 2, 46, 'air');
 
       // Embedded seabed illumination at Y = 0
       if (x % 3 === 0) {
-        this.setBlock(x, 0, 42, 'sea_lantern');
+        this.setBlock(x, 0, 46, 'sea_lantern');
       }
 
       // Active water blocks covering and surrounding the glass tube outside
-      this.setBlock(x, 2, 40, 'water');
       this.setBlock(x, 2, 44, 'water');
-      this.setBlock(x, 3, 40, 'water');
+      this.setBlock(x, 2, 48, 'water');
       this.setBlock(x, 3, 44, 'water');
-      this.setBlock(x, 4, 41, 'water');
-      this.setBlock(x, 4, 42, 'water');
-      this.setBlock(x, 4, 43, 'water');
+      this.setBlock(x, 3, 48, 'water');
+      this.setBlock(x, 4, 45, 'water');
+      this.setBlock(x, 4, 46, 'water');
+      this.setBlock(x, 4, 47, 'water');
     }
 
     // Portal archways at ends
-    this.setBlock(250, 2, 41, 'quartz_pillar');
-    this.setBlock(250, 2, 43, 'quartz_pillar');
-    this.setBlock(250, 3, 42, 'sea_lantern');
-    this.setBlock(308, 2, 41, 'quartz_pillar');
-    this.setBlock(308, 2, 43, 'quartz_pillar');
-    this.setBlock(308, 3, 42, 'sea_lantern');
+    this.setBlock(250, 2, 45, 'quartz_pillar');
+    this.setBlock(250, 2, 47, 'quartz_pillar');
+    this.setBlock(250, 3, 46, 'sea_lantern');
+    this.setBlock(308, 2, 45, 'quartz_pillar');
+    this.setBlock(308, 2, 47, 'quartz_pillar');
+    this.setBlock(308, 3, 46, 'sea_lantern');
 
-    this.setBlock(251, 2, 41, 'gold_block', {
+    this.setBlock(251, 2, 45, 'gold_block', {
       type: 'sign',
       title: 'Palm Subsea Glass Transit Tunnel 🌊',
       text: 'Walk 60 blocks underwater through the deep lagoon channel connecting the Palm Crown Hub directly to Atlantis! Look up through reinforced cyber-glass into the turquoise Arabian Gulf.'
@@ -4637,11 +4641,11 @@ export class WorldBuilder {
     });
   }
 
-  // J. The World Islands Archipelago Cluster (X in [260, 335], Z in [-75, -15])
+  // J. The World Islands Archipelago Cluster (Vast deep Arabian Gulf east of Palm Jumeirah, X in [342, 390], Z in [16, 78])
   private buildTheWorldIslands() {
-    // 1. Atoll 1 - The Heart of Europe / Monaco Atoll (Center at 280, -55, R = 12)
-    const mX = 280;
-    const mZ = -55;
+    // 1. Atoll 1 - The Heart of Europe / Monaco Atoll (Center at 360, 46, R = 12)
+    const mX = 360;
+    const mZ = 46;
     for (let dx = -12; dx <= 12; dx++) {
       for (let dz = -12; dz <= 12; dz++) {
         const d = Math.hypot(dx, dz);
@@ -4668,12 +4672,12 @@ export class WorldBuilder {
       text: 'Iconic satellite island on Dubai\'s World archipelago featuring European-inspired luxury chateau villas, private marinas, and crystal lagoon beaches.'
     });
 
-    // 2. Atoll 2 - Sweden Island (Center at 318, -48, R = 11)
-    const sX = 318;
-    const sZ = -48;
-    for (let dx = -11; dx <= 11; dx++) {
-      for (let dz = -11; dz <= 11; dz++) {
-        if (Math.hypot(dx, dz) <= 11) {
+    // 2. Atoll 2 - Sweden Island (Center at 380, 68, R = 10)
+    const sX = 380;
+    const sZ = 68;
+    for (let dx = -10; dx <= 10; dx++) {
+      for (let dz = -10; dz <= 10; dz++) {
+        if (Math.hypot(dx, dz) <= 10) {
           this.setBlock(sX + dx, 1, sZ + dz, 'sand');
         }
       }
@@ -4687,9 +4691,9 @@ export class WorldBuilder {
       }
     }
 
-    // 3. Atoll 3 - Floating Seahorse Overwater Island (Center at 270, -28, R = 9)
-    const shX = 270;
-    const shZ = -28;
+    // 3. Atoll 3 - Floating Seahorse Overwater Island (Center at 350, 24, R = 9)
+    const shX = 350;
+    const shZ = 24;
     for (let dx = -9; dx <= 9; dx++) {
       for (let dz = -9; dz <= 9; dz++) {
         if (Math.hypot(dx, dz) <= 9) {
@@ -4725,9 +4729,9 @@ export class WorldBuilder {
       text: 'World-famous overwater villa with submerged glass master bedroom looking directly into the Arabian Gulf seabed coral garden!'
     });
 
-    // 4. Atoll 4 - Coral Sandbar Atoll (Center at 322, -22, R = 8)
-    const cX = 322;
-    const cZ = -22;
+    // 4. Atoll 4 - Coral Sandbar Atoll (Center at 380, 28, R = 8)
+    const cX = 380;
+    const cZ = 28;
     for (let dx = -8; dx <= 8; dx++) {
       for (let dz = -8; dz <= 8; dz++) {
         if (Math.hypot(dx, dz) <= 8) {
@@ -4942,10 +4946,10 @@ export class WorldBuilder {
       text: 'Five-tier sacred pagoda preserving Lakshya’s international ventures and cultural studies.'
     });
 
-    // Temple of Heaven Imperial Pavilion & Languages Embassy at (-80, -90)
+    // Temple of Heaven Imperial Pavilion & Languages Embassy at (-122, -88)
     // 3-Tiered Circular Imperial Shrine with Vermilion Pillars & Golden Finial
-    const thX = -80;
-    const thZ = -90;
+    const thX = -122;
+    const thZ = -88;
     // Base Circular Plinth at Y = 1 to 2
     for (let dx = -8; dx <= 8; dx++) {
       for (let dz = -8; dz <= 8; dz++) {
@@ -5025,31 +5029,29 @@ export class WorldBuilder {
       }
     }
 
-    // Red Torii Gates
-    for (let y = 1; y <= 7; y++) {
-      this.setBlock(-85, y, -76, 'red_terracotta');
-      this.setBlock(-85, y, -70, 'red_terracotta');
+    // Imperial Chinese Red Lantern Posts flanking the Paifang Avenue
+    for (const lz of [-78, -92]) {
+      for (let y = 1; y <= 4; y++) {
+        this.setBlock(-84, y, lz, 'dark_oak_fence');
+      }
+      this.setBlock(-84, 5, lz, 'red_terracotta');
+      this.setBlock(-84, 4, lz + (lz > -85 ? -1 : 1), 'lantern');
     }
-    for (let z = -78; z <= -68; z++) {
-      this.setBlock(-85, 6, z, 'red_terracotta');
-      this.setBlock(-85, 8, z, 'red_terracotta');
-    }
-    this.setBlock(-85, 5, -73, 'glowstone');
 
     // Grand Paifang Imperial Gate (Celestial Entrance Arch to China Realm)
     for (let y = 1; y <= 6; y++) {
-      this.setBlock(-72, y, -87, 'red_terracotta');
-      this.setBlock(-72, y, -83, 'red_terracotta');
+      this.setBlock(-84, y, -87, 'red_terracotta');
+      this.setBlock(-84, y, -83, 'red_terracotta');
     }
     for (let z = -89; z <= -81; z++) {
-      this.setBlock(-72, 7, z, 'red_terracotta');
-      this.setBlock(-72, 8, z, 'stone_bricks');
+      this.setBlock(-84, 7, z, 'red_terracotta');
+      this.setBlock(-84, 8, z, 'stone_bricks');
     }
-    this.setBlock(-72, 9, -89, 'gold_block');
-    this.setBlock(-72, 9, -81, 'gold_block');
-    this.setBlock(-72, 8, -85, 'gold_block');
-    this.setBlock(-72, 6, -85, 'sea_lantern');
-    this.setBlock(-72, 3, -82, 'glowstone', {
+    this.setBlock(-84, 9, -89, 'gold_block');
+    this.setBlock(-84, 9, -81, 'gold_block');
+    this.setBlock(-84, 8, -85, 'gold_block');
+    this.setBlock(-84, 6, -85, 'sea_lantern');
+    this.setBlock(-84, 3, -82, 'glowstone', {
       type: 'sign',
       title: 'Celestial Paifang Gate',
       text: 'Ceremonial archway welcoming travelers into the sacred mountains and temples of the China Realm.'
@@ -7005,28 +7007,103 @@ export class WorldBuilder {
 
   private buildPalmTree(cx: number, baseY: number, cz: number) {
     const actualBaseY = Math.max(baseY, this.getTerrainHeight(cx, cz) + 1);
+
+    // Natural variation based on deterministic hash
+    const seed = Math.abs(Math.sin(cx * 12.9898 + cz * 78.233)) * 43758.5453;
+    const trunkHeight = 7 + (Math.floor(seed) % 3); // 7, 8, or 9 blocks tall
+
+    // Deep rooted base foundation
     this.setBlock(cx, actualBaseY - 2, cz, 'palm_wood');
     this.setBlock(cx, actualBaseY - 1, cz, 'palm_wood');
-    for (let y = 0; y <= 7; y++) {
-      const xOffset = Math.floor(y / 3);
-      this.setBlock(cx + xOffset, actualBaseY + y, cz, 'palm_wood');
-      if (y > 0) {
-        const prevOffset = Math.floor((y - 1) / 3);
-        if (prevOffset !== xOffset) {
-          this.setBlock(cx + xOffset, actualBaseY + y - 1, cz, 'palm_wood');
-        }
-      }
+    this.setBlock(cx, actualBaseY, cz, 'palm_wood');
+
+    // Root buttresses at base
+    if (Math.floor(seed) % 2 === 0) {
+      this.setBlock(cx + 1, actualBaseY, cz, 'palm_wood');
+      this.setBlock(cx - 1, actualBaseY, cz, 'palm_wood');
+    } else {
+      this.setBlock(cx, actualBaseY, cz + 1, 'palm_wood');
+      this.setBlock(cx, actualBaseY, cz - 1, 'palm_wood');
     }
-    const topX = cx + 2;
-    const topY = actualBaseY + 8;
-    this.setBlock(topX, topY, cz, 'palm_leaves');
-    const fronds = [
-      { dx: 2, dz: 0 }, { dx: -2, dz: 0 }, { dx: 0, dz: 2 }, { dx: 0, dz: -2 },
-      { dx: 2, dz: 2 }, { dx: -2, dz: -2 }, { dx: 2, dz: -2 }, { dx: -2, dz: 2 }
+
+    // Natural curved trunk: gentle organic lean of 1-2 blocks max
+    const leanAngle = (seed % (Math.PI * 2));
+    const maxLean = 1.6;
+    let prevX = cx;
+    let prevZ = cz;
+
+    for (let y = 1; y <= trunkHeight; y++) {
+      const u = y / trunkHeight;
+      const curLean = maxLean * Math.pow(u, 1.4);
+      const curX = cx + Math.round(curLean * Math.cos(leanAngle));
+      const curZ = cz + Math.round(curLean * Math.sin(leanAngle));
+
+      // Fill continuity bridge so trunk never has diagonal open gaps
+      if (curX !== prevX && curZ !== prevZ) {
+        this.setBlock(curX, actualBaseY + y - 1, prevZ, 'palm_wood');
+      } else if (curX !== prevX) {
+        this.setBlock(curX, actualBaseY + y - 1, curZ, 'palm_wood');
+      } else if (curZ !== prevZ) {
+        this.setBlock(curX, actualBaseY + y - 1, curZ, 'palm_wood');
+      }
+
+      this.setBlock(curX, actualBaseY + y, curZ, 'palm_wood');
+      prevX = curX;
+      prevZ = curZ;
+    }
+
+    const topX = prevX;
+    const topY = actualBaseY + trunkHeight;
+    const topZ = prevZ;
+
+    // Golden Coconuts tucked directly under the crown
+    this.setBlock(topX + 1, topY - 1, topZ, 'sponge');
+    this.setBlock(topX - 1, topY - 1, topZ, 'sponge');
+    this.setBlock(topX, topY - 1, topZ + 1, 'sponge');
+    this.setBlock(topX, topY - 1, topZ - 1, 'sponge');
+
+    // Solid Crown Hub & Upper Dome
+    this.setBlock(topX, topY, topZ, 'palm_wood');
+    this.setBlock(topX, topY + 1, topZ, 'palm_leaves');
+    this.setBlock(topX, topY + 2, topZ, 'palm_leaves'); // Dome top
+
+    // Crown core collar
+    this.setBlock(topX + 1, topY + 1, topZ, 'palm_leaves');
+    this.setBlock(topX - 1, topY + 1, topZ, 'palm_leaves');
+    this.setBlock(topX, topY + 1, topZ + 1, 'palm_leaves');
+    this.setBlock(topX, topY + 1, topZ - 1, 'palm_leaves');
+
+    // 8 Grand Cascading Palm Fronds (Cardinal + Diagonal)
+    // 1. Cardinal Fronds (Arch upward, spread wide, droop gracefully down)
+    const cardinals = [
+      { dx: 1, dz: 0 }, { dx: -1, dz: 0 }, { dx: 0, dz: 1 }, { dx: 0, dz: -1 }
     ];
-    for (const f of fronds) {
-      this.setBlock(topX + f.dx, topY, cz + f.dz, 'palm_leaves');
-      this.setBlock(topX + Math.round(f.dx * 1.5), topY - 1, cz + Math.round(f.dz * 1.5), 'palm_leaves');
+    for (const c of cardinals) {
+      // Step 1: Up and out
+      this.setBlock(topX + c.dx, topY + 1, topZ + c.dz, 'palm_leaves');
+      // Step 2: Arch apex & side leaflet expansion
+      this.setBlock(topX + c.dx * 2, topY + 1, topZ + c.dz * 2, 'palm_leaves');
+      const perpX = c.dz;
+      const perpZ = c.dx;
+      this.setBlock(topX + c.dx * 2 + perpX, topY + 1, topZ + c.dz * 2 + perpZ, 'palm_leaves');
+      this.setBlock(topX + c.dx * 2 - perpX, topY + 1, topZ + c.dz * 2 - perpZ, 'palm_leaves');
+      // Step 3: Droop downward
+      this.setBlock(topX + c.dx * 3, topY, topZ + c.dz * 3, 'palm_leaves');
+      // Step 4: Hanging frond tip
+      this.setBlock(topX + c.dx * 4, topY - 1, topZ + c.dz * 4, 'palm_leaves');
+      // Step 5: Delicate end tip
+      this.setBlock(topX + c.dx * 5, topY - 2, topZ + c.dz * 5, 'palm_leaves');
+    }
+
+    // 2. Diagonal Fronds (Graceful outward arc)
+    const diagonals = [
+      { dx: 1, dz: 1 }, { dx: -1, dz: 1 }, { dx: 1, dz: -1 }, { dx: -1, dz: -1 }
+    ];
+    for (const d of diagonals) {
+      this.setBlock(topX + d.dx, topY + 1, topZ + d.dz, 'palm_leaves');
+      this.setBlock(topX + d.dx * 2, topY, topZ + d.dz * 2, 'palm_leaves');
+      this.setBlock(topX + d.dx * 3, topY - 1, topZ + d.dz * 3, 'palm_leaves');
+      this.setBlock(topX + d.dx * 3, topY - 2, topZ + d.dz * 3, 'palm_leaves'); // Hanging diagonal tip
     }
   }
 
@@ -11363,6 +11440,705 @@ export class WorldBuilder {
       this.setBlock(fx, 13, fz, 'beacon');
     }
   }
+
+  // =========================================================================
+  // MONUMENTAL LONG STRUCTURES FILLING EMPTY LAND MASSES
+  // =========================================================================
+
+  // 1. South-East Mega Transcontinental Suspension Bridge & Skyway Viaduct (X in [74, 190], Z around 130)
+  private buildMegaSuspensionBridge() {
+    const startX = 74;
+    const endX = 190;
+    const centerZ = 130;
+    const deckY = 16;
+    const lowerDeckY = 10;
+    const tower1X = 105;
+    const tower2X = 155;
+
+    // A. West Anchorage Pier & Abutment (X in [74, 80], Z in [125, 135])
+    for (let x = startX; x <= startX + 6; x++) {
+      for (let z = centerZ - 5; z <= centerZ + 5; z++) {
+        for (let y = 1; y <= deckY; y++) {
+          const isEdge = (x === startX || x === startX + 6 || z === centerZ - 5 || z === centerZ + 5);
+          this.setBlock(x, y, z, isEdge ? 'stone_bricks' : 'smooth_stone');
+        }
+      }
+    }
+    // Grand West Entry Portal Arch
+    for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+      this.setBlock(startX + 6, deckY + 1, z, 'quartz_pillar');
+      this.setBlock(startX + 6, deckY + 5, z, 'quartz_block');
+    }
+    for (let y = deckY + 1; y <= deckY + 4; y++) {
+      this.setBlock(startX + 6, y, centerZ - 4, 'quartz_pillar');
+      this.setBlock(startX + 6, y, centerZ + 4, 'quartz_pillar');
+    }
+    this.setBlock(startX + 6, deckY + 6, centerZ, 'gold_block');
+    this.setBlock(startX + 6, deckY + 7, centerZ, 'sea_lantern');
+
+    // Pedestrian Access Stairway to Upper Deck on West Bank
+    for (let step = 0; step < deckY - 1; step++) {
+      const sx = startX - 1 - Math.floor(step * 0.8);
+      const sy = 1 + step;
+      this.setBlock(sx, sy, centerZ - 4, 'smooth_stone');
+      this.setBlock(sx, sy, centerZ - 3, 'smooth_stone');
+      this.setBlock(sx, sy + 1, centerZ - 5, 'iron_block');
+    }
+
+    // B. East Anchorage Pier & Coastal Abutment (X in [184, 190], Z in [125, 135])
+    for (let x = endX - 6; x <= endX; x++) {
+      for (let z = centerZ - 5; z <= centerZ + 5; z++) {
+        for (let y = 1; y <= deckY; y++) {
+          const isEdge = (x === endX - 6 || x === endX || z === centerZ - 5 || z === centerZ + 5);
+          this.setBlock(x, y, z, isEdge ? 'stone_bricks' : 'smooth_stone');
+        }
+      }
+    }
+    // East Portal Arch
+    for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+      this.setBlock(endX - 6, deckY + 1, z, 'quartz_pillar');
+      this.setBlock(endX - 6, deckY + 5, z, 'quartz_block');
+    }
+    for (let y = deckY + 1; y <= deckY + 4; y++) {
+      this.setBlock(endX - 6, y, centerZ - 4, 'quartz_pillar');
+      this.setBlock(endX - 6, y, centerZ + 4, 'quartz_pillar');
+    }
+    this.setBlock(endX - 6, deckY + 6, centerZ, 'gold_block');
+    this.setBlock(endX - 6, deckY + 7, centerZ, 'sea_lantern');
+
+    // C. Twin Colossal Suspension Towers (Tower 1 at 105, Tower 2 at 155, Top Y = 38)
+    const towers = [tower1X, tower2X];
+    for (const tx of towers) {
+      // Underwater / Ground Concrete Foundation Caisson (Y = 1 to 5)
+      for (let x = tx - 3; x <= tx + 3; x++) {
+        for (let z = centerZ - 6; z <= centerZ + 6; z++) {
+          for (let y = 1; y <= 5; y++) {
+            this.setBlock(x, y, z, (y === 5) ? 'smooth_stone' : 'stone_bricks');
+          }
+        }
+      }
+      // Tower Pylon Legs (South at Z=127, North at Z=133)
+      for (const pz of [centerZ - 3, centerZ + 3]) {
+        for (let y = 6; y <= 38; y++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            this.setBlock(tx + dx, y, pz, (y % 4 === 0) ? 'redstone_block' : 'red_terracotta');
+          }
+        }
+      }
+      // Horizontal Cross-Struts / Portal Bracing
+      for (const hy of [lowerDeckY, deckY, 24, 32, 38]) {
+        for (let z = centerZ - 3; z <= centerZ + 3; z++) {
+          this.setBlock(tx - 1, hy, z, 'gold_block');
+          this.setBlock(tx, hy, z, (hy === 38) ? 'gold_block' : 'red_terracotta');
+          this.setBlock(tx + 1, hy, z, 'gold_block');
+        }
+      }
+      // Tower Top Aircraft Warning Beacons & Saddles
+      for (const pz of [centerZ - 3, centerZ + 3]) {
+        this.setBlock(tx, 39, pz, 'beacon');
+        this.setBlock(tx, 40, pz, 'sea_lantern');
+      }
+    }
+
+    // D. Main Suspension Cables & Vertical Suspenders
+    for (let x = startX + 6; x <= endX - 6; x++) {
+      let cableY = deckY;
+      if (x < tower1X) {
+        // West Backstay
+        const u = (x - (startX + 6)) / (tower1X - (startX + 6));
+        cableY = Math.round(deckY + 1 + 21 * Math.pow(u, 1.4));
+      } else if (x <= tower2X) {
+        // Main Midspan Sag
+        const u = Math.abs(x - (tower1X + tower2X) / 2) / ((tower2X - tower1X) / 2);
+        cableY = Math.round(deckY + 2 + 18 * Math.pow(u, 2));
+      } else {
+        // East Backstay
+        const u = ((endX - 6) - x) / ((endX - 6) - tower2X);
+        cableY = Math.round(deckY + 1 + 21 * Math.pow(u, 1.4));
+      }
+
+      // Cable strings on both sides
+      for (const cz of [centerZ - 3, centerZ + 3]) {
+        this.setBlock(x, cableY, cz, 'iron_block');
+        // Vertical Hangers every 2 blocks
+        if (x % 2 === 0 && cableY > deckY + 1) {
+          for (let hy = deckY + 1; hy < cableY; hy++) {
+            this.setBlock(x, hy, cz, 'iron_block');
+          }
+        }
+      }
+    }
+
+    // E. Double-Deck Deck System
+    for (let x = startX; x <= endX; x++) {
+      // 1. Lower Deck (Maglev Express at Y = 10)
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        this.setBlock(x, lowerDeckY, z, 'smooth_stone');
+        this.setBlock(x, lowerDeckY + 4, z, 'iron_block'); // Lower deck ceiling
+      }
+      // Maglev Center Magnetic Induction Track
+      this.setBlock(x, lowerDeckY, centerZ, 'redstone_block');
+      this.setBlock(x, lowerDeckY + 1, centerZ, 'gold_block');
+      // Lower Deck Aerodynamic Truss Enclosure
+      this.setBlock(x, lowerDeckY + 1, centerZ - 3, (x % 3 === 0) ? 'iron_block' : 'cyber_glass');
+      this.setBlock(x, lowerDeckY + 2, centerZ - 3, (x % 3 === 0) ? 'iron_block' : 'cyber_glass');
+      this.setBlock(x, lowerDeckY + 3, centerZ - 3, 'iron_block');
+      this.setBlock(x, lowerDeckY + 1, centerZ + 3, (x % 3 === 0) ? 'iron_block' : 'cyber_glass');
+      this.setBlock(x, lowerDeckY + 2, centerZ + 3, (x % 3 === 0) ? 'iron_block' : 'cyber_glass');
+      this.setBlock(x, lowerDeckY + 3, centerZ + 3, 'iron_block');
+
+      // 2. Upper Deck (Express Highway at Y = 16)
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        const isCenterline = (z === centerZ);
+        const isWalkway = (Math.abs(z - centerZ) === 4);
+        if (isWalkway) {
+          this.setBlock(x, deckY, z, 'smooth_stone');
+        } else if (isCenterline) {
+          this.setBlock(x, deckY, z, (x % 3 === 0) ? 'quartz_block' : 'asphalt_road');
+        } else {
+          this.setBlock(x, deckY, z, 'asphalt_road');
+        }
+      }
+      // Crash Barriers and Lampposts
+      this.setBlock(x, deckY + 1, centerZ - 4, 'iron_block');
+      this.setBlock(x, deckY + 1, centerZ + 4, 'iron_block');
+
+      if (x % 6 === 0) {
+        // Highway Luminaire Lampposts
+        this.setBlock(x, deckY + 2, centerZ - 4, 'iron_block');
+        this.setBlock(x, deckY + 3, centerZ - 4, 'lantern');
+        this.setBlock(x, deckY + 2, centerZ + 4, 'iron_block');
+        this.setBlock(x, deckY + 3, centerZ + 4, 'lantern');
+      }
+    }
+
+    // F. Futuristic Maglev Bullet Train on Lower Deck (Midspan, X in [120, 140])
+    for (let x = 122; x <= 138; x++) {
+      for (let z = centerZ - 1; z <= centerZ + 1; z++) {
+        this.setBlock(x, lowerDeckY + 1, z, 'quartz_block');
+        const isWall = (z === centerZ - 1 || z === centerZ + 1);
+        this.setBlock(x, lowerDeckY + 2, z, isWall ? 'cyber_glass' : 'air');
+        this.setBlock(x, lowerDeckY + 3, z, isWall ? 'lapis_block' : 'quartz_block');
+      }
+    }
+    // Aerodynamic Nose Cone (facing East)
+    this.setBlock(139, lowerDeckY + 1, centerZ, 'quartz_block');
+    this.setBlock(139, lowerDeckY + 2, centerZ, 'cyber_glass');
+    this.setBlock(140, lowerDeckY + 1, centerZ, 'gold_block');
+    this.setBlock(140, lowerDeckY + 2, centerZ, 'sea_lantern'); // Train headlamp
+
+    // G. Interactive Information Plaque
+    this.setBlock(startX + 8, deckY + 2, centerZ - 3, 'gold_block', {
+      type: 'sign',
+      title: 'Lakshya Transcontinental Mega-Bridge 🌉',
+      text: 'A 116-meter double-deck engineering marvel connecting the South Coast to Eastern archipelago. Features twin 38-meter suspension towers, four-lane express highway, and lower-level supersonic maglev transit.'
+    });
+    this.setBlock(startX + 8, lowerDeckY + 2, centerZ - 2, 'lapis_block', {
+      type: 'sign',
+      title: 'Trans-Island Maglev Line · Train #01 🚅',
+      text: 'Next Generation Magnetic Levitation Express. Cruising speed: 500 km/h across the ocean bay.'
+    });
+  }
+
+  // 2. Colossal Double-Tiered Roman Aqueduct & Waterfall Reservoir (X in [-180, -65], Z in [162, 168])
+  private buildColossalRomanAqueduct() {
+    const startX = -180;
+    const endX = -65;
+    const centerZ = 165;
+    const lowerArcTopY = 8;
+    const upperArcTopY = 15;
+    const waterLevelY = 16;
+
+    // A. Monumental Foundation & Lower Tier Heavy Pillars (Every 8 blocks)
+    for (let px = startX; px <= endX; px += 8) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          for (let y = 1; y <= lowerArcTopY; y++) {
+            const isCorner = Math.abs(dx) === 1 && Math.abs(dz) === 2;
+            this.setBlock(px + dx, y, centerZ + dz, isCorner ? 'sandstone' : 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    // Lower Tier Semicircular Barrel Arches between Pillars
+    for (let px = startX; px < endX; px += 8) {
+      for (let offset = 2; offset <= 6; offset++) {
+        const x = px + offset;
+        const archY = (offset === 2 || offset === 6) ? 6 : (offset === 3 || offset === 5) ? 7 : 8;
+        for (let dz = -2; dz <= 2; dz++) {
+          for (let y = archY; y <= lowerArcTopY; y++) {
+            this.setBlock(x, y, centerZ + dz, (y === archY) ? 'smooth_stone' : 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    // B. Intermediate Cornice Promenade Deck (Y = 9)
+    for (let x = startX; x <= endX; x++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(x, 9, centerZ + dz, (Math.abs(dz) === 2) ? 'smooth_stone' : 'stone_bricks');
+      }
+    }
+
+    // C. Upper Tier Rhythmic Arcade (Pillars every 4 blocks, Y = 10 to 15)
+    for (let px = startX; px <= endX; px += 4) {
+      for (let dz = -1; dz <= 1; dz++) {
+        for (let y = 10; y <= upperArcTopY; y++) {
+          this.setBlock(px, y, centerZ + dz, 'stone_bricks');
+        }
+      }
+    }
+    // Upper Arches
+    for (let px = startX; px < endX; px += 4) {
+      for (let offset = 1; offset <= 3; offset++) {
+        const x = px + offset;
+        const archY = (offset === 2) ? 14 : 13;
+        for (let dz = -1; dz <= 1; dz++) {
+          for (let y = archY; y <= upperArcTopY; y++) {
+            this.setBlock(x, y, centerZ + dz, (y === archY) ? 'sandstone' : 'stone_bricks');
+          }
+        }
+      }
+    }
+
+    // D. Water Channel Specus & Walkway (Y = 16)
+    for (let x = startX; x <= endX; x++) {
+      // Channel Bed & Walls
+      this.setBlock(x, waterLevelY - 1, centerZ, 'quartz_block');
+      this.setBlock(x, waterLevelY, centerZ, 'water'); // Running springwater!
+
+      // Walkway & Parapets
+      this.setBlock(x, waterLevelY, centerZ - 1, 'smooth_stone');
+      this.setBlock(x, waterLevelY, centerZ + 1, 'smooth_stone');
+      this.setBlock(x, waterLevelY + 1, centerZ - 2, 'stone_bricks');
+      this.setBlock(x, waterLevelY + 1, centerZ + 2, 'stone_bricks');
+
+      if (x % 5 === 0) {
+        this.setBlock(x, waterLevelY + 2, centerZ - 2, 'iron_block');
+        this.setBlock(x, waterLevelY + 3, centerZ - 2, 'lantern');
+        this.setBlock(x, waterLevelY + 2, centerZ + 2, 'iron_block');
+        this.setBlock(x, waterLevelY + 3, centerZ + 2, 'lantern');
+      }
+    }
+
+    // E. Western Spring Cavern / Mountain Intake (X in [-180, -175])
+    for (let x = startX - 4; x <= startX; x++) {
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        for (let y = 1; y <= waterLevelY + 2; y++) {
+          const isOuter = (x === startX - 4 || Math.abs(z - centerZ) === 4);
+          this.setBlock(x, y, z, isOuter ? 'mossy_stone_bricks' : 'air');
+        }
+      }
+    }
+    // Mountain Spring Cavern Water Source
+    this.setBlock(startX - 2, waterLevelY + 1, centerZ, 'sea_lantern');
+    this.setBlock(startX - 2, waterLevelY, centerZ, 'water');
+
+    // Access Stairway at West Mountain
+    for (let step = 0; step <= waterLevelY; step++) {
+      const sx = startX - 2;
+      const sz = centerZ - 4 - Math.floor(step * 0.5);
+      this.setBlock(sx, 1 + step, sz, 'sandstone');
+    }
+
+    // F. Eastern Terminal Nymphaeum & Giant Cascading Waterfall (X = -65)
+    // Monumental Greco-Roman Temple Facade
+    for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+      for (let y = 1; y <= waterLevelY + 4; y++) {
+        const isColumn = (z === centerZ - 4 || z === centerZ - 2 || z === centerZ + 2 || z === centerZ + 4);
+        if (isColumn) {
+          this.setBlock(endX, y, z, 'quartz_pillar');
+        } else if (y >= waterLevelY) {
+          this.setBlock(endX, y, z, 'quartz_block');
+        }
+      }
+    }
+    // Temple Pediment
+    this.setBlock(endX, waterLevelY + 5, centerZ, 'gold_block');
+    this.setBlock(endX, waterLevelY + 6, centerZ, 'sea_lantern');
+
+    // 16-Block Tall Waterfall Plunge into Southern Bay
+    for (let y = 1; y <= waterLevelY; y++) {
+      this.setBlock(endX + 1, y, centerZ, 'water');
+      this.setBlock(endX + 1, y, centerZ - 1, 'water');
+      this.setBlock(endX + 1, y, centerZ + 1, 'water');
+    }
+
+    // Grand Splash Basin Pool at Sea Level (X in [-64, -58], Z in [162, 168])
+    for (let x = endX + 1; x <= endX + 7; x++) {
+      for (let z = centerZ - 3; z <= centerZ + 3; z++) {
+        const isRim = (x === endX + 7 || Math.abs(z - centerZ) === 3);
+        if (isRim) {
+          this.setBlock(x, 1, z, 'quartz_block');
+        } else {
+          this.setBlock(x, 0, z, 'water');
+          this.setBlock(x, -1, z, 'prismarine_bricks');
+        }
+      }
+    }
+    this.setBlock(endX + 4, 1, centerZ, 'sea_lantern');
+
+    // G. Interactive Plaque
+    this.setBlock(endX - 2, 2, centerZ - 5, 'quartz_block', {
+      type: 'sign',
+      title: 'Aqua Magna · Imperial Colossal Aqueduct 🏛️💧',
+      text: 'A 115-meter monumental dual-tier Roman aqueduct engineered to transport pure mountain springwater across the southern badlands to the royal nymphaeum reservoir and ocean bay.'
+    });
+  }
+
+  // 3. Nordic Atlantic Ocean Highway & Skyway Viaduct (X in [105, 190], Z around -145)
+  private buildNordicAtlanticSkyway() {
+    const startX = 105;
+    const endX = 190;
+    const centerZ = -145;
+    const peakX = 148;
+    const peakMastTopY = 36;
+
+    // A. Curving Undulating Deck & Soaring Piers
+    for (let x = startX; x <= endX; x++) {
+      // Smooth sinusoidal elevation profile rising to Y = 20 at peakX
+      const u = (x - startX) / (endX - startX);
+      const dy = Math.round(4 + 16 * Math.sin(u * Math.PI));
+
+      // Roadway Surface (5 blocks wide, Z in [-147, -143])
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        const isCenter = (z === centerZ);
+        this.setBlock(x, dy, z, isCenter && (x % 3 === 0) ? 'glowstone' : 'asphalt_road');
+      }
+
+      // Aerodynamic Cyber-Glass Wind Barrier & Railings
+      this.setBlock(x, dy + 1, centerZ - 3, 'cyber_glass');
+      this.setBlock(x, dy + 1, centerZ + 3, 'cyber_glass');
+      this.setBlock(x, dy, centerZ - 3, 'smooth_stone');
+      this.setBlock(x, dy, centerZ + 3, 'smooth_stone');
+
+      // Pier Supports every 11 blocks
+      if (x % 11 === 0 && x > startX + 2 && x < endX - 2) {
+        for (let y = 1; y < dy; y++) {
+          for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+            this.setBlock(x, y, z, (Math.abs(z - centerZ) === 2) ? 'quartz_pillar' : 'smooth_stone');
+          }
+        }
+      }
+    }
+
+    // B. Cable-Stayed Sail Pylon Mast at Midspan (Peak X = 148, Deck Y = 20)
+    const peakY = Math.round(4 + 16 * Math.sin(((peakX - startX) / (endX - startX)) * Math.PI));
+    // A-Frame Mast rising from Y = peakY to Y = peakMastTopY
+    for (let y = peakY; y <= peakMastTopY; y++) {
+      this.setBlock(peakX, y, centerZ - 3, 'quartz_pillar');
+      this.setBlock(peakX, y, centerZ + 3, 'quartz_pillar');
+      if (y >= 30) {
+        this.setBlock(peakX, y, centerZ, 'quartz_block');
+      }
+    }
+    // High-Tensile Stay Cables radiating from mast apex
+    for (const offset of [5, 10, 15, 20]) {
+      const stayY1 = Math.round(4 + 16 * Math.sin(((peakX - offset - startX) / (endX - startX)) * Math.PI));
+      const stayY2 = Math.round(4 + 16 * Math.sin(((peakX + offset - startX) / (endX - startX)) * Math.PI));
+      for (const pz of [centerZ - 3, centerZ + 3]) {
+        this.setBlock(peakX - offset, stayY1 + 1, pz, 'iron_block');
+        this.setBlock(peakX + offset, stayY2 + 1, pz, 'iron_block');
+      }
+    }
+    this.setBlock(peakX, peakMastTopY + 1, centerZ, 'beacon');
+    this.setBlock(peakX, peakMastTopY + 2, centerZ, 'sea_lantern');
+
+    // C. Cantilevered Glass Observation Skywalk (Peak X in [146, 150], extending north)
+    for (let x = peakX - 2; x <= peakX + 2; x++) {
+      for (let z = centerZ - 4; z >= centerZ - 8; z--) {
+        this.setBlock(x, peakY, z, 'cyber_glass');
+        if (x === peakX - 2 || x === peakX + 2 || z === centerZ - 8) {
+          this.setBlock(x, peakY + 1, z, 'cyber_glass');
+        }
+      }
+    }
+    this.setBlock(peakX, peakY, centerZ - 8, 'sea_lantern');
+
+    // D. Interactive Information Plaque
+    this.setBlock(peakX - 3, peakY + 1, centerZ - 2, 'gold_block', {
+      type: 'sign',
+      title: 'Nordic Atlantic Ocean Skyway 🌊🌉',
+      text: 'Inspired by Norway\'s Atlantic Ocean Road and the Millau Viaduct. Soars 20 meters above the fjords with cable-stayed pylon masts and a cantilevered glass skywalk looking into the Arctic abyss.'
+    });
+  }
+
+  // 4. Grand Trans-Continental Maritime Canal, Locks & Panamax Container Ship (X in [-175, -105], Z in [-52, -38])
+  private buildGrandMaritimeCanal() {
+    const startX = -175;
+    const endX = -105;
+    const centerZ = -45;
+
+    // A. Deep-Water Canal Basin & Stone Revetment Quays
+    for (let x = startX; x <= endX; x++) {
+      // 9-Block Wide Water Channel (Z in [-49, -41])
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        this.setBlock(x, 0, z, 'water');
+        this.setBlock(x, -1, z, 'prismarine_bricks');
+        this.setBlock(x, -2, z, 'stone_bricks');
+      }
+      // North Quay Wharf (Z in [-52, -50], Y = 1)
+      for (let z = centerZ - 7; z <= centerZ - 5; z++) {
+        this.setBlock(x, 1, z, (z === centerZ - 5) ? 'smooth_stone' : 'stone_bricks');
+      }
+      // South Quay Wharf (Z in [-39, -37], Y = 1)
+      for (let z = centerZ + 5; z <= centerZ + 7; z++) {
+        this.setBlock(x, 1, z, (z === centerZ + 5) ? 'smooth_stone' : 'stone_bricks');
+      }
+
+      // Mooring Bollards & Safety Buoys every 6 blocks
+      if (x % 6 === 0) {
+        this.setBlock(x, 2, centerZ - 5, 'iron_block');
+        this.setBlock(x, 2, centerZ + 5, 'iron_block');
+        this.setBlock(x, 1, centerZ - 6, 'redstone_block');
+        this.setBlock(x, 1, centerZ + 6, 'redstone_block');
+      }
+    }
+
+    // B. Hydraulic Lock Gates & Master Control Station (X in [-110, -105])
+    for (const lx of [endX - 5, endX]) {
+      // Heavy Steel Mitre Lock Gates across Channel
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        for (let y = -1; y <= 3; y++) {
+          this.setBlock(lx, y, z, (y === 3) ? 'gold_block' : 'obsidian');
+        }
+      }
+      // Hydraulic Operating Rams on Quays
+      this.setBlock(lx, 2, centerZ - 5, 'iron_block');
+      this.setBlock(lx, 3, centerZ - 5, 'redstone_block');
+      this.setBlock(lx, 2, centerZ + 5, 'iron_block');
+      this.setBlock(lx, 3, centerZ + 5, 'redstone_block');
+    }
+    // Lockmaster Control Tower on South Bank
+    const cX = endX - 2;
+    const cZ = centerZ + 6;
+    for (let y = 1; y <= 6; y++) {
+      this.setBlock(cX, y, cZ, 'quartz_pillar');
+    }
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(cX + dx, 7, cZ + dz, 'quartz_block');
+        this.setBlock(cX + dx, 8, cZ + dz, (dx === 0 && dz === 0) ? 'sea_lantern' : 'cyber_glass');
+        this.setBlock(cX + dx, 9, cZ + dz, 'quartz_block');
+      }
+    }
+    // Shipping Signal Lights (Green / Red)
+    this.setBlock(cX, 10, cZ, 'beacon');
+
+    // C. Heavy Quayside Container Gantry Crane at X = -140
+    const craneX = -140;
+    // 4 Portal Legs
+    for (const [px, pz] of [
+      [craneX - 2, centerZ - 7],
+      [craneX + 2, centerZ - 7],
+      [craneX - 2, centerZ - 5],
+      [craneX + 2, centerZ - 5],
+    ]) {
+      for (let y = 1; y <= 12; y++) {
+        this.setBlock(px, y, pz, 'gold_block');
+      }
+    }
+    // Top Horizontal Trolley Boom extending over ship (Z in [-7, -2], Y = 13)
+    for (let z = centerZ - 7; z <= centerZ - 1; z++) {
+      this.setBlock(craneX - 1, 13, z, 'iron_block');
+      this.setBlock(craneX, 13, z, 'gold_block');
+      this.setBlock(craneX + 1, 13, z, 'iron_block');
+    }
+    // Operator Cab & Hoist Spreader Cable
+    this.setBlock(craneX, 12, centerZ - 4, 'cyber_glass');
+    this.setBlock(craneX, 10, centerZ - 2, 'iron_block');
+    this.setBlock(craneX, 9, centerZ - 2, 'iron_block');
+    // Suspended Green ISO Container
+    for (let dx = -1; dx <= 1; dx++) {
+      this.setBlock(craneX + dx, 8, centerZ - 2, 'emerald_block');
+    }
+
+    // D. Panamax Container Ship ("EVER GLORY") Moored in Channel (X in [-162, -124], 39 blocks long)
+    const shipStartX = -162;
+    const shipEndX = -124;
+
+    for (let x = shipStartX; x <= shipEndX; x++) {
+      const isBow = (x >= shipEndX - 3);
+      const isStern = (x <= shipStartX + 3);
+      const widthSpan = (isBow || isStern) ? 1 : 2;
+
+      // Bottom Red Keel & Boot-topping (Y = 0)
+      for (let z = centerZ - widthSpan; z <= centerZ + widthSpan; z++) {
+        this.setBlock(x, 0, z, 'red_terracotta');
+        this.setBlock(x, 1, z, 'red_terracotta');
+        // Black Hull Topsides (Y = 2)
+        this.setBlock(x, 2, z, (Math.abs(z - centerZ) === widthSpan) ? 'coal_block' : 'smooth_stone');
+      }
+    }
+    // Bulbous Underwater Bow at X = -123
+    this.setBlock(shipEndX + 1, 0, centerZ, 'red_terracotta');
+
+    // Cargo Container Stacks (X in [-152, -128], Y = 3 to 6)
+    const containerTypes = ['emerald_block', 'lapis_block', 'redstone_block', 'gold_block', 'purpur_block', 'diamond_block'];
+    for (let x = -152; x <= -128; x += 4) {
+      for (let dz = -1; dz <= 1; dz++) {
+        const cType1 = containerTypes[Math.abs(x + dz) % containerTypes.length];
+        const cType2 = containerTypes[(Math.abs(x * 2 + dz) + 1) % containerTypes.length];
+        // 20ft / 40ft Stacks
+        for (let dx = 0; dx <= 2; dx++) {
+          this.setBlock(x + dx, 3, centerZ + dz, cType1);
+          this.setBlock(x + dx, 4, centerZ + dz, cType1);
+          this.setBlock(x + dx, 5, centerZ + dz, cType2);
+          this.setBlock(x + dx, 6, centerZ + dz, cType2);
+        }
+      }
+    }
+
+    // Aft Bridge & Living Quarters Superstructure (X in [-160, -154])
+    for (let x = -160; x <= -154; x++) {
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        for (let y = 3; y <= 6; y++) {
+          const isEdge = (x === -160 || x === -154 || Math.abs(z - centerZ) === 2);
+          this.setBlock(x, y, z, isEdge ? 'quartz_block' : 'smooth_stone');
+        }
+      }
+    }
+    // Navigation Bridge Cab (Y = 7)
+    for (let x = -158; x <= -155; x++) {
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        const isWindow = (x === -155 || Math.abs(z - centerZ) === 2);
+        this.setBlock(x, 7, z, isWindow ? 'cyber_glass' : 'quartz_block');
+        this.setBlock(x, 8, z, 'quartz_block'); // Bridge roof
+      }
+    }
+    // Radar Mast & Exhaust Funnel
+    this.setBlock(-156, 9, centerZ, 'iron_block');
+    this.setBlock(-156, 10, centerZ, 'iron_block');
+    this.setBlock(-156, 11, centerZ, 'sea_lantern');
+    this.setBlock(-159, 7, centerZ, 'redstone_block');
+    this.setBlock(-159, 8, centerZ, 'coal_block'); // Funnel
+
+    // E. Interactive Plaque
+    this.setBlock(-135, 2, centerZ - 6, 'iron_block', {
+      type: 'sign',
+      title: 'Grand Maritime Canal · Lock #1 & M/V EVER GLORY 🚢⚓',
+      text: 'A deep-water inter-oceanic canal connecting the Western Seas. Features heavy quayside gantry cranes, motorized lock gates, and the 39-meter Panamax container freighter EVER GLORY carrying 120 TEU of global cargo.'
+    });
+  }
+
+  // 5. CERN High-Energy Linear Supercollider & Particle Physics Complex (X in [105, 185], Z in [-174, -166])
+  private buildHyperColliderResearchFacility() {
+    const startX = 105;
+    const endX = 185;
+    const centerZ = -170;
+    const beamY = 2;
+
+    // A. 80-Block Long Linear Accelerator (LINAC) Beamline Tube
+    for (let x = startX; x <= endX; x++) {
+      // Beam Enclosure Trench & Heavy Foundation
+      this.setBlock(x, 0, centerZ, 'obsidian');
+      this.setBlock(x, 0, centerZ - 1, 'stone_bricks');
+      this.setBlock(x, 0, centerZ + 1, 'stone_bricks');
+
+      // Superconducting Beam Core (Continuous Relativistic Particle Beam!)
+      this.setBlock(x, beamY, centerZ, (x % 5 === 0) ? 'beacon' : 'sea_lantern');
+
+      // Cryogenic Vacuum Jacket & Inspection Windows
+      this.setBlock(x, beamY + 1, centerZ, 'obsidian');
+      this.setBlock(x, beamY - 1, centerZ, 'obsidian');
+      this.setBlock(x, beamY, centerZ - 1, (x % 3 === 0) ? 'cyber_glass' : 'iron_block');
+      this.setBlock(x, beamY, centerZ + 1, (x % 3 === 0) ? 'cyber_glass' : 'iron_block');
+
+      // Superconducting Quadrupole Magnet Rings every 4 blocks
+      if (x % 4 === 0) {
+        for (let dx = 0; dx <= 1; dx++) {
+          const ringBlock = (x % 8 === 0) ? 'amethyst_block' : 'lapis_block';
+          this.setBlock(x + dx, beamY + 1, centerZ - 1, ringBlock);
+          this.setBlock(x + dx, beamY + 1, centerZ + 1, ringBlock);
+          this.setBlock(x + dx, beamY - 1, centerZ - 1, ringBlock);
+          this.setBlock(x + dx, beamY - 1, centerZ + 1, ringBlock);
+          this.setBlock(x + dx, beamY + 2, centerZ, 'prismarine_bricks');
+        }
+      }
+
+      // Elevated Inspection Walkway flanking the LINAC
+      this.setBlock(x, 1, centerZ - 2, 'smooth_stone');
+      this.setBlock(x, 1, centerZ + 2, 'smooth_stone');
+      if (x % 6 === 0) {
+        this.setBlock(x, 2, centerZ - 2, 'iron_block');
+        this.setBlock(x, 3, centerZ - 2, 'lantern');
+        this.setBlock(x, 2, centerZ + 2, 'iron_block');
+        this.setBlock(x, 3, centerZ + 2, 'lantern');
+      }
+    }
+
+    // B. Massive Cylindrical High-Energy Particle Detector Chamber (ATLAS/CMS Scale, X in [175, 184])
+    const detX = 179;
+    const detRadius = 4;
+    for (let x = detX - 4; x <= detX + 4; x++) {
+      for (let dy = -detRadius; dy <= detRadius; dy++) {
+        for (let dz = -detRadius; dz <= detRadius; dz++) {
+          const d = Math.hypot(dy, dz);
+          const y = beamY + dy;
+          if (y < 1) continue;
+
+          if (d <= 1.2) {
+            // Inner Silicon Micro-Vertex Tracker
+            this.setBlock(x, y, centerZ + dz, 'diamond_block');
+          } else if (d <= 2.2) {
+            // Electromagnetic Calorimeter (ECAL)
+            this.setBlock(x, y, centerZ + dz, 'gold_block');
+          } else if (d <= 3.2) {
+            // Hadronic Calorimeter (HCAL)
+            this.setBlock(x, y, centerZ + dz, 'amethyst_block');
+          } else if (d <= 4.2) {
+            // Outer Toroidal Muon Spectrometer Magnet Yoke
+            this.setBlock(x, y, centerZ + dz, (x === detX - 4 || x === detX + 4 || d >= 3.8) ? 'lapis_block' : 'obsidian');
+          }
+        }
+      }
+    }
+    // Detector High-Voltage Strobe Indicators
+    this.setBlock(detX, beamY + detRadius + 1, centerZ, 'sea_lantern');
+    this.setBlock(detX, beamY + detRadius + 2, centerZ, 'beacon');
+
+    // C. Science Pavilion & Underground Collider Control Center (X in [106, 115])
+    const ctrlX = 110;
+    for (let x = ctrlX - 4; x <= ctrlX + 4; x++) {
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        this.setBlock(x, 1, z, 'quartz_block'); // Cleanroom floor
+        const isWall = (x === ctrlX - 4 || x === ctrlX + 4 || z === centerZ - 4 || z === centerZ + 4);
+        if (isWall) {
+          for (let y = 2; y <= 5; y++) {
+            this.setBlock(x, y, z, (y === 3 || y === 4) ? 'cyber_glass' : 'quartz_pillar');
+          }
+        }
+        this.setBlock(x, 6, z, 'quartz_block'); // Roof
+      }
+    }
+    // Mainframe Supercomputing Cluster & Holographic Workstations
+    for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+      this.setBlock(ctrlX - 3, 2, z, 'bookshelf');
+      this.setBlock(ctrlX - 3, 3, z, 'iron_block');
+      this.setBlock(ctrlX - 3, 4, z, 'redstone_block'); // Active CPU blinkers
+    }
+    this.setBlock(ctrlX, 2, centerZ - 2, 'smooth_stone');
+    this.setBlock(ctrlX, 3, centerZ - 2, 'cyber_glass'); // Control monitor
+    this.setBlock(ctrlX, 2, centerZ + 2, 'smooth_stone');
+    this.setBlock(ctrlX, 3, centerZ + 2, 'cyber_glass');
+
+    // Cryogenic Liquid Helium Storage Tanks
+    for (const [tx, tz] of [[ctrlX - 2, centerZ + 5], [ctrlX + 2, centerZ + 5]]) {
+      for (let y = 1; y <= 4; y++) {
+        this.setBlock(tx, y, tz, 'iron_block');
+      }
+      this.setBlock(tx, 5, tz, 'ice');
+    }
+
+    // D. Interactive Information Plaque
+    this.setBlock(ctrlX + 2, 2, centerZ - 4, 'diamond_block', {
+      type: 'sign',
+      title: 'CERN Hyper-Collider & Linear Accelerator ⚛️🔬',
+      text: 'An 80-meter cryogenic particle accelerator facility. Features superconducting quadrupole magnets, relativistic positron-electron beamline, and an 8-meter hermetic particle detector probing the fundamental laws of the universe.'
+    });
+  }
 }
+
 
 
