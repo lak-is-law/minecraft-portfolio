@@ -65,16 +65,16 @@ export class WorldBuilder {
 
   // Deterministic Biome Topography Elevation Engine
   public getTerrainHeight(x: number, z: number): number {
-    // -1. Radiator Springs Raceway (X in [168, 235], Z in [-62, -4]): mainland level at Y=1, ocean under pier at Y=0
-    if (x >= 168 && x <= 235 && z >= -62 && z <= -4) {
+    // -1. Radiator Springs Raceway (X in [168, 238], Z in [-65, -4]): mainland level at Y=1, ocean under pier at Y=0
+    if (x >= 168 && x <= 238 && z >= -65 && z <= -4) {
       if (x > 196) {
         return 0; // Ocean water beneath over-water pier track
       }
       return 1; // Solid mainland ground strictly at Y = 1
     }
 
-    // 0. Dubai Coastline, Palm Jumeirah & Arabian Gulf Archipelago Islands (X in [174, 380], Z in [-80, 165])
-    if (x >= 174 && x <= 380 && z >= -80 && z <= 165) {
+    // 0. Dubai Coastline, Palm Jumeirah & Arabian Gulf Archipelago Islands (X in [174, 400], Z in [10, 180])
+    if (x >= 174 && x <= 400 && z >= 10 && z <= 180) {
       const palmH = this.getPalmJumeirahTerrainHeight(x, z);
       if (palmH > 0) return palmH;
       if (x > 176) return 0; // Turquoise ocean water in Arabian Gulf bay
@@ -318,39 +318,42 @@ export class WorldBuilder {
 
   // Grand Large-Scale Dubai Archipelago Topography in Arabian Gulf (X in [174, 380], Z in [-80, 165])
   private getPalmJumeirahTerrainHeight(x: number, z: number): number {
+    // Strictly isolate Dubai archipelago to Z >= 10: zero overlap with Radiator Springs (Z <= -4)
+    if (z < 10) return 0;
+
     // Dubai mainland and coastal waterfront promenade
     if (x <= 176 && z >= 20 && z <= 64) return 1;
 
-    // 1. The Palm Trunk & Flared Gateway Base
-    if (x >= 176 && x <= 184 && Math.abs(z - 42) <= Math.round(5 - (x - 176) * 0.25)) {
+    // 1. The Palm Trunk & Flared Gateway Base (Z = 46)
+    if (x >= 176 && x <= 184 && Math.abs(z - 46) <= Math.round(5 - (x - 176) * 0.25)) {
       return 1;
     }
-    if (x >= 184 && x <= 235 && Math.abs(z - 42) <= 5) {
+    if (x >= 184 && x <= 235 && Math.abs(z - 46) <= 5) {
       return 1;
     }
     // Crown Fan Hub
-    if (x >= 235 && x <= 252 && Math.abs(z - 42) <= 8) {
+    if (x >= 235 && x <= 252 && Math.abs(z - 46) <= 7) {
       return 1;
     }
 
-    // 2. 16 Symmetrical Parametric Curved Fronds (8 Pairs, 40-60 blocks long each)
+    // 2. 16 Symmetrical Parametric Curved Fronds (8 Pairs, gracefully fanning within Z in [14, 78])
     const frondDefs = [
-      { xRoot: 236, xTip: 286, dz: 62 },
-      { xRoot: 238, xTip: 292, dz: 54 },
-      { xRoot: 240, xTip: 296, dz: 46 },
-      { xRoot: 242, xTip: 300, dz: 38 },
-      { xRoot: 244, xTip: 302, dz: 30 },
-      { xRoot: 246, xTip: 302, dz: 22 },
-      { xRoot: 248, xTip: 298, dz: 15 },
-      { xRoot: 250, xTip: 292, dz: 9 }
+      { xRoot: 236, xTip: 288, dz: 30 },
+      { xRoot: 238, xTip: 292, dz: 26 },
+      { xRoot: 240, xTip: 296, dz: 22 },
+      { xRoot: 242, xTip: 300, dz: 18 },
+      { xRoot: 244, xTip: 302, dz: 14 },
+      { xRoot: 246, xTip: 302, dz: 11 },
+      { xRoot: 248, xTip: 298, dz: 8 },
+      { xRoot: 250, xTip: 292, dz: 5 }
     ];
 
     for (const f of frondDefs) {
       if (x >= f.xRoot && x <= f.xTip) {
         const u = (x - f.xRoot) / (f.xTip - f.xRoot);
-        const curveOffset = 4 + (f.dz - 4) * Math.pow(u, 1.35);
-        const northZ = Math.round(42 - curveOffset);
-        const southZ = Math.round(42 + curveOffset);
+        const curveOffset = 3 + (f.dz - 3) * Math.pow(u, 1.35);
+        const northZ = Math.round(46 - curveOffset);
+        const southZ = Math.round(46 + curveOffset);
         if (Math.abs(z - northZ) <= 2 || Math.abs(z - southZ) <= 2) {
           return 1;
         }
@@ -363,16 +366,16 @@ export class WorldBuilder {
     }
 
     // 3. Atlantis, The Palm Resort Plinth at Crescent Crown
-    if (x >= 310 && x <= 336 && z >= 30 && z <= 54) {
+    if (x >= 312 && x <= 334 && z >= 36 && z <= 56) {
       return 1;
     }
 
-    // 4. Detached Outer Crescent Breakwater Barrier Reef Island (Rx = 75, Rz = 70)
-    const cd = Math.hypot((x - 245) / 75, (z - 42) / 70);
-    if (cd >= 0.94 && cd <= 1.05 && x >= 200) {
-      // Natural tidal breach gaps at North (Z in [0, 5]) and South (Z in [79, 84]) for maritime navigation
-      const isNorthGap = (z >= 0 && z <= 5 && x >= 215 && x <= 230);
-      const isSouthGap = (z >= 79 && z <= 84 && x >= 215 && x <= 230);
+    // 4. Detached Outer Crescent Breakwater Barrier Reef Island (Rx = 72, Rz = 34, Center at 252, 46)
+    const cd = Math.hypot((x - 252) / 72, (z - 46) / 34);
+    if (cd >= 0.94 && cd <= 1.05 && x >= 210) {
+      // Natural tidal breach gaps at North (Z in [24, 27]) and South (Z in [65, 68]) for maritime navigation
+      const isNorthGap = (z >= 24 && z <= 27 && x >= 222 && x <= 236);
+      const isSouthGap = (z >= 65 && z <= 68 && x >= 222 && x <= 236);
       if (!isNorthGap && !isSouthGap) {
         return 1;
       }
@@ -404,15 +407,15 @@ export class WorldBuilder {
       }
     }
 
-    // 7. The World Islands Archipelago Cluster (North in Arabian Gulf)
-    // Atoll 1 - The Heart of Europe / Monaco Atoll (280, -55, R = 12)
-    if (Math.hypot(x - 280, z - (-55)) <= 12) return 1;
-    // Atoll 2 - Sweden Island (318, -48, R = 11)
-    if (Math.hypot(x - 318, z - (-48)) <= 11) return 1;
-    // Atoll 3 - Floating Seahorse Overwater Island (270, -28, R = 9)
-    if (Math.hypot(x - 270, z - (-28)) <= 9) return 1;
-    // Atoll 4 - Coral Sandbar Atoll (322, -22, R = 8)
-    if (Math.hypot(x - 322, z - (-22)) <= 8) return 1;
+    // 7. The World Islands Archipelago Cluster (Vast deep Arabian Gulf east of Palm Jumeirah, strictly Z in [18, 80], X in [342, 388])
+    // Atoll 1 - The Heart of Europe / Monaco Atoll (360, 46, R = 12)
+    if (Math.hypot(x - 360, z - 46) <= 12) return 1;
+    // Atoll 2 - Sweden Island (380, 68, R = 10)
+    if (Math.hypot(x - 380, z - 68) <= 10) return 1;
+    // Atoll 3 - Floating Seahorse Overwater Island (350, 24, R = 9)
+    if (Math.hypot(x - 350, z - 24) <= 9) return 1;
+    // Atoll 4 - Coral Sandbar Atoll (380, 28, R = 8)
+    if (Math.hypot(x - 380, z - 28) <= 8) return 1;
 
     // Everything else in the bay is crystal turquoise lagoon water at Y = 0
     return 0;
@@ -11224,7 +11227,7 @@ export class WorldBuilder {
     this.setBlock(190, 2, -9, 'gold_block', {
       type: 'sign',
       title: '⚡ LIGHTNING McQUEEN STREET · PISTON CUP SPEEDWAY #95 ⚡',
-      text: '"Ka-Chow!" Welcome to Lightning McQueen Way! World-famous Radiator Springs Piston Cup Championship Raceway.\n\n"I am speed! Faster than fast, quicker than quick! Float like a Cadillac, sting like a Beemer!"\n\n• Press [E] to jump into Lightning McQueen and race in 3D!\n• Press [H] for Ka-Chow! horn · Hold [Shift] for Nitro Boost!\n• Challenge Doc Hudson to the 2-lap Willy\'s Butte showdown!'
+      text: '"Ka-Chow!" Welcome to Lightning McQueen Way! World-famous Radiator Springs Piston Cup Championship Raceway.\n\n"I am speed! Faster than fast, quicker than quick! Float like a Cadillac, sting like a Beemer!"\n\n• Press [E] to jump into Lightning McQueen and race in 3D!\n• Press [H] for Ka-Chow! horn · Hold [Shift] for Nitro Boost!\n• Challenge Doc Hudson to the 3-lap Willy\'s Butte showdown!'
     });
 
     // 4. Flo's V8 Café at X in [196, 204], Z in [-10, -3]

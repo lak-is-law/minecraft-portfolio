@@ -241,7 +241,7 @@ export class Player {
 
     // Window mousedown listener: works across all browsers & macOS trackpads
     window.addEventListener('mousedown', (e) => {
-      if (!this.isLocked) return;
+      if (!this.isLocked || this.ridingVehicle) return;
 
       const isRight = e.button === 2 || (e.button === 0 && e.ctrlKey);
       const isLeft = e.button === 0 && !e.ctrlKey;
@@ -399,7 +399,7 @@ export class Player {
           this.startDrivingRickshaw();
           return;
         }
-        if (this.currentTarget && this.onInteract) {
+        if (this.currentTarget && this.onInteract && !this.ridingVehicle && !this.world.mcQueenManager?.raceState?.active) {
           this.onInteract(this.currentTarget);
           if (document.pointerLockElement) {
             document.exitPointerLock();
@@ -548,7 +548,7 @@ export class Player {
   }
 
   private handleRightClick() {
-    if (!this.currentTarget) return;
+    if (this.ridingVehicle || !this.currentTarget) return;
 
     // 1. If pointing at a hammerable project banner
     if (this.currentTarget.targetBanner) {
@@ -1458,6 +1458,12 @@ export class Player {
 
   // Fast Raycasting forwards to find targeted block & face
   private updateRaycast() {
+    if (this.ridingVehicle) {
+      this.currentTarget = null;
+      if (this.blockHighlight) this.blockHighlight.visible = false;
+      return;
+    }
+
     const maxReach = 7.5; // reach distance in blocks
     this.camera.getWorldDirection(this.scratchRayDir);
     const origin = this.camera.position;
@@ -2018,6 +2024,7 @@ export class Player {
   }
 
   public handleTouchMine() {
+    if (this.ridingVehicle) return;
     this.triggerSwing();
     if (this.currentTarget?.targetBanner) {
       const banner = this.currentTarget.targetBanner;
@@ -2058,11 +2065,13 @@ export class Player {
   }
 
   public handleTouchPlace() {
+    if (this.ridingVehicle) return;
     this.triggerSwing();
     this.handleRightClick();
   }
 
   public handleTouchUse() {
+    if (this.ridingVehicle) return;
     if (this.currentTarget && this.onInteract) {
       this.onInteract(this.currentTarget);
       return;

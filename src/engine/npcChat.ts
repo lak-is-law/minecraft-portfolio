@@ -135,7 +135,7 @@ export class NPCChatManager {
           '🏁 "They\'re just empty cups, kid. It\'s the race that matters." — The Fabulous Hudson Hornet [X: 190, Z: -8]'
         ],
         proximityGreeting: '🏁 "Hey rookie. Think you can beat the Fabulous Hudson Hornet around Willy\'s Butte? Press [E] to challenge me!"',
-        detailedLocationText: '🏁 "The Fabulous Hudson Hornet"\n\n📍 Location: Doc Hudson Pit Box & Willy\'s Butte [X: 190, Y: 2, Z: -8]\n\n"3-Time Piston Cup Champion (1951, 1952, 1953). Master of the dirt slide: Turn right to go left! Press [E] to talk with Doc and start a head-to-head 2-lap race challenge!"',
+        detailedLocationText: '🏁 "The Fabulous Hudson Hornet"\n\n📍 Location: Doc Hudson Pit Box & Willy\'s Butte [X: 190, Y: 2, Z: -8]\n\n"3-Time Piston Cup Champion (1951, 1952, 1953). Master of the dirt slide: Turn right to go left! Press [E] to talk with Doc and start a head-to-head 3-lap race challenge!"',
         tagColor: '#1e40af',
         emoji: '🏁'
       },

@@ -753,7 +753,7 @@ export class LightningMcQueenManager {
     countdownStage: 1,
     playerLap: 1,
     docLap: 1,
-    totalLaps: 2,
+    totalLaps: 3,
     playerProgress: 0,
     docProgress: 0,
     playerPosition: 1,
@@ -1218,7 +1218,7 @@ export class LightningMcQueenManager {
     this.raceState.countdownStage = 1;
     this.raceState.playerLap = 1;
     this.raceState.docLap = 1;
-    this.raceState.totalLaps = 2;
+    this.raceState.totalLaps = 3;
     this.raceState.playerProgress = 0;
     this.raceState.docProgress = 0.98;
     this.raceState.playerPosition = 1;

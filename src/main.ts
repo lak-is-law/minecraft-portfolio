@@ -517,6 +517,7 @@ class Game {
 
   // Handle interaction with objects in world
   private handleInteraction(target: TargetInfo) {
+    if (this.player.ridingVehicle || this.world.mcQueenManager?.raceState?.active) return;
     if (!target.interactable) return;
     const inter = target.interactable;
 
@@ -693,7 +694,7 @@ class Game {
           },
           options: [
             {
-              label: '🏆 Accept Race Challenge: 2 Laps vs Doc Hudson!',
+              label: '🏆 Accept Race Challenge: 3 Laps vs Doc Hudson!',
               styleClass: 'mc-btn-gold',
               action: () => {
                 this.modals.close(true);
@@ -1204,7 +1205,8 @@ class Game {
     this.climate.update(dt, this.player.position, this.player.yaw, isNight);
 
     // 5. Update HUD elements
-    this.hud.updatePrompt(this.player.currentTarget);
+    const suppressInteractions = !!(this.player.ridingVehicle || this.world.mcQueenManager?.raceState?.active);
+    this.hud.updatePrompt(suppressInteractions ? null : this.player.currentTarget);
     this.hud.updateF3(this.player.position, this.player.yaw, this.player.pitch, this.fps);
     this.hud.updateMinimap(this.player.position, this.player.yaw, this.world.dragonManager?.getDragons(), this.world.liveTrains);
     this.hud.updateFlyStatus(this.player.isFlying);
