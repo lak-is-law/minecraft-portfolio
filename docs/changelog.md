@@ -55,3 +55,4 @@
 - 2026-10-14 20:06: refactor(blocks): bit-packed voxel state representation
 - 2026-10-14 22:16: feat(audio): spatial distance attenuation for ambient loops
 - 2026-10-16 11:14: feat(monument): LK brick monument voxel texture atlas
+- 2026-10-16 12:14: test(engine): benchmark frame time consistency under 60 FPS load
