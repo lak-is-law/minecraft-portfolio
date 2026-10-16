@@ -1,14 +1,5 @@
 # Engineering Changelog
 
-- 2026-09-24 16:33: perf(worker): offload terrain generation to web workers
-- 2026-09-24 17:41: perf(worker): offload terrain generation to web workers
-- 2026-09-24 19:58: feat(ui): inventory hotbar HUD and interactive crosshair
-- 2026-09-27 15:41: feat(audio): spatial distance attenuation for ambient loops
-- 2026-09-27 17:18: fix(camera): pitch clamp preventing gimbal lock at zenith
-- 2026-09-27 18:11: feat(audio): spatial distance attenuation for ambient loops
-- 2026-09-27 19:06: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-09-27 22:22: test(engine): benchmark frame time consistency under 60 FPS load
-- 2026-09-29 10:56: fix(camera): pitch clamp preventing gimbal lock at zenith
 - 2026-09-29 11:27: perf(shaders): optimize ambient occlusion fragment pass
 - 2026-09-29 12:31: feat(monument): LK brick monument voxel texture atlas
 - 2026-09-29 13:17: feat(audio): spatial distance attenuation for ambient loops
@@ -58,3 +49,4 @@
 - 2026-10-16 12:14: test(engine): benchmark frame time consistency under 60 FPS load
 - 2026-10-16 14:56: feat(postprocessing): bloom and atmospheric fog pass in Three.js
 - 2026-10-16 17:25: refactor(physics): AABB collision detection against voxel grid
+- 2026-10-16 19:03: refactor(physics): AABB collision detection against voxel grid
