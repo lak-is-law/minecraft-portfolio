@@ -518,6 +518,9 @@ export class WorldBuilder {
         } else if (ax > 192 || az > 192 || dCorner > 48) {
           // Perimeter coastal beach
           topType = 'sand';
+        } else if (x >= 168 && x <= 235 && z >= -62 && z <= -4) {
+          // Radiator Springs Raceway & Willy's Butte desert infield
+          topType = 'terracotta_adobe';
         } else if (x <= -20 && z <= -35) {
           // China
           topType = (h >= 7) ? ((x + z) % 3 === 0 ? 'mossy_stone_bricks' : 'stone_bricks') : 'grass';
@@ -10924,18 +10927,15 @@ export class WorldBuilder {
       }
     }
 
-    // 1. Feeder Avenue from Hollywood Blvd Grand Gateway (164, -54) into Raceway West Entrance (172, -51)
-    for (let x = 164; x <= 172; x++) {
-      for (let z = -53; z <= -49; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-        if (z === -51 && x % 3 <= 1) {
-          this.setBlock(x, 1, z, 'gold_block'); // Yellow center divider
+    // 1. Natural Landscaping outside West Outer Wall (X: 164..170, Z: -56..-48)
+    // Clean up any severed road stubs so the racetrack is a clean, self-contained rectangular circuit
+    for (let x = 164; x <= 170; x++) {
+      for (let z = -56; z <= -48; z++) {
+        this.setBlock(x, 1, z, 'grass');
+        for (let y = 2; y <= 6; y++) {
+          this.removeBlock(x, y, z);
         }
       }
-      this.setBlock(x, 1, -54, 'stone_bricks'); // Curb
-      this.setBlock(x, 1, -48, 'stone_bricks'); // Curb
-      this.setBlock(x, 2, -54, 'iron_bars'); // Safety fence
-      this.setBlock(x, 2, -48, 'iron_bars'); // Safety fence
     }
 
     // Helper to ensure over-water track sections (X > 192) have solid bridge pier foundation down to bedrock
@@ -11123,30 +11123,77 @@ export class WorldBuilder {
       }
     }
 
-    // 4. Iconic Willy's Butte Infield Monument & Desert Drift Loop (Center: X = 200, Z = -33)
-    for (let x = 195; x <= 205; x++) {
-      for (let z = -38; z <= -28; z++) {
-        const distFromCenter = Math.sqrt((x - 200) ** 2 + (z - -33) ** 2);
-        if (distFromCenter <= 5.2) {
-          this.setBlock(x, 1, z, 'red_terracotta');
-          this.setBlock(x, 2, z, 'red_terracotta');
-          if (distFromCenter <= 4.0) {
-            this.setBlock(x, 3, z, 'terracotta_adobe');
-            this.setBlock(x, 4, z, 'terracotta_adobe');
-          }
-          if (distFromCenter <= 2.8) {
-            this.setBlock(x, 5, z, 'sandstone');
-            this.setBlock(x, 6, z, 'sandstone');
-          }
-          if (distFromCenter <= 1.4) {
-            this.setBlock(x, 7, z, 'gold_block');
-            this.setBlock(x, 8, z, 'beacon');
-          }
+    // 4. Uniform Infield Paving & Iconic Willy's Butte Desert Mesa (X: 182..218, Z: -46..-20)
+    // A. 100% UNIFORM Desert Infield Ground (Level Y = 1, Deck at Y = 0)
+    // Eliminates all biome splits, grass stripes, and water puddles!
+    for (let x = 182; x <= 218; x++) {
+      for (let z = -46; z <= -20; z++) {
+        buildPierSupport(x, z);
+        // Clear any rogue floating blocks
+        for (let y = 2; y <= 8; y++) {
+          this.removeBlock(x, y, z);
+        }
+        // Solid foundation deck
+        this.setBlock(x, 0, z, 'stone_bricks');
+        // Uniform desert red-clay floor
+        this.setBlock(x, 1, z, 'terracotta_adobe');
+      }
+    }
+
+    // B. Authentic Radiator Springs Dirt Drift Ring around Willy's Butte
+    const butteX = 200;
+    const butteZ = -33;
+    for (let x = 184; x <= 216; x++) {
+      for (let z = -44; z <= -22; z++) {
+        const d = Math.hypot(x - butteX, z - butteZ);
+        // Circular red-sandstone dirt drift oval (radius 7.0 to 11.5)
+        if (d >= 7.0 && d <= 11.5) {
+          this.setBlock(x, 1, z, 'red_sandstone');
         }
       }
     }
-    // Willy's Butte Drift Marker Sign
-    this.setBlock(200, 2, -26, 'gold_block', {
+
+    // C. Majestic Natural Willy's Butte Desert Mesa (Natural stratified red rock)
+    for (let dx = -7; dx <= 7; dx++) {
+      for (let dz = -7; dz <= 7; dz++) {
+        const d = Math.hypot(dx, dz);
+        const x = butteX + dx;
+        const z = butteZ + dz;
+
+        // Base Footing (d <= 6.2, Y = 1..2): Stratified Red Terracotta
+        if (d <= 6.2) {
+          this.setBlock(x, 1, z, 'red_terracotta');
+          this.setBlock(x, 2, z, 'red_terracotta');
+        }
+
+        // Lower Mesa Tier (d <= 4.8, Y = 3..4): Weathered Red Sandstone
+        if (d <= 4.8) {
+          this.setBlock(x, 3, z, 'red_sandstone');
+          this.setBlock(x, 4, z, 'red_sandstone');
+        }
+
+        // Upper Mesa Cliff (d <= 3.4, Y = 5): Terracotta Adobe Band
+        if (d <= 3.4) {
+          this.setBlock(x, 5, z, 'terracotta_adobe');
+        }
+
+        // Summit Plateau (d <= 2.2, Y = 6): Smooth Sandstone Top
+        if (d <= 2.2) {
+          this.setBlock(x, 6, z, 'sandstone');
+        }
+      }
+    }
+
+    // Natural desert cacti and summit flora on Willy's Butte
+    this.setBlock(butteX, 7, butteZ, 'cactus');
+    this.setBlock(butteX, 8, butteZ, 'cactus');
+    this.setBlock(butteX - 1, 7, butteZ + 1, 'cactus');
+    this.setBlock(butteX + 1, 7, butteZ - 1, 'cactus');
+    this.setBlock(butteX, 7, butteZ + 2, 'lantern');
+
+    // Official Landmark Sign on a carved sandstone plinth at front of the butte (X = 200, Z = -25)
+    this.setBlock(200, 1, -25, 'red_sandstone');
+    this.setBlock(200, 2, -25, 'red_sandstone', {
       type: 'sign',
       title: "🌵 Willy's Butte · Doc's Dirt Drift Loop 🏁",
       text: 'Doc Hudson\'s Championship Secret:\n"When you\'re entering the turn in the dirt, turn right to go left! Give it too much throttle, you lose the rear; balance the slide, and you slingshot out ahead!"\n\nSite of the legendary Lightning vs. Doc Hudson race.'

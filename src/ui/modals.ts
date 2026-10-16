@@ -433,6 +433,27 @@ export class ModalManager {
     document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
   }
 
+  // Category classifier helper for all landmarks
+  public static getLandmarkCategory(tag: string): 'monuments' | 'cities' | 'transit' | 'nature' {
+    if (tag.includes('TAJ') || tag.includes('GREAT WALL') || tag.includes('EIFFEL') ||
+        tag.includes('LONDON') || tag.includes('PYRAMID') || tag.includes('GIZA') ||
+        tag.includes('TEMPLE') || tag.includes('ISRO') || tag.includes('HAWA MAHAL') ||
+        tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE') ||
+        tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS')) {
+      return 'monuments';
+    }
+    if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
+        tag.includes('HOLLYWOOD') || tag.includes('McQUEEN') || tag.includes('MEXICO') ||
+        tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
+        tag.includes('VARANASI') || tag.includes('CITADEL') || tag.includes('WORLD ISLANDS')) {
+      return 'cities';
+    }
+    if (tag.includes('AIRPORT') || tag.includes('RAILWAY') || tag.includes('MARINA') || tag.includes('DHABA')) {
+      return 'transit';
+    }
+    return 'nature';
+  }
+
   // 5. Maximised World Map & Realm Atlas GUI (Interactive Real-time Canvas)
   public openFastTravelModal(
     playerPos?: { x: number; y: number; z: number },
@@ -441,6 +462,7 @@ export class ModalManager {
     trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     this.onModalOpen();
+    this.modalContainer.classList.add('map-fullscreen');
 
     const info = this.getPlayerInfo?.();
     const effectivePos = playerPos || info?.position || { x: 0, y: 2, z: 0 };
@@ -451,150 +473,199 @@ export class ModalManager {
     const curX = Math.round(effectivePos.x);
     const curZ = Math.round(effectivePos.z);
 
-    const atlasRegions = [
-      { number: '01', name: 'Crossroads Citadel', subtitle: 'The central hub · 🌐', detail: 'Start at the island’s heart, meet your guide, and follow the beacon roads out to every realm.', tag: '[CITADEL]', tone: 'citadel', direction: 'CENTER · X 0 / Z 0' },
-      { number: '02', name: 'Crossroads Wildlife Park', subtitle: 'Grand Safari Zoo & Habitats · 🦁', detail: 'Expansive wildlife reserve featuring living animated pandas, lions, elephants, giraffes, polar bears, and shaded trails.', tag: '[ZOO]', tone: 'citadel', direction: 'WEST · X −65 / Z 0' },
-      { number: '03', name: 'Tokyo Shibuya Realm', subtitle: 'Japan', detail: 'Vibrant neon scramble crossing, Hachiko plaza, Japanese language embassy, and Shinkansen.', tag: '[TOKYO]', tone: 'sakura', direction: 'NORTHWEST · X −155 / Z −80' },
-      { number: '04', name: 'Imperial India · Taj Mahal & ISRO', subtitle: 'India', detail: 'Grand Taj Mahal, ISRO Chandrayaan-3 Moon lander, Jaipur Hawa Mahal, India Gate, living Royal Bengal Tigers, dancing Peacocks, and Diwali lights.', tag: '[TAJ MAHAL]', tone: 'raj', direction: 'NORTHEAST · X 80 / Z −135' },
-      { number: '05', name: 'Las Vegas Strip & Neo York', subtitle: 'United States', detail: 'Bellagio fountain lake, Caesars Palace, Venetian Campanile, Luxor pyramid beam, and Times Square avenue.', tag: '[NEO YORK]', tone: 'neoyork', direction: 'EAST · X 100 / Z 0' },
-      { number: '06', name: 'Mexico City · Zócalo', subtitle: 'Mexico', detail: 'Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Mercado stalls & Mayan Cenote.', tag: '[MEXICO CITY]', tone: 'pueblo', direction: 'WEST · X −105 / Z 60' },
-      { number: '07', name: 'Giza Pyramids & Sphinx', subtitle: 'Egypt', detail: 'Pyramids of Khufu & Khafre, Nile River Felucca, Avenue of Sphinxes, and Luxor Temple Pylons.', tag: '[GIZA]', tone: 'raj', direction: 'SOUTHWEST · X −155 / Z 36' },
-      { number: '08', name: 'Dubai · Burj Khalifa & Arabian Gulf Archipelago', subtitle: 'United Arab Emirates 🇦🇪', detail: 'Towering 828m spider-lily skyscraper overlooking the colossal Palm Jumeirah archipelago, 16 massive curved fronds, Atlantis palace, Burj Al Arab 7-star sail island, Bluewaters & Ain Dubai, and The World Islands.', tag: '[DUBAI]', tone: 'neoyork', direction: 'EAST · X 170 / Z 42' },
-      { number: '09', name: 'London · Big Ben', subtitle: 'United Kingdom', detail: 'Historic Elizabeth Tower clock with Westminster chime, Great Bell, and Tower Bridge walkways.', tag: '[LONDON]', tone: 'citadel', direction: 'NORTH · X −32 / Z −58' },
-      { number: '10', name: 'Paris · Eiffel Tower', subtitle: 'France', detail: 'Gustave Eiffel’s lattice monument, Champ de Mars gardens, and Café de Paris terrace.', tag: '[EIFFEL]', tone: 'frost', direction: 'NORTHEAST · X 26 / Z −38' },
-      { number: '11', name: 'Great Wall & Dragon Pagoda', subtitle: 'China', detail: 'Mighty stone ramparts, 5-tier pagoda, bamboo groves, and foreign language pavilion.', tag: '[GREAT WALL]', tone: 'sakura', direction: 'NORTHWEST · X −110 / Z −110' },
-      { number: '12', name: 'Hollywood Hills & Walk of Fame', subtitle: 'United States', detail: 'Block-built HOLLYWOOD sign atop Mount Lee, Walk of Fame brass stars, Hollywood Bowl amphitheatre, movie soundstages, and retro diner.', tag: '[HOLLYWOOD]', tone: 'raj', direction: 'NORTHEAST · X 165 / Z −100' },
-      { number: '13', name: 'Lightning McQueen Street', subtitle: 'Radiator Springs · ⚡', detail: 'High-speed 3D racing with Lightning McQueen (#95), Flo\'s V8 Café, Luigi\'s tire tower, Mater\'s towing, and playable racecar mode.', tag: '[McQUEEN]', tone: 'raj', direction: 'EAST · X 190 / Z −15' },
-      { number: '14', name: 'Frostpeak Alps · Ski Lodge', subtitle: 'Switzerland 🇨🇭', detail: 'Snow-capped Swiss Alpine peaks, Chalet ski lodge, Lake Serenity ice rink, Swiss flag mast, and high summit observatory.', tag: '[ALPS]', tone: 'frost', direction: 'NORTH · X −2 / Z −100' },
-      { number: '15', name: 'Sunflower Valley Farmstead', subtitle: 'Countryside', detail: 'Rustic 4-sail Dutch windmill, golden sunflower fields, and peaceful agricultural valley.', tag: '[VALLEY]', tone: 'citadel', direction: 'WEST · X −45 / Z 48' }
-    ];
-
-    const regionsHtml = atlasRegions.map((region) => {
-      const targetIdx = PORTFOLIO_DATA.landmarks.findIndex(lm => lm.tag === region.tag);
-      const safeIdx = targetIdx >= 0 ? targetIdx : 0;
+    const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => {
+      const cat = ModalManager.getLandmarkCategory(lm.tag);
+      const cleanTag = lm.tag.replace(/[\[\]]/g, '');
+      const px = effectivePos.x;
+      const pz = effectivePos.z;
+      const dist = Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz));
       return `
-      <article class="atlas-region-card atlas-${region.tone}">
-        <div class="atlas-card-topline"><span>${region.number} / REALM</span><span class="atlas-region-dot"></span></div>
-        <h3>${region.name}</h3>
-        <p class="atlas-region-subtitle">${region.subtitle}</p>
-        <p class="atlas-region-detail">${region.detail}</p>
-        <div class="atlas-card-bottom"><span>${region.direction}</span><button class="atlas-region-warp mc-map-chip-btn" data-index="${safeIdx}" aria-label="Travel to ${region.name}">GO <span aria-hidden="true">↗</span></button></div>
-      </article>
-    `;
+        <div class="mc-waypoint-card" data-index="${idx}" data-name="${lm.name.toLowerCase()}" data-tag="${cleanTag.toLowerCase()}" data-cat="${cat}">
+          <div class="mc-waypoint-top">
+            <span class="mc-waypoint-tag">${cleanTag}</span>
+            <span class="mc-waypoint-coords">X: ${lm.coords[0]} · Z: ${lm.coords[2]}</span>
+          </div>
+          <div class="mc-waypoint-title">${lm.name}</div>
+          <div class="mc-waypoint-desc">${lm.desc}</div>
+          <div class="mc-waypoint-actions">
+            <span class="mc-waypoint-dist">📍 ${dist}m</span>
+            <button class="mc-waypoint-warp-btn mc-map-chip-btn" data-index="${idx}" title="Fast Travel to ${lm.name}">WARP ↗</button>
+          </div>
+        </div>
+      `;
     }).join('');
 
-    const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => `
-      <button class="atlas-destination mc-map-chip-btn" data-index="${idx}">
-        <span class="atlas-destination-tag">${lm.tag.replace(/[\[\]]/g, '')}</span>
-        <span class="atlas-destination-copy"><strong>${lm.name}</strong><small>${lm.desc}</small></span>
-        <span class="atlas-destination-arrow" aria-hidden="true">↗</span>
-      </button>
-    `).join('');
-
     this.modalContainer.innerHTML = `
-      <div class="mc-dialog mc-max-map-dialog">
-        <div class="mc-dialog-header">
-          <div>
-            <p class="atlas-eyebrow">LAKSHYA’S PORTFOLIO WORLD <span>·</span> FIELD GUIDE 01</p>
-            <h2 class="mc-dialog-title">A world worth exploring.</h2>
-            <span class="mc-dialog-subtitle">All 39 destinations and 15 districts across 10 realms. Zoom, pan, and click to travel anywhere.</span>
+      <div class="mc-game-map-modal">
+        <!-- Floating Top HUD Header -->
+        <header class="mc-game-map-hud-header">
+          <div class="mc-game-map-hud-left">
+            <div class="mc-map-title-badge">
+              <span class="mc-map-badge-icon">🗺️</span>
+              <div class="mc-map-title-group">
+                <h1 class="mc-map-hud-title">WORLD OF LAKSHYA</h1>
+                <span class="mc-map-hud-coords" id="map-live-coords">📍 X: ${curX}, Z: ${curZ}</span>
+              </div>
+            </div>
           </div>
-          <button class="mc-close-btn" id="mc-modal-close">X</button>
+
+          <div class="mc-game-map-hud-center">
+            <div class="mc-map-filter-group" id="mc-map-filter-group">
+              <button class="mc-map-filter-btn active" data-filter="all">ALL (39)</button>
+              <button class="mc-map-filter-btn" data-filter="monuments">🏛️ MONUMENTS</button>
+              <button class="mc-map-filter-btn" data-filter="cities">🏙️ CITIES</button>
+              <button class="mc-map-filter-btn" data-filter="transit">🚆 TRANSIT</button>
+              <button class="mc-map-filter-btn" data-filter="nature">🌲 NATURE</button>
+            </div>
+          </div>
+
+          <div class="mc-game-map-hud-right">
+            <button class="mc-hud-action-btn mc-btn-sidebar-toggle" id="btn-toggle-sidebar" title="Toggle Waypoints Directory">
+              📋 WAYPOINTS <span class="mc-badge-count" id="mc-badge-count">39</span>
+            </button>
+            <button class="mc-hud-action-btn mc-btn-close-map" id="mc-modal-close" title="Close Map (ESC)">
+              ✕ ESC
+            </button>
+          </div>
+        </header>
+
+        <!-- Fullscreen Interactive Canvas Viewport -->
+        <div class="mc-game-map-viewport" id="mc-max-map-canvas-container">
+          <canvas id="max-realm-canvas"></canvas>
+          <div class="mc-map-tooltip-card" id="mc-map-tooltip-card"></div>
         </div>
 
-        <nav class="atlas-section-nav" aria-label="Map sections">
-          <a href="#atlas-map-section">01 <span>MAP</span></a>
-          <a href="#atlas-regions-section">02 <span>REALMS</span></a>
-          <a href="#atlas-destinations-section">03 <span>DESTINATIONS</span></a>
-        </nav>
-
-        <div class="atlas-scroll-area">
-          <section class="atlas-map-section" id="atlas-map-section" aria-label="Interactive world map">
-            <div class="mc-map-top-status-bar">
-              <div class="mc-map-gps-pill">
-                <span class="gps-label">YOUR POSITION:</span>
-                <span class="gps-val" id="map-live-coords">X: ${curX}, Z: ${curZ}</span>
-              </div>
-              <div class="mc-map-cursor-pill">
-                <span class="cursor-label">TARGET:</span>
-                <span class="cursor-val" id="map-cursor-coords">Select a landmark or click anywhere to travel</span>
-              </div>
+        <!-- Floating Bottom HUD Footer -->
+        <footer class="mc-game-map-hud-footer">
+          <div class="mc-hud-footer-left">
+            <div class="mc-map-status-pill">
+              <span class="mc-status-radar-pulse"></span>
+              <span class="cursor-val" id="map-cursor-coords">Select a waypoint or click anywhere to Fast Travel</span>
             </div>
+            <div class="mc-map-legend-pills">
+              <span class="mc-legend-pill"><i class="atlas-key-dot atlas-key-player"></i> YOU</span>
+              <span class="mc-legend-pill"><i class="atlas-key-dot atlas-key-place"></i> PIN</span>
+              <span class="mc-legend-pill"><i class="atlas-key-line"></i> RAIL</span>
+            </div>
+          </div>
 
-            <div class="mc-map-controls-bar">
-              <div class="mc-map-tools-group">
-                <button class="mc-map-tool-btn" id="btn-map-zoom-in" type="button" title="Zoom in (+)">🔍+ IN</button>
-                <button class="mc-map-tool-btn" id="btn-map-zoom-out" type="button" title="Zoom out (-)">🔍- OUT</button>
-                <button class="mc-map-tool-btn" id="btn-map-reset" type="button" title="Reset view">⟲ RESET</button>
-                <button class="mc-map-tool-btn" id="btn-map-locate-player" type="button" title="Center on your position">🎯 YOU</button>
+          <div class="mc-hud-footer-right">
+            <div class="mc-map-nav-tools">
+              <button class="mc-map-tool-btn" id="btn-map-zoom-in" type="button" title="Zoom in (+)">➕ IN</button>
+              <button class="mc-map-tool-btn" id="btn-map-zoom-out" type="button" title="Zoom out (-)">➖ OUT</button>
+              <button class="mc-map-tool-btn" id="btn-map-locate-player" type="button" title="Center camera on your position">🎯 YOU</button>
+              <button class="mc-map-tool-btn" id="btn-map-reset" type="button" title="Reset camera view">⟲ RESET</button>
+            </div>
+          </div>
+        </footer>
+
+        <!-- Sleek Collapsible Waypoints Sidebar Drawer -->
+        <aside class="mc-game-map-sidebar" id="mc-map-sidebar">
+          <div class="mc-sidebar-header">
+            <div class="mc-sidebar-top-row">
+              <div class="mc-sidebar-heading">
+                <span class="mc-sidebar-icon">📍</span>
+                <h3>FAST TRAVEL ATLAS</h3>
               </div>
-              <div class="mc-map-filter-group" id="mc-map-filter-group">
-                <button class="mc-map-filter-btn active" data-filter="all">ALL (39)</button>
-                <button class="mc-map-filter-btn" data-filter="monuments">MONUMENTS</button>
-                <button class="mc-map-filter-btn" data-filter="cities">CITIES</button>
-                <button class="mc-map-filter-btn" data-filter="transit">TRANSIT</button>
-                <button class="mc-map-filter-btn" data-filter="nature">NATURE</button>
-              </div>
+              <button class="mc-sidebar-close-btn" id="btn-close-sidebar" title="Close Sidebar">✕</button>
             </div>
-
-            <div class="mc-max-map-canvas-container" id="mc-max-map-canvas-container">
-              <canvas id="max-realm-canvas" width="1200" height="900"></canvas>
-              <div class="mc-map-tooltip-card" id="mc-map-tooltip-card"></div>
+            <div class="mc-sidebar-search-wrap">
+              <input type="text" id="map-waypoint-search" class="mc-sidebar-search-input" placeholder="🔍 Search 39 destinations..." autocomplete="off" />
             </div>
-
-            <div class="atlas-map-caption">
-              <span><i class="atlas-key-dot atlas-key-player"></i> YOU ARE HERE</span>
-              <span><i class="atlas-key-dot atlas-key-place"></i> WAYPOINT PIN</span>
-              <span><i class="atlas-key-line"></i> EXPRESS RAIL TRANSIT</span>
-              <span class="atlas-caption-hint">Drag to Pan · Wheel or Buttons to Zoom · Click to Travel</span>
-            </div>
-          </section>
-
-          <section class="atlas-content-section" id="atlas-regions-section">
-            <div class="atlas-section-heading"><div><p class="atlas-eyebrow">PICK A DIRECTION</p><h3>Explore the world</h3></div><span>${atlasRegions.length.toString().padStart(2, '0')} AREAS</span></div>
-            <div class="atlas-region-grid">${regionsHtml}</div>
-          </section>
-
-          <section class="atlas-content-section atlas-destinations-section" id="atlas-destinations-section">
-            <div class="atlas-section-heading"><div><p class="atlas-eyebrow">MAKE IT A JOURNEY</p><h3>All destinations</h3></div><span>${PORTFOLIO_DATA.landmarks.length.toString().padStart(2, '0')} WAYPOINTS</span></div>
-            <div class="atlas-destination-list">${destinationsHtml}</div>
-          </section>
-        </div>
-
-        <div class="mc-dialog-footer">
-          <span class="atlas-footer-note">FAST TRAVEL IS READY</span>
-          <button class="mc-btn mc-btn-stone" id="mc-modal-done">Close field guide</button>
-        </div>
+          </div>
+          <div class="mc-sidebar-list" id="mc-sidebar-list">
+            ${destinationsHtml}
+          </div>
+        </aside>
       </div>
     `;
 
     this.modalContainer.style.display = 'flex';
     document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
-    document.getElementById('mc-modal-done')?.addEventListener('click', () => this.close());
 
-    // Connect landmark chips buttons
-    document.querySelectorAll('.mc-map-chip-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const idx = parseInt(target.getAttribute('data-index') || '0', 10);
-        const lm = PORTFOLIO_DATA.landmarks[idx];
-        if (lm && this.onTeleportRequest) {
+    // Sidebar drawer toggle
+    const sidebar = document.getElementById('mc-map-sidebar');
+    const toggleBtn = document.getElementById('btn-toggle-sidebar');
+    const closeSidebarBtn = document.getElementById('btn-close-sidebar');
+
+    const toggleSidebar = (force?: boolean) => {
+      if (!sidebar) return;
+      const isOpen = force !== undefined ? force : !sidebar.classList.contains('open');
+      if (isOpen) {
+        sidebar.classList.add('open');
+        toggleBtn?.classList.add('active');
+      } else {
+        sidebar.classList.remove('open');
+        toggleBtn?.classList.remove('active');
+      }
+      sound.playClick();
+    };
+
+    toggleBtn?.addEventListener('click', () => toggleSidebar());
+    closeSidebarBtn?.addEventListener('click', () => toggleSidebar(false));
+
+    // Connect waypoint cards: clicking card pans to it, clicking warp button teleports
+    const cards = document.querySelectorAll('.mc-waypoint-card') as NodeListOf<HTMLElement>;
+    cards.forEach(card => {
+      const idx = parseInt(card.getAttribute('data-index') || '0', 10);
+      const lm = PORTFOLIO_DATA.landmarks[idx];
+      if (!lm) return;
+
+      card.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('.mc-waypoint-warp-btn')) {
+          e.stopPropagation();
           sound.playLevelUp();
-          this.onTeleportRequest(lm.coords as [number, number, number]);
+          this.onTeleportRequest?.(lm.coords as [number, number, number]);
           this.close();
+          return;
+        }
+
+        // Pan map camera to this landmark
+        if ((window as any).__mcMapPanTo) {
+          (window as any).__mcMapPanTo(lm.coords, lm);
         }
       });
     });
 
+    // Search filter input & category filtering
+    const searchInput = document.getElementById('map-waypoint-search') as HTMLInputElement;
+    const filterCards = () => {
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const activeFilterBtn = document.querySelector('.mc-map-filter-btn.active');
+      const activeFilter = activeFilterBtn?.getAttribute('data-filter') || 'all';
+      let count = 0;
+
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        const tag = card.getAttribute('data-tag') || '';
+        const cat = card.getAttribute('data-cat') || 'all';
+        const matchesSearch = query === '' || name.includes(query) || tag.includes(query);
+        const matchesFilter = activeFilter === 'all' || cat === activeFilter;
+        if (matchesSearch && matchesFilter) {
+          card.style.display = 'flex';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const badgeCount = document.getElementById('mc-badge-count');
+      if (badgeCount) badgeCount.textContent = count.toString();
+    };
+
+    searchInput?.addEventListener('input', filterCards);
+
     // Render Canvas and attach hover/click interactions
-    this.initMaximizedMapCanvas(effectivePos, effectiveYaw, effectiveDragons, effectiveTrains);
+    this.initMaximizedMapCanvas(effectivePos, effectiveYaw, effectiveDragons, effectiveTrains, filterCards);
   }
 
   private initMaximizedMapCanvas(
     playerPos?: { x: number; y: number; z: number },
     playerYaw?: number,
     dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
-    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
+    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[],
+    onFilterChange?: () => void
   ) {
     const canvas = document.getElementById('max-realm-canvas') as HTMLCanvasElement;
     if (!canvas) return;
@@ -602,13 +673,28 @@ export class ModalManager {
     if (!ctx) return;
     const tooltipEl = document.getElementById('mc-map-tooltip-card');
     const containerEl = document.getElementById('mc-max-map-canvas-container');
+    if (!containerEl) return;
 
-    const width = 1200;
-    const height = 900;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = width * pixelRatio;
-    canvas.height = height * pixelRatio;
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    let width = containerEl.clientWidth || window.innerWidth;
+    let height = containerEl.clientHeight || window.innerHeight;
+    if (width === 0) width = window.innerWidth;
+    if (height === 0) height = window.innerHeight;
+
+    const resizeCanvas = () => {
+      if (!containerEl) return;
+      width = containerEl.clientWidth || window.innerWidth;
+      height = containerEl.clientHeight || window.innerHeight;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = width * pixelRatio;
+      canvas.height = height * pixelRatio;
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    this.mapResizeCleanup = () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
 
     const cx = width / 2;
     const cy = height / 2;
@@ -631,26 +717,17 @@ export class ModalManager {
     let initialPanY = 0;
     let hasDragged = false;
 
-    // Helper: Category classifier for all landmarks
-    const getLandmarkCategory = (tag: string): 'monuments' | 'cities' | 'transit' | 'nature' => {
-      if (tag.includes('TAJ') || tag.includes('GREAT WALL') || tag.includes('EIFFEL') ||
-          tag.includes('LONDON') || tag.includes('PYRAMID') || tag.includes('GIZA') ||
-          tag.includes('TEMPLE') || tag.includes('ISRO') || tag.includes('HAWA MAHAL') ||
-          tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE') ||
-          tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS')) {
-        return 'monuments';
-      }
-      if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
-          tag.includes('HOLLYWOOD') || tag.includes('McQUEEN') || tag.includes('MEXICO') ||
-          tag.includes('DUBAI') || tag.includes('PALM') || tag.includes('SEOUL') || tag.includes('MUMBAI') ||
-          tag.includes('VARANASI') || tag.includes('CITADEL') || tag.includes('WORLD ISLANDS')) {
-        return 'cities';
-      }
-      if (tag.includes('AIRPORT') || tag.includes('RAILWAY') || tag.includes('MARINA') || tag.includes('DHABA')) {
-        return 'transit';
-      }
-      return 'nature';
+    // Expose camera pan for external interaction (e.g. sidebar card click)
+    (window as any).__mcMapPanTo = (coords: [number, number, number], lm: any) => {
+      userZoom = Math.max(1.8, userZoom);
+      panX = -coords[0] * baseScale * userZoom;
+      panY = -coords[2] * baseScale * userZoom;
+      hoveredLm = lm;
+      sound.playClick();
     };
+
+    // Helper: Category classifier for all landmarks
+    const getLandmarkCategory = ModalManager.getLandmarkCategory;
 
     const getPinColor = (tag: string): string => {
       if (tag.includes('TAJ')) return '#ffffff';
@@ -720,6 +797,7 @@ export class ModalManager {
         document.querySelectorAll('.mc-map-filter-btn').forEach(b => b.classList.remove('active'));
         target.classList.add('active');
         activeFilter = (target.getAttribute('data-filter') || 'all') as any;
+        onFilterChange?.();
         sound.playClick();
       });
     });
@@ -1704,7 +1782,7 @@ export class ModalManager {
 
       // Antique Cartography Compass Rose (Bottom-Left)
       const compX = 54;
-      const compY = height - 54;
+      const compY = height - 90;
       ctx.save();
       ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
       ctx.beginPath();
@@ -1763,15 +1841,15 @@ export class ModalManager {
 
       // Scale Indicator (Bottom-Right)
       ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-      ctx.fillRect(width - 160, height - 36, 150, 26);
+      ctx.fillRect(width - 160, height - 86, 150, 26);
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
-      ctx.strokeRect(width - 160, height - 36, 150, 26);
+      ctx.strokeRect(width - 160, height - 86, 150, 26);
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 8.5px monospace';
       const scaleBarLen = Math.round(50 * effectiveScale);
-      ctx.fillRect(width - 150, height - 16, Math.min(130, scaleBarLen), 3);
-      ctx.fillText(`SCALE: 50 BLOCKS`, width - 150, height - 23);
+      ctx.fillRect(width - 150, height - 66, Math.min(130, scaleBarLen), 3);
+      ctx.fillText(`SCALE: 50 BLOCKS`, width - 150, height - 73);
     };
 
     // Continuous Animation Loop using requestAnimationFrame
