@@ -133,47 +133,48 @@ export class Player {
     this.setupBlockHighlight();
   }
 
+  public requestPointerLock() {
+    const pauseOverlay = document.getElementById('pause-overlay');
+    if (pauseOverlay) pauseOverlay.style.display = 'none';
+    document.body.classList.add('game-active');
+
+    const startWithoutPointerLock = () => {
+      this.isPointerLockFallback = true;
+      this.fallbackMousePosition = null;
+      this.isLocked = true;
+      if (pauseOverlay) pauseOverlay.style.display = 'none';
+      document.body.classList.add('game-active');
+    };
+
+    const reqLock = (this.domElement as HTMLElement & {
+      requestPointerLock?: () => void | Promise<void>;
+    }).requestPointerLock;
+
+    if (!reqLock) {
+      startWithoutPointerLock();
+      return;
+    }
+
+    try {
+      const result = reqLock.call(this.domElement);
+      if (result && typeof (result as any).catch === 'function') {
+        (result as any).catch(startWithoutPointerLock);
+      }
+    } catch {
+      startWithoutPointerLock();
+    }
+  }
+
   private setupPointerLock() {
     const playBtn = document.getElementById('play-button');
     const pauseOverlay = document.getElementById('pause-overlay');
-
-    const requestLock = () => {
-      if (!this.isLocked) {
-        const startWithoutPointerLock = () => {
-          // Safari and some embedded browsers don't support Pointer Lock. Keep
-          // the world playable with keyboard/mouse input and a visible cursor.
-          this.isPointerLockFallback = true;
-          this.fallbackMousePosition = null;
-          this.isLocked = true;
-          if (pauseOverlay) pauseOverlay.style.display = 'none';
-          document.body.classList.add('game-active');
-        };
-        const requestPointerLock = (this.domElement as HTMLElement & {
-          requestPointerLock?: () => void | Promise<void>;
-        }).requestPointerLock;
-
-        if (!requestPointerLock) {
-          startWithoutPointerLock();
-          return;
-        }
-
-        try {
-          const result = requestPointerLock.call(this.domElement);
-          if (result && typeof result.catch === 'function') {
-            result.catch(startWithoutPointerLock);
-          }
-        } catch {
-          startWithoutPointerLock();
-        }
-      }
-    };
 
     const handleStartGame = (e: Event) => {
       e.stopPropagation();
       if (this.isTouchDevice) {
         this.startMobileSession();
       } else {
-        requestLock();
+        this.requestPointerLock();
       }
     };
 
@@ -198,7 +199,8 @@ export class Player {
       if (pauseOverlay) {
         const modalContainer = document.getElementById('modal-container');
         const isModalOpen = modalContainer && modalContainer.style.display === 'flex';
-        pauseOverlay.style.display = (this.isLocked || isModalOpen) ? 'none' : 'flex';
+        const isDrivingOrRacing = !!(this.ridingVehicle || this.world.mcQueenManager?.raceState?.active);
+        pauseOverlay.style.display = (this.isLocked || isModalOpen || isDrivingOrRacing) ? 'none' : 'flex';
       }
       const label = document.getElementById('play-btn-label');
       if (label) {
@@ -1219,6 +1221,7 @@ export class Player {
     if (pauseOverlay) {
       pauseOverlay.style.display = 'none';
     }
+    this.requestPointerLock();
     if (this.world.mcQueenManager) {
       this.world.mcQueenManager.isPlayerDriving = true;
       const qPos = this.world.mcQueenManager.getPosition();

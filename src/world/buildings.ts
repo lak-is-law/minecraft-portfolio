@@ -11,8 +11,66 @@ export interface VoxelBlock {
   };
 }
 
+// Authentic Non-Uniform Continental Country Coastline Geometry
+export const COUNTRY_COAST_POINTS: [number, number][] = [
+  // North Alpine Peninsula & Glacial Fjords
+  [-20, -195], [20, -195], [65, -190], [115, -185],
+  // North-East Subcontinent & Bay of Bengal Headland
+  [155, -172], [178, -148], [184, -120], [188, -85],
+  // Radiator Springs Raceway Coastline
+  [192, -55], [188, -20],
+  // Dubai Waterfront & Arabian Gulf Estuary
+  [182, 10], [182, 25], [185, 42], [182, 60], [178, 80],
+  // Southeast Coastal Shallows & Airport Lagoon
+  [150, 95], [115, 105], [75, 112], [42, 116],
+  // Southern Carnival Pier & Oceanfront Peninsula
+  [38, 145], [35, 188], [15, 198], [-15, 198], [-35, 188], [-38, 145],
+  // Southwest Mexican Cape & Desert Headland
+  [-45, 115], [-85, 120], [-125, 128], [-158, 122], [-178, 102], [-188, 75],
+  // Western Giza Dunes & Pyramids Promontory
+  [-190, 45], [-190, 15], [-184, -15],
+  // Northwest Pacific Rim, Tokyo Scramble & Great Wall Mountain Headlands
+  [-184, -50], [-188, -85], [-182, -120], [-160, -158], [-120, -180], [-70, -190]
+];
+
+interface PolarCoastPoint {
+  angle: number;
+  radius: number;
+}
+
+const POLAR_COAST: PolarCoastPoint[] = COUNTRY_COAST_POINTS.map(([px, pz]) => ({
+  angle: Math.atan2(pz, px),
+  radius: Math.hypot(px, pz)
+})).sort((a, b) => a.angle - b.angle);
+
 export class WorldBuilder {
   private blocks: Map<string, VoxelBlock> = new Map();
+
+  // Pure Deterministic Non-Uniform Country Continental Coastline Function
+  public static getCountryCoastRadius(x: number, z: number): number {
+    const a = Math.atan2(z, x);
+    let baseR = 190;
+    if (a <= POLAR_COAST[0].angle || a >= POLAR_COAST[POLAR_COAST.length - 1].angle) {
+      const pPrev = POLAR_COAST[POLAR_COAST.length - 1];
+      const pNext = POLAR_COAST[0];
+      const nextAngle = pNext.angle + Math.PI * 2;
+      const curAngle = a <= POLAR_COAST[0].angle ? a + Math.PI * 2 : a;
+      const span = nextAngle - pPrev.angle;
+      const t = Math.max(0, Math.min(1, (curAngle - pPrev.angle) / span));
+      baseR = pPrev.radius + (pNext.radius - pPrev.radius) * t;
+    } else {
+      for (let i = 0; i < POLAR_COAST.length - 1; i++) {
+        if (a >= POLAR_COAST[i].angle && a <= POLAR_COAST[i + 1].angle) {
+          const span = POLAR_COAST[i + 1].angle - POLAR_COAST[i].angle;
+          const t = span > 0 ? (a - POLAR_COAST[i].angle) / span : 0;
+          baseR = POLAR_COAST[i].radius + (POLAR_COAST[i + 1].radius - POLAR_COAST[i].radius) * t;
+          break;
+        }
+      }
+    }
+    const noise = Math.sin(x * 0.085 + z * 0.065) * 4.2 + Math.cos(x * 0.13 - z * 0.095) * 2.8;
+    return baseR + noise;
+  }
 
   public getBlocks(): VoxelBlock[] {
     return Array.from(this.blocks.values());
@@ -85,20 +143,17 @@ export class WorldBuilder {
       if (x > 176) return 0; // Turquoise ocean water in Arabian Gulf bay
     }
 
-    const ax = Math.abs(x);
-    const az = Math.abs(z);
-    const dCorner = Math.hypot(Math.max(0, ax - 145), Math.max(0, az - 145));
+    const dist = Math.hypot(x, z);
+    const coastR = WorldBuilder.getCountryCoastRadius(x, z);
 
-    // Ocean beyond coastline
-    if (ax > 200 || az > 200 || dCorner > 55) {
+    // Ocean beyond non-uniform continental country coastline
+    if (dist > coastR) {
       return 0; // Ocean water at Y = 0
     }
-    // Sandy beach shoreline
-    if (ax > 192 || az > 192 || dCorner > 48) {
+    // Sandy beach shoreline fringe
+    if (dist > coastR - 8) {
       return 1; // Sandy beach
     }
-
-    const dist = Math.hypot(x, z);
 
     // 1. Central Citadel Plaza (R < 18)
     if (dist < 18) {
@@ -478,7 +533,7 @@ export class WorldBuilder {
           } else if (isSunflowerValley) {
             subType = 'dirt';
           } else if (x >= 20 && z <= -35) {
-            subType = 'red_sandstone'; // India sub-base
+            subType = (y >= h - 2) ? 'dirt' : 'stone_bricks'; // Natural soil beneath grass
           } else if (x <= -20 && z <= -35) {
             subType = (h >= 6) ? 'stone_bricks' : 'dirt'; // China mountain rock
           } else if (x <= -20 && z >= 20) {
@@ -495,12 +550,11 @@ export class WorldBuilder {
         // Top surface block at Y = h
         let topType = 'grass';
         const dist = Math.hypot(x, z);
-        const ax = Math.abs(x);
-        const az = Math.abs(z);
-        const dCorner = Math.hypot(Math.max(0, ax - 145), Math.max(0, az - 145));
+        const coastR = WorldBuilder.getCountryCoastRadius(x, z);
         const foothillLine = -76 + Math.sin(x * 0.14) * 4 + Math.cos(x * 0.28) * 2;
         const isAlpineMountain = (x >= -48 && x <= 40 && z <= foothillLine);
         const isSunflowerValley = (x >= -68 && x <= -25 && z >= 24 && z <= 76);
+        const tNoise = Math.abs(Math.sin(x * 12.9898 + z * 78.233) * 43758.5453) % 1;
 
         if (isAlpineMountain) {
           const isLake = (Math.hypot((x - (-2)) / 12, (z - (-115)) / 10) <= 0.85);
@@ -511,10 +565,10 @@ export class WorldBuilder {
             topType = 'snow';
           } else if (h >= 8 && z <= -90) {
             // Cold mountain highlands & Lake Serenity rim: frosted snow grass & mossy rocks
-            topType = ((x + z) % 3 === 0) ? 'mossy_stone_bricks' : ((x + z) % 5 === 0) ? 'cobblestone' : 'snow_grass';
+            topType = (tNoise < 0.25) ? 'mossy_stone_bricks' : (tNoise < 0.45) ? 'cobblestone' : 'snow_grass';
           } else if (h >= 5 && z <= -84) {
             // Subalpine rocky foothills: natural mountain grass with weathered rocks & gravel
-            topType = ((x + z) % 4 === 0) ? 'cobblestone' : ((x + z) % 6 === 0) ? 'mossy_stone_bricks' : 'grass';
+            topType = (tNoise < 0.2) ? 'cobblestone' : (tNoise < 0.35) ? 'mossy_stone_bricks' : 'grass';
           } else {
             // Lower foothills and intersection valley (Z > -84 or H < 5): 100% natural lush green grass!
             topType = 'grass';
@@ -523,7 +577,7 @@ export class WorldBuilder {
           topType = 'grass';
         } else if (dist < 18) {
           topType = (dist < 4) ? 'quartz_block' : (Math.abs(x) <= 1 || Math.abs(z) <= 1) ? 'smooth_stone' : 'stone_bricks';
-        } else if (ax > 192 || az > 192 || dCorner > 48) {
+        } else if (dist > coastR - 8) {
           // Perimeter coastal beach
           topType = 'sand';
         } else if (x >= 168 && x <= 235 && z >= -62 && z <= -4) {
@@ -531,7 +585,7 @@ export class WorldBuilder {
           topType = 'terracotta_adobe';
         } else if (x <= -20 && z <= -35) {
           // China
-          topType = (h >= 7) ? ((x + z) % 3 === 0 ? 'mossy_stone_bricks' : 'stone_bricks') : 'grass';
+          topType = (h >= 7) ? (tNoise < 0.35 ? 'mossy_stone_bricks' : 'stone_bricks') : 'grass';
         } else if (x <= -20 && z >= 20) {
           // Mexico
           topType = (h >= 5) ? 'terracotta_adobe' : 'sand';
@@ -544,7 +598,7 @@ export class WorldBuilder {
           } else if (Math.hypot(x - 80, z - (-135)) <= 24) {
             topType = 'quartz_block';
           } else {
-            topType = ((x + z) % 5 === 0) ? 'red_sandstone' : 'grass';
+            topType = 'grass';
           }
         } else if (x >= 174 && x <= 400 && z >= -80 && z <= 165) {
           // Dubai Palm Jumeirah & Arabian Gulf Archipelago Islands coastal sands
@@ -7577,19 +7631,22 @@ export class WorldBuilder {
         const x = cx + dx;
         const z = cz + dz;
 
+        const mountNoise = Math.abs(Math.sin((x * 37.1 + z * 19.7)) * 43758.5453) % 1;
         for (let y = 1; y <= height; y++) {
-          let block: string = 'red_sandstone';
+          let block: string = 'dirt';
           if (y === height) {
             // Surface terrain: granite/stone near crest, grass and arid shrubs lower down
             if (height >= 20) {
               block = 'smooth_stone';
             } else if (height >= 12) {
-              block = (dx + dz) % 3 === 0 ? 'terracotta_adobe' : 'stone_bricks';
+              block = mountNoise < 0.35 ? 'cobblestone' : (mountNoise < 0.65 ? 'stone_bricks' : 'grass');
             } else {
-              block = (dx + dz) % 2 === 0 ? 'grass' : 'terracotta_adobe';
+              block = mountNoise < 0.15 ? 'dirt' : 'grass';
             }
           } else if (y >= height - 2) {
-            block = y >= 16 ? 'stone_bricks' : 'red_sandstone';
+            block = y >= 16 ? 'stone_bricks' : 'dirt';
+          } else {
+            block = y >= 12 ? 'stone_bricks' : 'dirt';
           }
           this.setBlock(x, y, z, block);
         }

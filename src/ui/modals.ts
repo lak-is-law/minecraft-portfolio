@@ -1,6 +1,7 @@
 import { PORTFOLIO_DATA, Project, Experience } from '../data/portfolioData';
 import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
+import { COUNTRY_COAST_POINTS } from '../world/buildings';
 
 export interface NPCDialogOption {
   label: string;
@@ -987,24 +988,11 @@ export class ModalManager {
       ctx.clip();
 
       // =========================================================================
-      // ORGANIC SCULPTED ISLAND CONTINENTAL OUTLINE & TURQUOISE SHALLOWS
+      // ORGANIC SCULPTED CONTINENTAL COUNTRY OUTLINE & TURQUOISE SHALLOWS
       // =========================================================================
-      const islandPoints: [number, number][] = [
-        [-20, -195], [20, -192], [65, -188], [115, -185], [155, -170], [175, -145],
-        [178, -120], [168, -85], [178, -55], [182, -20], [180, 10],
-        // Dubai waterfront promenade & Palm gateway
-        [178, 25], [176, 42], [178, 60],
-        [175, 80], [150, 95], [115, 105], [75, 108], [42, 112],
-        // Carnival pier & boardwalk peninsula
-        [38, 140], [35, 185], [15, 195], [-15, 195], [-35, 185], [-38, 140],
-        [-45, 110], [-85, 105], [-130, 95], [-165, 85], [-185, 60],
-        [-188, 30], [-178, 0], [-182, -40], [-188, -75], [-180, -115],
-        [-155, -155], [-115, -178], [-70, -188], [-20, -195]
-      ];
-
       const makeIslandPath = (scaleOffset = 0) => {
         ctx.beginPath();
-        islandPoints.forEach(([x, z], i) => {
+        COUNTRY_COAST_POINTS.forEach(([x, z], i) => {
           const dist = Math.hypot(x, z);
           const nx = dist > 0 ? (x / dist) * scaleOffset : 0;
           const nz = dist > 0 ? (z / dist) * scaleOffset : 0;
@@ -1300,15 +1288,81 @@ export class ModalManager {
       ctx.quadraticCurveTo(originX - 108 * effectiveScale, originZ - 130 * effectiveScale, originX - 84 * effectiveScale, originZ - 138 * effectiveScale);
       ctx.stroke();
 
-      // Lightning McQueen Raceway Track
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = Math.max(4, 6.5 * effectiveScale * 0.5);
+      // =========================================================================
+      // LIGHTNING McQUEEN RACEWAY · RADIATOR SPRINGS CIRCUIT (X: 172..228, Z: -54..-12)
+      // =========================================================================
+      const trackLeft = originX + 172 * effectiveScale;
+      const trackTop = originZ - 54 * effectiveScale;
+      const trackW = 56 * effectiveScale;
+      const trackH = 42 * effectiveScale;
+      const trackCornerR = 7 * effectiveScale;
+
+      // 1. Concrete & Timber Pier Pilings over water (East Hairpin Turn X > 194)
+      ctx.fillStyle = '#78350f';
+      for (let px = 196; px <= 228; px += 6) {
+        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 56 * effectiveScale, 3, 6);
+        ctx.fillRect(originX + px * effectiveScale - 1.5, originZ - 12 * effectiveScale, 3, 6);
+      }
+
+      // 2. Main Asphalt Track Ribbon
+      ctx.fillStyle = '#1e293b';
       ctx.beginPath();
-      ctx.ellipse(originX + 168 * effectiveScale, originZ - 24 * effectiveScale, 18 * effectiveScale, 10 * effectiveScale, 0, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.roundRect(trackLeft, trackTop, trackW, trackH, trackCornerR);
+      ctx.fill();
+
+      // Outer Red & White Rumble Curbs
       ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = Math.max(1.8, 3 * effectiveScale * 0.5);
+      ctx.lineWidth = Math.max(2, 3.5 * effectiveScale);
       ctx.stroke();
+
+      // 3. Desert Infield (Willy's Butte Sand Plateau & Red Mesa)
+      const infieldLeft = originX + 180 * effectiveScale;
+      const infieldTop = originZ - 46 * effectiveScale;
+      const infieldW = 40 * effectiveScale;
+      const infieldH = 26 * effectiveScale;
+      const infieldCornerR = 4 * effectiveScale;
+
+      ctx.fillStyle = '#d97706'; // Terracotta desert sand
+      ctx.beginPath();
+      ctx.roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldCornerR);
+      ctx.fill();
+
+      // Inner Red & White Kerb Border
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = Math.max(1.2, 2 * effectiveScale);
+      ctx.stroke();
+
+      // Willy's Butte Mesa Formation in Infield Center (X ~ 200, Z ~ -33)
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 13 * effectiveScale, 8 * effectiveScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * effectiveScale, originZ - 33 * effectiveScale, 8 * effectiveScale, 4.5 * effectiveScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. Gold Dash Racing Centerline
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = Math.max(1.2, 1.8 * effectiveScale);
+      ctx.setLineDash([4 * effectiveScale, 4 * effectiveScale]);
+      ctx.beginPath();
+      ctx.roundRect(trackLeft + 4 * effectiveScale, trackTop + 4 * effectiveScale, trackW - 8 * effectiveScale, trackH - 8 * effectiveScale, trackCornerR * 0.7);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 5. Start / Finish Line Checkered Grid (X = 190, Z = -15)
+      const sfX = originX + 190 * effectiveScale;
+      const sfTop = originZ - 18 * effectiveScale;
+      const sfH = 6 * effectiveScale;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(sfX - 2, sfTop, 4, sfH);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(sfX - 2, sfTop, 4, sfH * 0.5);
+
+      // Flo's V8 Café & Pit Stop Marker
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(originX + 184 * effectiveScale, originZ - 10 * effectiveScale, 6 * effectiveScale, 4 * effectiveScale);
 
       // Dubai Palm Jumeirah & Arabian Gulf Archipelago (Large-Scale Realistic Cartography)
       const pRootX = originX + 176 * effectiveScale;

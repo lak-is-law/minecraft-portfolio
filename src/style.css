@@ -1641,7 +1641,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid #facc15; outline-offs
 }
 
 body.modal-open #mc-touch-controls,
-body.modal-open #pause-overlay {
+body.modal-open #pause-overlay,
+body.driving-vehicle #pause-overlay,
+body.racing-active #pause-overlay {
   display: none !important;
   pointer-events: none !important;
 }

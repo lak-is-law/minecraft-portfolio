@@ -3,6 +3,7 @@ import { TargetInfo } from '../engine/player';
 import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
 import { RaceChallengeState } from '../world/lightningMcQueen';
+import { COUNTRY_COAST_POINTS } from '../world/buildings';
 
 export interface HotbarSlot {
   id: string;
@@ -528,52 +529,44 @@ export class HUDManager {
     ctx.rect(0, 0, w, h);
     ctx.clip();
 
-    // Rounded square island outline matching 3D world (R = 200, cornerR = 55)
-    const drawIslandShape = (margin = 0) => {
+    // Organic Non-Uniform Continental Country Coastline Geometry matching 3D World
+    const makeCountryPath = (scaleOffset = 0) => {
       ctx.beginPath();
-      const r = (200 - margin) * scale;
-      const cornerR = Math.max(6, (55 - margin) * scale);
-      const minX = originX - r;
-      const maxX = originX + r;
-      const minZ = originZ - r;
-      const maxZ = originZ + r;
-
-      ctx.moveTo(minX + cornerR, minZ);
-      ctx.lineTo(maxX - cornerR, minZ);
-      ctx.quadraticCurveTo(maxX, minZ, maxX, minZ + cornerR);
-      ctx.lineTo(maxX, maxZ - cornerR);
-      ctx.quadraticCurveTo(maxX, maxZ, maxX - cornerR, maxZ);
-      ctx.lineTo(minX + cornerR, maxZ);
-      ctx.quadraticCurveTo(minX, maxZ, minX, maxZ - cornerR);
-      ctx.lineTo(minX, minZ + cornerR);
-      ctx.quadraticCurveTo(minX, minZ, minX + cornerR, minZ);
+      COUNTRY_COAST_POINTS.forEach(([x, z], i) => {
+        const dist = Math.hypot(x, z);
+        const nx = dist > 0 ? (x / dist) * scaleOffset : 0;
+        const nz = dist > 0 ? (z / dist) * scaleOffset : 0;
+        const px = originX + (x + nx) * scale;
+        const pz = originZ + (z + nz) * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
       ctx.closePath();
     };
 
     // Turquoise Coral Reef Shallow Shelf
-    drawIslandShape(-6);
+    makeCountryPath(7);
     ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
     ctx.fill();
 
-    // Coastal Surf Foam
-    drawIslandShape(-1.5);
+    // Coastal Surf Foam Line
+    makeCountryPath(2);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
 
     // Golden beach shoreline fringe
-    drawIslandShape(0);
+    makeCountryPath(0);
     ctx.fillStyle = '#dfc47b';
     ctx.fill();
 
-    // Clip all terrain and biomes strictly inside the island landmass
+    // Clip all terrain and biomes strictly inside the country landmass
     ctx.save();
-    drawIslandShape(4);
+    makeCountryPath(-2);
     ctx.clip();
 
     // Base interior plains (Rich vibrant grass)
     ctx.fillStyle = '#427e28';
-    ctx.fillRect(originX - 210 * scale, originZ - 210 * scale, 420 * scale, 420 * scale);
+    ctx.fillRect(originX - 220 * scale, originZ - 220 * scale, 440 * scale, 440 * scale);
 
     // Draw Country Territories on Minimap Radar
     const drawMiniCountry = (poly: [number, number][], color: string) => {
@@ -606,8 +599,8 @@ export class HUDManager {
     drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
     // 9. Egypt (Sahara desert dunes)
     drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
-    // 10. UAE (Dubai Waterfront, Palm Jumeirah Archipelago, Burj Al Arab, Bluewaters & The World Islands)
-    drawMiniCountry([[150, 10], [390, 10], [390, 160], [150, 160], [150, 10]], '#0d9488');
+    // 10. UAE (Dubai Waterfront & Coastal Promenade)
+    drawMiniCountry([[150, 20], [182, 20], [185, 42], [182, 60], [178, 80], [150, 80]], '#0d9488');
     // 12. Sunflower Valley
     drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
     // Pier & Beach Boardwalk
@@ -722,17 +715,199 @@ export class HUDManager {
     ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
     ctx.stroke();
 
-    // Lightning McQueen Speedway track (Asphalt with red curb chevrons)
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 4 * scale;
-    ctx.beginPath();
-    ctx.ellipse(originX + 168 * scale, originZ - 24 * scale, 16 * scale, 9 * scale, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 2 * scale;
-    ctx.stroke();
+    ctx.restore(); // restore mainland country clip
 
-    ctx.restore(); // restore island clip
+    // =========================================================================
+    // RADIATOR SPRINGS RACEWAY (Authentic 3D Circuit Geometry X: 172..228, Z: -54..-12)
+    // =========================================================================
+    const drawMiniRaceway = () => {
+      ctx.save();
+      const trackLeft = originX + 172 * scale;
+      const trackTop = originZ - 54 * scale;
+      const trackW = 56 * scale;
+      const trackH = 42 * scale;
+      const cornerR = 6 * scale;
+
+      // Pier pilings over water for X > 194
+      ctx.fillStyle = '#78350f';
+      for (let px = 196; px <= 228; px += 8) {
+        ctx.fillRect(originX + px * scale - 1.5, originZ - 55 * scale, 3, 5);
+        ctx.fillRect(originX + px * scale - 1.5, originZ - 12 * scale, 3, 5);
+      }
+
+      // Outer Asphalt Track Surface
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.roundRect(trackLeft, trackTop, trackW, trackH, cornerR);
+      ctx.fill();
+
+      // Outer Red & White Rumble Curbs
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = Math.max(1.5, 2.5 * scale);
+      ctx.stroke();
+
+      // Infield (Desert Sand & Willy's Butte Red Mesa)
+      const infieldLeft = originX + 180 * scale;
+      const infieldTop = originZ - 46 * scale;
+      const infieldW = 40 * scale;
+      const infieldH = 26 * scale;
+      const infieldR = 4 * scale;
+
+      // Inner Red & White Kerbs
+      ctx.fillStyle = '#d97706'; // Desert sand
+      ctx.beginPath();
+      ctx.roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldR);
+      ctx.fill();
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = Math.max(1.0, 1.5 * scale);
+      ctx.stroke();
+
+      // Willy's Butte Mesa Rock in Infield
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 12 * scale, 7 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 7 * scale, 4 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Centerline Gold Racing Markings
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.setLineDash([3 * scale, 3 * scale]);
+      ctx.beginPath();
+      ctx.roundRect(trackLeft + 4 * scale, trackTop + 4 * scale, trackW - 8 * scale, trackH - 8 * scale, cornerR * 0.7);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Start / Finish Checkered Line (X = 190, Z = -15)
+      const sfX = originX + 190 * scale;
+      const sfTop = originZ - 18 * scale;
+      const sfH = 6 * scale;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(sfX - 1.5, sfTop, 3, sfH);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(sfX - 1.5, sfTop, 3, sfH * 0.5);
+
+      ctx.restore();
+    };
+    drawMiniRaceway();
+
+    // =========================================================================
+    // DUBAI PALM JUMEIRAH & ARABIAN GULF ARCHIPELAGO (Authentic 3D Coordinates)
+    // =========================================================================
+    const drawMiniPalmJumeirah = () => {
+      ctx.save();
+      const pRootX = originX + 176 * scale;
+      const pRootZ = originZ + 46 * scale;
+      const pTrunkEndX = originX + 236 * scale;
+
+      // 1. Palm Trunk
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = Math.max(2.5, 4.5 * scale);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // Monorail cyan line
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
+      ctx.beginPath();
+      ctx.moveTo(pRootX, pRootZ);
+      ctx.lineTo(pTrunkEndX, pRootZ);
+      ctx.stroke();
+
+      // 16 Parametric Curved Fronds (8 pairs fanning within Z in [14, 78])
+      ctx.strokeStyle = '#dfc47b';
+      ctx.lineWidth = Math.max(1.2, 2.2 * scale);
+      for (let f = 0; f < 8; f++) {
+        const rootFrondX = originX + (236 + f * 6.5) * scale;
+        const tipX = originX + (255 + f * 4.5) * scale;
+        const spreadZ = (6 + f * 3.4) * scale;
+        const ctrlX = originX + (242 + f * 6.0) * scale;
+
+        // North frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
+        ctx.stroke();
+
+        // South frond
+        ctx.beginPath();
+        ctx.moveTo(rootFrondX, pRootZ);
+        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
+        ctx.stroke();
+      }
+
+      // Detached Crescent Breakwater Barrier (Rx = 72, Rz = 34, Center = 252, 46)
+      ctx.strokeStyle = '#c2a661';
+      ctx.lineWidth = Math.max(2.0, 3.2 * scale);
+      ctx.beginPath();
+      const crescentCenterX = originX + 252 * scale;
+      ctx.ellipse(crescentCenterX, pRootZ, 72 * scale, 34 * scale, 0, -Math.PI * 0.42, Math.PI * 0.42);
+      ctx.stroke();
+
+      // Atlantis The Palm Resort Plinth Marker
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.arc(originX + 324 * scale, pRootZ, Math.max(2, 3.2 * scale), 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Burj Al Arab Private Island (220, 110) & Causeway
+      const burjX = originX + 220 * scale;
+      const burjZ = originZ + 110 * scale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
+      ctx.beginPath();
+      ctx.moveTo(originX + 176 * scale, originZ + 90 * scale);
+      ctx.quadraticCurveTo(originX + 195 * scale, originZ + 105 * scale, burjX, burjZ);
+      ctx.stroke();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.arc(burjX, burjZ, Math.max(3, 5 * scale), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(burjX, burjZ, Math.max(1.5, 2.2 * scale), 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Bluewaters Island & Ain Dubai Wheel (262, 146)
+      const blueX = originX + 262 * scale;
+      const blueZ = originZ + 146 * scale;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = Math.max(0.8, 1.0 * scale);
+      ctx.beginPath();
+      ctx.moveTo(originX + 176 * scale, originZ + 120 * scale);
+      ctx.lineTo(blueX, blueZ);
+      ctx.stroke();
+      ctx.fillStyle = '#dfc47b';
+      ctx.beginPath();
+      ctx.ellipse(blueX, blueZ, Math.max(4, 7 * scale), Math.max(3, 5 * scale), 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Ain Dubai observation wheel ring
+      ctx.strokeStyle = '#e0e7ff';
+      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.beginPath();
+      ctx.arc(blueX, blueZ, Math.max(2.5, 4.2 * scale), 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 4. The World Islands Archipelago
+      ctx.fillStyle = '#e2cb87';
+      const worldIslands = [
+        [360, 46, 4.2], [380, 68, 3.6], [350, 24, 3.4], [380, 28, 3.2]
+      ];
+      for (const [wx, wz, wr] of worldIslands) {
+        ctx.beginPath();
+        ctx.arc(originX + wx * scale, originZ + wz * scale, Math.max(1.8, wr * scale), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    };
+    drawMiniPalmJumeirah();
 
     // Main Roads (Double-line Minecraft gravel and paved highway)
     const drawMiniRoad = (points: [number, number][]) => {
@@ -1133,7 +1308,7 @@ export class HUDManager {
           <div class="mc-challenge-header">🏆 WILLY'S BUTTE RACE · vs DOC HUDSON #51</div>
           <div class="mc-challenge-stats">
             <div class="mc-challenge-stat"><span class="mc-label">POSITION</span> <span id="mc-race-pos" class="mc-pos-p1">P1</span></div>
-            <div class="mc-challenge-stat"><span class="mc-label">LAP</span> <span id="mc-race-lap">1/2</span></div>
+            <div class="mc-challenge-stat"><span class="mc-label">LAP</span> <span id="mc-race-lap">1/3</span></div>
             <div class="mc-challenge-stat"><span class="mc-label">TIME</span> <span id="mc-race-time">00:00.0</span></div>
             <div class="mc-challenge-stat"><span class="mc-label">SECTORS</span>
               <span id="mc-race-sectors" class="mc-sectors-row">
@@ -1181,6 +1356,37 @@ export class HUDManager {
     if (raceState && raceState.active) {
       if (challengePanel) challengePanel.style.display = 'block';
 
+      // Always update live telemetry stats (P1/P2, Lap 1/3, Time, Sectors) across all active states
+      const posEl = document.getElementById('mc-race-pos');
+      if (posEl) {
+        posEl.textContent = `P${raceState.playerPosition}`;
+        posEl.className = raceState.playerPosition === 1 ? 'mc-pos-p1' : 'mc-pos-p2';
+      }
+
+      const lapEl = document.getElementById('mc-race-lap');
+      if (lapEl) {
+        const currentLap = Math.min(raceState.totalLaps, Math.max(1, raceState.playerLap));
+        const isFinal = currentLap === raceState.totalLaps;
+        lapEl.textContent = `${currentLap}/${raceState.totalLaps}${isFinal ? ' (FINAL)' : ''}`;
+      }
+
+      const timeEl = document.getElementById('mc-race-time');
+      if (timeEl) {
+        const totalSec = Math.floor(raceState.elapsedTime);
+        const mins = Math.floor(totalSec / 60).toString().padStart(2, '0');
+        const secs = (totalSec % 60).toString().padStart(2, '0');
+        const dec = Math.floor((raceState.elapsedTime % 1) * 10);
+        timeEl.textContent = `${mins}:${secs}.${dec}`;
+      }
+
+      // Sectors indicator
+      const s1 = document.getElementById('mc-sec-1');
+      const s2 = document.getElementById('mc-sec-2');
+      const s3 = document.getElementById('mc-sec-3');
+      if (s1) s1.className = (raceState.playerSectors?.includes(1)) ? 'mc-sector-pip active' : 'mc-sector-pip';
+      if (s2) s2.className = (raceState.playerSectors?.includes(2)) ? 'mc-sector-pip active' : 'mc-sector-pip';
+      if (s3) s3.className = (raceState.playerSectors?.includes(3)) ? 'mc-sector-pip active' : 'mc-sector-pip';
+
       if (raceState.state === 'countdown') {
         const stage = raceState.countdownStage || 1;
         if (bigBanner) {
@@ -1221,35 +1427,6 @@ export class HUDManager {
             bigBanner.style.display = 'none';
           }
         }
-
-        const posEl = document.getElementById('mc-race-pos');
-        if (posEl) {
-          posEl.textContent = `P${raceState.playerPosition}`;
-          posEl.className = raceState.playerPosition === 1 ? 'mc-pos-p1' : 'mc-pos-p2';
-        }
-
-        const lapEl = document.getElementById('mc-race-lap');
-        if (lapEl) {
-          const isFinal = raceState.playerLap === raceState.totalLaps;
-          lapEl.textContent = `${Math.min(raceState.totalLaps, raceState.playerLap)}/${raceState.totalLaps}${isFinal ? ' (FINAL)' : ''}`;
-        }
-
-        const timeEl = document.getElementById('mc-race-time');
-        if (timeEl) {
-          const totalSec = Math.floor(raceState.elapsedTime);
-          const mins = Math.floor(totalSec / 60).toString().padStart(2, '0');
-          const secs = (totalSec % 60).toString().padStart(2, '0');
-          const dec = Math.floor((raceState.elapsedTime % 1) * 10);
-          timeEl.textContent = `${mins}:${secs}.${dec}`;
-        }
-
-        // Sectors indicator
-        const s1 = document.getElementById('mc-sec-1');
-        const s2 = document.getElementById('mc-sec-2');
-        const s3 = document.getElementById('mc-sec-3');
-        if (s1) s1.className = (raceState.playerSectors?.includes(1)) ? 'mc-sector-pip active' : 'mc-sector-pip';
-        if (s2) s2.className = (raceState.playerSectors?.includes(2)) ? 'mc-sector-pip active' : 'mc-sector-pip';
-        if (s3) s3.className = (raceState.playerSectors?.includes(3)) ? 'mc-sector-pip active' : 'mc-sector-pip';
       } else if (raceState.state === 'finished') {
         if (bigBanner) {
           bigBanner.style.display = 'block';

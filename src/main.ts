@@ -598,7 +598,7 @@ class Game {
               action: () => {
                 this.modals.close(true);
                 this.player.startDrivingMcQueen();
-                try { document.body.requestPointerLock?.(); } catch (_) {}
+                this.player.requestPointerLock();
                 this.hud.pushChatMessage('Race Control', '⚡ Boarded Lightning McQueen! WASD to race, SPACE to Power Drift, SHIFT for Nitro, E to exit.');
               }
             },
@@ -609,7 +609,7 @@ class Game {
                 this.modals.close(true);
                 this.player.startDrivingMcQueen();
                 this.world.mcQueenManager?.startRaceChallenge();
-                try { document.body.requestPointerLock?.(); } catch (_) {}
+                this.player.requestPointerLock();
                 this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! Red... Yellow... Green... GO!');
               }
             },
@@ -676,7 +676,7 @@ class Game {
                 this.modals.close(true);
                 this.player.startDrivingMcQueen();
                 this.world.mcQueenManager?.startRaceChallenge();
-                try { document.body.requestPointerLock?.(); } catch (_) {}
+                this.player.requestPointerLock();
                 this.hud.pushChatMessage('Race Control', '🏁 Piston Cup Challenge vs Doc Hudson started! Red... Yellow... Green... GO!');
               }
             },
@@ -1144,9 +1144,13 @@ class Game {
     }
 
     // 1. Update Player (ONLY when unpaused and actively playing)
+    const isDrivingOrRacing = !!(this.player.ridingVehicle || this.world.mcQueenManager?.raceState?.active);
     const pauseOverlay = document.getElementById('pause-overlay');
-    const isPauseMenuOpen = pauseOverlay && pauseOverlay.style.display === 'flex';
-    const isPaused = (!this.player.isLocked && !this.player.isMobileActive) || this.modals.isOpen || isPauseMenuOpen;
+    if (isDrivingOrRacing && pauseOverlay && pauseOverlay.style.display === 'flex') {
+      pauseOverlay.style.display = 'none';
+    }
+    const isPauseMenuOpen = pauseOverlay && pauseOverlay.style.display === 'flex' && !isDrivingOrRacing;
+    const isPaused = !isDrivingOrRacing && (((!this.player.isLocked && !this.player.isMobileActive) || this.modals.isOpen || isPauseMenuOpen));
     if (!isPaused) {
       this.player.update(dt);
     }
@@ -1183,6 +1187,8 @@ class Game {
 
     // Update Racing HUD for Lightning McQueen & Doc Hudson Challenge
     const isDrivingMcQueen = this.player.ridingVehicle === 'lightning_mcqueen';
+    document.body.classList.toggle('driving-vehicle', !!this.player.ridingVehicle);
+    document.body.classList.toggle('racing-active', !!this.world.mcQueenManager?.raceState?.active);
     const isShift = !!this.player.keys['ShiftLeft'] || !!this.player.keys['ShiftRight'];
     const isSpace = !!this.player.keys['Space'];
     this.hud.updateRacingHUD(
