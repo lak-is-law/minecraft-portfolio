@@ -47,8 +47,8 @@ export const PORTFOLIO_DATA = {
     title: "Software Engineer & Designer",
     level: 22,
     affiliation: "SRM Institute of Science and Technology, Chennai",
-    degree: "B.Tech in Computer Science and Engineering (2022 - 2026)",
-    gpa: "CGPA 4.37 / 5.0",
+    degree: "B.Tech in Computer Science and Engineering (2024 - 2028)",
+    gpa: "CGPA 8.74 / 10.0",
     bio: "Computer Science student at SRMIST, Chennai building at the intersection of software engineering, applied AI, and design. Comfortable moving between technical work and creative pursuits like design, music, and public speaking, with a steady focus on continuous growth and long-term impact.",
     email: "contact@lakshya.uk",
     portfolioUrl: "https://lakshya.uk",
@@ -59,6 +59,25 @@ export const PORTFOLIO_DATA = {
   },
 
   projects: [
+    {
+      id: "jinn",
+      title: "Jinn",
+      subtitle: "The Ancient Oracle of Minds",
+      tagline: "Akinator-style personality-guessing oracle game powered by multi-LLM orchestration",
+      category: "Cognitive AI",
+      description: [
+        "Akinator-style 20-questions personality-guessing oracle game engineered with an Egyptian and Arabian Nights aesthetic.",
+        "Orchestrates multi-LLM serverless queries across NVIDIA NIM (Llama 3.3 70B), Claude, Groq, and Gemini.",
+        "Features real-time ASCII canvas transitions and an offline trait-matching heuristic fallback engine."
+      ],
+      metrics: ["Multi-LLM Fallback Architecture", "Llama 3.3 70B + Claude + Gemini", "ASCII Canvas Transitions"],
+      tags: ["Multi-LLM", "NVIDIA NIM", "Claude", "Groq", "Gemini", "Canvas API"],
+      liveUrl: "https://jinn.lakshya.uk",
+      githubUrl: "https://github.com/lak-is-law",
+      accentColor: "#eab308",
+      iconBlock: "gold_block",
+      bannerCoords: { x: 108.9, y: 4, z: -30, rotY: -Math.PI / 2 }
+    },
     {
       id: "todar",
       title: "TODAR 2.0",
@@ -158,36 +177,48 @@ export const PORTFOLIO_DATA = {
 
   experience: [
     {
+      id: "exp-genospark",
+      role: "Full-Stack & AI Developer Intern",
+      company: "GenoSpark",
+      period: "Aug 2026 - Present",
+      type: "Work",
+      description: [
+        "Co-developed a Next.js frontend and Prisma backend with a server-authoritative data layer for progression, XP, and game state, serving 1M+ aspirants for AWS and Microsoft certifications.",
+        "Built the AWS Challenge Game with hybrid controls, database caching, and WebGL/Canvas 3D feedback across 5 themes, doubling hit rate and conversion."
+      ],
+      highlights: ["1M+ Aspirants Served", "AWS Challenge Game", "Double Conversion Rate"],
+      accentColor: "#3b82f6"
+    },
+    {
+      id: "exp-hackerrank",
+      role: "Software Engineering Intern",
+      company: "HackerRank",
+      period: "Jul 2026 - Sep 2026",
+      type: "Work",
+      description: [
+        "Maintained Project Euler+, authoring over 50 algorithmic challenges and validating over 400 test cases for the platform."
+      ],
+      highlights: ["Project Euler+", "50+ Challenges Authored", "400+ Test Cases Validated"],
+      accentColor: "#22c55e"
+    },
+    {
       id: "exp-daa",
       role: "Head of Alumni Relations",
       company: "Directorate of Alumni Affairs, SRMIST",
-      period: "Aug 2022 - Present",
+      period: "Aug 2024 - Present",
       type: "Leadership",
       description: [
-        "Mentored incoming student teams and spearheaded alumni-engagement strategy across 100+ alumni-engagement events.",
-        "Served as the primary point of contact for high-profile alumni relationships, faculty leadership, and student stakeholders."
+        "Connected with 10,000+ alumni, managed a database of 300,000+ alumni, and spearheaded alumni-engagement strategy across 100+ events.",
+        "Conducted LinkedIn branding workshops attended by 1,000+ members."
       ],
-      highlights: ["Head of Alumni Relations", "100+ Events Spearheaded", "High-Profile Alumni Strategy"],
+      highlights: ["Head of Alumni Relations", "300,000+ Database", "100+ Events Coordinated"],
       accentColor: "#f59e0b"
-    },
-    {
-      id: "exp-genospark",
-      role: "Full Stack Developer",
-      company: "GenoSpark",
-      period: "2024",
-      type: "Work",
-      description: [
-        "Developed and maintained full-stack web applications in a production environment.",
-        "Awarded verified Certificate of Excellence for platform performance and reliable architecture delivery."
-      ],
-      highlights: ["Certificate of Excellence", "Production Web Engineering", "Full-Stack Deployment"],
-      accentColor: "#3b82f6"
     },
     {
       id: "exp-emcee",
       role: "Official EMCEE",
       company: "Directorate of Student Affairs, SRMIST",
-      period: "Sep 2024 - Feb 2026",
+      period: "Sep 2024 - Aug 2026",
       type: "Leadership",
       description: [
         "Anchored large-scale institutional events for audiences of 5,000+ attendees.",
@@ -226,14 +257,14 @@ export const PORTFOLIO_DATA = {
       id: "exp-srmist",
       role: "B.Tech in Computer Science and Engineering",
       company: "SRM Institute of Science and Technology, Chennai",
-      period: "2022 - 2026",
+      period: "2024 - 2028",
       type: "Education",
       description: [
-        "CGPA: 4.37 / 5.0.",
+        "CGPA: 8.74 / 10.0.",
         "Specialization in applied AI, software engineering, and systems architecture.",
         "Core coursework: Distributed Systems, Deep Learning, Cloud Computing, Algorithms, Database Management."
       ],
-      highlights: ["CGPA 4.37 / 5.0", "Computer Science Major", "Chennai Campus"],
+      highlights: ["CGPA 8.74 / 10.0", "Computer Science Major", "Chennai Campus"],
       accentColor: "#10b981"
     }
   ] as Experience[],
@@ -243,7 +274,7 @@ export const PORTFOLIO_DATA = {
       id: "lead-daa",
       role: "Head of Alumni Relations",
       organization: "Directorate of Alumni Affairs, SRMIST",
-      period: "Aug 2022 - Present",
+      period: "Aug 2024 - Present",
       description: [
         "Mentored incoming student teams and spearheaded alumni-engagement strategy across 100+ events.",
         "Maintained active relationships across university leadership, corporate alumni, and undergraduate fellows."
