@@ -7150,11 +7150,36 @@ export class WorldBuilder {
     for (let z = -24; z <= -12; z++) {
       this.setBlock(110, 1, z, 'prismarine_bricks');
       this.setBlock(110, 2, z, 'water');
-      if (z === -18) {
-        // Arched Rialto Stone Bridge
-        this.setBlock(110, 3, z, 'smooth_stone');
-      }
     }
+
+    // Monumental Arched Rialto Stone Bridge spanning across canal (X in [108, 112], Z in [-19, -17])
+    for (let z = -19; z <= -17; z++) {
+      this.setBlock(108, 1, z, 'stone_bricks');
+      this.setBlock(108, 2, z, 'smooth_stone'); // West approach step
+      this.setBlock(109, 2, z, 'stone_bricks');
+      this.setBlock(109, 3, z, 'smooth_stone');
+      this.setBlock(110, 3, z, 'smooth_stone'); // Arch apex over canal water
+      this.setBlock(111, 2, z, 'stone_bricks');
+      this.setBlock(111, 3, z, 'smooth_stone');
+      this.setBlock(112, 1, z, 'stone_bricks');
+      this.setBlock(112, 2, z, 'smooth_stone'); // East approach step
+    }
+    // Classical Venetian balustrades and lanterns
+    for (let x = 108; x <= 112; x++) {
+      const by = (x === 108 || x === 112) ? 3 : 4;
+      this.setBlock(x, by, -20, 'quartz_pillar');
+      this.setBlock(x, by, -16, 'quartz_pillar');
+    }
+    this.setBlock(108, 4, -20, 'lantern');
+    this.setBlock(112, 4, -20, 'lantern');
+    this.setBlock(108, 4, -16, 'lantern');
+    this.setBlock(112, 4, -16, 'lantern');
+
+    this.setBlock(107, 2, -18, 'gold_block', {
+      type: 'sign',
+      title: 'Ponte di Rialto · Venetian Grand Canal 🎭',
+      text: 'Replica of Venice\'s famous 16th-century Rialto Bridge arching over the turquoise gondola canal into the Venetian Resort & Casino.'
+    });
 
     this.setBlock(111, 4, -16, 'sea_lantern', {
       type: 'sign',
@@ -7566,13 +7591,35 @@ export class WorldBuilder {
       text: 'Massive obsidian pyramid crowned with the most powerful beam of light on Earth! Egyptian pharaoh tomb casino and ancient gaming oasis.'
     });
 
-    // 8. The Venetian St. Mark's Campanile & Grand Canal (East Side: X in [148, 158], Z in [-22, -6])
+    // 8. The Venetian St. Mark's Campanile & Grand Canal (East Side: X in [146, 158], Z in [-22, -6])
     // Turquoise Gondola Canal Basin
     for (let z = -22; z <= -8; z++) {
       this.setBlock(148, 1, z, 'prismarine_bricks');
       this.setBlock(148, 2, z, 'water');
-      if (z === -15) this.setBlock(148, 3, z, 'smooth_stone'); // Arched Rialto bridge
     }
+
+    // Complete Arched Rialto Stone Bridge spanning across canal (X in [146, 150], Z in [-16, -14])
+    for (let z = -16; z <= -14; z++) {
+      this.setBlock(146, 1, z, 'stone_bricks');
+      this.setBlock(146, 2, z, 'smooth_stone'); // West step from Strip sidewalk
+      this.setBlock(147, 2, z, 'stone_bricks');
+      this.setBlock(147, 3, z, 'smooth_stone');
+      this.setBlock(148, 3, z, 'smooth_stone'); // Arch apex over canal water
+      this.setBlock(149, 2, z, 'stone_bricks');
+      this.setBlock(149, 3, z, 'smooth_stone');
+      this.setBlock(150, 1, z, 'stone_bricks');
+      this.setBlock(150, 2, z, 'smooth_stone'); // East step into Campanile plaza
+    }
+    // Classical Balustrades and Lanterns
+    for (let x = 146; x <= 150; x++) {
+      const by = (x === 146 || x === 150) ? 3 : 4;
+      this.setBlock(x, by, -17, 'quartz_pillar');
+      this.setBlock(x, by, -13, 'quartz_pillar');
+    }
+    this.setBlock(146, 4, -17, 'lantern');
+    this.setBlock(150, 4, -17, 'lantern');
+    this.setBlock(146, 4, -13, 'lantern');
+    this.setBlock(150, 4, -13, 'lantern');
     // St. Mark's Campanile Bell Tower
     for (let x = 152; x <= 155; x++) {
       for (let z = -16; z <= -13; z++) {
