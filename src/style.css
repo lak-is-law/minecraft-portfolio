@@ -491,14 +491,216 @@ body, html {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  background: #071520;
+  background: #22a0ce;
 }
 
 #max-realm-canvas {
   display: block;
   width: 100%;
   height: 100%;
-  cursor: crosshair;
+  cursor: grab;
+}
+
+#max-realm-canvas:active {
+  cursor: grabbing;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Modern Sleek HTML Landmark Badges Layer (Matching Reference Image)        */
+/* -------------------------------------------------------------------------- */
+.mc-map-badges-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 90;
+  overflow: hidden;
+}
+
+.mc-map-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  background: rgba(15, 23, 42, 0.90);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  transform: translate(-50%, -100%);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Downward Pointer Triangle Arrow */
+.mc-map-badge .mc-badge-arrow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid rgba(15, 23, 42, 0.90);
+  pointer-events: none;
+  transition: border-top-color 0.15s ease;
+}
+
+.mc-map-badge:hover {
+  transform: translate(-50%, -107%) scale(1.07);
+  background: rgba(30, 41, 59, 0.98);
+  border-color: #38bdf8;
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.45);
+  z-index: 100;
+}
+
+.mc-map-badge:hover .mc-badge-arrow {
+  border-top-color: rgba(30, 41, 59, 0.98);
+}
+
+.mc-map-badge:active {
+  transform: translate(-50%, -100%) scale(0.96);
+}
+
+/* Category Accent Dots */
+.mc-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #facc15;
+}
+
+.mc-badge-monuments .mc-badge-dot { background: #facc15; }
+.mc-badge-cities .mc-badge-dot { background: #38bdf8; }
+.mc-badge-transit .mc-badge-dot { background: #4ade80; }
+.mc-badge-nature .mc-badge-dot { background: #f472b6; }
+
+/* Special Player Badge Styling */
+.mc-map-badge.is-player {
+  background: rgba(30, 58, 138, 0.94);
+  border-color: #facc15;
+  color: #fef08a;
+  box-shadow: 0 4px 20px rgba(250, 204, 21, 0.35);
+  font-weight: 800;
+  z-index: 110;
+}
+
+.mc-map-badge.is-player .mc-badge-arrow {
+  border-top-color: rgba(30, 58, 138, 0.94);
+}
+
+.mc-map-badge.is-player .mc-badge-dot {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: mcBadgePulse 1.8s infinite;
+}
+
+@keyframes mcBadgePulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Vintage Nautical Compass Rose (Bottom-Left - Matching Reference Image)     */
+/* -------------------------------------------------------------------------- */
+.mc-map-compass-rose {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  width: 90px;
+  height: 90px;
+  z-index: 95;
+  pointer-events: auto;
+  user-select: none;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+}
+
+.mc-compass-dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fef3c7 0%, #fde68a 60%, #d97706 100%);
+  border: 4px solid #78350f;
+  box-shadow: inset 0 0 10px rgba(120, 53, 15, 0.6), 0 0 0 2px #facc15;
+}
+
+.mc-compass-cardinal {
+  position: absolute;
+  font-family: 'Times New Roman', serif;
+  font-weight: bold;
+  font-size: 13px;
+  color: #78350f;
+  line-height: 1;
+}
+
+.mc-cardinal-n { top: 6px; left: 50%; transform: translateX(-50%); color: #b91c1c; font-size: 15px; font-weight: 900; }
+.mc-cardinal-s { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.mc-cardinal-e { right: 8px; top: 50%; transform: translateY(-50%); }
+.mc-cardinal-w { left: 8px; top: 50%; transform: translateY(-50%); }
+
+.mc-compass-needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 52px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.mc-compass-needle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 26px solid #dc2626;
+}
+
+.mc-compass-needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 26px solid #475569;
+}
+
+.mc-compass-center-gem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #facc15;
+  border: 2px solid #78350f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Floating Top HUD Header */

@@ -542,6 +542,18 @@ export class ModalManager {
         <!-- Fullscreen Interactive Canvas Viewport -->
         <div class="mc-game-map-viewport" id="mc-max-map-canvas-container">
           <canvas id="max-realm-canvas"></canvas>
+          <div class="mc-map-badges-layer" id="mc-map-badges-layer"></div>
+          <!-- Vintage Nautical Compass Rose (Bottom Left - Matching Reference Image) -->
+          <div class="mc-map-compass-rose" id="mc-map-compass-rose">
+            <div class="mc-compass-dial">
+              <span class="mc-compass-cardinal mc-cardinal-n">N</span>
+              <span class="mc-compass-cardinal mc-cardinal-e">E</span>
+              <span class="mc-compass-cardinal mc-cardinal-s">S</span>
+              <span class="mc-compass-cardinal mc-cardinal-w">W</span>
+              <div class="mc-compass-needle"></div>
+              <div class="mc-compass-center-gem"></div>
+            </div>
+          </div>
           <div class="mc-map-tooltip-card" id="mc-map-tooltip-card"></div>
         </div>
 
@@ -690,6 +702,7 @@ export class ModalManager {
     this.adventureMapRenderer = new AdventureMapRenderer({
       canvas,
       container: containerEl,
+      badgesContainer: document.getElementById('mc-map-badges-layer'),
       tooltipEl,
       cursorCoordsEl: document.getElementById('map-cursor-coords'),
       liveCoordsEl: document.getElementById('map-live-coords'),
