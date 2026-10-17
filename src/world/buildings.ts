@@ -13088,19 +13088,94 @@ export class WorldBuilder {
     this.setBlock(startX + 6, deckY + 6, centerZ, 'gold_block');
     this.setBlock(startX + 6, deckY + 7, centerZ, 'sea_lantern');
 
-    // Pedestrian Access Stairway to Upper Deck on West Bank
+    // Solid Underwater & Ground Foundation Caisson beneath West Anchorage & Stairs (X in [58, 80], Z in [124, 136])
+    for (let x = 58; x <= startX + 6; x++) {
+      for (let z = centerZ - 6; z <= centerZ + 6; z++) {
+        for (let y = -1; y <= 1; y++) {
+          this.setBlock(x, y, z, (y === 1) ? 'smooth_stone' : 'stone_bricks');
+        }
+      }
+    }
+
+    // Pedestrian Access Stairway to Upper Deck on West Bank with solid support stepping
     for (let step = 0; step < deckY - 1; step++) {
       const sx = startX - 1 - Math.floor(step * 0.8);
       const sy = 1 + step;
-      this.setBlock(sx, sy, centerZ - 4, 'smooth_stone');
-      this.setBlock(sx, sy, centerZ - 3, 'smooth_stone');
-      this.setBlock(sx, sy + 1, centerZ - 5, 'iron_block');
+      for (let fy = 1; fy <= sy; fy++) {
+        this.setBlock(sx, fy, centerZ - 4, (fy === sy) ? 'smooth_stone' : 'stone_bricks');
+        this.setBlock(sx, fy, centerZ - 3, (fy === sy) ? 'smooth_stone' : 'stone_bricks');
+      }
+      this.setBlock(sx, sy + 1, centerZ - 5, 'iron_block'); // Safety railing
+      if (sy % 4 === 0) {
+        this.setBlock(sx, sy + 2, centerZ - 5, 'lantern');
+      }
     }
 
-    // B. East Anchorage Pier & Coastal Abutment (X in [184, 190], Z in [125, 135])
+    // Scenic Waterfront Boardwalk connecting Mega-Bridge West Base (60, 1, 126) to Carnival Pier & South Beach (Z = 112 to 126)
+    for (let z = 112; z <= 126; z++) {
+      for (let x = 58; x <= 62; x++) {
+        this.setBlock(x, 1, z, 'oak_planks');
+        if (x === 58) this.setBlock(x, 2, z, 'oak_fence');
+      }
+      if (z % 5 === 0) {
+        this.setBlock(58, 3, z, 'lantern');
+      }
+    }
+    this.setBlock(60, 2, 124, 'gold_block', {
+      type: 'sign',
+      title: 'Transcontinental Bridge Promenade · West Pier 🌉',
+      text: 'Waterfront boardwalk connecting Carnival Pier & South Coast Beach directly to the Mega-Bridge pedestrian stairways and Maglev Express.'
+    });
+
+    // West Maglev Station Platform at Lower Deck (X in [66, 74], Y = 10, Z in [126, 134])
+    for (let x = 66; x <= 74; x++) {
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        this.setBlock(x, lowerDeckY, z, 'smooth_stone');
+        if (Math.abs(z - centerZ) === 3) this.setBlock(x, lowerDeckY, z, 'gold_block');
+      }
+    }
+    this.setBlock(68, lowerDeckY + 1, centerZ - 4, 'quartz_block', {
+      type: 'sign',
+      title: 'Crossroads Harbor Maglev Station 🚅 · Track 1',
+      text: 'Supersonic Maglev Terminal. Direct express transit across the ocean to Dubai Island Station. Board Train #01.'
+    });
+
+    // West Highway Viaduct Ramp (X in [44, 74]): smoothly descending from Deck (Y = 16) to South Harbor Boulevard (Y = 1)
+    for (let rx = 44; rx < startX; rx++) {
+      const u = (rx - 44) / (startX - 44);
+      const ry = Math.max(1, Math.round(1 + 15 * u));
+      for (let z = centerZ - 3; z <= centerZ + 3; z++) {
+        for (let fy = 1; fy <= ry; fy++) {
+          this.setBlock(rx, fy, z, (fy === ry) ? ((z === centerZ && rx % 3 === 0) ? 'glowstone' : 'asphalt_road') : 'stone_bricks');
+        }
+      }
+      this.setBlock(rx, ry + 1, centerZ - 4, 'iron_block');
+      this.setBlock(rx, ry + 1, centerZ + 4, 'iron_block');
+      // Viaduct support piers every 6 blocks
+      if (rx % 6 === 0 && ry > 3) {
+        for (let fy = 1; fy < ry; fy++) {
+          this.setBlock(rx, fy, centerZ - 3, 'quartz_pillar');
+          this.setBlock(rx, fy, centerZ + 3, 'quartz_pillar');
+        }
+      }
+    }
+    this.setBlock(44, 2, centerZ - 5, 'gold_block', {
+      type: 'sign',
+      title: 'Mega-Bridge Express Viaduct · West Ramp 🌉',
+      text: 'Four-lane transcontinental vehicular viaduct connecting South Harbor directly to the Mega-Bridge suspension span.'
+    });
+
+    // B. East Anchorage Pier & Coastal Abutment (X in [184, 196], Z in [124, 136])
+    for (let x = endX - 6; x <= endX + 6; x++) {
+      for (let z = centerZ - 6; z <= centerZ + 6; z++) {
+        for (let y = -1; y <= 1; y++) {
+          this.setBlock(x, y, z, (y === 1) ? 'smooth_stone' : 'stone_bricks');
+        }
+      }
+    }
     for (let x = endX - 6; x <= endX; x++) {
       for (let z = centerZ - 5; z <= centerZ + 5; z++) {
-        for (let y = -1; y <= deckY; y++) {
+        for (let y = 1; y <= deckY; y++) {
           const isEdge = (x === endX - 6 || x === endX || z === centerZ - 5 || z === centerZ + 5);
           this.setBlock(x, y, z, isEdge ? 'stone_bricks' : 'smooth_stone');
         }
@@ -13117,6 +13192,84 @@ export class WorldBuilder {
     }
     this.setBlock(endX - 6, deckY + 6, centerZ, 'gold_block');
     this.setBlock(endX - 6, deckY + 7, centerZ, 'sea_lantern');
+
+    // East Observation Tower & Multi-Level Spiral Staircase (X = 191, Z in [124, 128])
+    // Connects Ground (Y = 1), Maglev Deck (Y = 10), and Highway Deck (Y = 16) up to Sky Observation Deck (Y = 18)
+    for (let y = 1; y <= 18; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const isCorner = Math.abs(dx) === 1 && Math.abs(dz) === 1;
+          const isCenter = dx === 0 && dz === 0;
+          if (isCorner) {
+            this.setBlock(191 + dx, y, 126 + dz, 'quartz_pillar');
+          } else if (!isCenter) {
+            if (y === 10 || y === 16 || y === 18) {
+              this.setBlock(191 + dx, y, 126 + dz, 'air'); // Portal openings
+            } else {
+              this.setBlock(191 + dx, y, 126 + dz, (y % 4 === 0) ? 'stone_bricks' : 'smooth_stone');
+            }
+          }
+        }
+      }
+      // Winding stairs inside tower
+      const stepIndex = (y - 1) % 4;
+      const sOffset = [[0, -1], [1, 0], [0, 1], [-1, 0]][stepIndex];
+      this.setBlock(191 + sOffset[0], y, 126 + sOffset[1], 'smooth_stone');
+      if (y % 4 === 0) this.setBlock(191, y, 126, 'sea_lantern');
+    }
+    // High Sky Observation Balcony at Y = 18 atop East Tower
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(191 + dx, 18, 126 + dz, 'quartz_block');
+        if (Math.abs(dx) === 2 || Math.abs(dz) === 2) {
+          this.setBlock(191 + dx, 19, 126 + dz, 'cyber_glass');
+        }
+      }
+    }
+    this.setBlock(191, 20, 126, 'beacon');
+    this.setBlock(191, 19, 124, 'gold_block', {
+      type: 'sign',
+      title: 'East Tower Sky Observation Deck 🔭✨',
+      text: 'Panoramic 360-degree overlook perched 18 meters above the Arabian Gulf. View the suspension cables, Dubai skyline, and Bluewaters Island.'
+    });
+
+    // East Maglev Station Platform at Lower Deck (X in [190, 198], Y = 10, Z in [126, 134])
+    for (let x = 190; x <= 198; x++) {
+      for (let z = centerZ - 4; z <= centerZ + 4; z++) {
+        this.setBlock(x, lowerDeckY, z, 'smooth_stone');
+        if (Math.abs(z - centerZ) === 3) this.setBlock(x, lowerDeckY, z, 'gold_block');
+      }
+    }
+    this.setBlock(193, lowerDeckY + 1, centerZ - 4, 'lapis_block', {
+      type: 'sign',
+      title: 'Dubai Island Maglev Station 🚅 · Track 2',
+      text: 'Eastern terminus of the Trans-Island Maglev Express. Transfer to Dubai Waterfront Promenade and Bluewaters Island.'
+    });
+
+    // East Highway Viaduct Ramp (X in [190, 220]): smoothly descending from Deck (Y = 16) to Dubai Coastal Highway (Y = 1)
+    for (let rx = endX + 1; rx <= 220; rx++) {
+      const u = (rx - endX) / (220 - endX);
+      const ry = Math.max(1, Math.round(deckY - 15 * u));
+      for (let z = centerZ - 3; z <= centerZ + 3; z++) {
+        for (let fy = 1; fy <= ry; fy++) {
+          this.setBlock(rx, fy, z, (fy === ry) ? ((z === centerZ && rx % 3 === 0) ? 'glowstone' : 'asphalt_road') : 'stone_bricks');
+        }
+      }
+      this.setBlock(rx, ry + 1, centerZ - 4, 'iron_block');
+      this.setBlock(rx, ry + 1, centerZ + 4, 'iron_block');
+      // Viaduct support piers every 6 blocks
+      if (rx % 6 === 0 && ry > 3) {
+        for (let fy = 1; fy < ry; fy++) {
+          this.setBlock(rx, fy, centerZ - 3, 'quartz_pillar');
+          this.setBlock(rx, fy, centerZ + 3, 'quartz_pillar');
+        }
+      }
+    }
+    this.setBlock(220, 2, centerZ - 5, 'gold_block', {
+      type: 'sign',
+      title: 'Mega-Bridge Express Viaduct · East Dubai Ramp 🌉',
+      text: 'Four-lane transcontinental vehicular viaduct arriving at Dubai Coastal Highway and Bluewaters Island junction.'
+    });
 
     // C. Twin Colossal Suspension Towers (Tower 1 at 105, Tower 2 at 155, Top Y = 38)
     const towers = [tower1X, tower2X];
@@ -13405,11 +13558,31 @@ export class WorldBuilder {
     }
     this.setBlock(endX + 4, 1, centerZ, 'sea_lantern');
 
+    // Eastern Colonnade Grand Marble Staircase descending from Walkway (Y = 16) to Sea Level Plaza (Y = 1)
+    for (let step = 0; step <= 15; step++) {
+      const sy = 16 - step;
+      const sx = endX - 1 - Math.floor(step * 0.8);
+      for (let z = centerZ - 5; z <= centerZ - 3; z++) {
+        for (let fy = 1; fy <= sy; fy++) {
+          this.setBlock(sx, fy, z, (fy === sy) ? 'quartz_block' : 'sandstone');
+        }
+      }
+      this.setBlock(sx, sy + 1, centerZ - 6, 'quartz_pillar');
+      if (sy % 4 === 0) {
+        this.setBlock(sx, sy + 2, centerZ - 6, 'lantern');
+      }
+    }
+    this.setBlock(endX - 14, 2, centerZ - 4, 'gold_block', {
+      type: 'sign',
+      title: 'Scala Nymphaea · Imperial Marble Stairway 🏛️💧',
+      text: 'Monumental staircase descending from the high aqueduct watercourse down to the sea-level temple reservoir and nymphaeum terrace.'
+    });
+
     // G. Interactive Plaque
     this.setBlock(endX - 2, 2, centerZ - 5, 'quartz_block', {
       type: 'sign',
       title: 'Aqua Magna · Imperial Colossal Aqueduct 🏛️💧',
-      text: 'A 115-meter monumental dual-tier Roman aqueduct engineered to transport pure mountain springwater across the southern badlands to the royal nymphaeum reservoir and ocean bay.'
+      text: 'A 115-meter monumental dual-tier Roman aqueduct engineered to transport pure mountain springwater across the southern badlands to the royal nymphaeum reservoir and ocean bay. Walk along the upper channel at Y = 16!'
     });
   }
 
@@ -13492,6 +13665,92 @@ export class WorldBuilder {
       }
     }
     this.setBlock(peakX, peakY, centerZ - 8, 'sea_lantern');
+
+    // E. West Approach Ramp (X in [92, 104]) smoothly ascending from Northern Parkway (Y = 1) up to Bridge Deck (Y = 4)
+    for (let rx = 92; rx < startX; rx++) {
+      const u = (rx - 92) / (startX - 92);
+      const ry = Math.max(1, Math.round(1 + 3 * u));
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        for (let fy = 1; fy <= ry; fy++) {
+          this.setBlock(rx, fy, z, (fy === ry) ? ((z === centerZ && rx % 3 === 0) ? 'glowstone' : 'asphalt_road') : 'smooth_stone');
+        }
+      }
+      this.setBlock(rx, ry + 1, centerZ - 3, 'cyber_glass');
+      this.setBlock(rx, ry + 1, centerZ + 3, 'cyber_glass');
+    }
+    this.setBlock(92, 2, centerZ - 4, 'gold_block', {
+      type: 'sign',
+      title: 'Nordic Atlantic Ocean Skyway · West Gateway 🌊',
+      text: 'Alpine coastal highway climbing smoothly up to the cable-stayed ocean bridge. Connects the Alpine realm to the remote Nordic Cape.'
+    });
+
+    // F. East Approach Ramp (X in [191, 204]) descending to Nordic Cape Lighthouse Island (Y = 1)
+    for (let rx = endX + 1; rx <= 204; rx++) {
+      const u = (rx - endX) / (204 - endX);
+      const ry = Math.max(1, Math.round(4 - 3 * u));
+      for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        for (let fy = 1; fy <= ry; fy++) {
+          this.setBlock(rx, fy, z, (fy === ry) ? ((z === centerZ && rx % 3 === 0) ? 'glowstone' : 'asphalt_road') : 'smooth_stone');
+        }
+      }
+      this.setBlock(rx, ry + 1, centerZ - 3, 'cyber_glass');
+      this.setBlock(rx, ry + 1, centerZ + 3, 'cyber_glass');
+    }
+
+    // G. Nordic Cape Lighthouse Island (X in [202, 218], Z in [-155, -135])
+    for (let x = 202; x <= 218; x++) {
+      for (let z = centerZ - 10; z <= centerZ + 10; z++) {
+        const d = Math.hypot((x - 210) / 8, (z - centerZ) / 10);
+        if (d <= 1.0) {
+          this.setBlock(x, 1, z, (d <= 0.6) ? 'stone_bricks' : ((x + z) % 2 === 0) ? 'cobblestone' : 'smooth_stone');
+        }
+      }
+    }
+
+    // Nordic Cape Lighthouse Tower at (212, centerZ)
+    const lhX = 212;
+    for (let y = 1; y <= 16; y++) {
+      const isRed = Math.floor(y / 3) % 2 === 0;
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          const isWall = Math.abs(dx) === 2 || Math.abs(dz) === 2;
+          if (isWall) {
+            this.setBlock(lhX + dx, y, centerZ + dz, isRed ? 'redstone_block' : 'quartz_block');
+          } else if (y === 1) {
+            this.setBlock(lhX + dx, 1, centerZ + dz, 'stone_bricks');
+          }
+        }
+      }
+    }
+    // Lighthouse Beacon Lantern Room (Y = 17 to 20)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const isWall = Math.abs(dx) === 2 || Math.abs(dz) === 2;
+        this.setBlock(lhX + dx, 17, centerZ + dz, isWall ? 'cyber_glass' : 'air');
+        this.setBlock(lhX + dx, 19, centerZ + dz, 'gold_block');
+      }
+    }
+    this.setBlock(lhX, 17, centerZ, 'sea_lantern');
+    this.setBlock(lhX, 18, centerZ, 'beacon');
+    this.setBlock(lhX, 20, centerZ, 'gold_block');
+    this.setBlock(lhX, 21, centerZ, 'sea_lantern');
+
+    // Ocean Pier Dock & Overlook
+    for (let x = 214; x <= 220; x++) {
+      for (let z = centerZ - 1; z <= centerZ + 1; z++) {
+        this.setBlock(x, 1, z, 'oak_planks');
+        if (z === centerZ - 1 || z === centerZ + 1 || x === 220) {
+          this.setBlock(x, 2, z, 'oak_fence');
+        }
+      }
+    }
+    this.setBlock(220, 3, centerZ, 'lantern');
+
+    this.setBlock(208, 2, centerZ - 3, 'quartz_block', {
+      type: 'sign',
+      title: 'Nordic Cape · Arctic Ocean Overlook & Lighthouse ⚓🌊',
+      text: 'Remote ocean headland at the end of the Atlantic Skyway. Features 21-meter navigation lighthouse, ocean fishing pier, and panoramic views of the northern sea.'
+    });
 
     // D. Interactive Information Plaque
     this.setBlock(peakX - 3, peakY + 1, centerZ - 2, 'gold_block', {
