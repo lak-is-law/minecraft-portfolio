@@ -7416,14 +7416,6 @@ export class WorldBuilder {
     // Hollywood Mountain & Illuminated Block-Built Sign at (165, -100)
     this.buildHollywoodMountain(165, -100);
 
-    // Expanded Hollywood Entertainment District:
-    this.buildHollywoodWalkOfFame();
-    this.buildHollywoodBowl(180, -76);
-    this.buildHollywoodStudioLot(144, -76);
-    this.buildCapitolRecordsTower(174, -62);
-    this.buildHollywoodPremiereAndOscar(151, -61);
-    this.buildMelsRetroDiner(139, -60);
-
     // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
     this.buildVegasStripInFrontOfHollywoodAndLKTower();
   }

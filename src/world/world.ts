@@ -2262,7 +2262,7 @@ export class VoxelWorld {
       { name: 'Seraphina Gold', role: 'Academy Award Actress', x: 165, y: 2, z: -70, heading: -Math.PI / 2, skinColor: 0xffdbac, shirtColor: 0xf59e0b, pantsColor: 0xd97706, hairColor: 0x451a03, tagColor: '#f59e0b', hatType: 'none' },
       { name: 'Marco Rossi', role: 'Hollywood Bowl Conductor', x: 179, y: 3, z: -76, heading: -Math.PI / 2, skinColor: 0xf5d0b5, shirtColor: 0x1e1b4b, pantsColor: 0x0f172a, hairColor: 0x94a3b8, tagColor: '#c084fc', hatType: 'none' },
       { name: 'Rex Wilder', role: 'Movie Stunt Coordinator', x: 147, y: 2, z: -74, heading: Math.PI / 4, skinColor: 0xffe0bd, shirtColor: 0x78350f, pantsColor: 0x18181b, hairColor: 0x18181b, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x18181b },
-      { name: 'DJ Sterling', role: 'Capitol Audio Engineer', x: 171, y: 2, z: -61, heading: -Math.PI / 3, skinColor: 0x8d5524, shirtColor: 0x06b6d4, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0284c7 },
+      { name: 'DJ Sterling', role: 'Capitol Audio Engineer', x: 171, y: 2, z: -58, heading: -Math.PI / 3, skinColor: 0x8d5524, shirtColor: 0x06b6d4, pantsColor: 0x1e293b, hairColor: 0x111111, tagColor: '#38bdf8', hatType: 'cap', hatColor: 0x0284c7 },
 
       // 5. London Westminster & Big Ben Realm
       { name: 'Oliver Wright', role: 'Royal Guard Guide', x: -28, y: 2, z: -60, heading: Math.PI / 2, skinColor: 0xffe0bd, shirtColor: 0xdc2626, pantsColor: 0x111827, hairColor: 0x78350f, tagColor: '#ef4444', hatType: 'cap', hatColor: 0x111827 },
