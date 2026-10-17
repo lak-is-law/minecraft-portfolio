@@ -1091,7 +1091,12 @@ export class HUDManager {
       if (tag.includes('TEMPLE')) return '#a855f7';
       if (tag.includes('ISRO')) return '#38bdf8';
       if (tag.includes('HAWA MAHAL')) return '#fb923c';
-      if (tag.includes('INDIA GATE')) return '#f59e0b';
+      if (tag.includes('MT FUJI')) return '#e0f2fe';
+      if (tag.includes('FUSHIMI INARI')) return '#ef4444';
+      if (tag.includes('GYEONGHOERU')) return '#06b6d4';
+      if (tag.includes('CHEONGGYECHEON')) return '#3b82f6';
+      if (tag.includes('MERIDIAN GATE')) return '#eab308';
+      if (tag.includes('GUILIN')) return '#10b981';
       if (tag.includes('VALLEY')) return '#eab308';
       return '#94a3b8';
     };

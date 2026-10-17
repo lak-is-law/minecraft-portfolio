@@ -440,7 +440,10 @@ export class ModalManager {
         tag.includes('LONDON') || tag.includes('PYRAMID') || tag.includes('GIZA') ||
         tag.includes('TEMPLE') || tag.includes('ISRO') || tag.includes('HAWA MAHAL') ||
         tag.includes('INDIA GATE') || tag.includes('PAVILION') || tag.includes('CASTLE') ||
-        tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS')) {
+        tag.includes('BURJ AL ARAB') || tag.includes('BLUEWATERS') || tag.includes('FORBIDDEN CITY') ||
+        tag.includes('MERIDIAN GATE') || tag.includes('TERRACOTTA') || tag.includes('GEUNJEONGJEON') ||
+        tag.includes('GYEONGHOERU') || tag.includes('KING SEJONG') || tag.includes('SENSO-JI') ||
+        tag.includes('FUSHIMI INARI')) {
       return 'monuments';
     }
     if (tag.includes('TOKYO') || tag.includes('NEO') || tag.includes('TOWER') ||
@@ -765,6 +768,12 @@ export class ModalManager {
       if (tag.includes('ISRO')) return '#38bdf8';
       if (tag.includes('HAWA MAHAL')) return '#fb923c';
       if (tag.includes('INDIA GATE')) return '#f59e0b';
+      if (tag.includes('MT FUJI')) return '#e0f2fe';
+      if (tag.includes('FUSHIMI INARI')) return '#ef4444';
+      if (tag.includes('GYEONGHOERU')) return '#06b6d4';
+      if (tag.includes('CHEONGGYECHEON')) return '#3b82f6';
+      if (tag.includes('MERIDIAN GATE')) return '#eab308';
+      if (tag.includes('GUILIN')) return '#10b981';
       if (tag.includes('VALLEY')) return '#eab308';
       return '#94a3b8';
     };
@@ -1792,7 +1801,8 @@ export class ModalManager {
         'CITADEL', 'TAJ MAHAL', 'GREAT WALL', 'TOKYO', 'SEOUL', 'NEO YORK',
         'LONDON', 'EIFFEL', 'MEXICO CITY', 'GIZA', 'DUBAI', 'HOLLYWOOD', 'McQUEEN', 'ALPS',
         'PALM JUMEIRAH', 'BURJ AL ARAB', 'BLUEWATERS', 'WORLD ISLANDS',
-        'FORBIDDEN CITY', 'PANDA RESERVE', 'TERRACOTTA', 'TOKYO TOWER', 'SENSO-JI', 'GEUNJEONGJEON', 'KING SEJONG'
+        'FORBIDDEN CITY', 'PANDA RESERVE', 'TERRACOTTA', 'TOKYO TOWER', 'SENSO-JI', 'GEUNJEONGJEON', 'KING SEJONG',
+        'MT FUJI', 'FUSHIMI INARI', 'GYEONGHOERU', 'CHEONGGYECHEON', 'MERIDIAN GATE', 'GUILIN'
       ];
 
       const drawRedBannerFlag = (

@@ -136,11 +136,12 @@ export class WorldBuilder {
       return 1; // Solid mainland ground strictly at Y = 1
     }
 
-    // 0. Dubai Coastline, Palm Jumeirah & Arabian Gulf Archipelago Islands (X in [174, 400], Z in [10, 180])
-    if (x >= 174 && x <= 400 && z >= 10 && z <= 180) {
+    // 0. Dubai Coastline, Palm Jumeirah & Arabian Gulf Archipelago Islands (X in [168, 400], Z in [10, 180])
+    if (x >= 168 && x <= 400 && z >= 10 && z <= 180) {
       const palmH = this.getPalmJumeirahTerrainHeight(x, z);
       if (palmH > 0) return palmH;
       if (x > 176) return 0; // Turquoise ocean water in Arabian Gulf bay
+      return 1; // Solid Dubai mainland along coastal boulevard
     }
 
     const dist = Math.hypot(x, z);
@@ -266,16 +267,65 @@ export class WorldBuilder {
         return 1;
       }
 
+      // Mount Fuji (富士山) Sacred Stratovolcano (X in [-202, -168], Z in [-142, -108])
+      const fujiDist = Math.hypot((x - (-185)) / 17, (z - (-125)) / 17);
+      if (fujiDist <= 1.0) {
+        if (fujiDist <= 0.12) {
+          return 25; // Volcanic summit caldera crater
+        }
+        const fujiHeight = Math.round(1 + 27 * Math.pow(1 - fujiDist, 1.35));
+        return Math.max(1, Math.min(28, fujiHeight));
+      }
+
+      // Guilin Karst Limestone Pillar Peaks (China Realm: [-105, -135] & [-125, -138])
+      const karst1 = Math.hypot(x - (-105), z - (-135));
+      if (karst1 <= 6.5) {
+        return Math.round(1 + 20 * Math.pow(1 - karst1 / 6.5, 0.7));
+      }
+      const karst2 = Math.hypot(x - (-125), z - (-138));
+      if (karst2 <= 5.5) {
+        return Math.round(1 + 18 * Math.pow(1 - karst2 / 5.5, 0.7));
+      }
+
+      // Seoul Cheonggyecheon Urban Sunken Stream (X in [-74, -48], Z in [-91, -89])
+      if (x >= -74 && x <= -48 && z >= -91 && z <= -89) {
+        return 0; // Sunken urban stream channel
+      }
+
+      // Seoul Gyeonghoeru Reflecting Lotus Lake (X in [-80, -68], Z in [-122, -108])
+      if (x >= -80 && x <= -68 && z >= -122 && z <= -108) {
+        // Pavilion island in center (X in [-76, -72], Z in [-117, -113])
+        if (x >= -76 && x <= -72 && z >= -117 && z <= -113) {
+          return 1; // Pavilion stone base
+        }
+        return 0; // Reflecting lake water
+      }
+
+      // Forbidden City Inner Golden Water River Canal (X in [-106, -78], Z in [-96, -92])
+      if (x >= -106 && x <= -78 && z >= -96 && z <= -92) {
+        return 0; // Marble-lined imperial canal
+      }
+
+      // Seoul Gyeongbokgung Palace grounds & King Sejong Square (level royal terrace)
+      if (x >= -85 && x <= -55 && z >= -132 && z <= -78) {
+        return 1;
+      }
+
       // Seoul Namsan knoll for N Seoul Tower
-      if (x >= -65 && x <= -40 && z >= -125 && z <= -105) {
-        const towerKnoll = Math.hypot((x - (-52)) / 10, (z - (-115)) / 8);
+      if (x >= -56 && x <= -38 && z >= -125 && z <= -105) {
+        const towerKnoll = Math.hypot((x - (-52)) / 9, (z - (-115)) / 8);
         if (towerKnoll <= 1) {
           return Math.round(12 * Math.pow(1 - towerKnoll, 1.2)) + 2;
         }
       }
 
-      // Tokyo leveled city ground
-      if (x <= -140 && z >= -95 && z <= -65) {
+      // Tokyo leveled city ground (Shibuya, Tokyo Tower, Senso-ji, Shinjuku)
+      if (x <= -135 && z >= -115 && z <= -50) {
+        return 1;
+      }
+
+      // China Realm Imperial Valley (Pagoda, Forbidden City, Terracotta Pit, Wolong Reserve)
+      if (x >= -145 && x <= -75 && z >= -130 && z <= -70) {
         return 1;
       }
 
@@ -381,8 +431,8 @@ export class WorldBuilder {
     // Strictly isolate Dubai archipelago to Z >= 10: zero overlap with Radiator Springs (Z <= -4)
     if (z < 10) return 0;
 
-    // Dubai mainland and coastal waterfront promenade
-    if (x <= 176 && z >= 20 && z <= 64) return 1;
+    // Dubai mainland and coastal waterfront promenade (linking Burj Khalifa, Palm, Burj Al Arab, Mega Bridge, and Bluewaters)
+    if (x <= 176 && z >= 20 && z <= 150) return 1;
 
     // 1. The Palm Trunk & Flared Gateway Base (Z = 46)
     if (x >= 176 && x <= 184 && Math.abs(z - 46) <= Math.round(5 - (x - 176) * 0.25)) {
@@ -576,8 +626,13 @@ export class WorldBuilder {
           // Radiator Springs Raceway & Willy's Butte desert infield
           topType = 'terracotta_adobe';
         } else if (x <= -20 && z <= -35) {
-          // China
-          topType = (h >= 7) ? (tNoise < 0.35 ? 'mossy_stone_bricks' : 'stone_bricks') : 'grass';
+          // China, Japan & Mount Fuji
+          const isFuji = Math.hypot((x - (-185)) / 17, (z - (-125)) / 17) <= 1.0;
+          if (isFuji) {
+            topType = (h >= 14) ? 'snow' : (h >= 8) ? 'obsidian' : 'mossy_stone_bricks';
+          } else {
+            topType = (h >= 7) ? (tNoise < 0.35 ? 'mossy_stone_bricks' : 'stone_bricks') : 'grass';
+          }
         } else if (x <= -20 && z >= 20) {
           // Mexico
           topType = (h >= 5) ? 'terracotta_adobe' : 'sand';
@@ -744,14 +799,49 @@ export class WorldBuilder {
       this.setBlock(6, 1, z, 'stone_bricks');
       this.setBlock(8, 1, z, 'mossy_stone_bricks');
     }
-    // Arched stone footbridge crossing the brook at Z in [-55, -59]
-    for (let z = -55; z >= -59; z--) {
-      for (let x = 6; x <= 8; x++) {
-        this.setBlock(x, 2, z, 'stone_bricks');
+    // Arched stone footbridge crossing the brook from West (Plaza) to East (Nature Trails)
+    for (let x = 5; x <= 9; x++) {
+      for (let z = -58; z <= -56; z++) {
+        const deckY = (x === 7) ? 2 : 2;
+        this.setBlock(x, deckY, z, 'stone_bricks');
       }
-      this.setBlock(6, 3, z, 'oak_fence');
-      this.setBlock(8, 3, z, 'oak_fence');
+      // Safety railings on North (Z = -59) and South (Z = -55) so bridge crossing (East-West) is open
+      this.setBlock(x, 3, -59, 'oak_fence');
+      this.setBlock(x, 3, -55, 'oak_fence');
     }
+    // Corner lantern posts on bridge parapets
+    this.setBlock(5, 4, -59, 'lantern');
+    this.setBlock(9, 4, -59, 'lantern');
+    this.setBlock(5, 4, -55, 'lantern');
+    this.setBlock(9, 4, -55, 'lantern');
+
+    // Approach steps on West bank (Plaza side: X = 4..5)
+    for (let z = -58; z <= -56; z++) {
+      this.setBlock(4, 1, z, 'smooth_stone');
+      this.setBlock(5, 1, z, 'stone_bricks');
+    }
+    // Approach steps on East bank (Nature side: X = 9..10)
+    for (let z = -58; z <= -56; z++) {
+      this.setBlock(9, 1, z, 'stone_bricks');
+      this.setBlock(10, 1, z, 'smooth_stone');
+    }
+
+    // East Bank Nature Trail & Brook Overlook Bench (X in [11, 14], Z = -57)
+    for (let x = 11; x <= 14; x++) {
+      for (let z = -58; z <= -56; z++) {
+        this.setBlock(x, 1, z, ((x + z) % 2 === 0) ? 'cobblestone' : 'mossy_cobblestone');
+      }
+    }
+    this.setBlock(14, 2, -57, 'oak_planks'); // Rustic nature bench
+    this.setBlock(14, 2, -58, 'oak_fence');
+    this.setBlock(14, 3, -58, 'lantern');
+    this.setBlock(14, 2, -56, 'oak_fence');
+    this.setBlock(14, 3, -56, 'lantern');
+    this.setBlock(14, 2, -55, 'stone_bricks', {
+      type: 'sign',
+      title: 'Alpine Brook & Waterfall Overlook 🌲💧',
+      text: 'Crystal mountain meltwater rushing from the Frostpeak Alps down into the central Citadel riverways. Cross the stone footbridge to explore the alpine foothills.'
+    });
 
     // Grand Pine Avenue continuing north from the Plaza into the foothills (Z = -66 to -82, X in [-3, 3])
     for (let z = -66; z >= -82; z--) {
@@ -1344,12 +1434,7 @@ export class WorldBuilder {
       ['redstone_block', 'coal_block', 'coal_block', 'coal_block']
     ], 'east');
 
-    // 10. Mexico 🇲🇽 (Mexico Realm near Zócalo & Chichén Itzá)
-    this.buildFlagpole(-100, 57, 'United Mexican States 🇲🇽 · Bandera de México', 'Bandera de México: Vertical tricolor of Green (hope), White (unity) with golden Mexican Eagle & Serpent emblem, and Red (heroes). Erected in the Mexico Realm.', [
-      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block'],
-      ['emerald_block', 'gold_block', 'quartz_block', 'redstone_block'],
-      ['emerald_block', 'quartz_block', 'quartz_block', 'redstone_block']
-    ], 'west');
+    // 10. Mexico 🇲🇽 (Represented by the Grand Asta Bandera Monumental in Zócalo Plaza)
 
     // 11. Swiss Confederation 🇨🇭 (Frostpeak Alps by Chalet de Lakshya)
     this.buildFlagpole(-18, -86, 'Swiss Confederation 🇨🇭 · Cross of the Alps', 'White Greek cross on red field, representing alpine freedom, peace, and neutrality. Erected in the Frostpeak Alps at Chalet de Lakshya.', [
@@ -1688,10 +1773,14 @@ export class WorldBuilder {
     }
   }
 
-  // 4. Imperial India Realm (North-East: Taj Mahal, Yamuna Canal, Varanasi Ghats, Chhatris)
+  // 4. Imperial India Realm (North-East: Taj Mahal, Yamuna Canal, Varanasi Ghats, Chhatris, India Gate, Mumbai, Temple, GT Road, ISRO)
   private buildImperialIndiaRealm() {
     const cx = 80;
     const cz = -140;
+
+    // =========================================================================
+    // 1. TAJ MAHAL MAUSOLEUM & CHARBAGH GARDENS (Agra Mughal Heritage)
+    // =========================================================================
 
     // Raised Grand Marble Plinth (X in [66, 94], Z in [-154, -126], Y = 1 to 3)
     for (let x = cx - 14; x <= cx + 14; x++) {
@@ -1786,24 +1875,48 @@ export class WorldBuilder {
     });
     this.setBlock(cx, 5, cz, 'gold_block');
 
-    // Yamuna Canal Reflecting Pool (Z in [cz + 18, cz + 65], X in [cx - 4, cx + 4])
+    // Yamuna Canal Reflecting Pool (Z in [cz + 18, cz + 64] = [-122, -76], X in [cx - 4, cx + 4] = [76, 84])
     for (let x = cx - 4; x <= cx + 4; x++) {
-      for (let z = cz + 18; z <= cz + 65; z++) {
-        if (x === cx - 4 || x === cx + 4 || z === cz + 18 || z === cz + 65) {
-          this.setBlock(x, 1, z, 'red_sandstone');
+      for (let z = cz + 18; z <= cz + 64; z++) {
+        if (x === cx - 4 || x === cx + 4 || z === cz + 18 || z === cz + 64) {
+          this.setBlock(x, 1, z, 'red_sandstone'); // Sandstone coping border
         } else {
           this.setBlock(x, 1, z, 'water');
-          if (z % 6 === 0) this.setBlock(x, 0, z, 'glowstone');
+          if (z % 4 === 0) this.setBlock(x, 0, z, 'glowstone');
         }
       }
     }
 
-    // Floating Lotus Blossoms along Yamuna Canal
+    // Floating Lotus Blossoms & Illuminated Diyas along Yamuna Canal
     for (const lz of [cz + 28, cz + 40, cz + 52]) {
       this.setBlock(cx - 1, 1, lz, 'emerald_block');
       this.setBlock(cx + 1, 1, lz, 'emerald_block');
       this.setBlock(cx, 1, lz, 'purpur_block');
       this.setBlock(cx, 2, lz, 'lantern');
+      // Floating diyas
+      this.setBlock(cx - 2, 1, lz, 'glowstone');
+      this.setBlock(cx + 2, 1, lz, 'glowstone');
+    }
+
+    // Symmetrical Charbagh Paved Sandstone Walkways along Canal banks
+    for (let z = cz + 18; z <= cz + 64; z++) {
+      for (let dx of [-6, -5, 5, 6]) {
+        this.setBlock(cx + dx, 1, z, 'smooth_stone');
+      }
+      // Marigold & Rose floral borders
+      if (z % 2 === 0) {
+        this.setBlock(cx - 7, 1, z, 'indian_saffron');
+        this.setBlock(cx + 7, 1, z, 'indian_green');
+      } else {
+        this.setBlock(cx - 7, 1, z, 'gold_block');
+        this.setBlock(cx + 7, 1, z, 'red_terracotta');
+      }
+    }
+
+    // Symmetrical Cypress Pines along canal (leaving clear sightlines)
+    for (let z = cz + 20; z <= cz + 62; z += 7) {
+      this.buildCypressTree(cx - 8, 1, z);
+      this.buildCypressTree(cx + 8, 1, z);
     }
 
     // Grand Darwaza-i-Rauza (Great Entrance Gateway of Taj Mahal at South: Z in [-74, -70], X in [74, 86])
@@ -1831,19 +1944,171 @@ export class WorldBuilder {
     this.setBlock(cx, 3, cz + 71, 'quartz_block', {
       type: 'sign',
       title: 'Darwaza-i-Rauza · Great Gate',
-      text: 'Monumental red sandstone portal leading to the Taj Mahal reflecting pool.'
+      text: 'Monumental red sandstone portal with ornate arched passage leading to the Taj Mahal reflecting pool.'
     });
 
-    // Symmetrical Cypress Pines along canal (leaving clear open perimeter around Indian flag at Z = -118)
-    for (let z = cz + 20; z <= cz + 62; z += 7) {
-      if (Math.abs(z - (-118)) <= 3) continue; // Skip Z = -120 to keep flag sightline completely unobstructed
-      this.buildCypressTree(cx - 6, 1, z);
-      this.buildCypressTree(cx + 6, 1, z);
+    // Marigold Floral Swags across Darwaza-i-Rauza Great Gate at Z = -70
+    for (let x = cx - 5; x <= cx + 5; x++) {
+      this.setBlock(x, 6, -70, (x % 2 === 0) ? 'indian_saffron' : 'gold_block');
+      if (Math.abs(x - cx) === 3 || Math.abs(x - cx) === 5) {
+        this.setBlock(x, 5, -70, 'lantern');
+      }
     }
 
-    // Varanasi Ghats & Riverfront Steps (X in [35, 55], Z in [-135, -115])
+    // Rajasthani Haveli Chhatris flanking the Charbagh gardens
+    this.buildRajasthaniChhatri(cx - 16, 1, cz + 30);
+    this.buildRajasthaniChhatri(cx + 16, 1, cz + 30);
+    this.buildRajasthaniChhatri(45, 2, -125);
+
+    // Sprawling Sacred Indian Banyan Trees (Sanctuary Grove)
+    this.buildBanyanTree(cx - 26, 1, cz + 10);
+    this.buildBanyanTree(cx + 26, 1, cz + 10);
+    this.buildBanyanTree(52, 1, -145);
+
+    // =========================================================================
+    // 2. TAJ FORECOURT, DIWALI RANGOLI & KARTAVYA PATH (Rajpath Boulevard)
+    // =========================================================================
+
+    // Taj South Forecourt Paving (Z in [-69, -58], X in [73, 87])
+    for (let x = cx - 7; x <= cx + 7; x++) {
+      for (let z = -69; z <= -58; z++) {
+        const isBorder = (Math.abs(x - cx) === 7 || z === -69 || z === -58);
+        this.setBlock(x, 1, z, isBorder ? 'red_sandstone' : 'smooth_stone');
+      }
+    }
+
+    // Grand Diwali Peacock Rangoli Mandala (Centered at 80, 1, -63 on the open forecourt)
+    const rangX = 80;
+    const rangZ = -63;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 1.0) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, 'gold_block');
+        } else if (d <= 2.0) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, ((dx + dz) % 2 === 0) ? 'lapis_block' : 'emerald_block');
+        } else if (d <= 3.0) {
+          this.setBlock(rangX + dx, 1, rangZ + dz, (Math.abs(dx) === Math.abs(dz)) ? 'indian_saffron' : 'red_terracotta');
+        }
+      }
+    }
+    this.setBlock(rangX, 2, rangZ, 'sea_lantern');
+    this.setBlock(rangX, 2, rangZ + 4, 'gold_block', {
+      type: 'sign',
+      title: 'Grand Diwali Rangoli Mandala 🪔',
+      text: 'Intricate folk art crafted with vibrant colored rice powders, turmeric, and vermillion, celebrating prosperity, light, and new beginnings!'
+    });
+
+    // Kartavya Path (Rajpath Ceremonial Boulevard: Z in [-57, -44], X in [77, 83])
+    for (let z = -57; z <= -44; z++) {
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        this.setBlock(x, 1, z, (Math.abs(x - cx) === 3) ? 'red_sandstone' : 'smooth_stone');
+      }
+      if (z % 4 === 0) {
+        this.setBlock(cx - 4, 1, z, 'red_sandstone');
+        this.setBlock(cx - 4, 2, z, 'iron_block');
+        this.setBlock(cx - 4, 3, z, 'lantern');
+        this.setBlock(cx + 4, 1, z, 'red_sandstone');
+        this.setBlock(cx + 4, 2, z, 'iron_block');
+        this.setBlock(cx + 4, 3, z, 'lantern');
+      }
+    }
+
+    // =========================================================================
+    // 3. INDIA GATE & AMAR JAWAN JYOTI (New Delhi Ceremonial Capital)
+    // =========================================================================
+    const igX = 80;
+    const igZ = -50;
+
+    // Monumental Sandstone Pylons & Triumphal Archway (X in [igX - 6, igX + 6], Z in [igZ - 2, igZ + 2], Y = 1 to 14)
+    for (let x = igX - 6; x <= igX + 6; x++) {
+      for (let z = igZ - 2; z <= igZ + 2; z++) {
+        const isCenterVault = Math.abs(x - igX) <= 2;
+        for (let y = 1; y <= 14; y++) {
+          if (y <= 9 && isCenterVault) {
+            if (y === 1) this.setBlock(x, 1, z, 'red_sandstone'); // Paved arch floor
+          } else if (y <= 12) {
+            const isPylonFace = (Math.abs(x - igX) >= 3 || y >= 10);
+            if (isPylonFace) {
+              const isAccent = (y === 6 || y === 10);
+              this.setBlock(x, y, z, isAccent ? 'sandstone' : 'red_sandstone');
+            }
+          } else {
+            // Stepped Attic Cornice (Y = 13 to 14)
+            if (Math.abs(x - igX) <= 5) {
+              this.setBlock(x, y, z, (y === 14) ? 'sandstone' : 'red_sandstone');
+            }
+          }
+        }
+      }
+    }
+
+    // Amar Jawan Jyoti (Eternal Flame Cenotaph under archway)
+    this.setBlock(igX, 2, igZ, 'obsidian'); // Black marble cenotaph
+    this.setBlock(igX, 3, igZ, 'iron_block'); // Inverted bayonet rifle
+    this.setBlock(igX, 4, igZ, 'iron_block'); // Soldier's helmet
+    // 4 Eternal Flame Braziers
+    const flames = [[igX - 1, igZ - 1], [igX + 1, igZ - 1], [igX - 1, igZ + 1], [igX + 1, igZ + 1]];
+    for (const [fx, fz] of flames) {
+      this.setBlock(fx, 2, fz, 'gold_block');
+      this.setBlock(fx, 3, fz, 'magma_block');
+      this.setBlock(fx, 4, fz, 'lantern');
+    }
+
+    // India Gate Memorial Plaque
+    this.setBlock(igX, 2, igZ + 4, 'red_sandstone', {
+      type: 'sign',
+      title: 'India Gate & Amar Jawan Jyoti 🇮🇳',
+      text: 'Monumental 42-meter triumphal arch in New Delhi with the eternal flame commemorating the supreme sacrifice and eternal valor of Indian soldiers.'
+    });
+
+    // India Gate Grand South Ceremonial Plaza (Z in [-46, -42], X in [68, 92])
+    for (let x = 68; x <= 92; x++) {
+      for (let z = -46; z <= -42; z++) {
+        this.setBlock(x, 1, z, 'smooth_stone');
+      }
+    }
+    // Low ornamental sandstone balustrades
+    for (let x of [68, 92]) {
+      for (let z = -46; z <= -42; z++) {
+        this.setBlock(x, 2, z, 'red_sandstone');
+      }
+    }
+
+    // Grand Rajpath / Kartavya Path Imperial Avenue connecting India Gate directly to Darwaza-i-Rauza (Z in [-70, -46])
+    for (let z = -70; z <= -46; z++) {
+      for (let x = 76; x <= 84; x++) {
+        const isCenter = (Math.abs(x - 80) <= 2);
+        const isMedallion = isCenter && (Math.abs(z) % 6 === 0);
+        this.setBlock(x, 1, z, isMedallion ? 'gold_block' : isCenter ? 'red_sandstone' : 'smooth_stone');
+      }
+      // Marigold flower borders along avenue flanks
+      if (Math.abs(z) % 2 === 0) {
+        this.setBlock(75, 1, z, 'indian_saffron');
+        this.setBlock(85, 1, z, 'indian_green');
+      } else {
+        this.setBlock(75, 1, z, 'gold_block');
+        this.setBlock(85, 1, z, 'red_terracotta');
+      }
+      // Royal Ceremonial Lampposts every 6 blocks
+      if (Math.abs(z) % 6 === 0) {
+        this.setBlock(75, 2, z, 'red_sandstone');
+        this.setBlock(75, 3, z, 'lantern');
+        this.setBlock(85, 2, z, 'red_sandstone');
+        this.setBlock(85, 3, z, 'lantern');
+      }
+    }
+    this.setBlock(80, 2, -48, 'gold_block', {
+      type: 'sign',
+      title: 'Rajpath · Kartavya Path Imperial Boulevard 🇮🇳🏛️',
+      text: 'Grand ceremonial processional boulevard connecting India Gate to the Darwaza-i-Rauza Great Gate, Yamuna Canal, and the Taj Mahal gardens.'
+    });
+
+    // =========================================================================
+    // 4. VARANASI GHATS & RIVERFRONT (North-West)
+    // =========================================================================
     for (let x = 35; x <= 55; x++) {
-      for (let z = -135; z <= -115; z++) {
+      for (let z = -140; z <= -120; z++) {
         const stepLevel = Math.max(1, 4 - Math.floor((x - 35) / 5));
         for (let y = 1; y <= stepLevel; y++) {
           this.setBlock(x, y, z, 'red_sandstone');
@@ -1851,32 +2116,128 @@ export class WorldBuilder {
       }
     }
     // Sacred Braziers along Varanasi Riverfront
-    for (let z = -134; z <= -116; z += 6) {
+    for (let z = -138; z <= -122; z += 6) {
       this.setBlock(36, 4, z, 'cobblestone');
       this.setBlock(36, 5, z, 'magma_block');
       this.setBlock(36, 6, z, 'lantern');
     }
     // Floating Diyas (lanterns) along river
-    for (let z = -132; z <= -118; z += 4) {
+    for (let z = -136; z <= -120; z += 4) {
       this.setBlock(34, 1, z, 'water');
       this.setBlock(34, 2, z, 'glowstone');
     }
+    this.setBlock(45, 3, -121, 'red_sandstone', {
+      type: 'sign',
+      title: 'Varanasi Ghats & Holy Ganga Steps',
+      text: 'Ancient riverfront stone steps where pilgrims gather for peaceful sunrise prayers, temple bells, and illuminated evening Ganga Aarti.'
+    });
 
-    // Rajasthani Haveli Chhatris
-    this.buildRajasthaniChhatri(cx - 16, 1, cz + 30);
-    this.buildRajasthaniChhatri(cx + 16, 1, cz + 30);
-    this.buildRajasthaniChhatri(45, 2, -125);
+    // =========================================================================
+    // 5. JAIPUR HAWA MAHAL (Palace of Winds - Authentic 3D Facade at X = 58)
+    // =========================================================================
+    const hawaX = 58;
+    // Paved Pink City sandstone courtyard (X in [54, 57], Z in [-114, -104])
+    for (let x = hawaX - 4; x <= hawaX - 1; x++) {
+      for (let z = -114; z <= -104; z++) {
+        this.setBlock(x, 1, z, 'red_sandstone');
+      }
+    }
+    // 5-Tiered Rajasthani Rose Sandstone Honeycomb Facade with 3D Depth (X = 58 and 59)
+    for (let z = -114; z <= -104; z++) {
+      // Tier 1 Base (Y = 1 to 3)
+      for (let y = 1; y <= 3; y++) {
+        this.setBlock(hawaX, y, z, 'red_sandstone');
+        this.setBlock(hawaX + 1, y, z, 'red_sandstone');
+      }
+      // Honeycomb Jharokhas (Tier 2: Y = 4 to 6)
+      for (let y = 4; y <= 6; y++) {
+        const isJharokhaWindow = (z % 2 === 0);
+        this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
+        this.setBlock(hawaX + 1, y, z, 'red_sandstone');
+        if (isJharokhaWindow && y === 5) {
+          this.setBlock(hawaX - 1, y, z, 'sandstone'); // Projecting oriel balcony
+          this.setBlock(hawaX, y, z, 'lantern');
+        }
+      }
+      // Honeycomb Jharokhas (Tier 3: Y = 7 to 9, stepped inward)
+      if (z >= -112 && z <= -106) {
+        for (let y = 7; y <= 9; y++) {
+          const isJharokhaWindow = (z % 2 !== 0);
+          this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
+          this.setBlock(hawaX + 1, y, z, 'red_sandstone');
+          if (isJharokhaWindow && y === 8) {
+            this.setBlock(hawaX - 1, y, z, 'sandstone');
+          }
+        }
+      }
+      // Honeycomb Jharokhas (Tier 4: Y = 10 to 11)
+      if (z >= -111 && z <= -107) {
+        for (let y = 10; y <= 11; y++) {
+          this.setBlock(hawaX, y, z, 'red_sandstone');
+        }
+      }
+      // Tier 5 Top Crown & Kalasam Finials (Y = 12 to 13)
+      if (z >= -110 && z <= -108) {
+        this.setBlock(hawaX, 12, z, 'red_sandstone');
+        this.setBlock(hawaX, 13, z, 'gold_block'); // Golden urn finials
+      }
+    }
+    // Hawa Mahal Plaque
+    this.setBlock(hawaX - 2, 2, -109, 'red_sandstone', {
+      type: 'sign',
+      title: 'Hawa Mahal · Palace of Winds (Jaipur 🌸)',
+      text: 'Built in 1799 from pink and red sandstone with 953 honeycombed jharokha lattice windows designed to funnel refreshing royal breezes.'
+    });
 
-    // Sprawling Indian Banyan Trees
-    this.buildBanyanTree(cx - 24, 1, cz + 15);
-    this.buildBanyanTree(cx + 24, 1, cz + 15);
-    this.buildBanyanTree(52, 1, -145);
+    // =========================================================================
+    // 6. GULLY CRICKET MAIDAN (Neighborhood Recreation Field at 58, -96)
+    // =========================================================================
+    const cricX = 58;
+    const cricZ = -96;
+    // Boundary outfield grass perimeter & boundary stones
+    for (let x = cricX - 8; x <= cricX + 8; x++) {
+      for (let z = cricZ - 4; z <= cricZ + 4; z++) {
+        if (Math.abs(x - cricX) === 8 || Math.abs(z - cricZ) === 4) {
+          this.setBlock(x, 1, z, 'quartz_block'); // White boundary line
+        }
+      }
+    }
+    // 22-Yard Stamped Clay Pitch (X in [cricX - 6, cricX + 6], Z = cricZ)
+    for (let x = cricX - 6; x <= cricX + 6; x++) {
+      for (let z = cricZ - 1; z <= cricZ + 1; z++) {
+        this.setBlock(x, 1, z, 'sandstone');
+      }
+    }
+    // Batsman Crease (East: cricX + 4)
+    this.setBlock(cricX + 4, 1, cricZ - 1, 'quartz_block');
+    this.setBlock(cricX + 4, 1, cricZ, 'quartz_block');
+    this.setBlock(cricX + 4, 1, cricZ + 1, 'quartz_block');
+    // Three Wooden Wickets and Bails
+    this.setBlock(cricX + 5, 2, cricZ - 1, 'oak_fence');
+    this.setBlock(cricX + 5, 2, cricZ, 'oak_fence');
+    this.setBlock(cricX + 5, 2, cricZ + 1, 'oak_fence');
+    // Kashmir Willow Cricket Bat & Red Leather Ball
+    this.setBlock(cricX + 3, 2, cricZ, 'oak_planks');
+    this.setBlock(cricX + 2, 2, cricZ, 'redstone_block'); // Cricket ball
 
-    // --- Vibrant Everyday Indian Cultural Life ---
-    // A. Mumbai Gateway of India & Mumbai Local Suburban Train at (40, -95)
+    // Bowler's Crease (West: cricX - 4)
+    this.setBlock(cricX - 4, 1, cricZ - 1, 'quartz_block');
+    this.setBlock(cricX - 4, 1, cricZ, 'quartz_block');
+    this.setBlock(cricX - 4, 1, cricZ + 1, 'quartz_block');
+    this.setBlock(cricX - 5, 2, cricZ, 'oak_fence'); // Non-striker wicket
+
+    this.setBlock(cricX + 5, 3, cricZ, 'gold_block', {
+      type: 'sign',
+      title: 'Gully Cricket Championship Pitch 🏏',
+      text: "Rule 1: One-tip one-hand is OUT. Rule 2: Direct hit into neighbor's window is out + ball recovery duty! Long live tennis-ball cricket."
+    });
+
+    // =========================================================================
+    // 7. MUMBAI WATERFRONT, GATEWAY OF INDIA & CST SUBURBAN RAILWAY STATION
+    // =========================================================================
     const gwX = 40;
     const gwZ = -95;
-    // Basalt plinth foundation (Y = 1)
+    // Basalt plinth foundation (Y = 1) facing the coastal promenade
     for (let x = gwX - 6; x <= gwX + 6; x++) {
       for (let z = gwZ - 4; z <= gwZ + 4; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
@@ -1895,11 +2256,10 @@ export class WorldBuilder {
           }
         }
       }
-      // Fluted turret mini-domes at top
       this.setBlock(tx, 17, tz, 'quartz_pillar');
       this.setBlock(tx, 18, tz, 'gold_block');
     }
-    // Grand Indo-Saracenic Central Archway (X in [gwX - 4, gwX + 4], Z in [gwZ - 2, gwZ + 2])
+    // Grand Indo-Saracenic Central Archway
     for (let y = 2; y <= 14; y++) {
       for (let x = gwX - 4; x <= gwX + 4; x++) {
         for (let z = gwZ - 2; z <= gwZ + 2; z++) {
@@ -1910,7 +2270,7 @@ export class WorldBuilder {
               this.setBlock(x, y, z, (y >= 10 && y <= 12 && Math.abs(x - gwX) <= 1) ? 'quartz_pillar' : 'stone_bricks');
             }
           } else {
-            this.setBlock(x, 1, z, 'smooth_stone'); // Archway floor
+            this.setBlock(x, 1, z, 'smooth_stone');
           }
         }
       }
@@ -1932,17 +2292,43 @@ export class WorldBuilder {
     this.setBlock(gwX, 18, gwZ, 'gold_block');
     this.setBlock(gwX, 19, gwZ, 'beacon');
 
-
-
     this.setBlock(gwX, 2, gwZ + 5, 'stone_bricks', {
       type: 'sign',
       title: 'Gateway of India · Mumbai',
-      text: 'Historic Indo-Saracenic basalt monument built to commemorate the royal landing at Apollo Bunder.'
+      text: 'Historic Indo-Saracenic basalt monument built to commemorate the royal landing at Apollo Bunder overlooking the Arabian Sea.'
     });
 
-    // Mumbai Local Suburban Train Coach parked along coastal siding at Z = -86
+    // Mumbai Western Railway Suburban Station (Churchgate Platform at Z = -88 to -84)
+    const stnX = gwX;
     const trainZ = -86;
-    for (let x = gwX - 7; x <= gwX + 7; x++) {
+    const platZ = -88;
+
+    // Raised Passenger Platform (Y = 2) with Yellow Safety Edge
+    for (let x = stnX - 7; x <= stnX + 7; x++) {
+      for (let z = platZ - 2; z <= platZ; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+        this.setBlock(x, 2, z, (z === platZ) ? 'gold_block' : 'smooth_stone'); // Yellow tactile edge
+      }
+      // Station platform roof canopy posts
+      if (Math.abs(x - stnX) === 6 || x === stnX) {
+        for (let y = 3; y <= 5; y++) {
+          this.setBlock(x, y, platZ - 1, 'iron_block');
+        }
+      }
+      // Station roof canopy
+      for (let z = platZ - 2; z <= platZ; z++) {
+        this.setBlock(x, 6, z, 'quartz_block');
+      }
+    }
+    this.setBlock(stnX, 5, platZ - 1, 'lantern');
+    this.setBlock(stnX - 5, 3, platZ - 2, 'smooth_stone', {
+      type: 'sign',
+      title: 'Mumbai Suburban Railway · Platform 1',
+      text: 'Western Railway Suburban Network · Churchgate Station. Please mind the gap and let passengers deboard first!'
+    });
+
+    // Mumbai Local Suburban Train Coach parked along railway track at Z = -86
+    for (let x = stnX - 7; x <= stnX + 7; x++) {
       // Rails and sleepers
       this.setBlock(x, 1, trainZ, (x % 2 === 0) ? 'oak_planks' : 'iron_block');
       // Coach Floor (Y = 2)
@@ -1950,7 +2336,7 @@ export class WorldBuilder {
         this.setBlock(x, 2, z, 'smooth_stone');
       }
       // Western Railway Yellow & Maroon Livery
-      const isDoorway = (Math.abs(x - (gwX - 3)) <= 1 || Math.abs(x - (gwX + 3)) <= 1);
+      const isDoorway = (Math.abs(x - (stnX - 3)) <= 1 || Math.abs(x - (stnX + 3)) <= 1);
       for (let z of [trainZ - 1, trainZ + 1]) {
         this.setBlock(x, 2, z, 'red_terracotta'); // Maroon lower stripe
         if (!isDoorway) {
@@ -1971,24 +2357,284 @@ export class WorldBuilder {
       }
     }
     // Destination display board
-    this.setBlock(gwX - 7, 4, trainZ, 'glowstone', {
+    this.setBlock(stnX - 7, 4, trainZ, 'glowstone', {
       type: 'sign',
       title: 'Mumbai Local · Western Railway',
       text: 'Fast Local to Churchgate · Open doors, peak-hour breeze, and the spirit of Maximum City!'
     });
 
-    // B. Dravidian Temple Gopuram & Mandapam at (115, -135)
-    const gpX = 115;
-    const gpZ = -135;
+    // =========================================================================
+    // 8. GRAND TRUNK ROAD (GT ROAD), DHABA & STREET BAZAAR
+    // =========================================================================
+    const roadZ = -74;
+    // Paved GT Road (Z in [-76, -72], X in [36, 72])
+    for (let x = 36; x <= 72; x++) {
+      for (let z = roadZ - 2; z <= roadZ + 2; z++) {
+        const isCurb = (z === roadZ - 2 || z === roadZ + 2);
+        this.setBlock(x, 1, z, isCurb ? 'stone_bricks' : 'asphalt_road');
+      }
+    }
+
+    // Sher-e-Punjab Highway Dhaba at (55, -74) South Roadside
+    const dhabaX = 55;
+    const dhabaZ = -74;
+    // Dhaba Pavilion Thatched Shelter (Z in [-78, -70])
+    for (let x = dhabaX - 5; x <= dhabaX + 5; x++) {
+      for (let z = dhabaZ - 6; z <= dhabaZ - 3; z++) {
+        this.setBlock(x, 1, z, 'terracotta_adobe');
+        if (Math.abs(x - dhabaX) === 5 && (z === dhabaZ - 6 || z === dhabaZ - 3)) {
+          for (let y = 2; y <= 4; y++) this.setBlock(x, y, z, 'spruce_log');
+        }
+        this.setBlock(x, 5, z, 'oak_planks');
+      }
+    }
+    // Woven String Charpai Cots
+    const charpais = [[dhabaX - 3, dhabaZ - 5], [dhabaX - 3, dhabaZ - 4], [dhabaX + 2, dhabaZ - 5]];
+    for (const [cpx, cpz] of charpais) {
+      this.setBlock(cpx, 2, cpz, 'red_terracotta');
+      this.setBlock(cpx + 1, 2, cpz, 'red_terracotta');
+      this.setBlock(cpx, 1, cpz, 'oak_fence');
+      this.setBlock(cpx + 1, 1, cpz, 'oak_fence');
+    }
+    // Roadside Clay Tandoor Oven with Smoking Chimney
+    this.setBlock(dhabaX + 4, 2, dhabaZ - 4, 'terracotta_adobe');
+    this.setBlock(dhabaX + 4, 3, dhabaZ - 4, 'terracotta_adobe');
+    this.setBlock(dhabaX + 4, 2, dhabaZ - 5, 'magma_block');
+    this.setBlock(dhabaX + 4, 3, dhabaZ - 5, 'glowstone');
+    this.setBlock(dhabaX + 4, 4, dhabaZ - 5, 'cauldron'); // Chimney pot
+
+    this.setBlock(dhabaX, 2, dhabaZ - 7, 'terracotta_adobe', {
+      type: 'sign',
+      title: 'Sher-e-Punjab Grand Trunk Dhaba',
+      text: 'Crispy butter tandoori rotis, dal makhani, charpai seating, and piping hot cutting chai!'
+    });
+
+    // Dedicated Truck Parking Layby for Tata 1613 Truck at (46, -74)
+    const truckX = 46;
+    const truckZ = -74;
+    for (let x = truckX - 5; x <= truckX + 5; x++) {
+      for (let z = truckZ - 2; z <= truckZ + 2; z++) {
+        this.setBlock(x, 1, z, 'asphalt_road');
+      }
+    }
+    // 6 Heavy Wheels
+    for (const [wx, wz] of [[truckX - 3, truckZ - 1], [truckX, truckZ - 1], [truckX + 2, truckZ - 1],
+                            [truckX - 3, truckZ + 1], [truckX, truckZ + 1], [truckX + 2, truckZ + 1]]) {
+      this.setBlock(wx, 1, wz, 'coal_block');
+    }
+    // Cargo Bed with vibrant folk filigree paintings
+    for (let x = truckX - 4; x <= truckX + 1; x++) {
+      for (let z = truckZ - 1; z <= truckZ + 1; z++) {
+        this.setBlock(x, 2, z, 'oak_planks');
+        const isSide = Math.abs(z - truckZ) === 1;
+        if (isSide) {
+          this.setBlock(x, 3, z, (x % 2 === 0) ? 'gold_block' : 'emerald_block');
+          this.setBlock(x, 4, z, (x % 2 === 0) ? 'red_terracotta' : 'lapis_block');
+        }
+      }
+    }
+    // High-Roof Driver Cab (X in [truckX + 2, truckX + 4])
+    for (let x = truckX + 2; x <= truckX + 4; x++) {
+      for (let z = truckZ - 1; z <= truckZ + 1; z++) {
+        this.setBlock(x, 2, z, 'red_terracotta');
+        this.setBlock(x, 3, z, (x === truckX + 4) ? 'cyber_glass' : 'red_terracotta');
+        this.setBlock(x, 4, z, (x === truckX + 4) ? 'cyber_glass' : 'red_terracotta');
+        this.setBlock(x, 5, z, 'gold_block');
+      }
+    }
+    // Front chrome grill & headlights
+    this.setBlock(truckX + 5, 2, truckZ, 'iron_block');
+    this.setBlock(truckX + 5, 2, truckZ - 1, 'glowstone');
+    this.setBlock(truckX + 5, 2, truckZ + 1, 'glowstone');
+    // Twin vertical chrome exhaust pipes
+    this.setBlock(truckX + 2, 5, truckZ - 1, 'iron_block');
+    this.setBlock(truckX + 2, 6, truckZ - 1, 'iron_block');
+    this.setBlock(truckX + 2, 5, truckZ + 1, 'iron_block');
+    this.setBlock(truckX + 2, 6, truckZ + 1, 'iron_block');
+
+    // Tailgate "HORN OK PLEASE" Sign
+    this.setBlock(truckX - 4, 3, truckZ, 'gold_block', {
+      type: 'sign',
+      title: 'Tata 1613 Truck · National Permit',
+      text: '★ HORN OK PLEASE ★ Buri Nazar Wale Tera Munh Kaala ★ All India Permit'
+    });
+
+    // Roadside Vintage Indian Oil Petrol Pump
+    this.setBlock(38, 2, roadZ - 3, 'red_terracotta');
+    this.setBlock(38, 3, roadZ - 3, 'iron_block');
+    this.setBlock(38, 4, roadZ - 3, 'glowstone'); // Fuel globe
+    this.setBlock(38, 2, roadZ - 4, 'stone_bricks', {
+      type: 'sign',
+      title: 'IndianOil Highway Service Station',
+      text: 'Pure Petrol, High Speed Diesel, Air & Water · 24x7 Highway Assistance.'
+    });
+
+    // Street Food Lane & "Raju ki Tapri" Chai Stall along North Roadside (X in [64, 71], Z = -71)
+    const foodZ = roadZ + 3;
+    for (let x = 64; x <= 72; x++) {
+      this.setBlock(x, 1, foodZ, 'smooth_stone');
+    }
+    // 1. "Raju ki Tapri" Cutting Chai Stall
+    this.setBlock(64, 2, foodZ, 'oak_planks');
+    this.setBlock(64, 3, foodZ, 'cauldron'); // Brass boiling kettle
+    this.setBlock(65, 2, foodZ, 'oak_planks');
+    this.setBlock(65, 3, foodZ, 'cyber_glass'); // Cutting glasses rack
+    this.setBlock(64, 4, foodZ, 'lantern');
+    this.setBlock(64, 2, foodZ + 1, 'gold_block', {
+      type: 'sign',
+      title: 'Raju ki Tapri · Special Cutting Chai',
+      text: 'Kadak Masala Chai brewed with crushed fresh ginger, cardamom & lemongrass! Have a sip to restore energy.'
+    });
+
+    // 2. Pani Puri & Golgappe Stall at (68, foodZ)
+    this.setBlock(68, 2, foodZ, 'terracotta_adobe');
+    this.setBlock(68, 3, foodZ, 'emerald_block'); // Teekha mint pani
+    this.setBlock(69, 2, foodZ, 'terracotta_adobe');
+    this.setBlock(69, 3, foodZ, 'red_sandstone'); // Meetha imli chutney
+    this.setBlock(68, 2, foodZ + 1, 'emerald_block', {
+      type: 'sign',
+      title: 'Golgappe & Pani Puri Stand',
+      text: 'Crispy puris filled with spicy potato mash, mint water & sweet tamarind chutney. Pure street bliss!'
+    });
+
+    // 3. Mumbai Dosa Tawa Counter at (71, foodZ)
+    this.setBlock(71, 2, foodZ, 'stone_bricks');
+    this.setBlock(71, 3, foodZ, 'obsidian'); // Cast iron flat tawa
+    this.setBlock(71, 3, foodZ - 1, 'gold_block'); // Golden crispy Mysore Masala Dosa
+    this.setBlock(71, 2, foodZ + 1, 'quartz_block', {
+      type: 'sign',
+      title: 'Dosa & Uttapam Counter',
+      text: 'Fresh crispy butter dosa served with hot sambar and freshly ground coconut chutney.'
+    });
+
+    // Bajaj Auto-Rickshaw Stand with Yellow Curb at (43, 1, -80)
+    const rickX = 43;
+    const rickZ = -80;
+    // 3 Wheels (1 front, 2 rear)
+    this.setBlock(rickX + 2, 1, rickZ, 'coal_block'); // Front wheel
+    this.setBlock(rickX - 1, 1, rickZ - 1, 'coal_block'); // Rear left wheel
+    this.setBlock(rickX - 1, 1, rickZ + 1, 'coal_block'); // Rear right wheel
+    // Green Lower Chassis (Y = 2)
+    for (let x = rickX - 1; x <= rickX + 1; x++) {
+      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
+        this.setBlock(x, 2, z, 'emerald_block');
+      }
+    }
+    // Front Nose / Fork
+    this.setBlock(rickX + 2, 2, rickZ, 'emerald_block');
+    this.setBlock(rickX + 3, 2, rickZ, 'glowstone'); // Headlight
+    // Driver Cab & Passenger Seat (Y = 3)
+    this.setBlock(rickX - 1, 3, rickZ - 1, 'red_terracotta');
+    this.setBlock(rickX - 1, 3, rickZ, 'red_terracotta');
+    this.setBlock(rickX - 1, 3, rickZ + 1, 'red_terracotta');
+    this.setBlock(rickX + 1, 3, rickZ, 'iron_block'); // Handlebars
+    this.setBlock(rickX + 1, 3, rickZ - 1, 'redstone_block'); // Mechanical Fare Meter
+    this.setBlock(rickX + 2, 3, rickZ, 'cyber_glass'); // Windshield
+    // Yellow Canopy Roof (Y = 4)
+    for (let x = rickX - 1; x <= rickX + 1; x++) {
+      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
+        this.setBlock(x, 4, z, 'gold_block');
+      }
+    }
+    this.setBlock(rickX + 2, 4, rickZ, 'gold_block');
+    this.setBlock(rickX, 4, rickZ, 'lantern');
+
+    this.setBlock(rickX - 2, 2, rickZ, 'emerald_block', {
+      type: 'sign',
+      title: 'Bajaj Auto-Rickshaw Stand 🛺',
+      text: '★ MUMBAI 02 ★ Meter Jamgega: The iconic 3-wheeled champion of Indian streets! Agile, unstoppable, and pure nostalgia.'
+    });
+
+    // Gentle Street Cow resting peacefully under a roadside shade at (60, 1, -80)
+    const cowX = 60;
+    const cowZ = -80;
+    this.setBlock(cowX, 1, cowZ, 'quartz_block');
+    this.setBlock(cowX + 1, 1, cowZ, 'coal_block'); // Patches
+    this.setBlock(cowX + 2, 1, cowZ, 'quartz_block');
+    this.setBlock(cowX + 3, 2, cowZ, 'quartz_block'); // Head
+    this.setBlock(cowX + 3, 3, cowZ - 1, 'oak_fence'); // Horn
+    this.setBlock(cowX + 3, 3, cowZ + 1, 'oak_fence'); // Horn
+    this.setBlock(cowX, 1, cowZ - 1, 'stone_bricks', {
+      type: 'sign',
+      title: 'Gentle Street Cow · गौमाता',
+      text: 'Peacefully resting by the roadside. Remember: The cow always has right of way in traffic!'
+    });
+
+    // =========================================================================
+    // 9. EAST-WEST TEMPLE CONNECTOR AVENUE (Temple Street / Ratha Veedhi)
+    // =========================================================================
+    // Paved stone avenue linking Rajpath (86, -63) eastwards to Temple Precinct (108, -63)
+    for (let x = 86; x <= 115; x++) {
+      for (let z = -64; z <= -62; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+      }
+      if (x % 6 === 0) {
+        this.setBlock(x, 1, -65, 'quartz_pillar');
+        this.setBlock(x, 2, -65, 'lantern');
+      }
+    }
+    // North avenue to South Gopuram Portal: X in [113, 117], Z in [-108, -64]
+    for (let z = -64; z >= -108; z--) {
+      for (let x = 113; x <= 117; x++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+      }
+    }
+
+    // =========================================================================
+    // 10. AUTHENTIC SOUTH INDIAN DRAVIDIAN TEMPLE COMPLEX (Tamil Nadu Heritage)
+    // =========================================================================
+    // Sacred precinct centered along North-South axis at X = 115:
+    // South to North:
+    // 1. Entrance Kolam & South Raja Gopuram at Z = -111 (Entrance Gatehouse Tower)
+    // 2. Dhvajastambha (Golden Flagstaff / Kodimaram) at Z = -116
+    // 3. Sacred Nandi Bull Shrine at Z = -119
+    // 4. Maha Mandapam (16-Pillared Hall with hanging bells) at Z = -128 to -122
+    // 5. Antarala Threshold at Z = -130
+    // 6. Garbhagriha (Sanctum Sanctorum) with sacred Shiva Lingam & Vimana Tower at Z = -137 to -131
+    // 7. Enclosing Temple Prakaram Walls around precinct (X in [105, 125], Z in [-139, -111])
+    // 8. Temple Pushkarini (Stepped Kulam Tank) to the East at (130, -125)
+
+    const temX = 115;
+
+    // A. Sacred Temple Courtyard Floor (Prakaram)
+    for (let x = temX - 10; x <= temX + 10; x++) {
+      for (let z = -139; z <= -111; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+      }
+    }
+    // Carved Perimeter Prakaram Walls (Y = 2 to 4)
+    for (let x = temX - 10; x <= temX + 10; x++) {
+      for (let z of [-139, -111]) {
+        // Leave south portal opening for Gopuram entrance
+        if (z === -111 && Math.abs(x - temX) <= 2) continue;
+        this.setBlock(x, 2, z, 'stone_bricks');
+        this.setBlock(x, 3, z, 'stone_bricks');
+        this.setBlock(x, 4, z, (x % 2 === 0) ? 'sandstone' : 'red_terracotta'); // Ornamental crenelated parapet
+      }
+    }
+    for (let z = -139; z <= -111; z++) {
+      for (let x of [temX - 10, temX + 10]) {
+        this.setBlock(x, 2, z, 'stone_bricks');
+        this.setBlock(x, 3, z, 'stone_bricks');
+        this.setBlock(x, 4, z, (z % 2 === 0) ? 'sandstone' : 'red_terracotta');
+        if (z % 5 === 0) {
+          this.setBlock(x, 5, z, 'lantern'); // Deepam lamps along outer wall
+        }
+      }
+    }
+
+    // B. Grand Raja Gopuram (South Entrance Gateway Tower at Z = -111, X = 115)
+    const gpZ = -111;
     // Granite Plinth Base (Y = 1 to 6)
-    for (let x = gpX - 6; x <= gpX + 6; x++) {
-      for (let z = gpZ - 4; z <= gpZ + 4; z++) {
+    for (let x = temX - 5; x <= temX + 5; x++) {
+      for (let z = gpZ - 2; z <= gpZ + 2; z++) {
         for (let y = 1; y <= 6; y++) {
-          const isGateOpening = (Math.abs(x - gpX) <= 1 && y <= 5);
-          if (!isGateOpening) {
-            this.setBlock(x, y, z, 'stone_bricks');
+          const isGatePassage = (Math.abs(x - temX) <= 1 && y <= 5);
+          if (isGatePassage) {
+            if (y === 1) this.setBlock(x, 1, z, 'smooth_stone'); // Polished temple threshold
           } else {
-            this.setBlock(x, 1, z, 'smooth_stone');
+            const isCorner = Math.abs(x - temX) === 5;
+            this.setBlock(x, y, z, isCorner ? 'quartz_pillar' : 'stone_bricks');
           }
         }
       }
@@ -1998,11 +2644,11 @@ export class WorldBuilder {
     for (let tier = 0; tier < 8; tier++) {
       const y = 7 + tier * 2;
       const spanX = Math.max(2, 5 - Math.floor(tier * 0.45));
-      const spanZ = Math.max(1, 3 - Math.floor(tier * 0.3));
+      const spanZ = Math.max(1, 2 - Math.floor(tier * 0.25));
       const col = tierColors[tier];
-      for (let x = gpX - spanX; x <= gpX + spanX; x++) {
+      for (let x = temX - spanX; x <= temX + spanX; x++) {
         for (let z = gpZ - spanZ; z <= gpZ + spanZ; z++) {
-          const isEdge = (Math.abs(x - gpX) === spanX || Math.abs(z - gpZ) === spanZ);
+          const isEdge = (Math.abs(x - temX) === spanX || Math.abs(z - gpZ) === spanZ);
           if (isEdge) {
             this.setBlock(x, y, z, col);
             this.setBlock(x, y + 1, z, (x % 2 === 0) ? 'gold_block' : col);
@@ -2010,57 +2656,220 @@ export class WorldBuilder {
         }
       }
     }
-    // Barrel Vault Roof & 7 Golden Kalasam Finials at Y = 23 to 24
-    for (let x = gpX - 3; x <= gpX + 3; x++) {
+    // Barrel Vault Roof & 7 Golden Kalasam Finials at Y = 23 to 25
+    for (let x = temX - 3; x <= temX + 3; x++) {
       this.setBlock(x, 23, gpZ, 'gold_block');
       this.setBlock(x, 24, gpZ, 'gold_block');
       this.setBlock(x, 25, gpZ, 'glowstone');
     }
 
-    // 16-Pillared Stone Mandapam Hall in front of Gopuram (Z in [gpZ + 6, gpZ + 14], X in [gpX - 5, gpX + 5])
+    // Sacred Rice-Powder Kolam at South Gopuram Threshold (115, 1, -108)
+    for (const [kx, kz] of [[temX, -108]]) {
+      this.setBlock(kx - 1, 1, kz, 'quartz_block');
+      this.setBlock(kx + 1, 1, kz, 'quartz_block');
+      this.setBlock(kx, 1, kz - 1, 'quartz_block');
+      this.setBlock(kx, 1, kz + 1, 'quartz_block');
+      this.setBlock(kx, 1, kz, 'red_terracotta');
+    }
+
+    // C. Dhvajastambha (Golden Temple Flagstaff / Kodimaram at 115, -116)
+    this.setBlock(temX, 2, -116, 'gold_block');
+    this.setBlock(temX, 3, -116, 'gold_block');
+    for (let y = 4; y <= 9; y++) {
+      this.setBlock(temX, y, -116, 'iron_block');
+    }
+    this.setBlock(temX, 10, -116, 'gold_block');
+    this.setBlock(temX, 11, -116, 'sea_lantern');
+
+    // Sacred Nandi Bull Shrine facing the deity at (115, 2, -119)
+    this.setBlock(temX, 2, -119, 'obsidian'); // Carved black granite altar
+    this.setBlock(temX, 3, -119, 'stone_bricks'); // Resting Nandi torso
+    this.setBlock(temX, 4, -119, 'stone_bricks'); // Nandi head
+    this.setBlock(temX - 1, 4, -119, 'oak_fence'); // Horn
+    this.setBlock(temX + 1, 4, -119, 'oak_fence'); // Horn
+    this.setBlock(temX, 3, -118, 'gold_block'); // Brass neck bell
+    this.setBlock(temX, 2, -118, 'lantern');
+
+    // D. Maha Mandapam (Grand 16-Pillared Hall: Z in [-128, -122], X in [110, 120])
     for (let dx of [-4, -1, 1, 4]) {
-      for (let dz of [7, 10, 13]) {
-        for (let y = 1; y <= 4; y++) {
-          this.setBlock(gpX + dx, y, gpZ + dz, 'quartz_pillar');
+      for (let dz of [-128, -125, -122]) {
+        for (let y = 2; y <= 5; y++) {
+          this.setBlock(temX + dx, y, dz, 'quartz_pillar');
         }
-        // Brass hanging temple bell
-        this.setBlock(gpX + dx, 3, gpZ + dz + 1, 'gold_block');
+        // Hanging brass temple bells with golden clapper
+        this.setBlock(temX + dx, 4, dz + 1, 'gold_block');
+        this.setBlock(temX + dx, 3, dz + 1, 'lantern');
       }
     }
-    // Mandapam Stone Roof
-    for (let x = gpX - 5; x <= gpX + 5; x++) {
-      for (let z = gpZ + 6; z <= gpZ + 14; z++) {
-        this.setBlock(x, 5, z, 'stone_bricks');
+    // Mandapam Stone Roof Ceiling (Y = 6)
+    for (let x = temX - 5; x <= temX + 5; x++) {
+      for (let z = -129; z <= -121; z++) {
+        this.setBlock(x, 6, z, 'stone_bricks');
+        if (Math.abs(x - temX) === 5 || z === -129 || z === -121) {
+          this.setBlock(x, 7, z, 'sandstone'); // Roof cornice
+        }
       }
     }
 
-    // Sacred Stepwell Tank (Temple Kulam) at (gpX, gpZ + 22)
-    const kulamZ = gpZ + 22;
+    // E. Garbhagriha (Sanctum Sanctorum) with Sacred Shiva Lingam (Z in [-137, -131], X in [111, 119])
+    for (let x = temX - 4; x <= temX + 4; x++) {
+      for (let z = -137; z <= -131; z++) {
+        const isWall = (Math.abs(x - temX) === 4 || z === -137 || z === -131);
+        const isSouthDoor = (z === -131 && Math.abs(x - temX) <= 1);
+        for (let y = 2; y <= 6; y++) {
+          if (isSouthDoor) {
+            // Sacred sanctum entrance doorway
+            continue;
+          } else if (isWall) {
+            this.setBlock(x, y, z, (y === 6) ? 'sandstone' : 'stone_bricks');
+          } else {
+            // Sanctum floor at Y = 2
+            if (y === 2) this.setBlock(x, 2, z, 'smooth_stone');
+          }
+        }
+      }
+    }
+    // Sacred Polished Black Granite Shiva Lingam & Peedam at center (115, 2, -134)
+    this.setBlock(temX, 2, -134, 'obsidian'); // Circular pedestal base (Avudaiyar)
+    this.setBlock(temX, 3, -134, 'obsidian'); // Sacred Lingam
+    this.setBlock(temX, 4, -134, 'gold_block'); // Golden Vilva leaf crown
+    // Eternal Brass Ghee Lamps (Kuthuvilakku) inside sanctum
+    this.setBlock(temX - 2, 2, -135, 'gold_block');
+    this.setBlock(temX - 2, 3, -135, 'lantern');
+    this.setBlock(temX + 2, 2, -135, 'gold_block');
+    this.setBlock(temX + 2, 3, -135, 'lantern');
+    this.setBlock(temX, 2, -136, 'magma_block'); // Fragrant camphor incense burner
+    this.setBlock(temX, 3, -136, 'cauldron');
+
+    // F. Vimana Shikhara (Sacred Stepped Pyramid Tower rising directly over Garbhagriha, Y = 7 to 18)
+    for (let step = 0; step < 5; step++) {
+      const y = 7 + step * 2;
+      const r = Math.max(1, 4 - step);
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dz = -r; dz <= r; dz++) {
+          const isEdge = (Math.abs(dx) === r || Math.abs(dz) === r);
+          if (isEdge) {
+            this.setBlock(temX + dx, y, -134 + dz, (step % 2 === 0) ? 'sandstone' : 'red_terracotta');
+            this.setBlock(temX + dx, y + 1, -134 + dz, 'gold_block');
+          }
+        }
+      }
+    }
+    // Vimana Dome (Griva & Shikhara) & Golden Kalash Finial (Y = 17 to 20)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(temX + dx, 17, -134 + dz, 'gold_block');
+        this.setBlock(temX + dx, 18, -134 + dz, 'gold_block');
+      }
+    }
+    this.setBlock(temX, 19, -134, 'gold_block');
+    this.setBlock(temX, 20, -134, 'sea_lantern');
+
+    // Temple Main Signboard
+    this.setBlock(temX, 2, -107, 'gold_block', {
+      type: 'sign',
+      title: 'Sri Kapaleeshwarar Dravidian Temple · Garbhagriha 🕉️',
+      text: 'Magnificent South Indian stone sanctuary featuring the 25-block Raja Gopuram, 16-pillared Mandapam, sacred Nandi, holy Garbhagriha sanctum, Vimana tower, and Pushkarini stepwell.'
+    });
+
+    // G. Temple Pushkarini (Sacred Stepped Kulam / Teppakulam Water Tank at 130, -125)
+    const kulamX = 130;
+    const kulamZ = -125;
     for (let dx = -5; dx <= 5; dx++) {
       for (let dz = -5; dz <= 5; dz++) {
         const dist = Math.max(Math.abs(dx), Math.abs(dz));
         if (dist === 5) {
-          this.setBlock(gpX + dx, 1, kulamZ + dz, 'stone_bricks'); // Top terrace
+          this.setBlock(kulamX + dx, 1, kulamZ + dz, 'stone_bricks'); // Top terrace
         } else if (dist === 4) {
-          this.setBlock(gpX + dx, 0, kulamZ + dz, 'smooth_stone'); // Middle step
+          this.setBlock(kulamX + dx, 0, kulamZ + dz, 'smooth_stone'); // Upper step
+        } else if (dist === 3) {
+          this.setBlock(kulamX + dx, -1, kulamZ + dz, 'stone_bricks'); // Lower step
         } else {
-          this.setBlock(gpX + dx, -1, kulamZ + dz, 'stone_bricks'); // Pool bed
-          this.setBlock(gpX + dx, 0, kulamZ + dz, 'water'); // Sacred water
+          this.setBlock(kulamX + dx, -2, kulamZ + dz, 'stone_bricks'); // Pool bed
+          this.setBlock(kulamX + dx, 0, kulamZ + dz, 'water'); // Holy teertham water
         }
       }
     }
-    this.setBlock(gpX, 0, kulamZ, 'sea_lantern');
+    this.setBlock(kulamX, 0, kulamZ, 'sea_lantern');
+    // Floating holy diyas on kulam
+    for (const [fx, fz] of [[kulamX - 2, kulamZ], [kulamX + 2, kulamZ], [kulamX, kulamZ - 2], [kulamX, kulamZ + 2]]) {
+      this.setBlock(fx, 1, fz, 'glowstone');
+    }
 
-    this.setBlock(gpX, 2, gpZ + 5, 'gold_block', {
+    // =========================================================================
+    // 11. ISRO SATISH DHAWAN SPACEPORT & CHANDRAYAAN-3 (Shiv Shakti Point)
+    // =========================================================================
+    const isroX = 115;
+    const isroZ = -75;
+    // Reinforced Staged Launch/Test Surface (Y = 1)
+    for (let x = isroX - 6; x <= isroX + 6; x++) {
+      for (let z = isroZ - 6; z <= isroZ + 6; z++) {
+        const isBorder = Math.abs(x - isroX) === 6 || Math.abs(z - isroZ) === 6;
+        this.setBlock(x, 1, z, isBorder ? ((x + z) % 2 === 0 ? 'gold_block' : 'coal_block') : 'smooth_stone');
+      }
+    }
+
+    // Vikram Lunar Lander Module (Centered at isroX, isroZ, Y = 2 to 7)
+    const landerLegs = [
+      [isroX - 2, isroZ - 2], [isroX + 2, isroZ - 2],
+      [isroX - 2, isroZ + 2], [isroX + 2, isroZ + 2]
+    ];
+    for (const [lx, lz] of landerLegs) {
+      this.setBlock(lx, 2, lz, 'end_stone_bricks');
+      this.setBlock(lx, 3, lz, 'iron_block');
+    }
+    // Main Lander Core with Gold Thermal Insulation Blanket (Y = 3 to 5)
+    for (let x = isroX - 1; x <= isroX + 1; x++) {
+      for (let z = isroZ - 1; z <= isroZ + 1; z++) {
+        for (let y = 3; y <= 5; y++) {
+          this.setBlock(x, y, z, 'gold_block');
+        }
+      }
+    }
+    // Retrorocket Thruster Nozzle underneath
+    this.setBlock(isroX, 2, isroZ, 'magma_block');
+    this.setBlock(isroX, 2, isroZ - 1, 'iron_block');
+    this.setBlock(isroX, 2, isroZ + 1, 'iron_block');
+
+    // Deployed Solar Panels (East & West Wings at Y = 4)
+    this.setBlock(isroX - 2, 4, isroZ, 'lapis_block');
+    this.setBlock(isroX - 3, 4, isroZ, 'cyber_glass');
+    this.setBlock(isroX + 2, 4, isroZ, 'lapis_block');
+    this.setBlock(isroX + 3, 4, isroZ, 'cyber_glass');
+
+    // High-Gain Communication Dish & Nav Cameras at Y = 6 to 7
+    this.setBlock(isroX, 6, isroZ, 'quartz_block');
+    this.setBlock(isroX, 7, isroZ, 'iron_block');
+    this.setBlock(isroX + 1, 6, isroZ, 'glowstone');
+
+    // Tricolor Emblem Insignia on South face of Lander
+    this.setBlock(isroX - 1, 4, isroZ + 2, 'indian_saffron');
+    this.setBlock(isroX, 4, isroZ + 2, 'quartz_block');
+    this.setBlock(isroX + 1, 4, isroZ + 2, 'indian_green');
+
+    // Pragyan Lunar Rover on Ramp (South of Lander)
+    this.setBlock(isroX, 2, isroZ + 2, 'smooth_stone');
+    this.setBlock(isroX, 2, isroZ + 3, 'iron_block');
+    // 6-wheeled Pragyan Rover at (isroX, isroZ + 4)
+    this.setBlock(isroX - 1, 2, isroZ + 4, 'coal_block');
+    this.setBlock(isroX + 1, 2, isroZ + 4, 'coal_block');
+    this.setBlock(isroX, 2, isroZ + 4, 'gold_block');
+    this.setBlock(isroX, 3, isroZ + 4, 'lapis_block');
+    this.setBlock(isroX, 3, isroZ + 5, 'sea_lantern');
+
+    // Mission Control Terminal Plaque
+    this.setBlock(isroX, 2, isroZ - 7, 'iron_block', {
       type: 'sign',
-      title: 'Dravidian Temple Gopuram & Mandapam',
-      text: 'Majestic southern multi-tiered temple tower adorned with sculptures, pillared mandapam, and holy kulam tank.'
+      title: 'ISRO Chandrayaan-3 · Shiv Shakti Point 🚀',
+      text: "Historical Lunar South Pole soft landing! Vikram Lander & Pragyan Rover embody India's cutting-edge aerospace engineering, deep-space telemetry, and scientific triumph."
     });
 
-    // C. Chennai Marina Beach Lighthouse & Coastal Cultural Life at (145, -125)
+    // =========================================================================
+    // 12. CHENNAI MARINA BEACH LIGHTHOUSE & COROMANDEL COASTLINE
+    // =========================================================================
     const lhX = 145;
     const lhZ = -125;
-    // Octagonal Lighthouse Tower rising to Y = 22 with alternating Red and White Bands
+    // Octagonal Lighthouse Tower rising to Y = 20 with alternating Red and White Bands
     for (let y = 1; y <= 20; y++) {
       const isRedBand = Math.floor(y / 4) % 2 === 0;
       const mat = isRedBand ? 'red_terracotta' : 'quartz_block';
@@ -2130,431 +2939,8 @@ export class WorldBuilder {
       this.setBlock(kx, 8, kz, col);
       this.setBlock(kx, 6, kz, 'glowstone');
     }
-
-    // D. Sher-e-Punjab Highway Dhaba & Decorated Tata Truck at (55, -75)
-    const dhabaX = 55;
-    const dhabaZ = -75;
-    // Dhaba Pavilion Thatched Shelter
-    for (let x = dhabaX - 5; x <= dhabaX + 5; x++) {
-      for (let z = dhabaZ - 4; z <= dhabaZ + 4; z++) {
-        this.setBlock(x, 1, z, 'terracotta_adobe');
-        if (Math.abs(x - dhabaX) === 5 && Math.abs(z - dhabaZ) === 4) {
-          for (let y = 2; y <= 4; y++) this.setBlock(x, y, z, 'spruce_log'); // Wooden support posts
-        }
-        this.setBlock(x, 5, z, 'oak_planks'); // Thatched roof
-      }
-    }
-    // Woven String Charpai Cots
-    const charpais = [[dhabaX - 3, dhabaZ - 2], [dhabaX - 3, dhabaZ + 2], [dhabaX + 2, dhabaZ - 2]];
-    for (const [cpx, cpz] of charpais) {
-      this.setBlock(cpx, 2, cpz, 'red_terracotta');
-      this.setBlock(cpx + 1, 2, cpz, 'red_terracotta');
-      this.setBlock(cpx, 1, cpz, 'oak_fence');
-      this.setBlock(cpx + 1, 1, cpz, 'oak_fence');
-    }
-    // Roadside Clay Tandoor Oven with Smoking Chimney
-    this.setBlock(dhabaX + 4, 2, dhabaZ + 2, 'terracotta_adobe');
-    this.setBlock(dhabaX + 4, 3, dhabaZ + 2, 'terracotta_adobe');
-    this.setBlock(dhabaX + 4, 2, dhabaZ + 1, 'magma_block');
-    this.setBlock(dhabaX + 4, 3, dhabaZ + 1, 'glowstone');
-    this.setBlock(dhabaX + 4, 4, dhabaZ + 1, 'cauldron'); // Chimney pot
-
-    // Decorated Indian Tata Truck ("HORN OK PLEASE") parked at (48, 1, -74)
-    const truckX = 48;
-    const truckZ = -74;
-    // 6 Heavy Wheels
-    for (const [wx, wz] of [[truckX - 3, truckZ - 1], [truckX, truckZ - 1], [truckX + 2, truckZ - 1],
-                            [truckX - 3, truckZ + 1], [truckX, truckZ + 1], [truckX + 2, truckZ + 1]]) {
-      this.setBlock(wx, 1, wz, 'coal_block');
-    }
-    // Cargo Bed with vibrant folk filigree paintings
-    for (let x = truckX - 4; x <= truckX + 1; x++) {
-      for (let z = truckZ - 1; z <= truckZ + 1; z++) {
-        this.setBlock(x, 2, z, 'oak_planks');
-        const isSide = Math.abs(z - truckZ) === 1;
-        if (isSide) {
-          this.setBlock(x, 3, z, (x % 2 === 0) ? 'gold_block' : 'emerald_block');
-          this.setBlock(x, 4, z, (x % 2 === 0) ? 'red_terracotta' : 'lapis_block');
-        }
-      }
-    }
-    // High-Roof Driver Cab (X in [truckX + 2, truckX + 4])
-    for (let x = truckX + 2; x <= truckX + 4; x++) {
-      for (let z = truckZ - 1; z <= truckZ + 1; z++) {
-        this.setBlock(x, 2, z, 'red_terracotta');
-        this.setBlock(x, 3, z, (x === truckX + 4) ? 'cyber_glass' : 'red_terracotta');
-        this.setBlock(x, 4, z, (x === truckX + 4) ? 'cyber_glass' : 'red_terracotta');
-        this.setBlock(x, 5, z, 'gold_block'); // Crown
-      }
-    }
-    // Front chrome grill & headlights
-    this.setBlock(truckX + 5, 2, truckZ, 'iron_block');
-    this.setBlock(truckX + 5, 2, truckZ - 1, 'glowstone');
-    this.setBlock(truckX + 5, 2, truckZ + 1, 'glowstone');
-    // Twin vertical chrome exhaust pipes
-    this.setBlock(truckX + 2, 5, truckZ - 1, 'iron_block');
-    this.setBlock(truckX + 2, 6, truckZ - 1, 'iron_block');
-    this.setBlock(truckX + 2, 5, truckZ + 1, 'iron_block');
-    this.setBlock(truckX + 2, 6, truckZ + 1, 'iron_block');
-
-    // Tailgate "HORN OK PLEASE" Sign
-    this.setBlock(truckX - 4, 3, truckZ, 'gold_block', {
-      type: 'sign',
-      title: 'Tata 1613 Truck · National Permit',
-      text: '★ HORN OK PLEASE ★ Buri Nazar Wale Tera Munh Kaala ★ All India Permit'
-    });
-
-    // Roadside Vintage Indian Petrol Pump
-    this.setBlock(truckX + 7, 2, truckZ - 3, 'red_terracotta');
-    this.setBlock(truckX + 7, 3, truckZ - 3, 'iron_block');
-    this.setBlock(truckX + 7, 4, truckZ - 3, 'glowstone'); // Fuel globe
-
-    this.setBlock(dhabaX, 2, dhabaZ - 5, 'terracotta_adobe', {
-      type: 'sign',
-      title: 'Sher-e-Punjab Grand Trunk Dhaba',
-      text: 'Crispy butter tandoori rotis, dal makhani, charpai seating, and piping hot cutting chai!'
-    });
-
-    // E. Street Food Lane & "Raju ki Tapri" Chai Stall at (68, -75)
-    const foodX = 68;
-    const foodZ = -75;
-    // Paved street food strip
-    for (let x = foodX - 4; x <= foodX + 8; x++) {
-      for (let z = foodZ - 2; z <= foodZ + 2; z++) {
-        this.setBlock(x, 1, z, 'smooth_stone');
-      }
-    }
-    // 1. "Raju ki Tapri" Cutting Chai Stall
-    this.setBlock(foodX, 2, foodZ, 'oak_planks');
-    this.setBlock(foodX, 3, foodZ, 'cauldron'); // Brass boiling kettle
-    this.setBlock(foodX + 1, 2, foodZ, 'oak_planks');
-    this.setBlock(foodX + 1, 3, foodZ, 'cyber_glass'); // Cutting glasses rack
-    this.setBlock(foodX, 4, foodZ, 'lantern');
-    this.setBlock(foodX, 2, foodZ - 1, 'gold_block', {
-      type: 'sign',
-      title: 'Raju ki Tapri · Special Cutting Chai',
-      text: 'Kadak Masala Chai brewed with crushed fresh ginger, cardamom & lemongrass! Have a sip to restore energy.'
-    });
-
-    // 2. Pani Puri & Golgappe Stall at (foodX + 4, foodZ)
-    this.setBlock(foodX + 4, 2, foodZ, 'terracotta_adobe');
-    this.setBlock(foodX + 4, 3, foodZ, 'emerald_block'); // Teekha mint pani
-    this.setBlock(foodX + 5, 2, foodZ, 'terracotta_adobe');
-    this.setBlock(foodX + 5, 3, foodZ, 'red_sandstone'); // Meetha imli chutney
-    this.setBlock(foodX + 4, 2, foodZ - 1, 'emerald_block', {
-      type: 'sign',
-      title: 'Golgappe & Pani Puri Stand',
-      text: 'Crispy puris filled with spicy potato mash, mint water & sweet tamarind chutney. Pure street bliss!'
-    });
-
-    // 3. Mumbai Dosa Tawa Counter at (foodX + 7, foodZ)
-    this.setBlock(foodX + 7, 2, foodZ, 'stone_bricks');
-    this.setBlock(foodX + 7, 3, foodZ, 'obsidian'); // Cast iron flat tawa
-    this.setBlock(foodX + 7, 3, foodZ + 1, 'gold_block'); // Golden crispy Mysore Masala Dosa
-    this.setBlock(foodX + 7, 2, foodZ - 1, 'quartz_block', {
-      type: 'sign',
-      title: 'Dosa & Uttapam Counter',
-      text: 'Fresh crispy butter dosa served with hot sambar and freshly ground coconut chutney.'
-    });
-
-    // F. Gully Cricket Pitch on the River Plains at (88, -100)
-    const cricX = 88;
-    const cricZ = -100;
-    // 22-Yard Stamped Clay Pitch (X in [cricX - 6, cricX + 6], Z = cricZ)
-    for (let x = cricX - 7; x <= cricX + 7; x++) {
-      for (let z = cricZ - 1; z <= cricZ + 1; z++) {
-        this.setBlock(x, 1, z, 'sandstone');
-      }
-    }
-    // Batsman Crease (East: cricX + 5)
-    this.setBlock(cricX + 5, 1, cricZ - 1, 'quartz_block');
-    this.setBlock(cricX + 5, 1, cricZ, 'quartz_block');
-    this.setBlock(cricX + 5, 1, cricZ + 1, 'quartz_block');
-    // Three Wooden Wickets and Bails
-    this.setBlock(cricX + 6, 2, cricZ - 1, 'oak_fence');
-    this.setBlock(cricX + 6, 2, cricZ, 'oak_fence');
-    this.setBlock(cricX + 6, 2, cricZ + 1, 'oak_fence');
-    // Kashmir Willow Cricket Bat & Red Leather Ball
-    this.setBlock(cricX + 4, 2, cricZ, 'oak_planks');
-    this.setBlock(cricX + 3, 2, cricZ, 'redstone_block'); // Cricket ball
-
-    // Bowler's Crease (West: cricX - 5)
-    this.setBlock(cricX - 5, 1, cricZ - 1, 'quartz_block');
-    this.setBlock(cricX - 5, 1, cricZ, 'quartz_block');
-    this.setBlock(cricX - 5, 1, cricZ + 1, 'quartz_block');
-    this.setBlock(cricX - 6, 2, cricZ, 'oak_fence'); // Non-striker wicket
-
-    this.setBlock(cricX + 6, 3, cricZ, 'gold_block', {
-      type: 'sign',
-      title: 'Gully Cricket Championship Pitch',
-      text: 'Rule 1: One-tip one-hand is OUT. Rule 2: Breaking neighbor\'s window is out + ball recovery duty!'
-    });
-
-    // G. Sacred Doorstep Kolam Carpet Art & Street Cow
-    // Kolam patterns at (78, 1, -125) and (40, 1, -90)
-    for (const [kx, kz] of [[78, -125], [40, -90]]) {
-      this.setBlock(kx - 1, 1, kz, 'quartz_block');
-      this.setBlock(kx + 1, 1, kz, 'quartz_block');
-      this.setBlock(kx, 1, kz - 1, 'quartz_block');
-      this.setBlock(kx, 1, kz + 1, 'quartz_block');
-      this.setBlock(kx, 1, kz, 'red_terracotta');
-    }
-    // Street Cow resting peacefully by roadside at (62, 1, -78)
-    const cowX = 62;
-    const cowZ = -78;
-    this.setBlock(cowX, 1, cowZ, 'quartz_block');
-    this.setBlock(cowX + 1, 1, cowZ, 'coal_block'); // Patches
-    this.setBlock(cowX + 2, 1, cowZ, 'quartz_block');
-    this.setBlock(cowX + 3, 2, cowZ, 'quartz_block'); // Head
-    this.setBlock(cowX + 3, 3, cowZ - 1, 'oak_fence'); // Horn
-    this.setBlock(cowX + 3, 3, cowZ + 1, 'oak_fence'); // Horn
-    this.setBlock(cowX, 1, cowZ - 1, 'stone_bricks', {
-      type: 'sign',
-      title: 'Gentle Street Cow · गौमाता',
-      text: 'Peacefully resting by the roadside. Remember: The cow always has right of way in traffic!'
-    });
-
-    // H. Classic Green & Yellow Bajaj Auto-Rickshaw (Tuk-Tuk) at (43, 1, -80)
-    const rickX = 43;
-    const rickZ = -80;
-    // 3 Wheels (1 front, 2 rear)
-    this.setBlock(rickX + 2, 1, rickZ, 'coal_block'); // Front wheel
-    this.setBlock(rickX - 1, 1, rickZ - 1, 'coal_block'); // Rear left wheel
-    this.setBlock(rickX - 1, 1, rickZ + 1, 'coal_block'); // Rear right wheel
-
-    // Green Lower Chassis (Y = 2)
-    for (let x = rickX - 1; x <= rickX + 1; x++) {
-      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
-        this.setBlock(x, 2, z, 'emerald_block');
-      }
-    }
-    // Front Nose / Fork
-    this.setBlock(rickX + 2, 2, rickZ, 'emerald_block');
-    this.setBlock(rickX + 3, 2, rickZ, 'glowstone'); // Headlight
-
-    // Driver Cab & Passenger Seat (Y = 3)
-    this.setBlock(rickX - 1, 3, rickZ - 1, 'red_terracotta'); // Passenger seat cushion
-    this.setBlock(rickX - 1, 3, rickZ, 'red_terracotta');
-    this.setBlock(rickX - 1, 3, rickZ + 1, 'red_terracotta');
-    this.setBlock(rickX + 1, 3, rickZ, 'iron_block'); // Handlebars
-    this.setBlock(rickX + 1, 3, rickZ - 1, 'redstone_block'); // Mechanical Fare Meter
-    this.setBlock(rickX + 2, 3, rickZ, 'cyber_glass'); // Windshield
-
-    // Yellow Canopy Roof (Y = 4)
-    for (let x = rickX - 1; x <= rickX + 1; x++) {
-      for (let z = rickZ - 1; z <= rickZ + 1; z++) {
-        this.setBlock(x, 4, z, 'gold_block');
-      }
-    }
-    this.setBlock(rickX + 2, 4, rickZ, 'gold_block'); // Canopy visor
-    this.setBlock(rickX, 4, rickZ, 'lantern'); // Interior roof cabin lamp
-
-    this.setBlock(rickX - 2, 2, rickZ, 'emerald_block', {
-      type: 'sign',
-      title: 'Bajaj Auto-Rickshaw · Tuk-Tuk 🛺',
-      text: '★ MUMBAI 02 ★ Meter Jamgega: The iconic 3-wheeled champion of Indian streets! Agile, unstoppable, and pure nostalgia. Press [E] to honk.'
-    });
-
-    // I. ISRO Spaceport & Chandrayaan-3 Lunar South Pole Mission at (115, -85)
-    const isroX = 115;
-    const isroZ = -85;
-    // Reinforced Staged Launch/Test Surface (Y = 1)
-    for (let x = isroX - 6; x <= isroX + 6; x++) {
-      for (let z = isroZ - 6; z <= isroZ + 6; z++) {
-        const isBorder = Math.abs(x - isroX) === 6 || Math.abs(z - isroZ) === 6;
-        this.setBlock(x, 1, z, isBorder ? ((x + z) % 2 === 0 ? 'gold_block' : 'coal_block') : 'smooth_stone');
-      }
-    }
-
-    // Vikram Lunar Lander Module (Centered at isroX, isroZ, Y = 2 to 7)
-    // 4 Landing Struts / Shock Absorbing Footpads at corners
-    const landerLegs = [
-      [isroX - 2, isroZ - 2], [isroX + 2, isroZ - 2],
-      [isroX - 2, isroZ + 2], [isroX + 2, isroZ + 2]
-    ];
-    for (const [lx, lz] of landerLegs) {
-      this.setBlock(lx, 2, lz, 'end_stone_bricks');
-      this.setBlock(lx, 3, lz, 'iron_block');
-    }
-    // Main Lander Core with Gold Thermal Insulation Blanket (Y = 3 to 5)
-    for (let x = isroX - 1; x <= isroX + 1; x++) {
-      for (let z = isroZ - 1; z <= isroZ + 1; z++) {
-        for (let y = 3; y <= 5; y++) {
-          this.setBlock(x, y, z, 'gold_block');
-        }
-      }
-    }
-    // Retrorocket Thruster Nozzle underneath
-    this.setBlock(isroX, 2, isroZ, 'magma_block');
-    this.setBlock(isroX, 2, isroZ - 1, 'iron_block');
-    this.setBlock(isroX, 2, isroZ + 1, 'iron_block');
-
-    // Deployed Solar Panels (East & West Wings at Y = 4)
-    this.setBlock(isroX - 2, 4, isroZ, 'lapis_block');
-    this.setBlock(isroX - 3, 4, isroZ, 'cyber_glass');
-    this.setBlock(isroX + 2, 4, isroZ, 'lapis_block');
-    this.setBlock(isroX + 3, 4, isroZ, 'cyber_glass');
-
-    // High-Gain Communication Dish & Nav Cameras at Y = 6 to 7
-    this.setBlock(isroX, 6, isroZ, 'quartz_block');
-    this.setBlock(isroX, 7, isroZ, 'iron_block');
-    this.setBlock(isroX + 1, 6, isroZ, 'glowstone'); // Laser altimeter
-
-    // Tricolor Emblem Insignia on South face of Lander
-    this.setBlock(isroX - 1, 4, isroZ + 2, 'indian_saffron');
-    this.setBlock(isroX, 4, isroZ + 2, 'quartz_block');
-    this.setBlock(isroX + 1, 4, isroZ + 2, 'indian_green');
-
-    // Pragyan Lunar Rover on Ramp (South of Lander)
-    // Deployment Ramp
-    this.setBlock(isroX, 2, isroZ + 2, 'smooth_stone');
-    this.setBlock(isroX, 2, isroZ + 3, 'iron_block');
-    // 6-wheeled Pragyan Rover at (isroX, isroZ + 4)
-    this.setBlock(isroX - 1, 2, isroZ + 4, 'coal_block'); // Left wheels
-    this.setBlock(isroX + 1, 2, isroZ + 4, 'coal_block'); // Right wheels
-    this.setBlock(isroX, 2, isroZ + 4, 'gold_block'); // Rover chassis
-    this.setBlock(isroX, 3, isroZ + 4, 'lapis_block'); // Solar panel
-    this.setBlock(isroX, 3, isroZ + 5, 'sea_lantern'); // NavCam / APXS Spectrometer
-
-    // Mission Control Terminal Plaque
-    this.setBlock(isroX, 2, isroZ - 7, 'iron_block', {
-      type: 'sign',
-      title: 'ISRO Chandrayaan-3 · Shiv Shakti Point 🚀',
-      text: 'Historical Lunar South Pole soft landing! Vikram Lander & Pragyan Rover embody India\'s cutting-edge aerospace engineering, deep-space telemetry, and scientific triumph.'
-    });
-
-    // J. Jaipur Hawa Mahal (Palace of Winds) at (58, -108) to (58, -98)
-    const hawaX = 58;
-    // 5-Tiered Rajasthani Rose Sandstone Honeycomb Facade
-    for (let z = -108; z <= -98; z++) {
-      // Tier 1 Base (Y = 1 to 3)
-      for (let y = 1; y <= 3; y++) {
-        this.setBlock(hawaX, y, z, 'red_sandstone');
-      }
-      // Honeycomb Jharokhas (Tier 2: Y = 4 to 6)
-      for (let y = 4; y <= 6; y++) {
-        const isJharokhaWindow = (z % 2 === 0);
-        this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
-        if (isJharokhaWindow && y === 5) {
-          this.setBlock(hawaX - 1, y, z, 'sandstone'); // Projecting oriel balcony
-          this.setBlock(hawaX, y, z, 'lantern');
-        }
-      }
-      // Honeycomb Jharokhas (Tier 3: Y = 7 to 9, stepped inward)
-      if (z >= -106 && z <= -100) {
-        for (let y = 7; y <= 9; y++) {
-          const isJharokhaWindow = (z % 2 !== 0);
-          this.setBlock(hawaX, y, z, isJharokhaWindow ? 'cyber_glass' : 'red_sandstone');
-          if (isJharokhaWindow && y === 8) {
-            this.setBlock(hawaX - 1, y, z, 'sandstone');
-          }
-        }
-      }
-      // Honeycomb Jharokhas (Tier 4: Y = 10 to 11)
-      if (z >= -105 && z <= -101) {
-        for (let y = 10; y <= 11; y++) {
-          this.setBlock(hawaX, y, z, 'red_sandstone');
-        }
-      }
-      // Tier 5 Top Crown & Kalasam Finials (Y = 12 to 13)
-      if (z >= -104 && z <= -102) {
-        this.setBlock(hawaX, 12, z, 'red_sandstone');
-        this.setBlock(hawaX, 13, z, 'gold_block'); // Golden urn finials
-      }
-    }
-    // Hawa Mahal Plaque
-    this.setBlock(hawaX - 2, 2, -103, 'red_sandstone', {
-      type: 'sign',
-      title: 'Hawa Mahal · Palace of Winds (Jaipur 🌸)',
-      text: 'Built in 1799 from pink and red sandstone with 953 honeycombed jharokha lattice windows designed to funnel refreshing royal breezes.'
-    });
-
-    // K. India Gate & Amar Jawan Jyoti Memorial Arch at (80, -60)
-    const igX = 80;
-    const igZ = -60;
-    // Monumental Sandstone Pylons & Archway (Y = 1 to 14)
-    for (let x = igX - 6; x <= igX + 6; x++) {
-      for (let z = igZ - 2; z <= igZ + 2; z++) {
-        const isCenterVault = Math.abs(x - igX) <= 2;
-        for (let y = 1; y <= 14; y++) {
-          if (y <= 9 && isCenterVault) {
-            // Open archway passage
-            if (y === 1) this.setBlock(x, 1, z, 'red_sandstone'); // Paved arch floor
-          } else if (y <= 12) {
-            // Arch walls & barrel vault crown
-            const isPylonFace = (Math.abs(x - igX) >= 3 || y >= 10);
-            if (isPylonFace) {
-              const isAccent = (y === 6 || y === 10);
-              this.setBlock(x, y, z, isAccent ? 'sandstone' : 'red_sandstone');
-            }
-          } else {
-            // Stepped Attic Cornice (Y = 13 to 14)
-            if (Math.abs(x - igX) <= 5) {
-              this.setBlock(x, y, z, (y === 14) ? 'sandstone' : 'red_sandstone');
-            }
-          }
-        }
-      }
-    }
-    // Amar Jawan Jyoti (Eternal Flame Cenotaph under archway)
-    this.setBlock(igX, 2, igZ, 'obsidian'); // Black marble cenotaph
-    this.setBlock(igX, 3, igZ, 'iron_block'); // Inverted bayonet rifle
-    this.setBlock(igX, 4, igZ, 'iron_block'); // Soldier's helmet
-    // 4 Eternal Flame Braziers
-    const flames = [[igX - 1, igZ - 1], [igX + 1, igZ - 1], [igX - 1, igZ + 1], [igX + 1, igZ + 1]];
-    for (const [fx, fz] of flames) {
-      this.setBlock(fx, 2, fz, 'gold_block');
-      this.setBlock(fx, 3, fz, 'magma_block');
-      this.setBlock(fx, 4, fz, 'lantern');
-    }
-    // India Gate Memorial Plaque
-    this.setBlock(igX, 2, igZ + 4, 'red_sandstone', {
-      type: 'sign',
-      title: 'India Gate & Amar Jawan Jyoti 🇮🇳',
-      text: 'Monumental 42-meter triumphal arch in New Delhi with the eternal flame commemorating the supreme sacrifice and eternal valor of Indian soldiers.'
-    });
-
-    // L. Diwali Festival of Lights, Marigold Garlands & Rangoli Mandala
-    // 1. Marigold Floral Swags across Darwaza-i-Rauza Great Gate at Z = -70
-    for (let x = cx - 5; x <= cx + 5; x++) {
-      this.setBlock(x, 6, -70, (x % 2 === 0) ? 'indian_saffron' : 'gold_block'); // Marigold garland
-      if (Math.abs(x - cx) === 3 || Math.abs(x - cx) === 5) {
-        this.setBlock(x, 5, -70, 'lantern'); // Hanging Diwali lantern
-      }
-    }
-    // 2. Floating Illuminated Diyas along Yamuna Reflecting Pool & Stepwell Kulam
-    for (const dyZ of [-112, -98, -84]) {
-      this.setBlock(cx - 2, 2, dyZ, 'glowstone');
-      this.setBlock(cx + 2, 2, dyZ, 'glowstone');
-    }
-    for (const dyZ of [gpZ + 20, gpZ + 24]) {
-      this.setBlock(gpX - 2, 1, dyZ, 'glowstone');
-      this.setBlock(gpX + 2, 1, dyZ, 'glowstone');
-    }
-    // 3. Ornate Royal Peacock Rangoli Mandala in Front Courtyard at (80, 1, -73)
-    const rangX = 80;
-    const rangZ = -73;
-    for (let dx = -3; dx <= 3; dx++) {
-      for (let dz = -3; dz <= 3; dz++) {
-        const d = Math.hypot(dx, dz);
-        if (d <= 1.0) {
-          this.setBlock(rangX + dx, 1, rangZ + dz, 'gold_block');
-        } else if (d <= 2.2) {
-          this.setBlock(rangX + dx, 1, rangZ + dz, ((dx + dz) % 2 === 0) ? 'lapis_block' : 'emerald_block');
-        } else if (d <= 3.2) {
-          this.setBlock(rangX + dx, 1, rangZ + dz, 'red_terracotta');
-        }
-      }
-    }
-    this.setBlock(rangX, 2, rangZ, 'sea_lantern');
-    this.setBlock(rangX, 2, rangZ + 4, 'gold_block', {
-      type: 'sign',
-      title: 'Grand Diwali Rangoli Mandala 🪔',
-      text: 'Intricate folk art crafted with vibrant colored rice powders, turmeric, and vermillion, celebrating prosperity, light, and new beginnings!'
-    });
   }
 
-  // London & Westminster Realm (Westminster Palace, Big Ben, Tower Bridge, Routemaster Bus, Red Phone Booths)
   private buildLondonRealm() {
     const clockX = -32;
     const clockZ = -65;
@@ -2831,8 +3217,12 @@ export class WorldBuilder {
           for (let z = -53; z <= -49; z++) {
             const isCorner = Math.abs(x - tx) === 2 && Math.abs(z - (-51)) === 2;
             const isWall = Math.abs(x - tx) === 2 || Math.abs(z - (-51)) === 2;
-            const isArchway = Math.abs(z - (-51)) === 2 && Math.abs(x - tx) <= 1 && y <= 8;
-            if (!isArchway) {
+            // Archway for roadway traffic in East-West direction (X)
+            const isRoadArchway = Math.abs(x - tx) === 2 && Math.abs(z - (-51)) <= 1 && y <= 8;
+            // Walkway portal opening into High-Level glass walkway at Y = 15..16
+            const isWalkwayPortal = Math.abs(x - tx) === 2 && z === -51 && (y === 15 || y === 16);
+
+            if (!isRoadArchway && !isWalkwayPortal) {
               if (isCorner) {
                 this.setBlock(x, y, z, 'quartz_pillar');
               } else if (isWall) {
@@ -2842,6 +3232,22 @@ export class WorldBuilder {
           }
         }
       }
+
+      // Interior Spiral Staircase connecting Bridge Deck (Y = 3) to High-Level Walkway (Y = 15)
+      const spiralCoords = [
+        [tx - 1, -52], [tx, -52], [tx + 1, -52],
+        [tx + 1, -51], [tx + 1, -50],
+        [tx, -50], [tx - 1, -50], [tx - 1, -51]
+      ];
+      for (let step = 0; step <= 11; step++) {
+        const sy = 4 + step;
+        const [sx, sz] = spiralCoords[step % spiralCoords.length];
+        this.setBlock(sx, sy, sz, 'smooth_stone');
+        if (sy % 4 === 0) {
+          this.setBlock(tx, sy + 1, -51, 'lantern');
+        }
+      }
+
       // Roof and Conical Pinnacles (Y = 18 to 21)
       for (let x = tx - 2; x <= tx + 2; x++) {
         for (let z = -53; z <= -49; z++) {
@@ -2854,8 +3260,8 @@ export class WorldBuilder {
       }
     }
 
-    // High-Level Glass Walkways between towers at Y = 15 and Y = 16
-    for (let x = -35; x <= -29; x++) {
+    // High-Level Glass Walkways between towers at Y = 15 and Y = 16 (walkable across both towers!)
+    for (let x = -36; x <= -28; x++) {
       this.setBlock(x, 15, -53, 'iron_block');
       this.setBlock(x, 15, -49, 'iron_block');
       this.setBlock(x, 16, -53, 'cyber_glass');
@@ -2875,10 +3281,42 @@ export class WorldBuilder {
       this.setBlock(x, 4, -49, 'iron_block');
     }
 
+    // West Approach Ramp (X in [-48, -43]) smoothly ascending from Westminster Embankment (Y = 1) up to Deck (Y = 3)
+    const westRampProfile = [
+      { x: -48, y: 1 }, { x: -47, y: 1 },
+      { x: -46, y: 2 }, { x: -45, y: 2 },
+      { x: -44, y: 3 }, { x: -43, y: 3 }
+    ];
+    for (const p of westRampProfile) {
+      for (let z = -52; z <= -50; z++) {
+        for (let fy = 1; fy <= p.y; fy++) {
+          this.setBlock(p.x, fy, z, (fy === p.y) ? 'asphalt_road' : 'stone_bricks');
+        }
+      }
+      this.setBlock(p.x, p.y + 1, -53, 'iron_block');
+      this.setBlock(p.x, p.y + 1, -49, 'iron_block');
+    }
+
+    // East Approach Ramp (X in [-21, -16]) smoothly descending from Deck (Y = 3) to Southwark Embankment (Y = 1)
+    const eastRampProfile = [
+      { x: -21, y: 3 }, { x: -20, y: 3 },
+      { x: -19, y: 2 }, { x: -18, y: 2 },
+      { x: -17, y: 1 }, { x: -16, y: 1 }
+    ];
+    for (const p of eastRampProfile) {
+      for (let z = -52; z <= -50; z++) {
+        for (let fy = 1; fy <= p.y; fy++) {
+          this.setBlock(p.x, fy, z, (fy === p.y) ? 'asphalt_road' : 'stone_bricks');
+        }
+      }
+      this.setBlock(p.x, p.y + 1, -53, 'iron_block');
+      this.setBlock(p.x, p.y + 1, -49, 'iron_block');
+    }
+
     this.setBlock(-32, 4, -49, 'stone_bricks', {
       type: 'sign',
-      title: 'Tower Bridge · River Thames',
-      text: 'Iconic Victorian Gothic suspension and bascule bridge completed in 1894. Spans across the River Thames with 65-meter towers and high-level walkways.'
+      title: 'Tower Bridge · River Thames 🇬🇧🌉',
+      text: 'Iconic Victorian Gothic suspension and bascule bridge completed in 1894. Spans across the River Thames connecting Westminster to Southwark. Climb inside either tower to cross the high-level glass walkways!'
     });
 
     // 3. Classic Red Double-Decker Routemaster Bus at (-26, 1, -70)
@@ -3178,23 +3616,70 @@ export class WorldBuilder {
     });
   }
 
-  // Tokyo & Shibuya Realm (Shibuya Scramble Crossing, Giant LED Billboards, Torii Gate, Hachiko Plaza, Shinkansen)
+  // Tokyo, Kyoto & Mount Fuji Realm (Shibuya 109, QFRONT, Scramble Crossing, Metro Subway, Shinjuku Golden Gai, Fushimi Inari Torii, Shinkansen, Mount Fuji)
   private buildTokyoShibuyaRealm() {
     const cx = -155;
     const cz = -80;
 
-    // 1. Shibuya Scramble Crossing
-    // Main 8-lane Intersection (X in [cx - 8, cx + 8], Z in [cz - 8, cz + 8])
-    for (let x = cx - 8; x <= cx + 8; x++) {
-      for (let z = cz - 8; z <= cz + 8; z++) {
+    // =========================================================================
+    // 1. MOUNT FUJI (富士山 · 3,776m Sacred Volcanic Stratovolcano)
+    // =========================================================================
+    // Towering on the Northwestern Horizon at [-185, -125]
+    const fujiX = -185;
+    const fujiZ = -125;
+    // Base 5th Station Shrine & Viewing Pavilion (X = -170, Z = -110)
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(fujiX + 15 + dx, 2, fujiZ + 15 + dz, 'stone_bricks');
+      }
+    }
+    // Viewing Pavilion Pillars & Vermilion Roof
+    for (const [pdx, pdz] of [[-2, -2], [2, -2], [-2, 2], [2, 2]]) {
+      this.setBlock(fujiX + 15 + pdx, 3, fujiZ + 15 + pdz, 'red_terracotta');
+      this.setBlock(fujiX + 15 + pdx, 4, fujiZ + 15 + pdz, 'red_terracotta');
+    }
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(fujiX + 15 + dx, 5, fujiZ + 15 + dz, 'purpur_block');
+      }
+    }
+    this.setBlock(fujiX + 15, 6, fujiZ + 15, 'gold_block');
+    this.setBlock(fujiX + 15, 3, fujiZ + 15, 'sea_lantern'); // Sacred lantern
+    this.setBlock(fujiX + 15, 3, fujiZ + 18, 'quartz_block', {
+      type: 'sign',
+      title: 'Mount Fuji · 富士山 (3,776m)',
+      text: 'Sacred UNESCO stratovolcano, iconic symbol of Japan with its symmetrical snow-capped volcanic cone and summit caldera.'
+    });
+
+    // Summit Caldera Beacon & Torii on Crater Rim
+    this.setBlock(fujiX, 26, fujiZ, 'obsidian'); // Crater floor
+    this.setBlock(fujiX, 27, fujiZ, 'magma_block'); // Geothermal volcanic vent
+    this.setBlock(fujiX, 28, fujiZ, 'beacon'); // Celestial skyward beam
+    // Summit Torii Gate at Crater Edge
+    this.setBlock(fujiX + 3, 27, fujiZ, 'red_terracotta');
+    this.setBlock(fujiX + 5, 27, fujiZ, 'red_terracotta');
+    this.setBlock(fujiX + 3, 28, fujiZ, 'red_terracotta');
+    this.setBlock(fujiX + 5, 28, fujiZ, 'red_terracotta');
+    this.setBlock(fujiX + 4, 29, fujiZ, 'red_terracotta');
+    this.setBlock(fujiX + 3, 29, fujiZ, 'gold_block');
+    this.setBlock(fujiX + 5, 29, fujiZ, 'gold_block');
+
+    // =========================================================================
+    // 2. SHIBUYA 12-LANE SCRAMBLE CROSSING (Busiest Intersection on Earth)
+    // =========================================================================
+    // Main Scramble Pavement (X in [cx - 10, cx + 10], Z in [cz - 10, cz + 10])
+    for (let x = cx - 10; x <= cx + 10; x++) {
+      for (let z = cz - 10; z <= cz + 10; z++) {
         this.setBlock(x, 1, z, 'asphalt_road');
-        // Perimeter Crosswalks
-        const isPerimeterCrosswalk = (Math.abs(x - (cx - 7)) <= 1 || Math.abs(x - (cx + 7)) <= 1 ||
-                                      Math.abs(z - (cz - 7)) <= 1 || Math.abs(z - (cz + 7)) <= 1);
+
+        // Perimeter Zebra Crosswalks
+        const isPerimeterCrosswalk = (Math.abs(x - (cx - 9)) <= 1 || Math.abs(x - (cx + 9)) <= 1 ||
+                                      Math.abs(z - (cz - 9)) <= 1 || Math.abs(z - (cz + 9)) <= 1);
         if (isPerimeterCrosswalk && (x + z) % 2 === 0) {
           this.setBlock(x, 1, z, 'smooth_stone');
         }
-        // Diagonal Scramble Zebra Crossings (iconic Shibuya X)
+
+        // Giant Diagonal Scramble Zebra Crossings (Iconic Shibuya X)
         const d1 = Math.abs((x - cx) - (z - cz));
         const d2 = Math.abs((x - cx) + (z - cz));
         if ((d1 <= 1 || d2 <= 1) && (x + z) % 2 === 0) {
@@ -3203,143 +3688,506 @@ export class WorldBuilder {
       }
     }
 
-    // 2. Surrounding Cyberpunk Skyscrapers with Giant LED Billboards
-    // Building 1 (North-East: Shibuya 109 style cylinder corner tower at cx + 10, cz - 10)
-    const b1x = cx + 11;
-    const b1z = cz - 11;
-    for (let y = 1; y <= 24; y++) {
-      for (let dx = 0; dx <= 6; dx++) {
-        for (let dz = 0; dz >= -6; dz--) {
-          const isEdge = (dx === 0 || dz === 0);
-          if (isEdge) {
-            // Giant LED Billboard on lower and mid floors
-            if (y >= 4 && y <= 16 && (dx === 0 || dz === 0)) {
-              const ledColor = ((y + dx - dz) % 4 === 0) ? 'amethyst_block' :
-                               ((y + dx - dz) % 4 === 1) ? 'emerald_block' :
-                               ((y + dx - dz) % 4 === 2) ? 'sea_lantern' : 'lapis_block';
-              this.setBlock(b1x + dx, y, b1z + dz, ledColor);
+    // Pedestrian Traffic Signal Poles at the 4 Crossing Corners
+    for (const [sx, sz] of [[cx - 9, cz - 9], [cx + 9, cz - 9], [cx - 9, cz + 9], [cx + 9, cz + 9]]) {
+      this.setBlock(sx, 2, sz, 'iron_block');
+      this.setBlock(sx, 3, sz, 'iron_block');
+      this.setBlock(sx, 4, sz, 'glowstone'); // Pedestrian walking signal
+      this.setBlock(sx, 5, sz, 'emerald_block'); // Neon green light
+    }
+
+    // =========================================================================
+    // 3. SHIBUYA 109 CYLINDRICAL LANDMARK TOWER & SHIBUYA SKY (North-East)
+    // =========================================================================
+    const s109X = cx + 12;
+    const s109Z = cz - 12;
+    // Curved Cylindrical Tower (Radius 5, Height Y = 1 to 28)
+    for (let y = 1; y <= 28; y++) {
+      for (let dx = -5; dx <= 5; dx++) {
+        for (let dz = -5; dz <= 5; dz++) {
+          const dist2D = Math.hypot(dx, dz);
+          if (dist2D <= 5.2 && dist2D >= 4.0) {
+            // Animated Neon LED Displays on Lower/Mid Floors (Y = 4 to 18)
+            if (y >= 4 && y <= 18 && (dx >= -1 || dz >= -1)) {
+              const ledPattern = (y + dx - dz) % 5;
+              const ledBlock = (ledPattern === 0) ? 'amethyst_block' :
+                               (ledPattern === 1) ? 'emerald_block' :
+                               (ledPattern === 2) ? 'sea_lantern' :
+                               (ledPattern === 3) ? 'redstone_block' : 'gold_block';
+              this.setBlock(s109X + dx, y, s109Z + dz, ledBlock);
             } else {
-              this.setBlock(b1x + dx, y, b1z + dz, (y % 4 === 0) ? 'stone_bricks' : 'cyber_glass');
+              this.setBlock(s109X + dx, y, s109Z + dz, (y % 4 === 0) ? 'stone_bricks' : 'cyber_glass');
             }
+          } else if (dist2D < 4.0 && (y === 1 || y === 8 || y === 16 || y === 24 || y === 28)) {
+            this.setBlock(s109X + dx, y, s109Z + dz, 'smooth_stone'); // Interior floor plates
           }
         }
       }
     }
-    // Illuminated Crown Logo atop Building 1
-    this.setBlock(b1x + 1, 25, b1z - 1, 'glowstone');
-    this.setBlock(b1x + 2, 25, b1z - 1, 'beacon');
+    // Iconic Shibuya 109 Red Cylindrical Crown Logo
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(s109X + dx, 29, s109Z + dz, 'red_terracotta');
+        this.setBlock(s109X + dx, 30, s109Z + dz, 'glowstone');
+      }
+    }
+    // Shibuya Sky Observation Deck on Top of 109 (Panoramic Glass Perimeter at Y = 29)
+    for (let dx = -5; dx <= 5; dx++) {
+      for (let dz = -5; dz <= 5; dz++) {
+        const d = Math.hypot(dx, dz);
+        if (d <= 5.2 && d >= 4.5) {
+          this.setBlock(s109X + dx, 29, s109Z + dz, 'cyber_glass'); // Edge safety glass
+        }
+      }
+    }
+    this.setBlock(s109X, 31, s109Z, 'beacon'); // Skyward Shibuya Sky beam
 
-    // Building 2 (North-West: QFRONT Billboard Tower at cx - 11, cz - 11)
-    const b2x = cx - 11;
-    const b2z = cz - 11;
-    for (let y = 1; y <= 22; y++) {
-      for (let dx = 0; dx >= -6; dx--) {
-        for (let dz = 0; dz >= -6; dz--) {
+    // =========================================================================
+    // 4. QFRONT MEDIA TOWER & STARBUCKS VIEWING DECK (North-West)
+    // =========================================================================
+    const qx = cx - 12;
+    const qz = cz - 12;
+    for (let y = 1; y <= 24; y++) {
+      for (let dx = 0; dx >= -7; dx--) {
+        for (let dz = 0; dz >= -7; dz--) {
           const isFacingCrossing = (dx === 0 || dz === 0);
           if (isFacingCrossing) {
-            if (y >= 5 && y <= 18) {
-              // Giant Animated Display Wall
-              this.setBlock(b2x + dx, y, b2z + dz, (y % 3 === 0) ? 'redstone_block' : (y % 3 === 1) ? 'gold_block' : 'glowstone');
+            if (y >= 5 && y <= 20) {
+              // Giant Animated Video Wall (Holographic displays)
+              const qColor = (y % 4 === 0) ? 'sea_lantern' : (y % 4 === 1) ? 'redstone_block' : (y % 4 === 2) ? 'gold_block' : 'amethyst_block';
+              this.setBlock(qx + dx, y, qz + dz, qColor);
             } else {
-              this.setBlock(b2x + dx, y, b2z + dz, 'cyber_glass');
+              this.setBlock(qx + dx, y, qz + dz, 'cyber_glass');
             }
+          } else {
+            this.setBlock(qx + dx, y, qz + dz, (y % 4 === 0) ? 'stone_bricks' : 'cyber_glass');
           }
         }
       }
     }
+    // 2nd-Floor Starbucks Viewing Deck overlooking Scramble (Y = 6)
+    for (let dx = 0; dx >= -3; dx--) {
+      this.setBlock(qx + dx, 6, qz + 1, 'oak_planks');
+      this.setBlock(qx + dx, 7, qz + 1, 'cyber_glass');
+    }
 
-    // 3. Hachiko Plaza & Shinto Torii Gate (South-West: cx - 11, cz + 10)
+    // =========================================================================
+    // 5. TOKYO METRO SHIBUYA SUBWAY ENTRANCE (Underground Access: X = cx + 8, Z = cz + 6)
+    // =========================================================================
+    const subX = cx + 8;
+    const subZ = cz + 6;
+    // Canopy Roof over Entrance
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(subX + dx, 4, subZ + dz, 'cyber_glass');
+      }
+    }
+    // Subway Railing & Metro Logo
+    this.setBlock(subX - 1, 2, subZ - 2, 'iron_block');
+    this.setBlock(subX + 1, 2, subZ - 2, 'iron_block');
+    this.setBlock(subX, 3, subZ - 2, 'gold_block'); // Ginza Line Yellow Metro Circle
+    // Tiled Subway Steps descending downwards
+    this.setBlock(subX, 1, subZ - 1, 'smooth_stone');
+    this.setBlock(subX, 0, subZ, 'smooth_stone');
+    this.setBlock(subX, -1, subZ + 1, 'smooth_stone');
+    this.setBlock(subX, -1, subZ + 2, 'sea_lantern'); // Subway concourse lighting
+
+    this.setBlock(subX, 2, subZ - 3, 'stone_bricks', {
+      type: 'sign',
+      title: 'Tokyo Metro Shibuya Station · 渋谷駅',
+      text: 'Underground transit hub serving Ginza Line (G), Hanzomon Line (Z), and JR Yamanote Line.'
+    });
+
+    // =========================================================================
+    // 6. SHINJUKU OMOIDE YOKOCHO & GOLDEN GAI (Traditional Izakaya Alley)
+    // =========================================================================
+    const yokoX = cx + 5;
+    const yokoZ = cz + 14;
+    // Cobblestone Alleyway (Width 3, Length 14)
+    for (let z = yokoZ - 4; z <= yokoZ + 10; z++) {
+      this.setBlock(yokoX, 1, z, 'smooth_stone');
+      this.setBlock(yokoX - 1, 1, z, 'cobblestone');
+      this.setBlock(yokoX + 1, 1, z, 'cobblestone');
+      // Overhead strung red paper lanterns every 3 blocks
+      if (z % 3 === 0) {
+        this.setBlock(yokoX - 2, 4, z, 'red_terracotta');
+        this.setBlock(yokoX + 2, 4, z, 'red_terracotta');
+        this.setBlock(yokoX, 4, z, 'lantern');
+      }
+    }
+    // West Side: Yakitori & Craft Beer Izakaya Bar
+    for (let z = yokoZ - 2; z <= yokoZ + 2; z++) {
+      this.setBlock(yokoX - 2, 2, z, 'oak_planks'); // Counter
+      this.setBlock(yokoX - 3, 2, z, 'oak_planks');
+      this.setBlock(yokoX - 3, 3, z, (z === yokoZ) ? 'cauldron' : 'crafting_table'); // Grill
+      this.setBlock(yokoX - 2, 3, z, (z % 2 === 0) ? 'redstone_block' : 'gold_block'); // Yakitori skewers
+    }
+    // East Side: Ramen Master Kitchen & Bar Stools
+    for (let z = yokoZ + 4; z <= yokoZ + 8; z++) {
+      this.setBlock(yokoX + 2, 2, z, 'oak_planks'); // Counter
+      this.setBlock(yokoX + 3, 2, z, 'oak_planks');
+      this.setBlock(yokoX + 3, 3, z, 'cauldron'); // Simmering broth
+      this.setBlock(yokoX + 2, 3, z, 'redstone_block'); // Hot spicy ramen bowl
+      this.setBlock(yokoX + 1, 2, z, 'stone_bricks'); // Stool
+    }
+
+    this.setBlock(yokoX, 2, yokoZ - 5, 'oak_planks', {
+      type: 'sign',
+      title: 'Shinjuku Omoide Yokocho · 思い出横丁',
+      text: 'Atmospheric post-war neon izakaya alley filled with sizzling yakitori skewers, steaming tonkotsu ramen, and red paper lanterns.'
+    });
+
+    // =========================================================================
+    // 7. KYOTO FUSHIMI INARI TORII TUNNEL & MOUNTAIN SHRINE (South-West)
+    // =========================================================================
+    const inariX = cx - 18;
+    const inariZ = cz - 2;
+    // Tunnel of 10 Sequential Vermilion Torii Gates ascending mountain trail
+    for (let i = 0; i < 8; i++) {
+      const tx = inariX - i * 2;
+      const tz = inariZ - i * 2;
+      const ty = 2 + Math.floor(i / 3);
+      // Stone trail floor
+      this.setBlock(tx, ty - 1, tz, 'stone_bricks');
+
+      // Torii Pillars
+      this.setBlock(tx - 1, ty, tz + 1, 'red_terracotta');
+      this.setBlock(tx - 1, ty + 1, tz + 1, 'red_terracotta');
+      this.setBlock(tx - 1, ty + 2, tz + 1, 'red_terracotta');
+
+      this.setBlock(tx + 1, ty, tz - 1, 'red_terracotta');
+      this.setBlock(tx + 1, ty + 1, tz - 1, 'red_terracotta');
+      this.setBlock(tx + 1, ty + 2, tz - 1, 'red_terracotta');
+
+      // Top Lintel
+      this.setBlock(tx - 1, ty + 3, tz + 1, 'gold_block');
+      this.setBlock(tx, ty + 3, tz, 'red_terracotta');
+      this.setBlock(tx + 1, ty + 3, tz - 1, 'gold_block');
+    }
+
+    // Sacred Inari Mountain Shrine Sanctuary at the end of the Torii Tunnel
+    const shrineX = inariX - 18;
+    const shrineZ = inariZ - 18;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(shrineX + dx, 4, shrineZ + dz, 'stone_bricks');
+      }
+    }
+    // Shrine Sanctuary Pavilion (Vermilion with curved roof)
+    for (const [sdx, sdz] of [[-2, -2], [2, -2], [-2, 2], [2, 2]]) {
+      this.setBlock(shrineX + sdx, 5, shrineZ + sdz, 'red_terracotta');
+      this.setBlock(shrineX + sdx, 6, shrineZ + sdz, 'red_terracotta');
+    }
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(shrineX + dx, 7, shrineZ + dz, 'purpur_block');
+      }
+    }
+    // Gold Shrine Finial
+    this.setBlock(shrineX, 8, shrineZ, 'gold_block');
+    this.setBlock(shrineX, 5, shrineZ, 'sea_lantern'); // Sacred mirror altar
+
+    // Sacred Kitsune (Fox Guardian) Statues flanking shrine entrance
+    this.setBlock(shrineX - 2, 5, shrineZ + 3, 'stone_bricks');
+    this.setBlock(shrineX - 2, 6, shrineZ + 3, 'gold_block'); // Fox with sacred key
+    this.setBlock(shrineX + 2, 5, shrineZ + 3, 'stone_bricks');
+    this.setBlock(shrineX + 2, 6, shrineZ + 3, 'amethyst_block'); // Fox with sacred jewel
+
+    // Chōzuya Purification Water Basin
+    this.setBlock(shrineX + 4, 5, shrineZ + 1, 'cauldron');
+    this.setBlock(shrineX + 4, 6, shrineZ + 1, 'lantern');
+
+    this.setBlock(shrineX, 5, shrineZ + 4, 'quartz_block', {
+      type: 'sign',
+      title: 'Fushimi Inari-Taisha Shrine · 伏見稲荷大社',
+      text: 'Sacred Shinto shrine of Inari, patron of harvest and prosperity. Known for thousands of vermilion Senbon Torii gates and Kitsune fox guardians.'
+    });
+
+    // Flanking Sakura Blossom Trees along the mountain approach
+    this.buildSakuraTree(shrineX - 5, 4, shrineZ);
+    this.buildSakuraTree(shrineX + 5, 4, shrineZ);
+    this.buildSakuraTree(shrineX, 4, shrineZ - 5);
+
+    // =========================================================================
+    // 8. HACHIKO MEMORIAL PLAZA (South-West Crossing Corner)
+    // =========================================================================
     const hachikoX = cx - 10;
     const hachikoZ = cz + 10;
-    // Stone Plaza floor
     for (let x = hachikoX - 4; x <= hachikoX + 4; x++) {
       for (let z = hachikoZ - 4; z <= hachikoZ + 4; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
       }
     }
-    // Hachiko Bronze Dog Statue on Granite Plinth
+    // Hachiko Bronze Dog Statue
     this.setBlock(hachikoX, 2, hachikoZ, 'stone_bricks');
     this.setBlock(hachikoX, 3, hachikoZ, 'gold_block');
     this.setBlock(hachikoX, 4, hachikoZ, 'iron_block');
     this.setBlock(hachikoX, 2, hachikoZ - 1, 'stone_bricks', {
       type: 'sign',
       title: 'Hachikō Memorial Plaza · 忠犬ハチ公',
-      text: 'Faithful Akita dog commemorated for loyalty at Shibuya Station. Tokyo rendezvous point.'
+      text: 'Faithful Akita dog commemorated for loyalty at Shibuya Station. Tokyo\'s premier meeting point.'
     });
 
-    // Red Vermilion Shinto Torii Gate at (hachikoX - 2, hachikoZ + 3)
-    const toriiX = hachikoX - 2;
-    const toriiZ = hachikoZ + 3;
-    for (let y = 2; y <= 6; y++) {
-      this.setBlock(toriiX - 2, y, toriiZ, 'red_terracotta');
-      this.setBlock(toriiX + 2, y, toriiZ, 'red_terracotta');
-    }
-    // Top lintels (Kasagi and Shimaki)
-    for (let x = toriiX - 3; x <= toriiX + 3; x++) {
-      this.setBlock(x, 6, toriiZ, 'red_terracotta');
-      this.setBlock(x, 7, toriiZ, (Math.abs(x - toriiX) === 3) ? 'gold_block' : 'red_terracotta');
-    }
-    // Lower tie beam (Nuki)
-    for (let x = toriiX - 2; x <= toriiX + 2; x++) {
-      this.setBlock(x, 5, toriiZ, 'red_terracotta');
-    }
-
-    // Cherry Blossom (Sakura) Trees flanking the shrine
-    this.buildSakuraTree(toriiX - 4, 1, toriiZ - 2);
-    this.buildSakuraTree(toriiX + 4, 1, toriiZ + 2);
-
-    // 4. Shinkansen (Bullet Train) Elevated Viaduct & Platform (South: Z in [cz + 8, cz + 14], X in [cx - 15, cx + 15])
-    for (let x = cx - 15; x <= cx + 15; x++) {
-      // Concrete viaduct support pillars every 6 blocks
-      if (x % 6 === 0) {
+    // =========================================================================
+    // 9. SHINKANSEN N700 BULLET TRAIN & ELEVATED HIGH-SPEED TERMINAL
+    // =========================================================================
+    // High Concrete Viaduct Track Bed at Y = 6 (X in [cx - 20, cx + 20])
+    for (let x = cx - 20; x <= cx + 20; x++) {
+      if (x % 5 === 0) {
         for (let y = 1; y <= 5; y++) {
           this.setBlock(x, y, cz + 11, 'quartz_pillar');
         }
       }
-      // Viaduct Track Bed at Y = 6
       for (let z = cz + 9; z <= cz + 13; z++) {
         this.setBlock(x, 6, z, 'smooth_stone');
         if (z === cz + 11) {
-          this.setBlock(x, 7, z, (x % 2 === 0) ? 'oak_planks' : 'iron_block'); // Train rails
+          this.setBlock(x, 7, z, (x % 2 === 0) ? 'oak_planks' : 'iron_block'); // Rails
         }
       }
-      this.setBlock(x, 7, cz + 9, 'stone_bricks'); // Rail guard wall
+      this.setBlock(x, 7, cz + 9, 'stone_bricks');
       this.setBlock(x, 7, cz + 13, 'stone_bricks');
     }
 
-    // Aerodynamic Shinkansen Series N700 Bullet Train parked at platform
-    const trainStartX = cx - 4;
-    // Aerodynamic nose cone (pointed duckbill)
-    this.setBlock(trainStartX - 5, 8, cz + 11, 'quartz_block');
+    // Aerodynamic Shinkansen Series N700 (Multi-Car with Walkable Passenger Interior)
+    const trainStartX = cx - 8;
+    // Aerodynamic Pointed Nose Cone
     this.setBlock(trainStartX - 4, 8, cz + 11, 'quartz_block');
-    this.setBlock(trainStartX - 4, 9, cz + 11, 'cyber_glass'); // Cockpit
-    for (let x = trainStartX - 3; x <= trainStartX + 6; x++) {
-      this.setBlock(x, 8, cz + 10, 'quartz_block');
+    this.setBlock(trainStartX - 3, 8, cz + 11, 'quartz_block');
+    this.setBlock(trainStartX - 3, 9, cz + 11, 'cyber_glass'); // Cockpit
+
+    // Passenger Car with Seats, Aisle & Windows (Length 14 blocks)
+    for (let x = trainStartX - 2; x <= trainStartX + 12; x++) {
+      this.setBlock(x, 8, cz + 10, 'quartz_block'); // Floor
+      this.setBlock(x, 8, cz + 11, 'lapis_block'); // Blue stripe
       this.setBlock(x, 8, cz + 12, 'quartz_block');
-      this.setBlock(x, 8, cz + 11, 'lapis_block'); // Shinkansen blue stripe
-      this.setBlock(x, 9, cz + 10, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      this.setBlock(x, 9, cz + 12, (x % 2 === 0) ? 'cyber_glass' : 'quartz_block');
-      this.setBlock(x, 10, cz + 11, 'quartz_block'); // Roof
+
+      // Passenger Seats & Aisle
+      this.setBlock(x, 9, cz + 10, (x % 2 === 0) ? 'oak_planks' : 'cyber_glass'); // Window
+      this.setBlock(x, 9, cz + 11, 'smooth_stone'); // Walkable aisle!
+      this.setBlock(x, 9, cz + 12, (x % 2 === 0) ? 'oak_planks' : 'cyber_glass'); // Window
+
+      // Streamlined White Roof
+      this.setBlock(x, 10, cz + 11, 'quartz_block');
     }
-    // Pantograph power collector
-    this.setBlock(trainStartX + 2, 11, cz + 11, 'iron_block');
-    this.setBlock(trainStartX + 2, 12, cz + 11, 'glowstone');
+    // High-Voltage Pantograph Power Collector
+    this.setBlock(trainStartX + 4, 11, cz + 11, 'iron_block');
+    this.setBlock(trainStartX + 4, 12, cz + 11, 'glowstone');
+
+    // Elevated Passenger Station Platform at Y = 6 along south flank (Z in [cz + 6, cz + 8], X in [cx + 2, cx + 14])
+    for (let x = cx + 2; x <= cx + 14; x++) {
+      for (let z = cz + 6; z <= cz + 8; z++) {
+        this.setBlock(x, 6, z, (z === cz + 8) ? 'gold_block' : 'smooth_stone');
+        // Platform canopy roof at Y = 9
+        this.setBlock(x, 9, z, 'quartz_block');
+      }
+      // Canopy support pillars every 4 blocks
+      if ((x - (cx + 2)) % 4 === 0) {
+        this.setBlock(x, 7, cz + 6, 'quartz_pillar');
+        this.setBlock(x, 8, cz + 6, 'quartz_pillar');
+        this.setBlock(x, 9, cz + 7, 'sea_lantern');
+      }
+      // Safety railing on outer side
+      this.setBlock(x, 7, cz + 6, 'iron_block');
+    }
+    // Waiting benches on platform
+    this.setBlock(cx + 6, 7, cz + 7, 'oak_planks');
+    this.setBlock(cx + 10, 7, cz + 7, 'oak_planks');
+    this.setBlock(cx + 4, 7, cz + 7, 'gold_block', {
+      type: 'sign',
+      title: 'Shibuya Shinkansen Platform · 渋谷駅新幹線ホーム 🚅',
+      text: 'Series N700 Tokaido Shinkansen bullet train terminal. Walk directly from Shibuya Scramble up the covered stairs to board the train.'
+    });
+
+    // Covered Station Access Stairway from Shibuya Scramble street level (Y = 1) up to platform (Y = 6)
+    const stairProfile = [
+      { x: cx + 20, y: 1 }, { x: cx + 19, y: 2 },
+      { x: cx + 18, y: 3 }, { x: cx + 17, y: 4 },
+      { x: cx + 16, y: 5 }, { x: cx + 15, y: 6 }
+    ];
+    for (const step of stairProfile) {
+      for (let z = cz + 6; z <= cz + 8; z++) {
+        for (let fy = 1; fy <= step.y; fy++) {
+          this.setBlock(step.x, fy, z, (fy === step.y) ? 'smooth_stone' : 'stone_bricks');
+        }
+        // Stairway canopy roof
+        this.setBlock(step.x, step.y + 3, z, 'quartz_block');
+      }
+      this.setBlock(step.x, step.y + 1, cz + 6, 'iron_block');
+      this.setBlock(step.x, step.y + 1, cz + 8, 'iron_block');
+      if (step.y % 2 === 0) {
+        this.setBlock(step.x, step.y + 2, cz + 6, 'lantern');
+      }
+    }
 
     this.setBlock(cx, 2, cz - 8, 'stone_bricks', {
       type: 'sign',
       title: 'Shibuya Scramble Crossing · 渋谷スクランブル交差点',
-      text: 'The busiest pedestrian intersection in the world, surrounded by neon billboard towers and Shinkansen rail.'
+      text: 'The busiest pedestrian intersection in the world, framed by Shibuya 109, QFRONT, Shinkansen bullet train, and Mount Fuji!'
     });
+
+    // =========================================================================
+    // 10. TOKYO TOWER RED & WHITE LATTICE SPIRE (West: X = -176, Z = -78)
+    // =========================================================================
+    const ttx = -176;
+    const ttz = -78;
+    for (let y = 1; y <= 14; y++) {
+      const legOffset = Math.max(1, Math.round(4 - (y / 14) * 3));
+      const legColor = (Math.floor(y / 2) % 2 === 0) ? 'red_terracotta' : 'iron_block';
+      for (const sx of [-1, 1]) {
+        for (const sz of [-1, 1]) {
+          const lx = ttx + sx * legOffset;
+          const lz = ttz + sz * legOffset;
+          this.setBlock(lx, y, lz, legColor);
+          if (y <= 5) this.setBlock(lx + sx, y, lz, 'stone_bricks');
+        }
+      }
+      if (y === 4 || y === 8 || y === 12) {
+        for (let dx = -legOffset; dx <= legOffset; dx++) {
+          this.setBlock(ttx + dx, y, ttz - legOffset, 'red_terracotta');
+          this.setBlock(ttx + dx, y, ttz + legOffset, 'red_terracotta');
+        }
+        for (let dz = -legOffset; dz <= legOffset; dz++) {
+          this.setBlock(ttx - legOffset, y, ttz + dz, 'red_terracotta');
+          this.setBlock(ttx + legOffset, y, ttz + dz, 'red_terracotta');
+        }
+      }
+    }
+    // Main Observation Skydeck (Y = 14 to 17)
+    for (let y = 14; y <= 17; y++) {
+      for (let dx = -3; dx <= 3; dx++) {
+        for (let dz = -3; dz <= 3; dz++) {
+          const isEdge = (Math.abs(dx) === 3 || Math.abs(dz) === 3);
+          const isCorner = (Math.abs(dx) === 3 && Math.abs(dz) === 3);
+          if (y === 14 || y === 17) {
+            this.setBlock(ttx + dx, y, ttz + dz, 'red_terracotta');
+          } else if (isEdge && !isCorner) {
+            this.setBlock(ttx + dx, y, ttz + dz, 'cyber_glass');
+          } else if (isCorner) {
+            this.setBlock(ttx + dx, y, ttz + dz, 'quartz_pillar');
+          }
+        }
+      }
+    }
+    this.setBlock(ttx, 15, ttz, 'sea_lantern');
+    this.setBlock(ttx, 16, ttz, 'glowstone');
+
+    // Upper Spire Shaft (Y = 18 to 28)
+    for (let y = 18; y <= 28; y++) {
+      const bandColor = (y <= 20) ? 'red_terracotta' : (y <= 23) ? 'quartz_block' : (y <= 25) ? 'red_terracotta' : (y <= 27) ? 'quartz_block' : 'red_terracotta';
+      this.setBlock(ttx, y, ttz, bandColor);
+      this.setBlock(ttx + 1, y, ttz, bandColor);
+      this.setBlock(ttx - 1, y, ttz, bandColor);
+      this.setBlock(ttx, y, ttz + 1, bandColor);
+      this.setBlock(ttx, y, ttz - 1, bandColor);
+    }
+    // Special Observation Deck (Y = 29 to 31)
+    for (let y = 29; y <= 31; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          this.setBlock(ttx + dx, y, ttz + dz, (y === 29 || y === 31) ? 'red_terracotta' : 'cyber_glass');
+        }
+      }
+    }
+    // Transmission Spire (Y = 32 to 38)
+    for (let y = 32; y <= 36; y++) {
+      this.setBlock(ttx, y, ttz, (y % 2 === 0) ? 'iron_block' : 'red_terracotta');
+    }
+    this.setBlock(ttx, 37, ttz, 'beacon');
+    this.setBlock(ttx, 38, ttz, 'redstone_block');
+
+    this.setBlock(ttx, 2, ttz + 4, 'stone_bricks', {
+      type: 'sign',
+      title: 'Tokyo Tower · 東京タワー',
+      text: '333m Eiffel-inspired communications lattice tower, dual observation decks, and beacon of modern Japan.'
+    });
+
+    // =========================================================================
+    // 11. SENSŌ-JI KAMINARIMON GATE (North: X = -155, Z = -62)
+    // =========================================================================
+    const gx = -155;
+    const gz = -62;
+    for (let dx = -5; dx <= 5; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(gx + dx, 1, gz + dz, 'stone_bricks');
+      }
+    }
+    // Vermilion Pillars
+    for (let y = 1; y <= 8; y++) {
+      this.setBlock(gx - 4, y, gz, 'red_terracotta');
+      this.setBlock(gx - 3, y, gz, 'red_terracotta');
+      this.setBlock(gx + 3, y, gz, 'red_terracotta');
+      this.setBlock(gx + 4, y, gz, 'red_terracotta');
+    }
+    this.setBlock(gx - 4, 3, gz, 'emerald_block'); // Fūjin
+    this.setBlock(gx + 4, 3, gz, 'redstone_block'); // Raijin
+
+    // Giant Red Chōchin Lantern
+    for (let y = 4; y <= 6; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (y === 4 || y === 6) {
+            this.setBlock(gx + dx, y, gz + dz, (dx === 0 && dz === 0) ? 'gold_block' : 'red_terracotta');
+          } else {
+            this.setBlock(gx + dx, y, gz + dz, (dx === 0 && dz === 0) ? 'glowstone' : 'redstone_block');
+          }
+        }
+      }
+    }
+    this.setBlock(gx, 3, gz, 'gold_block');
+    this.setBlock(gx, 7, gz, 'iron_block');
+
+    // Buddhist Temple Roof
+    for (let dx = -6; dx <= 6; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        const edgeDist = Math.max(Math.abs(dx) - 4, Math.abs(dz) - 1);
+        const roofY = (edgeDist <= 0) ? 9 : (edgeDist === 1) ? 10 : 11;
+        this.setBlock(gx + dx, roofY, gz + dz, 'purpur_block');
+      }
+    }
+    this.setBlock(gx, 11, gz, 'beacon');
+    this.setBlock(gx, 2, gz - 4, 'cauldron'); // Jokoro incense
+    this.setBlock(gx, 3, gz - 4, 'lantern');
+
+    this.setBlock(gx, 2, gz - 2, 'stone_bricks', {
+      type: 'sign',
+      title: 'Sensō-ji Kaminarimon · 浅草寺 雷門',
+      text: 'Ancient Buddhist Thunder Gate with giant red Chōchin lantern, guardian deities, and Jokoro incense.'
+    });
+
+    // =========================================================================
+    // 12. JAPANESE VENDING MACHINES & ZEN ROCK GARDEN
+    // =========================================================================
+    // Vending Machine Row (X = -148, Z = -73)
+    this.setBlock(-150, 2, -73, 'redstone_block'); this.setBlock(-150, 3, -73, 'glowstone'); // Boss Coffee
+    this.setBlock(-148, 2, -73, 'emerald_block'); this.setBlock(-148, 3, -73, 'cyber_glass'); // Green Tea
+    this.setBlock(-146, 2, -73, 'sea_lantern'); this.setBlock(-146, 3, -73, 'cyber_glass'); // Melon Soda
+    this.setBlock(-145, 2, -73, 'cauldron'); // Can drop
+
+    // Karesansui Zen Rock Garden (X = -170, Z = -92)
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) {
+        const ring = Math.floor(Math.hypot(dx, dz));
+        this.setBlock(-170 + dx, 1, -92 + dz, (ring % 2 === 0) ? 'sand' : 'smooth_stone');
+      }
+    }
+    this.setBlock(-171, 2, -92, 'mossy_stone_bricks');
+    this.setBlock(-171, 3, -92, 'mossy_stone_bricks');
+    this.setBlock(-168, 2, -91, 'stone_bricks');
+    this.setBlock(-167, 2, -94, 'cauldron'); // Basin
+    this.setBlock(-167, 3, -94, 'lantern');
   }
 
   // Seoul & Korea Realm (Gwanghwamun Joseon Palace Gate, N Seoul Tower, Hongdae K-Pop Street & Food Cart)
+  // Seoul, Gyeongbokgung & Joseon Realm (Gwanghwamun, Geunjeongjeon, Gyeonghoeru Lake Pavilion, King Sejong, Admiral Yi, Cheonggyecheon, K-Pop, N Seoul Tower)
   private buildSeoulRealm() {
-    // 1. Gwanghwamun Joseon Palace Gate at (-65, -95)
     const gateX = -65;
     const gateZ = -95;
 
-    // High White Stone Embankment Base (Y = 1 to 5)
-    for (let x = gateX - 10; x <= gateX + 10; x++) {
+    // =========================================================================
+    // 1. GWANGHWAMUN MAIN ROYAL PALACE GATE & STONE FORTRESS RAMPARTS
+    // =========================================================================
+    // High White Stone Embankment Base (Y = 1 to 5, X in [gateX - 16, gateX + 16])
+    for (let x = gateX - 16; x <= gateX + 16; x++) {
       for (let z = gateZ - 3; z <= gateZ + 3; z++) {
         for (let y = 1; y <= 5; y++) {
           this.setBlock(x, y, z, 'stone_bricks');
@@ -3347,14 +4195,11 @@ export class WorldBuilder {
       }
     }
     // Three Arched Portals through the stone base (Center arched gate, West & East gates)
-    const portals = [gateX - 5, gateX, gateX + 5];
+    const portals = [gateX - 6, gateX, gateX + 6];
     for (const px of portals) {
       for (let z = gateZ - 3; z <= gateZ + 3; z++) {
         for (let y = 1; y <= 4; y++) {
-          if (y === 4 && (px === gateX - 5 || px === gateX + 5)) {
-            // Side gates are slightly lower
-            continue;
-          }
+          if (y === 4 && (px === gateX - 6 || px === gateX + 6)) continue; // Side gates slightly lower
           this.setBlock(px, y, z, 'smooth_stone'); // Walkway opening
           this.setBlock(px - 1, y, z, (y === 1) ? 'smooth_stone' : 'air');
           this.setBlock(px + 1, y, z, (y === 1) ? 'smooth_stone' : 'air');
@@ -3363,150 +4208,433 @@ export class WorldBuilder {
     }
 
     // Two-Story Royal Wooden Pavilion above (Y = 6 to 13)
-    // Vermilion wooden pillars and Dancheong decorative eaves
     for (let y = 6; y <= 11; y++) {
-      for (let x = gateX - 8; x <= gateX + 8; x++) {
+      for (let x = gateX - 10; x <= gateX + 10; x++) {
         for (let z = gateZ - 2; z <= gateZ + 2; z++) {
           const isPillar = (Math.abs(x - gateX) % 4 === 0) && (Math.abs(z - gateZ) === 2);
-          if (isPillar) {
-            this.setBlock(x, y, z, 'red_terracotta');
-          }
-          if (y === 6) {
-            this.setBlock(x, y, z, 'oak_planks'); // Balcony floor
-          }
+          if (isPillar) this.setBlock(x, y, z, 'red_terracotta');
+          if (y === 6) this.setBlock(x, y, z, 'oak_planks'); // Balcony deck
         }
       }
     }
     // Dancheong Painted Eaves (emerald & lapis & gold)
-    for (let x = gateX - 11; x <= gateX + 11; x++) {
+    for (let x = gateX - 12; x <= gateX + 12; x++) {
       for (let z = gateZ - 4; z <= gateZ + 4; z++) {
-        const isEave = Math.abs(x - gateX) >= 9 || Math.abs(z - gateZ) >= 3;
+        const isEave = Math.abs(x - gateX) >= 10 || Math.abs(z - gateZ) >= 3;
         if (isEave) {
           this.setBlock(x, 9, z, (x % 2 === 0) ? 'emerald_block' : 'lapis_block');
           this.setBlock(x, 12, z, (x % 2 === 0) ? 'emerald_block' : 'lapis_block');
         }
       }
     }
-    // Traditional Sweeping Curved Hanok Roof (Y = 12 to 15)
-    for (let x = gateX - 10; x <= gateX + 10; x++) {
+    // Sweeping Curved Hanok Roof (Y = 12 to 15)
+    for (let x = gateX - 11; x <= gateX + 11; x++) {
       for (let z = gateZ - 3; z <= gateZ + 3; z++) {
-        const distEdge = Math.max(Math.abs(x - gateX) - 6, Math.abs(z - gateZ) - 1);
+        const distEdge = Math.max(Math.abs(x - gateX) - 7, Math.abs(z - gateZ) - 1);
         const roofY = Math.max(13, 15 - Math.max(0, distEdge));
         this.setBlock(x, roofY, z, 'purpur_block');
       }
     }
-    // Ridge finials
+    // Gold Ridge Finials
     this.setBlock(gateX, 16, gateZ, 'gold_block');
-    this.setBlock(gateX - 9, 14, gateZ, 'gold_block');
-    this.setBlock(gateX + 9, 14, gateZ, 'gold_block');
+    this.setBlock(gateX - 11, 14, gateZ, 'gold_block');
+    this.setBlock(gateX + 11, 14, gateZ, 'gold_block');
 
     this.setBlock(gateX, 6, gateZ + 3, 'gold_block', {
       type: 'sign',
       title: 'Gwanghwamun Palace Gate · 광화문',
-      text: 'Main royal gate of Gyeongbokgung Palace, featuring traditional Joseon architecture and Dancheong eaves.'
+      text: 'Main royal gate of Gyeongbokgung Palace, featuring 3 arched stone portals, two-story Dancheong pavilion, and Joseon fortress ramparts.'
     });
 
-    // 2. N Seoul Tower (Namsan Tower) atop the Namsan knoll at (-52, -115)
-    const towerX = -52;
-    const towerZ = -115;
-    const baseTerrainY = this.getTerrainHeight(towerX, towerZ); // ~14
-
-    // Observation Base Plaza (Y = baseTerrainY)
-    for (let dx = -4; dx <= 4; dx++) {
-      for (let dz = -4; dz <= 4; dz++) {
-        this.setBlock(towerX + dx, baseTerrainY, towerZ + dz, 'quartz_block');
+    // =========================================================================
+    // 2. HEUNGNYEMUN INNER GATE & ROYAL COURTYARD
+    // =========================================================================
+    const innerGateZ = gateZ - 9; // Z = -104
+    for (let x = gateX - 8; x <= gateX + 8; x++) {
+      for (let z = innerGateZ - 1; z <= innerGateZ + 1; z++) {
+        for (let y = 1; y <= 4; y++) {
+          const isPortal = Math.abs(x - gateX) <= 1 && y <= 3;
+          this.setBlock(x, y, z, isPortal ? (y === 1 ? 'smooth_stone' : 'air') : 'red_terracotta');
+        }
+        this.setBlock(x, 5, z, 'purpur_block'); // Curved roof
       }
     }
 
-    // Slender Concrete & Steel Tower Shaft (Y = baseTerrainY + 1 to baseTerrainY + 20)
-    for (let y = baseTerrainY + 1; y <= baseTerrainY + 20; y++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dz = -1; dz <= 1; dz++) {
-          if (Math.abs(dx) + Math.abs(dz) <= 1) {
-            this.setBlock(towerX + dx, y, towerZ + dz, 'quartz_pillar');
+    // =========================================================================
+    // 3. GEUNJEONGJEON IMPERIAL THRONE HALL & PUMGYESEOK COURTYARD
+    // =========================================================================
+    const hx = gateX;
+    const hz = -118;
+
+    // A. Grand Stone Courtyard (X in [hx - 12, hx + 12], Z in [hz + 11, hz - 7])
+    for (let x = hx - 12; x <= hx + 12; x++) {
+      for (let z = hz - 7; z <= hz + 11; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+        // Eodo (King's Elevated Royal Path)
+        if (Math.abs(x - hx) <= 1) this.setBlock(x, 1, z, 'smooth_stone');
+      }
+    }
+    // Pumgyeseok (Official Rank Stone Markers)
+    for (const pz of [hz + 3, hz + 6, hz + 9]) {
+      // East: Civil Officials (Munban)
+      this.setBlock(hx + 3, 2, pz, 'quartz_pillar'); this.setBlock(hx + 3, 3, pz, 'lantern');
+      // West: Military Officials (Muban)
+      this.setBlock(hx - 3, 2, pz, 'quartz_pillar'); this.setBlock(hx - 3, 3, pz, 'lantern');
+    }
+
+    // B. Double-Tiered Royal Stone Podium (Woldae: Y = 2 to 3)
+    // Lower Woldae (Footprint 23x17)
+    for (let x = hx - 10; x <= hx + 10; x++) {
+      for (let z = hz - 8; z <= hz + 8; z++) {
+        this.setBlock(x, 2, z, 'stone_bricks');
+        if (Math.abs(x - hx) === 10 || Math.abs(z - hz) === 8) this.setBlock(x, 3, z, 'smooth_stone');
+      }
+    }
+    // Upper Woldae (Footprint 19x13)
+    for (let x = hx - 8; x <= hx + 8; x++) {
+      for (let z = hz - 6; z <= hz + 6; z++) {
+        this.setBlock(x, 3, z, 'smooth_stone');
+        if (Math.abs(x - hx) === 8 || Math.abs(z - hz) === 6) this.setBlock(x, 4, z, 'stone_bricks');
+      }
+    }
+    // Haetae Mythical Guardian Beasts at corners
+    for (const [hdx, hdz] of [[-10, -8], [10, -8], [-10, 8], [10, 8]]) {
+      this.setBlock(hx + hdx, 4, hz + hdz, 'gold_block');
+      this.setBlock(hx + hdx, 5, hz + hdz, 'glowstone');
+    }
+    // Royal Dragon Ramp Steps
+    for (let step = 0; step <= 2; step++) {
+      this.setBlock(hx, 1 + step, hz + 9 - step, 'quartz_block');
+      this.setBlock(hx - 1, 1 + step, hz + 9 - step, 'smooth_stone');
+      this.setBlock(hx + 1, 1 + step, hz + 9 - step, 'smooth_stone');
+    }
+
+    // C. Geunjeongjeon Main Structure (Y = 4 to 17)
+    for (let x = hx - 7; x <= hx + 7; x += 3) {
+      for (let z = hz - 5; z <= hz + 5; z += 5) {
+        for (let y = 4; y <= 9; y++) this.setBlock(x, y, z, 'red_terracotta');
+      }
+    }
+    for (let x = hx - 7; x <= hx + 7; x++) {
+      for (let z = hz - 5; z <= hz + 5; z++) this.setBlock(x, 4, z, 'oak_planks');
+    }
+    // Lower Eave (Y = 10 to 11)
+    for (let x = hx - 9; x <= hx + 9; x++) {
+      for (let z = hz - 7; z <= hz + 7; z++) {
+        const d = Math.max(Math.abs(x - hx) - 6, Math.abs(z - hz) - 4);
+        if (d >= 1) this.setBlock(x, 10, z, 'purpur_block');
+      }
+    }
+    // Upper Clerestory & Eaves (Y = 11 to 16)
+    for (let y = 11; y <= 13; y++) {
+      for (let x = hx - 5; x <= hx + 5; x++) {
+        for (let z = hz - 3; z <= hz + 3; z++) {
+          if (Math.abs(x - hx) === 5 || Math.abs(z - hz) === 3) {
+            this.setBlock(x, y, z, (y === 12 && (x + z) % 2 === 0) ? 'cyber_glass' : 'red_terracotta');
           }
         }
       }
-      if (y % 4 === 0) {
-        this.setBlock(towerX, y, towerZ, 'sea_lantern');
+    }
+    for (let x = hx - 7; x <= hx + 7; x++) {
+      for (let z = hz - 5; z <= hz + 5; z++) {
+        const edgeD = Math.max(Math.abs(x - hx) - 4, Math.abs(z - hz) - 2);
+        this.setBlock(x, Math.max(14, 16 - Math.max(0, edgeD)), z, 'purpur_block');
       }
     }
+    this.setBlock(hx, 17, hz, 'gold_block');
+    this.setBlock(hx, 18, hz, 'beacon');
 
-    // Multi-Deck Cylindrical Observation Capsule at Y = baseTerrainY + 21 to baseTerrainY + 26
+    // D. Interior: Eojwa (King's Throne) & Ilwolobongdo Screen
+    this.setBlock(hx, 5, hz - 3, 'gold_block');
+    this.setBlock(hx, 6, hz - 3, 'gold_block'); // King's throne
+    this.setBlock(hx - 2, 6, hz - 4, 'quartz_block'); // White Moon
+    this.setBlock(hx + 2, 6, hz - 4, 'redstone_block'); // Red Sun
+    for (let sx = hx - 2; sx <= hx + 2; sx++) this.setBlock(sx, 5, hz - 4, 'lapis_block'); // Five Peaks
+    this.setBlock(hx, 9, hz - 3, 'glowstone'); // Twin dragon ceiling canopy
+
+    this.setBlock(hx, 4, hz + 8, 'stone_bricks', {
+      type: 'sign',
+      title: 'Geunjeongjeon Throne Hall · 근정전',
+      text: 'Main imperial hall of Gyeongbokgung Palace where Joseon Dynasty monarchs held state affairs, coronations, and morning assemblies.'
+    });
+
+    // =========================================================================
+    // 4. GYEONGHOERU ROYAL BANQUET LAKE PAVILION (경회루 · West of Palace)
+    // =========================================================================
+    const pondX = -74;
+    const pondZ = -115;
+    // Reflecting Lotus Lake (Water level Y = 0)
+    for (let x = pondX - 6; x <= pondX + 6; x++) {
+      for (let z = pondZ - 7; z <= pondZ + 7; z++) {
+        const isIsland = (Math.abs(x - pondX) <= 3 && Math.abs(z - pondZ) <= 3);
+        const isBridge = (x >= pondX + 3 && Math.abs(z - pondZ) <= 1);
+        if (isIsland) {
+          this.setBlock(x, 1, z, 'stone_bricks'); // Island foundation
+        } else if (isBridge) {
+          this.setBlock(x, 1, z, 'smooth_stone'); // Stone arched bridge to island
+        } else {
+          this.setBlock(x, 0, z, 'water');
+          // Floating lotus lilies
+          if ((x + z) % 5 === 0) this.setBlock(x, 1, z, 'emerald_block');
+        }
+      }
+    }
+    // Gyeonghoeru Two-Story Pavilion Structure (Y = 2 to 9)
+    // 1st Floor 12 Outer Granite Pillars (Stone columns)
+    for (let dx = -3; dx <= 3; dx += 2) {
+      for (let dz = -3; dz <= 3; dz += 2) {
+        this.setBlock(pondX + dx, 2, pondZ + dz, 'quartz_pillar');
+        this.setBlock(pondX + dx, 3, pondZ + dz, 'quartz_pillar');
+      }
+    }
+    // 2nd Floor Banquet Hall Deck (Y = 4)
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(pondX + dx, 4, pondZ + dz, 'oak_planks');
+      }
+    }
+    // 2nd Floor Pillars & Hanok Roof (Y = 5 to 8)
+    for (let dx = -3; dx <= 3; dx += 3) {
+      for (let dz = -3; dz <= 3; dz += 3) {
+        this.setBlock(pondX + dx, 5, pondZ + dz, 'red_terracotta');
+        this.setBlock(pondX + dx, 6, pondZ + dz, 'red_terracotta');
+      }
+    }
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) {
+        const d = Math.max(Math.abs(dx) - 2, Math.abs(dz) - 2);
+        this.setBlock(pondX + dx, (d >= 1) ? 8 : 7, pondZ + dz, 'purpur_block');
+      }
+    }
+    this.setBlock(pondX, 9, pondZ, 'gold_block');
+    this.setBlock(pondX, 5, pondZ, 'sea_lantern'); // Floating banquet lanterns
+
+    this.setBlock(pondX + 5, 2, pondZ + 2, 'stone_bricks', {
+      type: 'sign',
+      title: 'Gyeonghoeru Royal Banquet Pavilion · 경회루',
+      text: 'Iconic two-story royal pavilion floating on an artificial lotus lake, used for royal banquets and welcoming foreign envoys.'
+    });
+
+    // =========================================================================
+    // 5. GWANGHWAMUN SQUARE & MONUMENTAL STATUES (South of Palace)
+    // =========================================================================
+    // Monumental Seated Statue of King Sejong the Great (X = -65, Z = -84)
+    const kx = -65;
+    const kz = -84;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(kx + dx, 1, kz + dz, 'stone_bricks');
+        if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) this.setBlock(kx + dx, 2, kz + dz, 'quartz_block');
+      }
+    }
+    // Fountains
+    for (const sx of [kx - 3, kx + 3]) {
+      this.setBlock(sx, 1, kz, 'sea_lantern');
+      this.setBlock(sx, 2, kz, 'glass');
+      this.setBlock(sx, 3, kz, 'water');
+    }
+    // Seated King Sejong (Gold & Quartz)
+    this.setBlock(kx, 3, kz, 'gold_block');
+    this.setBlock(kx - 1, 3, kz, 'gold_block');
+    this.setBlock(kx + 1, 3, kz, 'gold_block');
+    this.setBlock(kx, 4, kz, 'gold_block');
+    this.setBlock(kx, 4, kz + 1, 'quartz_block'); // Hunminjeongeum book
+    this.setBlock(kx, 5, kz, 'gold_block');
+    this.setBlock(kx, 6, kz, 'iron_block'); // Crown
+    // Scientific Instruments
+    this.setBlock(kx - 2, 2, kz + 2, 'lapis_block'); this.setBlock(kx - 2, 3, kz + 2, 'gold_block'); // Celestial globe
+    this.setBlock(kx + 2, 2, kz + 2, 'iron_block'); this.setBlock(kx + 2, 3, kz + 2, 'cauldron'); // Rain gauge
+
+    this.setBlock(kx, 2, kz - 3, 'stone_bricks', {
+      type: 'sign',
+      title: 'King Sejong the Great · 세종대왕 동상',
+      text: 'Revered 4th King of Joseon who created the Korean Hangul alphabet in 1443 and patronized astronomy and science.'
+    });
+
+    // Standing Bronze Statue of Admiral Yi Sun-sin & Turtle Ship (X = -65, Z = -76)
+    const yisX = -65;
+    const yisZ = -76;
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) this.setBlock(yisX + dx, 1, yisZ + dz, 'smooth_stone');
+    }
+    // Pedestal & Standing Statue
+    this.setBlock(yisX, 2, yisZ, 'stone_bricks');
+    this.setBlock(yisX, 3, yisZ, 'stone_bricks');
+    this.setBlock(yisX, 4, yisZ, 'coal_block'); // Navy armor
+    this.setBlock(yisX, 5, yisZ, 'coal_block');
+    this.setBlock(yisX, 6, yisZ, 'iron_block'); // Helmet
+    this.setBlock(yisX + 1, 4, yisZ, 'iron_block'); // Sword
+
+    // Geobukseon (Turtle Ship) Replica in Pool (West: X = -69, Z = -76)
+    this.setBlock(yisX - 4, 1, yisZ, 'water');
+    this.setBlock(yisX - 4, 2, yisZ, 'iron_block'); // Spiked iron shell
+    this.setBlock(yisX - 5, 2, yisZ, 'gold_block'); // Dragon head prow
+    this.setBlock(yisX - 3, 2, yisZ, 'oak_planks'); // Stern
+
+    this.setBlock(yisX, 2, yisZ - 2, 'stone_bricks', {
+      type: 'sign',
+      title: 'Admiral Yi Sun-sin · 충무공 이순신',
+      text: 'Legendary Joseon naval commander renowned for commanding the iron-clad Turtle Ship (Geobukseon) and victory at Battle of Myeongnyang.'
+    });
+
+    // =========================================================================
+    // 6. CHEONGGYECHEON URBAN SUNKEN STREAM (청계천 · X in [-74, -48], Z = -90)
+    // =========================================================================
+    for (let x = -74; x <= -48; x++) {
+      // Sunken Waterway at Y = 0
+      this.setBlock(x, 0, -90, 'water');
+      this.setBlock(x, 0, -91, 'water');
+      this.setBlock(x, 0, -89, 'water');
+
+      // Stone Embankment Promenade at Y = 1
+      this.setBlock(x, 1, -92, 'smooth_stone');
+      this.setBlock(x, 1, -88, 'smooth_stone');
+
+      // Stepping Stones every 4 blocks across the water
+      if (x % 4 === 0) {
+        this.setBlock(x, 1, -90, 'smooth_stone');
+        this.setBlock(x, 2, -92, 'lantern'); // Riverbank evening lantern
+      }
+    }
+    this.setBlock(-60, 2, -88, 'smooth_stone', {
+      type: 'sign',
+      title: 'Cheonggyecheon Stream · 청계천',
+      text: 'Sunken modern eco-stream flowing through central Seoul with stone stepping stones and illuminated lantern festivals.'
+    });
+
+    // =========================================================================
+    // 7. GANGNAM & HONGDAE NEON K-POP DISTRICT & POCHA STREET
+    // =========================================================================
+    const kpopX = -54;
+    const kpopZ = -82;
+    // Cyberpunk K-Pop Agency Skyscraper (Height Y = 1 to 18)
+    for (let y = 1; y <= 18; y++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          const isOuter = (Math.abs(dx) === 2 || Math.abs(dz) === 2);
+          if (isOuter) {
+            // Neon Hangul Billboard Colors on Facade
+            if (y >= 4 && y <= 14 && dz === -2) {
+              const neon = (y + dx) % 3;
+              this.setBlock(kpopX + dx, y, kpopZ + dz, (neon === 0) ? 'sea_lantern' : (neon === 1) ? 'amethyst_block' : 'redstone_block');
+            } else {
+              this.setBlock(kpopX + dx, y, kpopZ + dz, (y % 4 === 0) ? 'stone_bricks' : 'cyber_glass');
+            }
+          }
+        }
+      }
+    }
+    this.setBlock(kpopX, 19, kpopZ, 'beacon');
+
+    // Outdoor K-Pop Performance Rhythm Stage (X = -55, Z = -88)
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(-55 + dx, 2, -88 + dz, ((dx + dz) % 2 === 0) ? 'sea_lantern' : 'amethyst_block');
+      }
+    }
+    this.setBlock(-58, 3, -90, 'coal_block'); this.setBlock(-58, 4, -90, 'sea_lantern'); // Speaker & spotlight
+    this.setBlock(-52, 3, -90, 'coal_block'); this.setBlock(-52, 4, -90, 'sea_lantern');
+    this.setBlock(-55, 3, -88, 'iron_block'); this.setBlock(-55, 4, -88, 'gold_block'); // Mic
+
+    // Pojangmacha Street Food Tents (Tteokbokki, Bulgogi BBQ, Odeng)
+    this.setBlock(-50, 2, -84, 'magma_block'); // Sizzling BBQ grill
+    this.setBlock(-50, 3, -84, 'cauldron'); // Tteokbokki cauldron
+    this.setBlock(-50, 4, -84, 'red_terracotta'); // Orange tarp roof
+    this.setBlock(-50, 2, -83, 'emerald_block'); // Soju bottle
+
+    this.setBlock(-55, 2, -91, 'amethyst_block', {
+      type: 'sign',
+      title: 'Hongdae & Gangnam K-Pop Hub · K-POP & 포장마차',
+      text: 'Pulsing dance busking stage, neon entertainment agency towers, and sizzling Korean BBQ pojangmacha food tents!'
+    });
+
+    // =========================================================================
+    // 8. BUKCHON HANOK VILLAGE (X = -76, Z = -92)
+    // =========================================================================
+    const bx = -76;
+    const bz = -92;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        this.setBlock(bx + dx, 1, bz + dz, 'stone_bricks');
+        this.setBlock(bx + dx, 2, bz + dz, 'oak_planks'); // Maru floor
+      }
+    }
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const isWall = (Math.abs(dx) === 3 || Math.abs(dz) === 2);
+        if (isWall && !(dx === 0 && dz === 2)) {
+          this.setBlock(bx + dx, 3, bz + dz, 'quartz_block');
+          this.setBlock(bx + dx, 4, bz + dz, 'glass');
+        }
+      }
+    }
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        const edge = Math.max(Math.abs(dx) - 2, Math.abs(dz) - 1);
+        this.setBlock(bx + dx, (edge >= 1) ? 6 : 5, bz + dz, 'purpur_block');
+      }
+    }
+    // Ondol Chimney & Onggi Jars
+    this.setBlock(bx - 3, 3, bz - 3, 'stone_bricks'); this.setBlock(bx - 3, 4, bz - 3, 'coal_block');
+    this.setBlock(bx + 4, 2, bz, 'coal_block'); this.setBlock(bx + 4, 2, bz + 1, 'terracotta_adobe');
+
+    this.setBlock(bx, 2, bz + 3, 'oak_planks', {
+      type: 'sign',
+      title: 'Bukchon Hanok Village · 북촌 한옥마을',
+      text: 'Traditional Joseon timber residence with curved Giwa tile roofs, Maru wooden verandas, paper sliding doors, and Onggi kimchi jars.'
+    });
+
+    // =========================================================================
+    // 9. N SEOUL TOWER & LOCKS OF LOVE (Mount Namsan: X = -52, Z = -115)
+    // =========================================================================
+    const towerX = -52;
+    const towerZ = -115;
+    const baseTerrainY = this.getTerrainHeight(towerX, towerZ);
+
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) this.setBlock(towerX + dx, baseTerrainY, towerZ + dz, 'quartz_block');
+    }
+    // Shaft (Y = baseTerrainY + 1 to baseTerrainY + 20)
+    for (let y = baseTerrainY + 1; y <= baseTerrainY + 20; y++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (Math.abs(dx) + Math.abs(dz) <= 1) this.setBlock(towerX + dx, y, towerZ + dz, 'quartz_pillar');
+        }
+      }
+      if (y % 4 === 0) this.setBlock(towerX, y, towerZ, 'sea_lantern');
+    }
+    // Observation Deck
     const deckBaseY = baseTerrainY + 21;
     for (let y = deckBaseY; y <= deckBaseY + 5; y++) {
       for (let dx = -3; dx <= 3; dx++) {
         for (let dz = -3; dz <= 3; dz++) {
           const dist = Math.hypot(dx, dz);
           if (dist <= 3.2 && dist >= 2.0) {
-            // 360-degree glass observation deck
             this.setBlock(towerX + dx, y, towerZ + dz, (y === deckBaseY || y === deckBaseY + 5) ? 'quartz_block' : 'cyber_glass');
-          } else if (dist < 2.0 && (y === deckBaseY || y === deckBaseY + 5)) {
-            this.setBlock(towerX + dx, y, towerZ + dz, 'smooth_stone');
           }
         }
       }
     }
-    this.setBlock(towerX, deckBaseY + 2, towerZ, 'glowstone');
-
-    // Iconic Colorful Transmission Antenna Spire (Y = deckBaseY + 6 to deckBaseY + 15)
+    // Antenna Spire
     for (let y = deckBaseY + 6; y <= deckBaseY + 13; y++) {
-      const antennaColor = (y % 3 === 0) ? 'emerald_block' : (y % 3 === 1) ? 'amethyst_block' : 'lapis_block';
-      this.setBlock(towerX, y, towerZ, antennaColor);
+      this.setBlock(towerX, y, towerZ, (y % 2 === 0) ? 'emerald_block' : 'lapis_block');
     }
     this.setBlock(towerX, deckBaseY + 14, towerZ, 'beacon');
-    this.setBlock(towerX, deckBaseY + 15, towerZ, 'glowstone');
 
-    this.setBlock(towerX, baseTerrainY + 1, towerZ + 4, 'quartz_block', {
-      type: 'sign',
-      title: 'N Seoul Tower · N서울타워',
-      text: 'Iconic panoramic communications spire on Mount Namsan, illuminating Seoul\'s evening skyline.'
-    });
-
-    // 3. Hongdae K-Pop Street & Night Market Food Cart at (-55, -92)
-    const kpopX = -55;
-    const kpopZ = -92;
-    // Neon street pavement
-    for (let x = kpopX - 4; x <= kpopX + 4; x++) {
-      for (let z = kpopZ - 2; z <= kpopZ + 2; z++) {
-        this.setBlock(x, 1, z, 'asphalt_road');
-      }
-    }
-    // K-Pop Record Store Facade with Neon Hangul sign
-    for (let y = 1; y <= 6; y++) {
-      for (let x = kpopX - 3; x <= kpopX + 3; x++) {
-        if (y === 1) {
-          this.setBlock(x, y, kpopZ - 3, 'stone_bricks');
-        } else if (y >= 2 && y <= 4) {
-          this.setBlock(x, y, kpopZ - 3, (Math.abs(x - kpopX) <= 1) ? 'cyber_glass' : 'amethyst_block');
-        } else {
-          // Neon billboard sign
-          this.setBlock(x, y, kpopZ - 3, (x % 2 === 0) ? 'redstone_block' : 'sea_lantern');
+    // Locks of Love Promenade
+    for (let dx = -5; dx <= 5; dx++) {
+      for (let dz = -5; dz <= 5; dz++) {
+        if (Math.abs(dx) === 5 || Math.abs(dz) === 5) {
+          const lockColor = ((dx + dz + 10) % 4 === 0) ? 'redstone_block' : ((dx + dz + 10) % 4 === 1) ? 'lapis_block' : ((dx + dz + 10) % 4 === 2) ? 'emerald_block' : 'gold_block';
+          this.setBlock(towerX + dx, baseTerrainY + 1, towerZ + dz, 'iron_block');
+          this.setBlock(towerX + dx, baseTerrainY + 2, towerZ + dz, lockColor);
         }
       }
     }
-
-    // Pojangmacha Street Food Cart (Tteokbokki spicy rice cakes & Bungeo-ppang)
-    const cartX = kpopX + 2;
-    const cartZ = kpopZ + 1;
-    this.setBlock(cartX - 1, 1, cartZ, 'coal_block');
-    this.setBlock(cartX + 1, 1, cartZ, 'coal_block');
-    this.setBlock(cartX, 2, cartZ, 'terracotta_adobe');
-    this.setBlock(cartX - 1, 2, cartZ, 'redstone_block'); // Tteokbokki tray
-    this.setBlock(cartX + 1, 2, cartZ, 'gold_block'); // Bungeo-ppang pastries
-    this.setBlock(cartX, 3, cartZ, 'cauldron'); // Steaming broth
-    // Orange tarp tent roof
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dz = -1; dz <= 1; dz++) {
-        this.setBlock(cartX + dx, 4, cartZ + dz, 'red_terracotta');
-      }
-    }
-    this.setBlock(cartX, 3, cartZ + 1, 'lantern');
-
-    this.setBlock(cartX - 1, 2, cartZ + 1, 'glowstone', {
+    this.setBlock(towerX, baseTerrainY + 1, towerZ - 4, 'quartz_block', {
       type: 'sign',
-      title: 'Hongdae Street Food · 홍대 포장마차',
-      text: 'Hot simmering Tteokbokki (떡볶이), Odeng fish cakes, and warm bungeo-ppang pastries!'
+      title: 'N Seoul Tower & Locks of Love · N서울타워',
+      text: 'Panoramic Mount Namsan observation tower with rainbow padlock terrace overlooking Seoul.'
     });
   }
 
@@ -3938,10 +5066,16 @@ export class WorldBuilder {
 
   // A. Dubai Coastal Waterfront Promenade linking Burj Khalifa to Palm Jumeirah
   private buildDubaiWaterfrontPromenade() {
-    // Seawall & Promenade along X = 174..176, Z in [20, 64]
-    for (let z = 20; z <= 64; z++) {
-      for (let x = 174; x <= 176; x++) {
-        this.setBlock(x, 1, z, (x === 176) ? 'stone_bricks' : 'smooth_stone');
+    // Seawall & Promenade along X = 172..176, Z in [20, 146] linking Burj Khalifa, Palm, Burj Al Arab, and Bluewaters
+    for (let z = 20; z <= 146; z++) {
+      for (let x = 172; x <= 176; x++) {
+        if (x === 176) {
+          this.setBlock(x, 1, z, 'stone_bricks');
+        } else if (x === 175) {
+          this.setBlock(x, 1, z, 'asphalt_road');
+        } else {
+          this.setBlock(x, 1, z, 'smooth_stone');
+        }
       }
       if (z % 6 === 0) {
         this.setBlock(176, 2, z, 'iron_block');
@@ -3968,6 +5102,42 @@ export class WorldBuilder {
       type: 'sign',
       title: 'Palm Jumeirah Gateway · مدخل نخلة جميرا 🌴',
       text: 'Welcome to the Eighth Wonder of the World! A monumental, large-scale archipelago spanning the Arabian Gulf with 16 massive curved fronds, The Palm Tower, Atlantis, Burj Al Arab, and Bluewaters.'
+    });
+
+    // Burj Al Arab Causeway Entrance Gateway at (176, 96)
+    for (let y = 2; y <= 6; y++) {
+      this.setBlock(176, y, 94, 'quartz_pillar');
+      this.setBlock(176, y, 98, 'quartz_pillar');
+    }
+    this.setBlock(176, 7, 94, 'gold_block');
+    this.setBlock(176, 7, 98, 'gold_block');
+    this.setBlock(176, 8, 94, 'sea_lantern');
+    this.setBlock(176, 8, 98, 'sea_lantern');
+    for (let z = 94; z <= 98; z++) {
+      this.setBlock(176, 7, z, (z === 96) ? 'sea_lantern' : 'gold_block');
+    }
+    this.setBlock(176, 2, 95, 'gold_block', {
+      type: 'sign',
+      title: 'Burj Al Arab Causeway Entrance ⛵ · مدخل جسر برج العرب',
+      text: 'Private island causeway bridge spanning the Arabian Gulf to the 7-star sail hotel. Features sky helipad, infinity beach terrace, and panoramic Gulf views.'
+    });
+
+    // Bluewaters Footbridge Entrance Gateway at (176, 136)
+    for (let y = 2; y <= 5; y++) {
+      this.setBlock(176, y, 134, 'quartz_pillar');
+      this.setBlock(176, y, 138, 'quartz_pillar');
+    }
+    this.setBlock(176, 6, 134, 'gold_block');
+    this.setBlock(176, 6, 138, 'gold_block');
+    this.setBlock(176, 7, 134, 'lantern');
+    this.setBlock(176, 7, 138, 'lantern');
+    for (let z = 134; z <= 138; z++) {
+      this.setBlock(176, 6, z, 'oak_planks');
+    }
+    this.setBlock(176, 2, 135, 'smooth_stone', {
+      type: 'sign',
+      title: 'Bluewaters Island & Ain Dubai Boardwalk 🎡 · جسر جزيرة بلوواترز',
+      text: 'Pedestrian marine footbridge spanning across the Arabian Gulf to Ain Dubai (the world\'s largest observation wheel) and Bluewaters lifestyle boardwalk.'
     });
   }
 
@@ -4865,17 +6035,238 @@ export class WorldBuilder {
 
 
   // 5. China & East Asian Realm (North-West: Great Wall, Temple Pavilion, 5-Tier Pagoda, Bamboo)
+  // China, Forbidden City & Natural Wonders Realm (Meridian Gate, Golden Water River, Hall of Supreme Harmony, Great Wall, Guilin Karsts, Wolong Pandas, Terracotta Army, 5-Tier Pagoda)
   private buildChinaRealm() {
     const px = -110;
     const pz = -110;
 
-    // Great Wall of China dynamically cresting the mountain ridge
-    for (let x = -150; x <= -80; x++) {
+    // =========================================================================
+    // 1. THE FORBIDDEN CITY: MERIDIAN GATE (Wumen · 午门 / U-Shaped Grand Fortress)
+    // =========================================================================
+    const wmX = -92;
+    const wmZ = -86;
+    // Central Main Gatehouse Fortress (Y = 1 to 6, X in [wmX - 8, wmX + 8], Z in [wmZ - 2, wmZ + 2])
+    for (let x = wmX - 8; x <= wmX + 8; x++) {
+      for (let z = wmZ - 2; z <= wmZ + 2; z++) {
+        for (let y = 1; y <= 6; y++) {
+          this.setBlock(x, y, z, 'red_terracotta');
+        }
+      }
+    }
+    // Projecting Left & Right Wings (Phoenix Wings: Z = wmZ to wmZ + 7, forming U-shape)
+    for (const wx of [wmX - 8, wmX + 8]) {
+      for (let z = wmZ; z <= wmZ + 7; z++) {
+        for (let dx = -2; dx <= 2; dx++) {
+          for (let y = 1; y <= 6; y++) {
+            this.setBlock(wx + dx, y, z, 'red_terracotta');
+          }
+        }
+      }
+    }
+    // 5 Arched Passageways through the Meridian Gate Base
+    for (const ax of [wmX - 5, wmX - 2.5, wmX, wmX + 2.5, wmX + 5]) {
+      const archX = Math.round(ax);
+      for (let z = wmZ - 2; z <= wmZ + 2; z++) {
+        for (let y = 1; y <= 4; y++) {
+          this.setBlock(archX, y, z, (y === 1) ? 'smooth_stone' : 'air');
+        }
+      }
+    }
+
+    // Five Phoenix Pavilion Towers (Wufenglou) atop the Meridian Gate Ramparts (Y = 7 to 11)
+    // Central Imperial Pavilion
+    for (let x = wmX - 6; x <= wmX + 6; x++) {
+      for (let z = wmZ - 2; z <= wmZ + 2; z++) {
+        this.setBlock(x, 7, z, 'oak_planks');
+        if (Math.abs(x - wmX) === 6 || Math.abs(z - wmZ) === 2) {
+          this.setBlock(x, 8, z, 'red_terracotta');
+          this.setBlock(x, 9, z, 'red_terracotta');
+        }
+        this.setBlock(x, 10, z, 'gold_block'); // Imperial golden roof
+      }
+    }
+    this.setBlock(wmX, 11, wmZ, 'gold_block');
+    this.setBlock(wmX, 12, wmZ, 'beacon');
+
+    // Flanking Wing Towers atop the left & right wings
+    for (const wx of [wmX - 8, wmX + 8]) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dz = -2; dz <= 2; dz++) {
+          this.setBlock(wx + dx, 7, wmZ + 6 + dz, 'oak_planks');
+          this.setBlock(wx + dx, 8, wmZ + 6 + dz, 'red_terracotta');
+          this.setBlock(wx + dx, 9, wmZ + 6 + dz, 'gold_block');
+        }
+      }
+      this.setBlock(wx, 10, wmZ + 6, 'beacon');
+    }
+
+    this.setBlock(wmX, 2, wmZ + 9, 'stone_bricks', {
+      type: 'sign',
+      title: 'The Meridian Gate · 午门 (Wumen)',
+      text: 'Colossal U-shaped southern entrance fortress to the Forbidden City with 5 arched gateways and the Five Phoenix Pavilion Towers.'
+    });
+
+    // =========================================================================
+    // 2. INNER GOLDEN WATER RIVER & 5 WHITE MARBLE BRIDGES (Neijinshui He)
+    // =========================================================================
+    // Curving River Canal (X in [-108, -76], Z in [-96, -92], Water at Y = 0)
+    for (let x = -108; x <= -76; x++) {
+      for (let z = -96; z <= -92; z++) {
+        this.setBlock(x, 0, z, 'water');
+      }
+      // White Marble Embankments
+      this.setBlock(x, 1, -97, 'quartz_block');
+      this.setBlock(x, 1, -91, 'quartz_block');
+    }
+    // 5 Arched White Marble Imperial Bridges (Central Bridge for the Emperor)
+    for (const bx of [wmX - 6, wmX - 3, wmX, wmX + 3, wmX + 6]) {
+      for (let z = -96; z <= -92; z++) {
+        this.setBlock(bx, 1, z, 'quartz_block'); // Bridge deck
+        this.setBlock(bx - 1, 2, z, 'quartz_pillar'); // Carved balustrade
+        this.setBlock(bx + 1, 2, z, 'quartz_pillar');
+      }
+    }
+
+    // =========================================================================
+    // 3. HALL OF SUPREME HARMONY (Taihedian · 太和殿 / Crown of the Forbidden City)
+    // =========================================================================
+    const fcX = -92;
+    const fcZ = -114;
+
+    // A. Three-Tiered White Marble Terrace (San Tai: Y = 1 to 4)
+    // Tier 1 Base Platform (25x19)
+    for (let x = fcX - 12; x <= fcX + 12; x++) {
+      for (let z = fcZ - 9; z <= fcZ + 9; z++) {
+        this.setBlock(x, 1, z, 'quartz_block');
+      }
+    }
+    // Tier 2 Middle Platform (21x15)
+    for (let x = fcX - 10; x <= fcX + 10; x++) {
+      for (let z = fcZ - 7; z <= fcZ + 7; z++) {
+        this.setBlock(x, 2, z, 'quartz_block');
+      }
+    }
+    // Tier 3 Upper Platform (17x13)
+    for (let x = fcX - 8; x <= fcX + 8; x++) {
+      for (let z = fcZ - 6; z <= fcZ + 6; z++) {
+        this.setBlock(x, 3, z, 'smooth_stone');
+        if (Math.abs(x - fcX) === 8 || Math.abs(z - fcZ) === 6) {
+          this.setBlock(x, 4, z, 'quartz_pillar'); // Balustrade with dragon heads
+        }
+      }
+    }
+
+    // Danbi (Imperial Dragon Ramp Stone on Southern Staircase)
+    for (let step = 0; step <= 2; step++) {
+      const sz = fcZ + 9 - step;
+      this.setBlock(fcX, 1 + step, sz, 'gold_block'); // Flying dragon carved marble
+      this.setBlock(fcX - 1, 1 + step, sz, 'quartz_block');
+      this.setBlock(fcX + 1, 1 + step, sz, 'quartz_block');
+    }
+
+    // Bronze Incense Burners & Longevity Statues
+    this.setBlock(fcX - 7, 4, fcZ + 5, 'cauldron'); this.setBlock(fcX - 7, 5, fcZ + 5, 'lantern');
+    this.setBlock(fcX + 7, 4, fcZ + 5, 'cauldron'); this.setBlock(fcX + 7, 5, fcZ + 5, 'lantern');
+    this.setBlock(fcX - 5, 4, fcZ + 5, 'gold_block'); // Crane
+    this.setBlock(fcX + 5, 4, fcZ + 5, 'gold_block'); // Tortoise
+
+    // B. Hall Structure (Y = 4 to 18)
+    for (let x = fcX - 7; x <= fcX + 7; x += 3) {
+      for (let z = fcZ - 5; z <= fcZ + 5; z += 5) {
+        for (let y = 4; y <= 10; y++) this.setBlock(x, y, z, 'red_terracotta');
+      }
+    }
+    for (let x = fcX - 7; x <= fcX + 7; x++) {
+      for (let z = fcZ - 5; z <= fcZ + 5; z++) this.setBlock(x, 4, z, 'smooth_stone');
+    }
+
+    // Lower Golden Eave (Y = 10 to 11)
+    for (let x = fcX - 9; x <= fcX + 9; x++) {
+      for (let z = fcZ - 7; z <= fcZ + 7; z++) {
+        const edgeD = Math.max(Math.abs(x - fcX) - 6, Math.abs(z - fcZ) - 4);
+        if (edgeD >= 1) {
+          this.setBlock(x, 10, z, 'gold_block');
+          if (edgeD === 2) this.setBlock(x, 11, z, 'red_terracotta');
+        }
+      }
+    }
+
+    // Upper Clerestory & Imperial Wudian Hipped Roof (Y = 12 to 18)
+    for (let y = 12; y <= 14; y++) {
+      for (let x = fcX - 5; x <= fcX + 5; x++) {
+        for (let z = fcZ - 3; z <= fcZ + 3; z++) {
+          if (Math.abs(x - fcX) === 5 || Math.abs(z - fcZ) === 3) {
+            this.setBlock(x, y, z, (y === 13 && (x + z) % 2 === 0) ? 'cyber_glass' : 'red_terracotta');
+          }
+        }
+      }
+    }
+    for (let x = fcX - 7; x <= fcX + 7; x++) {
+      for (let z = fcZ - 5; z <= fcZ + 5; z++) {
+        const d = Math.max(Math.abs(x - fcX) - 3, Math.abs(z - fcZ) - 1);
+        this.setBlock(x, Math.max(15, 18 - Math.max(0, d)), z, 'gold_block');
+      }
+    }
+    // Chiwen Dragon Horn Ends & Ridge
+    for (let x = fcX - 4; x <= fcX + 4; x++) this.setBlock(x, 19, fcZ, 'gold_block');
+    this.setBlock(fcX - 4, 20, fcZ, 'gold_block');
+    this.setBlock(fcX + 4, 20, fcZ, 'gold_block');
+    this.setBlock(fcX, 20, fcZ, 'beacon');
+    this.setBlock(fcX, 21, fcZ, 'glowstone');
+
+    // C. Interior: Golden Dragon Throne (Longyi · 龙椅)
+    this.setBlock(fcX, 5, fcZ - 2, 'gold_block');
+    this.setBlock(fcX, 6, fcZ - 2, 'gold_block'); // Throne
+    this.setBlock(fcX, 7, fcZ - 2, 'gold_block');
+    for (let sx = fcX - 2; sx <= fcX + 2; sx++) {
+      this.setBlock(sx, 6, fcZ - 3, 'gold_block'); // Dragon screen
+      this.setBlock(sx, 7, fcZ - 3, 'gold_block');
+    }
+    // Sunken Coiled Dragon Ceiling Caisson (Zaojing)
+    this.setBlock(fcX, 14, fcZ - 2, 'beacon');
+    this.setBlock(fcX, 13, fcZ - 2, 'glowstone');
+
+    this.setBlock(fcX, 4, fcZ + 7, 'quartz_block', {
+      type: 'sign',
+      title: 'Hall of Supreme Harmony · 太和殿',
+      text: 'The grandest throne hall of the Forbidden City where Ming & Qing emperors held coronations before the Golden Dragon Throne.'
+    });
+
+    // =========================================================================
+    // 4. GUILIN KARST LIMESTONE PILLAR PEAKS (桂林山水甲天下 · Karst 1 & 2)
+    // =========================================================================
+    // Karst Pillar 1: [-105, -135] (Height Y = 1 to 22)
+    const k1x = -105;
+    const k1z = -135;
+    // Waterfall Cascading down the Karst cliff
+    for (let y = 1; y <= 16; y++) {
+      this.setBlock(k1x - 3, y, k1z, 'water');
+      this.setBlock(k1x - 3, y, k1z - 1, 'mossy_stone_bricks');
+      this.setBlock(k1x - 3, y, k1z + 1, 'mossy_stone_bricks');
+    }
+    this.setBlock(k1x - 4, 1, k1z, 'water'); // Splash pool
+    // Clinging Mountain Pine Trees on Karst Ledge
+    this.setBlock(k1x, 21, k1z, 'spruce_log');
+    this.setBlock(k1x, 22, k1z, 'spruce_leaves');
+    this.setBlock(k1x - 1, 22, k1z, 'spruce_leaves');
+    this.setBlock(k1x + 1, 22, k1z, 'spruce_leaves');
+
+    this.setBlock(k1x, 2, k1z + 7, 'stone_bricks', {
+      type: 'sign',
+      title: 'Guilin Karst Mountains · 桂林山水',
+      text: 'Towering vertical limestone karst pillars, cascading waterfalls, and misty peaks celebrated as the most scenic landscape under heaven.'
+    });
+
+    // =========================================================================
+    // 5. THE MIGHTY GREAT WALL OF CHINA & MOUNTAIN WATCHTOWERS
+    // =========================================================================
+    // Stone Ramparts winding across the mountain peaks (X in [-160, -70])
+    for (let x = -160; x <= -70; x++) {
       const ridgeZ = -140 + Math.sin((x + 150) * 0.075) * 12 + Math.cos(x * 0.12) * 3;
       const wallZ = Math.round(ridgeZ);
       const groundY = this.getTerrainHeight(x, wallZ);
 
-      // Deep foundation wall down to ensure no gaps on slopes
+      // Solid foundation wall down to ground
       for (let dz = -1; dz <= 1; dz++) {
         const localGround = this.getTerrainHeight(x, wallZ + dz);
         const bottomY = Math.max(-1, Math.min(groundY - 2, localGround));
@@ -4883,69 +6274,55 @@ export class WorldBuilder {
           this.setBlock(x, y, wallZ + dz, (y % 4 === 0) ? 'mossy_stone_bricks' : 'stone_bricks');
         }
       }
-      // Parapet battlements & walkway on top
+      // Walkway & Crenellated Battlements
       const walkY = groundY + 5;
       this.setBlock(x, walkY, wallZ, 'smooth_stone'); // Walkway
-      this.setBlock(x, walkY + 1, wallZ - 1, (x % 2 === 0) ? 'stone_bricks' : 'red_terracotta');
-      this.setBlock(x, walkY + 1, wallZ + 1, (x % 2 === 0) ? 'stone_bricks' : 'red_terracotta');
-      if (x % 7 === 0) {
-        this.setBlock(x, walkY + 2, wallZ, 'glowstone');
-      }
+      this.setBlock(x, walkY + 1, wallZ - 1, (x % 2 === 0) ? 'stone_bricks' : 'air'); // North crenellation
+      this.setBlock(x, walkY + 1, wallZ + 1, (x % 2 === 0) ? 'stone_bricks' : 'air'); // South crenellation
+      if (x % 6 === 0) this.setBlock(x, walkY + 2, wallZ, 'glowstone');
     }
 
-    // Great Wall Watchtowers at scenic mountain peaks
-    for (const wx of [-140, -115, -90]) {
+    // Fortified Multi-Story Mountain Watchtowers with Signal Beacon Fires
+    for (const wx of [-145, -118, -90]) {
       const ridgeZ = -140 + Math.sin((wx + 150) * 0.075) * 12 + Math.cos(wx * 0.12) * 3;
       const wz = Math.round(ridgeZ);
       const groundY = this.getTerrainHeight(wx, wz);
       const towerBase = groundY;
-      const towerTop = towerBase + 8;
+      const towerTop = towerBase + 9;
 
       for (let x = wx - 3; x <= wx + 3; x++) {
         for (let z = wz - 3; z <= wz + 3; z++) {
-          const localGround = this.getTerrainHeight(x, z);
-          const colBottom = Math.max(-1, Math.min(towerBase - 2, localGround));
+          const colBottom = Math.max(-1, Math.min(towerBase - 2, this.getTerrainHeight(x, z)));
           for (let y = colBottom; y <= towerTop; y++) {
-            const isPerimeter = (x === wx - 3 || x === wx + 3 || z === wz - 3 || z === wz + 3);
+            const isPerimeter = (Math.abs(x - wx) === 3 || Math.abs(z - wz) === 3);
             if (isPerimeter || y === towerBase || y === towerTop) {
               this.setBlock(x, y, z, 'stone_bricks');
             }
           }
         }
       }
-      // Curved Chinese tiled roof on tower
+      // Roof & Signal Beacon Fire Brazier
       for (let x = wx - 4; x <= wx + 4; x++) {
         for (let z = wz - 4; z <= wz + 4; z++) {
           this.setBlock(x, towerTop + 1, z, 'red_terracotta');
         }
       }
-      this.setBlock(wx, towerTop + 2, wz, 'gold_block');
-      this.setBlock(wx, towerTop + 3, wz, 'glowstone');
+      // Burning Signal Beacon
+      this.setBlock(wx, towerTop + 2, wz, 'magma_block'); // Embers
+      this.setBlock(wx, towerTop + 3, wz, 'beacon'); // Night fire beam
+      this.setBlock(wx, towerTop + 4, wz, 'glowstone');
     }
 
-    // 5-Tier Imperial Dragon Pagoda at (px, pz) = (-110, -110)
-    // 1. Raised Carved Dark Stone Plinth Base at Y = 1 to 2 (Footprint 19x19)
+    // =========================================================================
+    // 6. 5-TIER IMPERIAL DRAGON PAGODA & TEMPLE OF HEAVEN
+    // =========================================================================
+    // Pagoda Plinth Base at (-110, -110)
     for (let x = px - 9; x <= px + 9; x++) {
       for (let z = pz - 9; z <= pz + 9; z++) {
         this.setBlock(x, 1, z, 'stone_bricks');
-        if (Math.abs(x - px) <= 8 && Math.abs(z - pz) <= 8) {
-          this.setBlock(x, 2, z, 'stone_bricks');
-        }
+        if (Math.abs(x - px) <= 8 && Math.abs(z - pz) <= 8) this.setBlock(x, 2, z, 'stone_bricks');
       }
     }
-    // Plinth corner lanterns and four monumental entrance stairways
-    for (const [dx, dz] of [[-9, -9], [9, -9], [-9, 9], [9, 9]]) {
-      this.setBlock(px + dx, 2, pz + dz, 'red_terracotta');
-      this.setBlock(px + dx, 3, pz + dz, 'glowstone');
-    }
-    for (const dir of [{ x: 0, z: 9 }, { x: 0, z: -9 }, { x: 9, z: 0 }, { x: -9, z: 0 }]) {
-      for (let offset = -2; offset <= 2; offset++) {
-        const sx = dir.x !== 0 ? px + dir.x : px + offset;
-        const sz = dir.z !== 0 ? pz + dir.z : pz + offset;
-        this.setBlock(sx, 1, sz, 'smooth_stone');
-      }
-    }
-
     const tiers = [
       { yStart: 3, yEnd: 8, halfW: 7 },
       { yStart: 9, yEnd: 14, halfW: 6 },
@@ -4953,54 +6330,28 @@ export class WorldBuilder {
       { yStart: 20, yEnd: 24, halfW: 4 },
       { yStart: 25, yEnd: 28, halfW: 3 }
     ];
-
     for (const t of tiers) {
       for (let x = px - t.halfW; x <= px + t.halfW; x++) {
         for (let z = pz - t.halfW; z <= pz + t.halfW; z++) {
-          const isPerimeter = (x === px - t.halfW || x === px + t.halfW || z === pz - t.halfW || z === pz + t.halfW);
-          const isCorner = (x === px - t.halfW || x === px + t.halfW) && (z === pz - t.halfW || z === pz + t.halfW);
-
-          // Solid floor deck for each tier level
+          const isEdge = (Math.abs(x - px) === t.halfW || Math.abs(z - pz) === t.halfW);
           this.setBlock(x, t.yStart, z, 'oak_planks');
-
           for (let y = t.yStart; y <= t.yEnd; y++) {
-            if (isCorner) {
-              this.setBlock(x, y, z, 'red_terracotta');
-            } else if (isPerimeter) {
-              this.setBlock(x, y, z, (y === t.yStart || y === t.yEnd) ? 'red_terracotta' : 'glass');
-            }
+            if (isEdge) this.setBlock(x, y, z, (y === t.yStart || y === t.yEnd) ? 'red_terracotta' : 'glass');
           }
         }
       }
-      // Eave Roof
-      const roofY = t.yEnd + 1;
+      // Eaves
       const rW = t.halfW + 1;
       for (let x = px - rW; x <= px + rW; x++) {
-        for (let z = pz - rW; z <= pz + rW; z++) {
-          this.setBlock(x, roofY, z, 'stone_bricks');
-        }
-      }
-      for (const [dx, dz] of [[-rW, -rW], [rW, -rW], [-rW, rW], [rW, rW]]) {
-        this.setBlock(px + dx, roofY + 1, pz + dz, 'stone_bricks');
-        this.setBlock(px + dx, roofY - 1, pz + dz, 'glowstone');
+        for (let z = pz - rW; z <= pz + rW; z++) this.setBlock(x, t.yEnd + 1, z, 'stone_bricks');
       }
     }
-    // Pagoda Gold Spire
-    for (let y = 29; y <= 35; y++) {
-      this.setBlock(px, y, pz, (y % 2 === 0) ? 'gold_block' : 'iron_block');
-    }
+    for (let y = 29; y <= 35; y++) this.setBlock(px, y, pz, (y % 2 === 0) ? 'gold_block' : 'iron_block');
     this.setBlock(px, 36, pz, 'glowstone');
-    this.setBlock(px, 3, pz, 'crafting_table', {
-      type: 'sign',
-      title: 'Imperial Dragon Pagoda',
-      text: 'Five-tier sacred pagoda preserving Lakshya’s international ventures and cultural studies.'
-    });
 
-    // Temple of Heaven Imperial Pavilion & Languages Embassy at (-122, -88)
-    // 3-Tiered Circular Imperial Shrine with Vermilion Pillars & Golden Finial
+    // Temple of Heaven Circular Shrine at (-122, -88)
     const thX = -122;
     const thZ = -88;
-    // Base Circular Plinth at Y = 1 to 2
     for (let dx = -8; dx <= 8; dx++) {
       for (let dz = -8; dz <= 8; dz++) {
         const d = Math.hypot(dx, dz);
@@ -5010,150 +6361,159 @@ export class WorldBuilder {
         }
       }
     }
-    // Vermilion Pillars around Tier 1
+    // Vermilion Pillars & Lapis Blue Eaves
     for (let deg = 0; deg < 360; deg += 30) {
       const rad = (deg * Math.PI) / 180;
       const cx = Math.round(thX + Math.cos(rad) * 6);
       const cz = Math.round(thZ + Math.sin(rad) * 6);
-      for (let y = 3; y <= 7; y++) {
-        this.setBlock(cx, y, cz, 'red_terracotta');
-      }
+      for (let y = 3; y <= 7; y++) this.setBlock(cx, y, cz, 'red_terracotta');
     }
-    // Lower Circular Blue Eave (Y = 8)
     for (let dx = -7; dx <= 7; dx++) {
       for (let dz = -7; dz <= 7; dz++) {
         if (Math.hypot(dx, dz) <= 7.2) this.setBlock(thX + dx, 8, thZ + dz, 'lapis_block');
-      }
-    }
-    // Middle Tier Pillars (Y = 9 to 12)
-    for (let deg = 0; deg < 360; deg += 45) {
-      const rad = (deg * Math.PI) / 180;
-      const cx = Math.round(thX + Math.cos(rad) * 4);
-      const cz = Math.round(thZ + Math.sin(rad) * 4);
-      for (let y = 9; y <= 12; y++) {
-        this.setBlock(cx, y, cz, 'red_terracotta');
-      }
-    }
-    // Middle Blue Eave (Y = 13)
-    for (let dx = -5; dx <= 5; dx++) {
-      for (let dz = -5; dz <= 5; dz++) {
-        if (Math.hypot(dx, dz) <= 5.2) this.setBlock(thX + dx, 13, thZ + dz, 'lapis_block');
-      }
-    }
-    // Top Conical Golden Cupola (Y = 14 to 17)
-    for (let dx = -3; dx <= 3; dx++) {
-      for (let dz = -3; dz <= 3; dz++) {
-        if (Math.hypot(dx, dz) <= 3.2) this.setBlock(thX + dx, 14, thZ + dz, 'lapis_block');
-        if (Math.hypot(dx, dz) <= 2.2) this.setBlock(thX + dx, 15, thZ + dz, 'gold_block');
-        if (Math.hypot(dx, dz) <= 1.2) this.setBlock(thX + dx, 16, thZ + dz, 'gold_block');
+        if (Math.hypot(dx, dz) <= 4.2) this.setBlock(thX + dx, 13, thZ + dz, 'lapis_block');
+        if (Math.hypot(dx, dz) <= 2.2) this.setBlock(thX + dx, 16, thZ + dz, 'gold_block');
       }
     }
     this.setBlock(thX, 17, thZ, 'gold_block');
     this.setBlock(thX, 18, thZ, 'glowstone');
     this.setBlock(thX, 3, thZ, 'crafting_table', { type: 'languages' });
-    this.setBlock(thX, 4, thZ, 'bookshelf', { type: 'languages' });
-    this.setBlock(thX - 2, 3, thZ, 'gold_block');
-    this.setBlock(thX + 2, 3, thZ, 'gold_block');
-    this.setBlock(thX, 3, thZ + 7, 'glowstone', {
+
+    // =========================================================================
+    // 7. WOLONG GIANT PANDA BAMBOO SANCTUARY & WATERFALL
+    // =========================================================================
+    const px2 = -130;
+    const pz2 = -118;
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        if (Math.hypot(dx, dz) <= 3.2) {
+          this.setBlock(px2 + dx, 0, pz2 + dz, 'water');
+          this.setBlock(px2 + dx, 1, pz2 + dz, 'water');
+        }
+      }
+    }
+    this.setBlock(px2, 3, pz2 - 4, 'stone_bricks');
+    this.setBlock(px2, 4, pz2 - 4, 'stone_bricks');
+    this.setBlock(px2, 2, pz2 - 4, 'water'); // Waterfall
+
+    // Mommy Panda Mei Xiang & Cub Xiao Qi
+    this.setBlock(px2 + 3, 1, pz2 - 1, 'coal_block');
+    this.setBlock(px2 + 4, 1, pz2 - 1, 'coal_block');
+    this.setBlock(px2 + 3, 2, pz2 - 1, 'quartz_block');
+    this.setBlock(px2 + 4, 2, pz2 - 1, 'quartz_block');
+    this.setBlock(px2 + 3, 2, pz2, 'coal_block');
+    this.setBlock(px2 + 3, 3, pz2, 'quartz_block');
+    this.setBlock(px2 + 3, 4, pz2, 'coal_block'); // Ears
+    this.setBlock(px2 + 3, 2, pz2 + 1, 'emerald_block'); // Bamboo shoot
+
+    this.setBlock(px2 - 1, 1, pz2 + 3, 'coal_block'); // Baby cub
+    this.setBlock(px2 - 1, 2, pz2 + 3, 'quartz_block');
+    this.setBlock(px2 - 1, 3, pz2 + 3, 'coal_block');
+
+    for (const [bx, bz] of [[px2 + 2, pz2 - 4], [px2 + 4, pz2 + 2], [px2 - 5, pz2 + 3], [px2 - 3, pz2 - 5]]) {
+      this.buildBambooStalk(bx, 1, bz, 8);
+    }
+
+    this.setBlock(px2, 2, pz2 + 5, 'oak_planks', {
       type: 'sign',
-      title: 'Temple of Heaven · Languages Embassy',
-      text: 'Circular imperial shrine of heaven celebrating global multilingual communication and studies.'
+      title: 'Wolong Giant Panda Sanctuary · 卧龙大熊猫基地',
+      text: 'Misty Sichuan mountain bamboo reserve where protected giant pandas play in mountain streams and munch fresh bamboo shoots!'
     });
 
-    // Zen Koi Pond and Red Moon Bridge
-    for (let x = -98; x <= -90; x++) {
-      const archY = (x >= -95 && x <= -93) ? 3 : 2;
-      for (let z = -102; z <= -98; z++) {
-        this.setBlock(x, 1, z, 'stone_bricks'); // Solid bridge abutment/pier
-        this.setBlock(x, archY, z, 'oak_planks');
-        if (z === -102 || z === -98) {
-          this.setBlock(x, archY + 1, z, 'red_terracotta');
-        }
+    // =========================================================================
+    // 8. TERRACOTTA ARMY ARCHEOLOGICAL PIT (兵马俑 · X = -108, Z = -80)
+    // =========================================================================
+    const tcX = -108;
+    const tcZ = -80;
+    for (let x = tcX - 7; x <= tcX + 7; x++) {
+      for (let z = tcZ - 4; z <= tcZ + 4; z++) {
+        this.setBlock(x, 1, z, 'stone_bricks');
+        if (z === tcZ - 2 || z === tcZ + 2) this.setBlock(x, 2, z, 'terracotta_adobe');
       }
     }
-    for (let x = -102; x <= -88; x++) {
-      for (let z = -106; z <= -94; z++) {
-        if (Math.hypot(x - (-94), z - (-100)) <= 6) {
-          this.setBlock(x, 0, z, 'water');
-        }
+    // Visitor Catwalk (Y = 4)
+    for (let x = tcX - 7; x <= tcX + 7; x++) {
+      this.setBlock(x, 4, tcZ - 5, 'oak_planks');
+      this.setBlock(x, 5, tcZ - 5, 'oak_fence');
+    }
+    // Ranks of Clay Soldiers
+    for (let col = -5; col <= 5; col += 2) {
+      for (const rowZ of [tcZ - 3, tcZ, tcZ + 3]) {
+        this.setBlock(tcX + col, 2, rowZ, 'terracotta_adobe');
+        this.setBlock(tcX + col, 3, rowZ, 'smooth_stone');
+        this.setBlock(tcX + col, 4, rowZ, 'coal_block'); // Topknot
+        if (col === 5) this.setBlock(tcX + col + 1, 2, rowZ, 'iron_block'); // Sword
       }
     }
-
-    // Imperial Chinese Red Lantern Posts flanking the Paifang Avenue
-    for (const lz of [-78, -92]) {
-      for (let y = 1; y <= 4; y++) {
-        this.setBlock(-84, y, lz, 'dark_oak_fence');
-      }
-      this.setBlock(-84, 5, lz, 'red_terracotta');
-      this.setBlock(-84, 4, lz + (lz > -85 ? -1 : 1), 'lantern');
-    }
-
-    // Grand Paifang Imperial Gate (Celestial Entrance Arch to China Realm)
-    for (let y = 1; y <= 6; y++) {
-      this.setBlock(-84, y, -87, 'red_terracotta');
-      this.setBlock(-84, y, -83, 'red_terracotta');
-    }
-    for (let z = -89; z <= -81; z++) {
-      this.setBlock(-84, 7, z, 'red_terracotta');
-      this.setBlock(-84, 8, z, 'stone_bricks');
-    }
-    this.setBlock(-84, 9, -89, 'gold_block');
-    this.setBlock(-84, 9, -81, 'gold_block');
-    this.setBlock(-84, 8, -85, 'gold_block');
-    this.setBlock(-84, 6, -85, 'sea_lantern');
-    this.setBlock(-84, 3, -82, 'glowstone', {
+    this.setBlock(tcX, 4, tcZ - 4, 'stone_bricks', {
       type: 'sign',
-      title: 'Celestial Paifang Gate',
-      text: 'Ceremonial archway welcoming travelers into the sacred mountains and temples of the China Realm.'
+      title: 'Terracotta Army Pit · 秦始皇兵马俑',
+      text: 'Over 8,000 clay warriors, officers, and horses crafted over 2,200 years ago to guard China\'s First Emperor Qin Shi Huang.'
     });
 
-    // Great Wall Grand Stone Access Stairway (Ascending from valley at -86, -118 up to Great Wall at -90, -135)
-    for (let step = 0; step <= 14; step++) {
-      const sx = Math.round(-86 - (step / 14) * 4);
-      const sz = Math.round(-118 - step * 1.2);
-      const sy = 2 + step;
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let y = 1; y <= sy; y++) {
-          this.setBlock(sx + dx, y, sz, 'stone_bricks');
-        }
-      }
-      this.setBlock(sx - 2, sy + 1, sz, 'stone_bricks');
-      this.setBlock(sx + 2, sy + 1, sz, 'stone_bricks');
-      if (step % 4 === 0) {
-        this.setBlock(sx - 2, sy + 2, sz, 'lantern');
-        this.setBlock(sx + 2, sy + 2, sz, 'lantern');
+    // =========================================================================
+    // 9. DRAGON WELL TEAHOUSE & SHAOLIN KUNG FU PAVILION
+    // =========================================================================
+    // Teahouse over Koi Pond at (-88, -98)
+    const thX2 = -88;
+    const thZ2 = -98;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) {
+        this.setBlock(thX2 + dx, 1, thZ2 + dz, 'stone_bricks');
+        this.setBlock(thX2 + dx, 2, thZ2 + dz, 'oak_planks');
       }
     }
-
-    // Zen Koi Pond Floating Water Lilies & Stone Toro Lanterns
-    for (const [lx, lz] of [[-96, -100], [-92, -98], [-95, -103]]) {
-      this.setBlock(lx, 1, lz, 'emerald_block');
-      this.setBlock(lx, 2, lz, 'lantern');
+    for (let dx = -4; dx <= 4; dx++) {
+      for (let dz = -4; dz <= 4; dz++) {
+        const edge = Math.max(Math.abs(dx) - 2, Math.abs(dz) - 2);
+        this.setBlock(thX2 + dx, (edge >= 1) ? 7 : 6, thZ2 + dz, 'purpur_block');
+      }
     }
-    // Stone Toro Lanterns around pond perimeter
-    for (const [tx, tz] of [[-101, -96], [-89, -96], [-101, -104], [-89, -104]]) {
-      this.setBlock(tx, 1, tz, 'stone_bricks');
-      this.setBlock(tx, 2, tz, 'stone_bricks');
-      this.setBlock(tx, 3, tz, 'sea_lantern');
-      this.setBlock(tx, 4, tz, 'stone_bricks');
-    }
+    this.setBlock(thX2, 3, thZ2, 'crafting_table');
+    this.setBlock(thX2, 4, thZ2, 'emerald_block'); // Green tea pot
+    this.setBlock(thX2 + 1, 3, thZ2, 'gold_block'); // Dim sum basket
 
-    // Dense Bamboo Groves & Sakura Cherry Blossoms
+    this.setBlock(thX2 - 3, 2, thZ2 + 2, 'oak_planks', {
+      type: 'sign',
+      title: 'Dragon Well Teahouse & Dim Sum · 龙井茶楼 & 点心',
+      text: 'Serving hand-picked Longjing green tea, warm jasmine tea, and freshly steamed bamboo baskets of dim sum dumplings!'
+    });
+
+    // Shaolin Pavilion at (-136, -132)
+    const saX = -136;
+    const saZ = -132;
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dz = -3; dz <= 3; dz++) this.setBlock(saX + dx, 1, saZ + dz, 'smooth_stone');
+    }
+    // Wooden Training Dummy (Muk Yan Jong)
+    this.setBlock(saX - 2, 2, saZ, 'spruce_log');
+    this.setBlock(saX - 2, 3, saZ, 'spruce_log');
+    this.setBlock(saX - 1, 3, saZ, 'oak_fence');
+    this.setBlock(saX - 3, 3, saZ, 'oak_fence');
+    // Balance Posts & Bell
+    this.setBlock(saX + 2, 2, saZ - 2, 'oak_planks');
+    this.setBlock(saX + 1, 3, saZ - 1, 'oak_planks');
+    this.setBlock(saX + 2, 4, saZ, 'oak_planks');
+    this.setBlock(saX, 3, saZ - 3, 'gold_block'); // Meditation gong
+
+    this.setBlock(saX, 2, saZ + 3, 'stone_bricks', {
+      type: 'sign',
+      title: 'Shaolin Kung Fu Pavilion · 少林武术亭',
+      text: 'Martial arts training pavilion featuring Wing Chun wooden dummies (Muk Yan Jong), balance posts, and zen meditation bells.'
+    });
+
+    // Dense Bamboo Groves & Sakura Trees
     const bambooSpots = [
       [-125, -95], [-128, -98], [-122, -92], [-130, -104],
       [-95, -125], [-92, -128], [-98, -122], [-104, -130]
     ];
-    for (const [bx, bz] of bambooSpots) {
-      this.buildBambooStalk(bx, 1, bz, 6 + (bx % 3));
-    }
+    for (const [bx, bz] of bambooSpots) this.buildBambooStalk(bx, 1, bz, 6 + (bx % 3));
 
     const sakuraSpots = [
       [-118, -125], [-125, -118], [-102, -125], [-125, -102],
       [-75, -80], [-85, -105], [-105, -85], [-72, -95]
     ];
-    for (const [sx, sz] of sakuraSpots) {
-      this.buildSakuraTree(sx, 1, sz);
-    }
+    for (const [sx, sz] of sakuraSpots) this.buildSakuraTree(sx, 1, sz);
   }
 
   // 6. Mexico Realm (Zócalo, Baroque Metropolitan Cathedral, Palacio Nacional, Monumental Flag, Taquería, Chichén Itzá & Mayan Cenote)
@@ -5187,23 +6547,11 @@ export class WorldBuilder {
     this.setBlock(cx, 20, cz, 'gold_block'); // Mast finial
     this.setBlock(cx, 21, cz, 'beacon'); // Night spotlight
 
-    // Giant Monumental Mexican Flag (Bandera Monumental) waving Eastward (Y = 14 to 18)
-    for (let y = 14; y <= 18; y++) {
-      // Green field (Hope & Independence)
-      this.setBlock(cx + 1, y, cz, 'emerald_block');
-      this.setBlock(cx + 2, y, cz, 'emerald_block');
-      // White field with Golden Eagle & Serpent Emblem
-      this.setBlock(cx + 3, y, cz, (y === 16) ? 'gold_block' : 'quartz_block');
-      this.setBlock(cx + 4, y, cz, (y === 16) ? 'gold_block' : 'quartz_block');
-      // Red field (Heroes of the Fatherland)
-      this.setBlock(cx + 5, y, cz, 'redstone_block');
-      this.setBlock(cx + 6, y, cz, 'redstone_block');
-    }
-
+    // Giant Monumental Mexican Flag (Bandera de México) is rendered as authentic 3D waving cloth by FlagManager
     this.setBlock(cx, 3, cz + 2, 'stone_bricks', {
       type: 'sign',
       title: 'Asta Bandera Monumental · Zócalo 🇲🇽',
-      text: 'Plaza de la Constitución: The historic epicenter of Mexico. Site of ancient Tenochtitlan where the eagle was found devouring the serpent in 1325!'
+      text: 'Plaza de la Constitución: The historic epicenter of Mexico. Site of ancient Tenochtitlan where the eagle was found devouring the serpent in 1325! Flying the monumental 3D Bandera de México.'
     });
 
     // Festive Strings of "Papel Picado" & Plaza Lanterns crisscrossing the Zócalo
@@ -6043,6 +7391,13 @@ export class WorldBuilder {
     // Hollywood Mountain & Illuminated Block-Built Sign at (165, -100)
     this.buildHollywoodMountain(165, -100);
 
+    // Expanded Hollywood Entertainment District:
+    this.buildHollywoodWalkOfFame();
+    this.buildHollywoodBowl(180, -76);
+    this.buildHollywoodStudioLot(144, -76);
+    this.buildCapitolRecordsTower(174, -62);
+    this.buildHollywoodPremiereAndOscar(151, -61);
+    this.buildMelsRetroDiner(139, -60);
 
     // Dazzling Las Vegas Boulevard connecting Hollywood and Lak Tower
     this.buildVegasStripInFrontOfHollywoodAndLKTower();
@@ -8202,19 +9557,26 @@ export class WorldBuilder {
 
   // 4. Capitol Records Building / Vinyl Spire Tower
   private buildCapitolRecordsTower(cx: number, cz: number) {
-    // Centered at (cx, cz) = (174, -59)
+    // Centered at (cx, cz) = (174, -62)
     // A. Ground Plaza & Landscape Terrace at Y = 1..2
-    for (let dx = -6; dx <= 6; dx++) {
-      for (let dz = -6; dz <= 6; dz++) {
+    for (let dx = -5; dx <= 5; dx++) {
+      for (let dz = -5; dz <= 5; dz++) {
         const dist = Math.hypot(dx, dz);
-        if (dist <= 6) {
+        if (dist <= 5) {
           this.setBlock(cx + dx, 1, cz + dz, 'smooth_stone');
-          if (dist > 4.8) {
+          if (dist > 4.2) {
             this.setBlock(cx + dx, 2, cz + dz, 'oak_leaves'); // Manicured hedge ring
           } else {
             this.setBlock(cx + dx, 2, cz + dz, 'quartz_block');
           }
         }
+      }
+    }
+
+    // Paved entrance connector walkway leading to Hollywood Boulevard Walk of Fame
+    for (let x = 168; x <= cx - 5; x++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        this.setBlock(x, 1, cz + dz, 'smooth_stone');
       }
     }
 
@@ -8262,8 +9624,8 @@ export class WorldBuilder {
     this.setBlock(cx, 25, cz, 'redstone_block');
     this.setBlock(cx, 26, cz, 'beacon');
 
-    // E. Commemorative Building Plaque at entrance (cx - 5, 2, cz)
-    this.setBlock(cx - 5, 2, cz, 'gold_block', {
+    // E. Commemorative Building Plaque at entrance (cx - 5, 2, cz - 2)
+    this.setBlock(cx - 5, 2, cz - 2, 'gold_block', {
       type: 'sign',
       title: 'Capitol Records Tower · Hollywood & Vine 🎙️',
       text: 'The world\'s first circular office tower (1956), designed to evoke a stack of vinyl records. Its 90-foot spire beacon continuously blinks "H-O-L-L-Y-W-O-O-D" in Morse code! Studio home of Frank Sinatra, The Beatles, Nat King Cole, and Beach Boys.'
@@ -9490,6 +10852,38 @@ export class WorldBuilder {
     // Drawbridge iron winches and chains
     this.setBlock(cx - 2, 3, cz + 11, 'iron_block');
     this.setBlock(cx + 2, 3, cz + 11, 'iron_block');
+
+    // Southern Drawbridge Arrival Plaza & Heraldic Moat Gate (Z in [cz + 15, cz + 18], X in [cx - 3, cx + 3])
+    for (let z = cz + 15; z <= cz + 18; z++) {
+      for (let x = cx - 3; x <= cx + 3; x++) {
+        this.setBlock(x, 1, z, ((x + z) % 2 === 0) ? 'stone_bricks' : 'mossy_stone_bricks');
+      }
+    }
+    // Arrival Plaza Perimeter Banner Poles & Lanterns
+    for (const px of [cx - 3, cx + 3]) {
+      this.setBlock(px, 2, cz + 15, 'oak_fence');
+      this.setBlock(px, 3, cz + 15, 'oak_fence');
+      this.setBlock(px, 4, cz + 15, 'lantern');
+      this.setBlock(px, 2, cz + 18, 'oak_fence');
+      this.setBlock(px, 3, cz + 18, 'oak_fence');
+      this.setBlock(px, 4, cz + 18, 'lantern');
+    }
+    this.setBlock(cx - 2, 2, cz + 17, 'stone_bricks', {
+      type: 'sign',
+      title: 'Rapunzel Royal Fortress Drawbridge 🏰🗡️',
+      text: 'Heavy timber drawbridge and iron portcullis spanning the castle moat into the King\'s Courtyard and Rapunzel\'s High Tower. Cross the moat to enter the throne room.'
+    });
+
+    // Paved Fairytale Trail connecting Drawbridge Plaza eastward to Enchanted Castle Woodland (X: cx + 3 to -56)
+    for (let x = cx + 4; x <= -56; x++) {
+      for (let z = cz + 16; z <= cz + 18; z++) {
+        this.setBlock(x, 1, z, ((x + z) % 2 === 0) ? 'cobblestone' : 'mossy_stone_bricks');
+      }
+      if (x % 4 === 0) {
+        this.setBlock(x, 2, cz + 15, 'oak_fence');
+        this.setBlock(x, 3, cz + 15, 'lantern');
+      }
+    }
 
     // 3. Fortress Foundation Plinth & Outer Courtyard (Y = 1, X in [cx - 11, cx + 11], Z in [cz - 11, cz + 11])
     for (let x = cx - 11; x <= cx + 11; x++) {
@@ -11102,18 +12496,18 @@ export class WorldBuilder {
   // -------------------------------------------------------------
   private buildLightningMcQueenStreet() {
     // 0. Airspace Clearing: Ensure entire raceway footprint has ZERO underground or floating blocks
-    for (let x = 164; x <= 235; x++) {
-      for (let z = -60; z <= -2; z++) {
+    for (let x = 171; x <= 235; x++) {
+      for (let z = -55; z <= -11; z++) {
         for (let y = 2; y <= 12; y++) {
           this.removeBlock(x, y, z);
         }
       }
     }
 
-    // 1. Natural Landscaping outside West Outer Wall (X: 164..170, Z: -56..-48)
+    // 1. Natural Landscaping outside West Outer Wall (X: 169..170, Z: -55..-48)
     // Clean up any severed road stubs so the racetrack is a clean, self-contained rectangular circuit
-    for (let x = 164; x <= 170; x++) {
-      for (let z = -56; z <= -48; z++) {
+    for (let x = 169; x <= 170; x++) {
+      for (let z = -55; z <= -48; z++) {
         this.setBlock(x, 1, z, 'grass');
         for (let y = 2; y <= 6; y++) {
           this.removeBlock(x, y, z);
@@ -11561,7 +12955,7 @@ export class WorldBuilder {
     // A. West Anchorage Pier & Abutment (X in [74, 80], Z in [125, 135])
     for (let x = startX; x <= startX + 6; x++) {
       for (let z = centerZ - 5; z <= centerZ + 5; z++) {
-        for (let y = 1; y <= deckY; y++) {
+        for (let y = -1; y <= deckY; y++) {
           const isEdge = (x === startX || x === startX + 6 || z === centerZ - 5 || z === centerZ + 5);
           this.setBlock(x, y, z, isEdge ? 'stone_bricks' : 'smooth_stone');
         }
@@ -11591,7 +12985,7 @@ export class WorldBuilder {
     // B. East Anchorage Pier & Coastal Abutment (X in [184, 190], Z in [125, 135])
     for (let x = endX - 6; x <= endX; x++) {
       for (let z = centerZ - 5; z <= centerZ + 5; z++) {
-        for (let y = 1; y <= deckY; y++) {
+        for (let y = -1; y <= deckY; y++) {
           const isEdge = (x === endX - 6 || x === endX || z === centerZ - 5 || z === centerZ + 5);
           this.setBlock(x, y, z, isEdge ? 'stone_bricks' : 'smooth_stone');
         }
@@ -11612,10 +13006,10 @@ export class WorldBuilder {
     // C. Twin Colossal Suspension Towers (Tower 1 at 105, Tower 2 at 155, Top Y = 38)
     const towers = [tower1X, tower2X];
     for (const tx of towers) {
-      // Underwater / Ground Concrete Foundation Caisson (Y = 1 to 5)
+      // Underwater Seabed / Concrete Foundation Caisson (Y = -1 to 5)
       for (let x = tx - 3; x <= tx + 3; x++) {
         for (let z = centerZ - 6; z <= centerZ + 6; z++) {
-          for (let y = 1; y <= 5; y++) {
+          for (let y = -1; y <= 5; y++) {
             this.setBlock(x, y, z, (y === 5) ? 'smooth_stone' : 'stone_bricks');
           }
         }
@@ -11640,6 +13034,17 @@ export class WorldBuilder {
       for (const pz of [centerZ - 3, centerZ + 3]) {
         this.setBlock(tx, 39, pz, 'beacon');
         this.setBlock(tx, 40, pz, 'sea_lantern');
+      }
+    }
+
+    // Approach Viaduct Intermediate Piers at X = 92 and X = 172
+    for (const ax of [92, 172]) {
+      for (let x = ax - 1; x <= ax + 1; x++) {
+        for (let z = centerZ - 3; z <= centerZ + 3; z++) {
+          for (let y = -1; y < lowerDeckY; y++) {
+            this.setBlock(x, y, z, (Math.abs(z - centerZ) === 3) ? 'quartz_pillar' : 'stone_bricks');
+          }
+        }
       }
     }
 
@@ -11674,8 +13079,9 @@ export class WorldBuilder {
 
     // E. Double-Deck Deck System
     for (let x = startX; x <= endX; x++) {
-      // 1. Lower Deck (Maglev Express at Y = 10)
+      // 1. Lower Deck (Maglev Express at Y = 10 with structural box girder keel at Y = 9)
       for (let z = centerZ - 2; z <= centerZ + 2; z++) {
+        this.setBlock(x, lowerDeckY - 1, z, 'stone_bricks');
         this.setBlock(x, lowerDeckY, z, 'smooth_stone');
         this.setBlock(x, lowerDeckY + 4, z, 'iron_block'); // Lower deck ceiling
       }
@@ -11756,7 +13162,7 @@ export class WorldBuilder {
     for (let px = startX; px <= endX; px += 8) {
       for (let dx = -1; dx <= 1; dx++) {
         for (let dz = -2; dz <= 2; dz++) {
-          for (let y = 1; y <= lowerArcTopY; y++) {
+          for (let y = -1; y <= lowerArcTopY; y++) {
             const isCorner = Math.abs(dx) === 1 && Math.abs(dz) === 2;
             this.setBlock(px + dx, y, centerZ + dz, isCorner ? 'sandstone' : 'stone_bricks');
           }
@@ -11828,7 +13234,7 @@ export class WorldBuilder {
     // E. Western Spring Cavern / Mountain Intake (X in [-180, -175])
     for (let x = startX - 4; x <= startX; x++) {
       for (let z = centerZ - 4; z <= centerZ + 4; z++) {
-        for (let y = 1; y <= waterLevelY + 2; y++) {
+        for (let y = -1; y <= waterLevelY + 2; y++) {
           const isOuter = (x === startX - 4 || Math.abs(z - centerZ) === 4);
           this.setBlock(x, y, z, isOuter ? 'mossy_stone_bricks' : 'air');
         }
@@ -11848,7 +13254,7 @@ export class WorldBuilder {
     // F. Eastern Terminal Nymphaeum & Giant Cascading Waterfall (X = -65)
     // Monumental Greco-Roman Temple Facade
     for (let z = centerZ - 4; z <= centerZ + 4; z++) {
-      for (let y = 1; y <= waterLevelY + 4; y++) {
+      for (let y = -1; y <= waterLevelY + 4; y++) {
         const isColumn = (z === centerZ - 4 || z === centerZ - 2 || z === centerZ + 2 || z === centerZ + 4);
         if (isColumn) {
           this.setBlock(endX, y, z, 'quartz_pillar');
@@ -11873,6 +13279,8 @@ export class WorldBuilder {
       for (let z = centerZ - 3; z <= centerZ + 3; z++) {
         const isRim = (x === endX + 7 || Math.abs(z - centerZ) === 3);
         if (isRim) {
+          this.setBlock(x, -1, z, 'quartz_block');
+          this.setBlock(x, 0, z, 'quartz_block');
           this.setBlock(x, 1, z, 'quartz_block');
         } else {
           this.setBlock(x, 0, z, 'water');
