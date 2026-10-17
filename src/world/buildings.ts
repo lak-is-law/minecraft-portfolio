@@ -10569,20 +10569,30 @@ export class WorldBuilder {
     // Footbridge 1 (East Footbridge at cx + 5, cz)
     for (let z = cz - 2; z <= cz + 2; z++) {
       this.setBlock(cx + 5, 2, z, "oak_planks");
-      this.setBlock(cx + 4, 2, z, "oak_fence");
-      this.setBlock(cx + 6, 2, z, "oak_fence");
+      this.setBlock(cx + 4, 3, z, "oak_fence");
+      this.setBlock(cx + 6, 3, z, "oak_fence");
     }
-    this.setBlock(cx + 4, 3, cz - 2, "lantern");
-    this.setBlock(cx + 6, 3, cz + 2, "lantern");
+    // Approach steps on North and South banks connecting to trails
+    this.setBlock(cx + 5, 1, cz - 3, "oak_planks");
+    this.setBlock(cx + 5, 1, cz - 4, "smooth_stone");
+    this.setBlock(cx + 5, 1, cz + 3, "oak_planks");
+    this.setBlock(cx + 5, 1, cz + 4, "smooth_stone");
+    this.setBlock(cx + 4, 4, cz - 2, "lantern");
+    this.setBlock(cx + 6, 4, cz + 2, "lantern");
 
     // Footbridge 2 (West Footbridge at cx - 10, cz)
     for (let z = cz - 2; z <= cz + 2; z++) {
       this.setBlock(cx - 10, 2, z, "oak_planks");
-      this.setBlock(cx - 11, 2, z, "oak_fence");
-      this.setBlock(cx - 9, 2, z, "oak_fence");
+      this.setBlock(cx - 11, 3, z, "oak_fence");
+      this.setBlock(cx - 9, 3, z, "oak_fence");
     }
-    this.setBlock(cx - 11, 3, cz - 2, "lantern");
-    this.setBlock(cx - 9, 3, cz + 2, "lantern");
+    // Approach steps on North and South banks connecting to trails
+    this.setBlock(cx - 10, 1, cz - 3, "oak_planks");
+    this.setBlock(cx - 10, 1, cz - 4, "smooth_stone");
+    this.setBlock(cx - 10, 1, cz + 3, "oak_planks");
+    this.setBlock(cx - 10, 1, cz + 4, "smooth_stone");
+    this.setBlock(cx - 11, 4, cz - 2, "lantern");
+    this.setBlock(cx - 9, 4, cz + 2, "lantern");
 
     // 4. Habitat 1: Giant Panda Bamboo Valley (X in [cx + 2, maxX - 8], Z in [minZ + 1, cz - 8])
     for (let x = cx + 2; x <= maxX - 8; x++) {
@@ -10745,6 +10755,49 @@ export class WorldBuilder {
         this.setBlock(x, 6, cz + 10, "lantern");
       }
     }
+
+    // Elevated Tree-Top Giraffe Feeding Lookout Platform at X in [cx - 15, cx - 12], Z in [cz + 7, cz + 10]
+    for (let x = cx - 15; x <= cx - 12; x++) {
+      for (let z = cz + 7; z <= cz + 10; z++) {
+        this.setBlock(x, 4, z, "oak_planks");
+      }
+    }
+    // Perimeter safety railings & feeding troughs on lookout platform
+    for (let x = cx - 15; x <= cx - 12; x++) {
+      this.setBlock(x, 5, cz + 10, "oak_fence");
+      if (x === cx - 15) this.setBlock(x, 5, cz + 7, "oak_fence");
+    }
+    for (let z = cz + 7; z <= cz + 10; z++) {
+      this.setBlock(cx - 15, 5, z, "oak_fence");
+    }
+    this.setBlock(cx - 15, 6, cz + 10, "lantern");
+    this.setBlock(cx - 12, 6, cz + 10, "lantern");
+    this.setBlock(cx - 14, 5, cz + 8, "leaves"); // Acacia browse feeding branch
+    this.setBlock(cx - 14, 5, cz + 9, "gold_block"); // Grain feed bin
+    this.setBlock(cx - 13, 5, cz + 9, "oak_planks", {
+      type: "sign",
+      title: "Tree-Top Giraffe Feeding Lookout 🦒🌿",
+      text: "Elevated canopy feeding station overlooking the acacia savanna plains. Watch Rothschild giraffes browse fresh leaves at eye level."
+    });
+
+    // Descent Stairway connecting Skywalk (Y = 4) down to Savanna Ground Trail (Y = 1) at X in [cx - 16, cx - 19]
+    const skywalkStairs = [
+      { x: cx - 16, y: 3 },
+      { x: cx - 17, y: 2 },
+      { x: cx - 18, y: 1 }
+    ];
+    for (const step of skywalkStairs) {
+      this.setBlock(step.x, step.y, cz + 7, "oak_planks");
+      this.setBlock(step.x, step.y, cz + 8, "oak_planks");
+      this.setBlock(step.x, step.y + 1, cz + 6, "oak_fence");
+      this.setBlock(step.x, step.y + 1, cz + 9, "oak_fence");
+    }
+    // Ground trail connection heading into Savanna Plains
+    for (let x = cx - 19; x >= cx - 22; x--) {
+      this.setBlock(x, 1, cz + 7, "smooth_stone");
+      this.setBlock(x, 1, cz + 8, "cobblestone");
+    }
+
     // Giraffe Habitat Plaque Sign
     this.setBlock(cx - 3, 2, cz + 8, "stone_bricks", {
       type: "sign",
