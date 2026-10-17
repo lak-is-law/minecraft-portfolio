@@ -11691,11 +11691,26 @@ export class WorldBuilder {
         this.setBlock(x, 7, z, 'quartz_block'); // Canopy
       }
     }
-    // Concourse North Skybridge Portal entry (clearing glass at Z = 54 for seamless walk-in)
+    // Concourse North Skybridge Portal entry (clearing doorway at Z = 54 for seamless walk-in)
     for (let x = 127; x <= 129; x++) {
-      this.setBlock(x, 5, 54, 'quartz_block');
-      this.setBlock(x, 6, 54, 'cyber_glass');
+      this.setBlock(x, 5, 54, 'quartz_block'); // Walkway threshold floor
+      this.removeBlock(x, 6, 54); // Clear passage!
+      this.removeBlock(x, 7, 54); // Clear head clearance!
     }
+    // Terminal doorway framing archway
+    this.setBlock(126, 6, 54, 'quartz_pillar');
+    this.setBlock(126, 7, 54, 'quartz_pillar');
+    this.setBlock(130, 6, 54, 'quartz_pillar');
+    this.setBlock(130, 7, 54, 'quartz_pillar');
+    for (let x = 126; x <= 130; x++) {
+      this.setBlock(x, 8, 54, 'quartz_block');
+    }
+    this.setBlock(128, 8, 54, 'sea_lantern');
+    this.setBlock(130, 6, 53, 'glowstone', {
+      type: 'sign',
+      title: 'Terminal 1 · Concourse A Skybridge Portal ✈️',
+      text: 'Direct passenger transfer link between Skyport Rapid Transit platform and Terminal 1 international departures.'
+    });
     // Access Stairs connecting Ground Station Avenue (Y = 1) up to Elevated Platform (Y = 5)
     for (let step = 0; step <= 4; step++) {
       const sx = 121 - step;
