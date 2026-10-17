@@ -23,6 +23,7 @@ interface PrimaryBadgeConfig {
   category: 'monuments' | 'cities' | 'transit' | 'nature';
   teleportCoords: [number, number, number];
   modelPos: [number, number, number];
+  badgePos: [number, number, number];
   pinHeight: number;
 }
 
@@ -56,11 +57,11 @@ export class AdventureMapRenderer {
   private isDisposed = false;
   private animId: number | null = null;
 
-  // Camera framing matching reference image (South-to-North tilt)
-  private baseFrustumSize = 250;
+  // Perfectly framed South-to-North perspective with breathing room
+  private baseFrustumSize = 295;
   private currentZoom = 1.0;
-  private cameraTarget = new THREE.Vector3(10, 2, -10);
-  private cameraOffset = new THREE.Vector3(0, 210, 240);
+  private cameraTarget = new THREE.Vector3(10, 4, -20);
+  private cameraOffset = new THREE.Vector3(0, 215, 255);
   private isPointerDown = false;
   private hasDragged = false;
   private dragStartX = 0;
@@ -121,7 +122,7 @@ export class AdventureMapRenderer {
   }
 
   // ---------------------------------------------------------------------------
-  // 1. Three.js Setup & Radiant Tropical Lighting
+  // 1. Three.js Setup & Radiant Tropical Sunlight
   // ---------------------------------------------------------------------------
   private initThree() {
     const width = this.container.clientWidth || window.innerWidth;
@@ -137,12 +138,12 @@ export class AdventureMapRenderer {
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
+    this.renderer.toneMappingExposure = 1.18;
 
     this.scene = new THREE.Scene();
-    // Radiant tropical cyan ocean background & atmospheric fog
+    // Radiant tropical cyan ocean background & atmospheric haze
     this.scene.background = new THREE.Color(0x22a0ce);
-    this.scene.fog = new THREE.FogExp2(0x22a0ce, 0.0005);
+    this.scene.fog = new THREE.FogExp2(0x22a0ce, 0.00045);
 
     // South-facing tilted Orthographic Camera
     const hHalf = this.baseFrustumSize / 2;
@@ -150,21 +151,21 @@ export class AdventureMapRenderer {
     this.camera = new THREE.OrthographicCamera(-wHalf, wHalf, hHalf, -hHalf, 1, 3500);
     this.updateCameraPosition();
 
-    // Warm Crisp Sunlight (Northwest direction casting soft relief shadows)
-    const sunLight = new THREE.DirectionalLight(0xfffaeb, 1.6);
-    sunLight.position.set(-180, 320, 150);
+    // Warm Sun Directional Light (Northwest direction casting soft relief shadows)
+    const sunLight = new THREE.DirectionalLight(0xfffaeb, 1.65);
+    sunLight.position.set(-180, 340, 140);
     this.scene.add(sunLight);
 
     // Sky & Ocean Ambient Lighting (Bright sunny tropical radiance)
-    const ambientLight = new THREE.AmbientLight(0xb8e2f8, 0.95);
+    const ambientLight = new THREE.AmbientLight(0xbde4f8, 0.95);
     this.scene.add(ambientLight);
 
-    // Warm Turquoise Fill
-    const fillLight = new THREE.DirectionalLight(0x60c8eb, 0.55);
-    fillLight.position.set(160, 140, 200);
+    // Warm Turquoise Fill Light from South
+    const fillLight = new THREE.DirectionalLight(0x62cbee, 0.6);
+    fillLight.position.set(160, 140, 220);
     this.scene.add(fillLight);
 
-    const hemiLight = new THREE.HemisphereLight(0x8ed7f8, 0x387a32, 0.4);
+    const hemiLight = new THREE.HemisphereLight(0x8ed7f8, 0x387a32, 0.42);
     this.scene.add(hemiLight);
   }
 
@@ -183,6 +184,7 @@ export class AdventureMapRenderer {
     this.createRevampedOcean();
     this.createSculptedIsland();
     this.createWaterwaysAndLakes();
+    this.createWindingPathways();
     this.createCitadelCastle();
     this.createNeoYorkSkyscrapers();
     this.createTajMahalAndCanal();
@@ -208,20 +210,19 @@ export class AdventureMapRenderer {
   // Revamped Tropical Ocean (Radiant turquoise sea, wave swells, surf rings)
   // ---------------------------------------------------------------------------
   private createRevampedOcean() {
-    // 1. Deep Ocean Floor
-    const oceanGeo = new THREE.PlaneGeometry(3000, 3000);
-    const oceanMat = new THREE.MeshLambertMaterial({ color: 0x1b87b2 });
+    const oceanGeo = new THREE.PlaneGeometry(3200, 3200);
+    const oceanMat = new THREE.MeshLambertMaterial({ color: 0x1887b4 });
     const oceanFloor = new THREE.Mesh(oceanGeo, oceanMat);
     oceanFloor.rotation.x = -Math.PI / 2;
     oceanFloor.position.y = -2.5;
     this.scene.add(oceanFloor);
 
-    // 2. Turquoise Shallow Coral Reef Shelf (Glowing crystal cyan water around island)
-    const shelfGeo = new THREE.RingGeometry(175, 275, 72);
+    // Turquoise Shallow Coral Reef Shelf (Glowing crystal cyan water around island)
+    const shelfGeo = new THREE.RingGeometry(175, 280, 72);
     const shelfMat = new THREE.MeshLambertMaterial({
       color: 0x38e1f0,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.68,
       side: THREE.DoubleSide
     });
     this.waterShelfMesh = new THREE.Mesh(shelfGeo, shelfMat);
@@ -229,13 +230,13 @@ export class AdventureMapRenderer {
     this.waterShelfMesh.position.y = 0.15;
     this.scene.add(this.waterShelfMesh);
 
-    // 3. Animated Surf Foam Wave Rings
-    for (let r = 185; r <= 260; r += 25) {
-      const ringGeo = new THREE.RingGeometry(r, r + 2.5, 64);
+    // Animated Surf Foam Wave Rings
+    for (let r = 185; r <= 265; r += 26) {
+      const ringGeo = new THREE.RingGeometry(r, r + 2.4, 64);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.38,
+        opacity: 0.4,
         side: THREE.DoubleSide
       });
       const waveRing = new THREE.Mesh(ringGeo, ringMat);
@@ -245,8 +246,8 @@ export class AdventureMapRenderer {
       this.animatedWaveRings.push(waveRing);
     }
 
-    // 4. Moving Ocean Water Surface with Wave Mesh Vertices
-    const waterSize = 2400;
+    // Moving Ocean Water Surface with Wave Mesh Vertices
+    const waterSize = 2600;
     const waterSegments = 72;
     this.waterGeoPlane = new THREE.PlaneGeometry(waterSize, waterSize, waterSegments, waterSegments);
     this.waterGeoPlane.rotateX(-Math.PI / 2);
@@ -265,11 +266,11 @@ export class AdventureMapRenderer {
   }
 
   // ---------------------------------------------------------------------------
-  // Sculpted Island Mesh with Exact Biome Palette Matching Reference
+  // Sculpted Island Mesh with Soft Organic Biome Transitions
   // ---------------------------------------------------------------------------
   private createSculptedIsland() {
-    const size = 480;
-    const segments = 120;
+    const size = 500;
+    const segments = 130;
     const geo = new THREE.PlaneGeometry(size, size, segments, segments);
     geo.rotateX(-Math.PI / 2);
 
@@ -278,18 +279,17 @@ export class AdventureMapRenderer {
     const colors = new Float32Array(count * 3);
     const tempColor = new THREE.Color();
 
-    const colorDeepOcean = new THREE.Color(0x1b87b2);
+    const colorDeepOcean = new THREE.Color(0x1887b4);
     const colorTurquoise = new THREE.Color(0x38e1f0);
     const colorWhiteFoam = new THREE.Color(0xffffff);
     const colorGoldenBeach = new THREE.Color(0xfde68a);
     const colorGrassLush = new THREE.Color(0x56b834);
     const colorGrassDark = new THREE.Color(0x3e8a22);
-    const colorPinkFlowers = new THREE.Color(0xf472b6); // South pink flower meadow
-    const colorDesertSand = new THREE.Color(0xeab308); // West Giza & East McQueen desert
+    const colorPinkFlowers = new THREE.Color(0xf472b6);
+    const colorDesertSand = new THREE.Color(0xeab308);
     const colorDarkRock = new THREE.Color(0x475569);
     const colorSnowPeak = new THREE.Color(0xf8fafc);
     const colorWaterCanal = new THREE.Color(0x38bdf8);
-    const colorCityPavement = new THREE.Color(0x64748b);
 
     for (let i = 0; i < count; i++) {
       const x = posAttr.getX(i);
@@ -299,7 +299,7 @@ export class AdventureMapRenderer {
       const dist = Math.hypot(x, z);
 
       // Boundary calculation matching the reference island shape
-      let boundary = 188;
+      let boundary = 190;
       boundary += Math.sin(angle * 3) * 14;
       boundary += Math.cos(angle * 5) * 8;
       // Protrusion for Dubai Palm in east
@@ -314,28 +314,24 @@ export class AdventureMapRenderer {
       let y = 0;
 
       if (dist > boundary + 12) {
-        // Ocean floor
         y = -8;
         tempColor.copy(colorDeepOcean);
       } else if (dist > boundary) {
-        // Turquoise surf foam line
         const t = (dist - boundary) / 12;
         y = THREE.MathUtils.lerp(0.2, -3.0, t);
         if (t < 0.35) tempColor.copy(colorWhiteFoam);
         else tempColor.lerpColors(colorTurquoise, colorDeepOcean, t);
       } else if (dist > boundary - 14) {
-        // Golden Sandy Beach Ring
         const t = (boundary - dist) / 14;
         y = THREE.MathUtils.lerp(0.3, 2.0, t);
         tempColor.copy(colorGoldenBeach);
       } else {
-        // Interior island body
         const innerRatio = 1 - dist / boundary;
 
-        // 1. North Volcano & Alpine Mountain Elevations
+        // 1. North Volcano & Mountain elevations
         const northMtnDist = Math.hypot(x - 10, z - (-145));
-        const northPeak = Math.max(0, 1 - northMtnDist / 65);
-        let northElev = Math.pow(northPeak, 1.6) * 32;
+        const northPeak = Math.max(0, 1 - northMtnDist / 68);
+        let northElev = Math.pow(northPeak, 1.6) * 34;
 
         // 2. West Desert Plateau (Giza)
         const westDesertDist = Math.hypot(x - (-135), z - 25);
@@ -343,7 +339,7 @@ export class AdventureMapRenderer {
         let westElev = Math.pow(westDesert, 1.4) * 8;
 
         // 3. East McQueen Desert Ridge
-        const eastDesertDist = Math.hypot(x - 125, z - (-25));
+        const eastDesertDist = Math.hypot(x - 125, z - (-45));
         const eastDesert = Math.max(0, 1 - eastDesertDist / 55);
         let eastElev = Math.pow(eastDesert, 1.4) * 8;
 
@@ -362,28 +358,34 @@ export class AdventureMapRenderer {
           y = Math.max(0.4, y - 6.5);
         }
 
-        // Biome vertex coloring
-        if (isCanal || isCenterLake) {
-          tempColor.copy(colorWaterCanal);
-        } else if (x > -50 && x < 0 && z > 105) {
-          // South Pink Sakura Flower Meadow (Matching user reference image!)
-          tempColor.copy(colorPinkFlowers);
-        } else if (x > 50 && z < -20 && z > -110 && northElev < 15) {
-          // East desert around McQueen / Hollywood
-          tempColor.copy(colorDesertSand);
-        } else if (x < -80 && z > -10 && z < 70) {
-          // West Giza desert
-          tempColor.copy(colorDesertSand);
-        } else if (northElev > 18) {
-          // Alpine snow and dark rock
+        // Base Grass with subtle noise variation
+        const grassNoise = Math.sin(x * 0.08) * Math.cos(z * 0.08) * 0.5 + 0.5;
+        tempColor.lerpColors(colorGrassLush, colorGrassDark, grassNoise * 0.4 + innerRatio * 0.6);
+
+        // Soft Organic Biome Blending (Radial falloffs - NO sharp boxes!)
+        const pinkDist = Math.hypot(x - (-25), z - 125);
+        const pinkFactor = Math.max(0, 1 - pinkDist / 42);
+        if (pinkFactor > 0) {
+          tempColor.lerp(colorPinkFlowers, Math.pow(pinkFactor, 1.2));
+        }
+
+        const gizaFactor = Math.max(0, 1 - westDesertDist / 58);
+        if (gizaFactor > 0) {
+          tempColor.lerp(colorDesertSand, Math.pow(gizaFactor, 1.3));
+        }
+
+        const eastDesertFactor = Math.max(0, 1 - eastDesertDist / 55);
+        if (eastDesertFactor > 0) {
+          tempColor.lerp(colorDesertSand, Math.pow(eastDesertFactor, 1.3));
+        }
+
+        if (northElev > 18) {
           if (y > 22) tempColor.copy(colorSnowPeak);
           else tempColor.copy(colorDarkRock);
-        } else if (x > 45 && x < 110 && z > -10 && z < 45) {
-          // Neo York City urban base
-          tempColor.copy(colorCityPavement);
-        } else {
-          // Lush Green Mainland
-          tempColor.lerpColors(colorGrassLush, colorGrassDark, innerRatio);
+        }
+
+        if (isCanal || isCenterLake) {
+          tempColor.copy(colorWaterCanal);
         }
       }
 
@@ -421,6 +423,30 @@ export class AdventureMapRenderer {
     lake.rotation.x = -Math.PI / 2;
     lake.position.set(10, 0.6, -25);
     this.scene.add(lake);
+  }
+
+  // Winding Cobblestone & Dirt Paths (Matching Reference Image)
+  private createWindingPathways() {
+    const pathMat = new THREE.MeshLambertMaterial({ color: 0xd4a373 }); // Warm sand-dirt path
+
+    const pathCurves = [
+      // Citadel to Neo York
+      [new THREE.Vector3(12, 3.8, 4), new THREE.Vector3(38, 3.8, 8), new THREE.Vector3(65, 3.8, 14)],
+      // Citadel heading towards Giza
+      [new THREE.Vector3(-12, 3.8, 2), new THREE.Vector3(-55, 3.8, 10), new THREE.Vector3(-105, 3.8, 22)],
+      // Citadel heading towards Eiffel & Seoul
+      [new THREE.Vector3(-4, 3.8, -14), new THREE.Vector3(6, 4.0, -32), new THREE.Vector3(-30, 4.2, -65), new THREE.Vector3(-55, 4.2, -85)],
+      // Neo York to McQueen / Hollywood
+      [new THREE.Vector3(75, 3.8, 0), new THREE.Vector3(100, 3.8, -12), new THREE.Vector3(118, 4.0, -22)]
+    ];
+
+    pathCurves.forEach(pts => {
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const tubeGeo = new THREE.TubeGeometry(curve, 24, 1.8, 5, false);
+      const mesh = new THREE.Mesh(tubeGeo, pathMat);
+      mesh.scale.set(1, 0.25, 1);
+      this.scene.add(mesh);
+    });
   }
 
   // Helper: Miniature Waving Red Flag (Matching Reference Image)
@@ -926,7 +952,7 @@ export class AdventureMapRenderer {
 
     this.scene.add(baaGroup);
 
-    // 3. Ain Dubai Giant Observation Wheel
+    // 3. Ain Dubai Giant Observation Wheel (Standing vertically!)
     const wheelGroup = new THREE.Group();
     wheelGroup.position.set(155, 0.6, 105);
 
@@ -934,6 +960,7 @@ export class AdventureMapRenderer {
     const bwIsland = new THREE.Mesh(bwIslandGeo, sandMat);
     wheelGroup.add(bwIsland);
 
+    // Vertical Standing Wheel Rim Group
     const wheelRimGroup = new THREE.Group();
     wheelRimGroup.position.y = 13;
     const rimGeo = new THREE.TorusGeometry(10, 0.7, 6, 24);
@@ -949,6 +976,19 @@ export class AdventureMapRenderer {
     }
     wheelGroup.add(wheelRimGroup);
     this.ferrisWheelRim = wheelRimGroup;
+
+    // A-Frame Wheel Support Legs
+    const legGeo = new THREE.CylinderGeometry(0.3, 0.4, 15, 6);
+    const legMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+    const legL = new THREE.Mesh(legGeo, legMat);
+    legL.position.set(-4, 7, 0);
+    legL.rotation.z = -0.25;
+    wheelGroup.add(legL);
+
+    const legR = new THREE.Mesh(legGeo, legMat);
+    legR.position.set(4, 7, 0);
+    legR.rotation.z = 0.25;
+    wheelGroup.add(legR);
 
     const flagWheel = this.createRedFlag(3.5);
     flagWheel.position.set(0, 24, 0);
@@ -1053,7 +1093,7 @@ export class AdventureMapRenderer {
     this.badgesContainer.innerHTML = '';
     this.activeBadges = [];
 
-    // The 12 primary landmarks from the reference image + Citadel
+    // The 12 primary landmarks from the reference image with accurate badge positions
     const PRIMARY_LANDMARKS: PrimaryBadgeConfig[] = [
       {
         id: 'giza',
@@ -1062,7 +1102,8 @@ export class AdventureMapRenderer {
         category: 'monuments',
         teleportCoords: [-155, 2, 36],
         modelPos: [-135, 4, 25],
-        pinHeight: 18
+        badgePos: [-135, 16, 25],
+        pinHeight: 12
       },
       {
         id: 'fushimi_inari',
@@ -1071,7 +1112,8 @@ export class AdventureMapRenderer {
         category: 'nature',
         teleportCoords: [-190, 4, -20],
         modelPos: [-125, 4, -18],
-        pinHeight: 18
+        badgePos: [-125, 16, -18],
+        pinHeight: 12
       },
       {
         id: 'tokyo_tower',
@@ -1080,7 +1122,8 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [-176, 2, -74],
         modelPos: [-115, 4, -65],
-        pinHeight: 32
+        badgePos: [-115, 28, -65],
+        pinHeight: 24
       },
       {
         id: 'seoul',
@@ -1089,7 +1132,8 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [-65, 2, -95],
         modelPos: [-65, 4, -95],
-        pinHeight: 20
+        badgePos: [-65, 18, -95],
+        pinHeight: 14
       },
       {
         id: 'taj_mahal',
@@ -1098,7 +1142,8 @@ export class AdventureMapRenderer {
         category: 'monuments',
         teleportCoords: [80, 4, -135],
         modelPos: [70, 4, -135],
-        pinHeight: 28
+        badgePos: [70, 24, -135],
+        pinHeight: 20
       },
       {
         id: 'eiffel',
@@ -1107,7 +1152,8 @@ export class AdventureMapRenderer {
         category: 'monuments',
         teleportCoords: [26, 2, -38],
         modelPos: [24, 4, -42],
-        pinHeight: 30
+        badgePos: [24, 26, -42],
+        pinHeight: 22
       },
       {
         id: 'citadel',
@@ -1116,7 +1162,8 @@ export class AdventureMapRenderer {
         category: 'monuments',
         teleportCoords: [0, 2, -4],
         modelPos: [0, 4, 0],
-        pinHeight: 22
+        badgePos: [0, 18, -8],
+        pinHeight: 14
       },
       {
         id: 'hollywood',
@@ -1125,7 +1172,8 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [165, 26, -100],
         modelPos: [125, 8, -85],
-        pinHeight: 22
+        badgePos: [125, 20, -85],
+        pinHeight: 12
       },
       {
         id: 'mcqueen',
@@ -1134,7 +1182,8 @@ export class AdventureMapRenderer {
         category: 'transit',
         teleportCoords: [190, 2, -15],
         modelPos: [125, 4, -25],
-        pinHeight: 18
+        badgePos: [125, 14, -25],
+        pinHeight: 10
       },
       {
         id: 'palm_jumeirah',
@@ -1143,7 +1192,8 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [324, 2, 46],
         modelPos: [130, 2, 35],
-        pinHeight: 14
+        badgePos: [130, 10, 35],
+        pinHeight: 8
       },
       {
         id: 'burj_al_arab',
@@ -1152,7 +1202,8 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [220, 2, 110],
         modelPos: [145, 2, 70],
-        pinHeight: 24
+        badgePos: [145, 18, 70],
+        pinHeight: 16
       },
       {
         id: 'ain_dubai_wheel',
@@ -1161,12 +1212,13 @@ export class AdventureMapRenderer {
         category: 'cities',
         teleportCoords: [262, 2, 146],
         modelPos: [155, 2, 105],
-        pinHeight: 22
+        badgePos: [155, 18, 105],
+        pinHeight: 16
       }
     ];
 
     PRIMARY_LANDMARKS.forEach(cfg => {
-      // 1. In 3D: Slender metallic pin stem with glowing base
+      // 1. In 3D: Slender metallic pin stem with glowing base ring
       const pinGroup = new THREE.Group();
       pinGroup.position.set(cfg.modelPos[0], cfg.modelPos[1], cfg.modelPos[2]);
 
@@ -1195,7 +1247,6 @@ export class AdventureMapRenderer {
         <div class="mc-badge-arrow"></div>
       `;
 
-      // Badge Click: Teleport immediately
       badgeEl.addEventListener('click', (e) => {
         e.stopPropagation();
         sound.playLevelUp();
@@ -1203,7 +1254,6 @@ export class AdventureMapRenderer {
         this.onClose();
       });
 
-      // Badge Hover: Show selection ring on 3D building
       badgeEl.addEventListener('mouseenter', () => {
         this.selectionRing.position.set(cfg.modelPos[0], cfg.modelPos[1] + 0.4, cfg.modelPos[2]);
         this.selectionRing.visible = true;
@@ -1214,7 +1264,7 @@ export class AdventureMapRenderer {
 
       this.badgesContainer!.appendChild(badgeEl);
 
-      const anchorPos = new THREE.Vector3(cfg.modelPos[0], cfg.modelPos[1] + cfg.pinHeight + 1.2, cfg.modelPos[2]);
+      const anchorPos = new THREE.Vector3(...cfg.badgePos);
       const modelPosVec = new THREE.Vector3(...cfg.modelPos);
 
       this.activeBadges.push({
@@ -1228,7 +1278,7 @@ export class AdventureMapRenderer {
       });
     });
 
-    // 3. Player Badge: "YOU [LAKSHYA]"
+    // 3. Player Badge: "YOU [LAKSHYA]" (Positioned cleanly to not overlap Citadel)
     const playerBadgeEl = document.createElement('div');
     playerBadgeEl.className = 'mc-map-badge is-player';
     playerBadgeEl.innerHTML = `
@@ -1241,12 +1291,14 @@ export class AdventureMapRenderer {
     const px = this.playerPos.x;
     const py = this.playerPos.y;
     const pz = this.playerPos.z;
+    // Offset player badge slightly south of spawn so it never overlaps Citadel
+    const playerAnchor = new THREE.Vector3(px, py + 10, pz + 8);
     this.activeBadges.push({
       id: 'player',
       label: 'YOU [LAKSHYA]',
       category: 'monuments',
       teleportCoords: [px, py, pz],
-      anchorPos: new THREE.Vector3(px, py + 12, pz),
+      anchorPos: playerAnchor,
       modelPos: new THREE.Vector3(px, py, pz),
       el: playerBadgeEl,
       isPlayer: true
@@ -1301,13 +1353,10 @@ export class AdventureMapRenderer {
   // ---------------------------------------------------------------------------
   private createBirds() {
     const birdConfigs = [
-      // Flock 1: Coastal lagoon gliders (South-East bay & beach village)
       { center: new THREE.Vector3(60, 0, 65), rx: 100, rz: 80, speed: 0.0007, alt: 35, phase: 0.0, flap: 0.012 },
       { center: new THREE.Vector3(60, 0, 65), rx: 108, rz: 86, speed: 0.0007, alt: 37, phase: 0.35, flap: 0.013 },
       { center: new THREE.Vector3(60, 0, 65), rx: 94, rz: 74, speed: 0.0007, alt: 33, phase: 0.75, flap: 0.011 },
       { center: new THREE.Vector3(60, 0, 65), rx: 114, rz: 90, speed: 0.0007, alt: 39, phase: 1.15, flap: 0.012 },
-
-      // Flock 2: Island mountain & citadel cruisers (North-West ridge & castle)
       { center: new THREE.Vector3(-20, 0, -30), rx: 90, rz: 110, speed: -0.0006, alt: 46, phase: 0.2, flap: 0.011 },
       { center: new THREE.Vector3(-20, 0, -30), rx: 98, rz: 116, speed: -0.0006, alt: 48, phase: 0.65, flap: 0.013 },
       { center: new THREE.Vector3(-20, 0, -30), rx: 84, rz: 102, speed: -0.0006, alt: 44, phase: 1.1, flap: 0.010 }
@@ -1481,7 +1530,7 @@ export class AdventureMapRenderer {
     });
 
     document.getElementById('btn-map-reset')?.addEventListener('click', () => {
-      this.cameraTarget.set(10, 2, -10);
+      this.cameraTarget.set(10, 4, -20);
       this.setZoom(1.0);
       sound.playClick();
     });
@@ -1553,7 +1602,6 @@ export class AdventureMapRenderer {
     const tempVec = new THREE.Vector3();
 
     this.activeBadges.forEach(b => {
-      // Check filter
       if (this.activeFilter !== 'all' && !b.isPlayer && b.category !== this.activeFilter) {
         b.el.style.display = 'none';
         return;
@@ -1561,11 +1609,9 @@ export class AdventureMapRenderer {
 
       tempVec.copy(b.anchorPos).project(this.camera);
 
-      // Convert NDC to screen pixels
       const sx = (tempVec.x * 0.5 + 0.5) * width;
       const sy = (-tempVec.y * 0.5 + 0.5) * height;
 
-      // Frustum clipping check
       if (
         tempVec.z >= -1 &&
         tempVec.z <= 1 &&
