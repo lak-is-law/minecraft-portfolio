@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World of Lakshya — Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Pirata+One&display=swap" rel="stylesheet">
+<style>
+:root{--wood:#2a1a0c;--wood2:#4a2f17;--gold:#e2b857;--parch:#f1e2b5;--ink:#3a230f;--red:#d6262c}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0a2f4d;overflow:hidden;font-family:'Cinzel',Georgia,serif;color:var(--parch)}
+#app{position:fixed;inset:0;cursor:grab;user-select:none;touch-action:none}
+#app.drag{cursor:grabbing}
+svg#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.panel{position:absolute;background:linear-gradient(#3b2512,#24160a);border:2px solid var(--gold);border-radius:10px;box-shadow:0 0 0 2px #1a0f06,0 8px 24px #0009,inset 0 0 18px #0007;z-index:5}
+.btn{font:700 12px 'Cinzel',serif;letter-spacing:.08em;color:var(--parch);background:linear-gradient(#5a3a1c,#3a2410);border:1.5px solid #b58a3a;border-radius:6px;padding:8px 12px;cursor:pointer;text-transform:uppercase}
+.btn:hover{background:linear-gradient(#7a5226,#4d3016);color:#fff}
+.btn.on{background:linear-gradient(#e2b857,#b98b2e);color:#2a1a0c}
+#title{left:20px;top:20px;padding:10px 16px 10px 12px;display:flex;gap:12px;align-items:center}
+#title h1{font:400 30px 'Pirata One',serif;margin:0;color:var(--gold);letter-spacing:.04em;line-height:1;text-shadow:0 2px 0 #000}
+#title small{display:block;font-size:11px;color:#d9c694;margin-top:4px;letter-spacing:.06em}
+#title .ic{width:38px;height:38px;border-radius:6px;background:radial-gradient(circle at 40% 35%,#6fd0c9,#1f7ea0);border:2px solid var(--gold);display:grid;place-items:center;font-size:20px}
+#tabs{left:50%;top:20px;transform:translateX(-50%);padding:8px;display:flex;gap:6px}
+#top-r{right:20px;top:20px;display:flex;gap:10px;background:none;border:0;box-shadow:none}
+#top-r .btn{padding:12px 16px}
+#esc{border-color:#c0504a;background:linear-gradient(#7a2520,#4a1410)}
+#drawer{right:20px;top:78px;width:320px;max-height:calc(100% - 180px);display:none;flex-direction:column;padding:10px}
+#drawer.open{display:flex}
+#drawer input{width:100%;padding:9px 10px;border-radius:6px;border:1.5px solid #b58a3a;background:#1a0f06;color:var(--parch);font:600 13px 'Cinzel',serif;margin-bottom:8px}
+#list{overflow:auto;display:flex;flex-direction:column;gap:3px}
+#list div{padding:7px 9px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:.05em;cursor:pointer;display:flex;justify-content:space-between;gap:8px;border:1px solid transparent}
+#list div:hover{background:#5a3a1c;border-color:#b58a3a}
+#list div span{color:#cdb26f;font-weight:600;white-space:nowrap}
+#sel{left:20px;top:100px;width:270px;padding:14px;display:none}
+#sel.show{display:block}
+#sel h2{margin:0 0 4px;font:400 24px 'Pirata One',serif;color:var(--gold)}
+#sel p{margin:2px 0 10px;font-size:12px;color:#d9c694;letter-spacing:.05em}
+#status{left:20px;bottom:20px;padding:10px 16px;font-size:13px;font-weight:700;letter-spacing:.05em;display:flex;gap:10px;align-items:center}
+#status i{width:10px;height:10px;border-radius:50%;background:#43d17a;box-shadow:0 0 8px #43d17a}
+#quick{left:calc(20px + 420px);bottom:20px;display:flex;gap:6px;padding:8px}
+#zoom{right:20px;bottom:20px;display:flex;gap:6px;padding:8px}
+#scale{right:20px;bottom:86px;padding:6px 10px 8px;font-size:11px;font-weight:700;letter-spacing:.06em}
+#scale b{display:block;height:4px;background:var(--gold);margin-top:4px;border-radius:2px;width:100px}
+#compass{left:20px;bottom:86px;width:92px;height:92px;border-radius:50%;padding:0;overflow:hidden}
+#vl,#hl{position:absolute;pointer-events:none;z-index:3;display:none}
+#vl{top:0;bottom:0;width:0;border-left:2px dashed #ffd24a99}
+#hl{left:0;right:0;height:0;border-top:2px dashed #ffd24a99}
+.cloud{position:absolute;pointer-events:none;z-index:4;width:34vw;height:34vh;filter:blur(14px);opacity:.92}
+.cloud.tl{left:-10vw;top:-10vh;background:radial-gradient(ellipse at 60% 60%,#fff 0,#fffd 30%,#f4d9b855 55%,transparent 72%)}
+.cloud.tr{right:-10vw;top:-10vh;background:radial-gradient(ellipse at 40% 60%,#fff 0,#fffd 30%,#f4d9b855 55%,transparent 72%)}
+.cloud.bl{left:-12vw;bottom:-14vh;background:radial-gradient(ellipse at 60% 40%,#fff 0,#fffd 30%,#f4d9b855 55%,transparent 72%)}
+.cloud.br{right:-12vw;bottom:-14vh;background:radial-gradient(ellipse at 40% 40%,#fff 0,#fffd 30%,#f4d9b855 55%,transparent 72%)}
+#toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.3s;z-index:9;padding:12px 20px;font-weight:700;letter-spacing:.06em;font-size:13px;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.wp{cursor:pointer}
+.wp.dim{opacity:.18}
+.wp:hover .pen{fill:#ff5a4d}
+@media(max-width:900px){#tabs{top:84px;max-width:96vw;overflow:auto}#quick{display:none}#title h1{font-size:22px}#sel{top:140px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="vl"></div><div id="hl"></div>
+  <div class="cloud tl"></div><div class="cloud tr"></div><div class="cloud bl"></div><div class="cloud br"></div>
+
+  <div id="title" class="panel"><div class="ic">🗺️</div><div><h1>World of Lakshya</h1><small id="you-coords">📍 X: -79, Z: 70</small></div></div>
+  <div id="tabs" class="panel"></div>
+  <div id="top-r" class="panel"><button class="btn" id="wpbtn">📜 Waypoints <span id="wpn"></span></button><button class="btn" id="esc">✕ Esc</button></div>
+  <div id="drawer" class="panel"><input id="q" placeholder="Search waypoints…"><div id="list"></div></div>
+  <div id="sel" class="panel"><h2 id="sel-n"></h2><p id="sel-c"></p><button class="btn on" id="sel-go">Travel Here</button> <button class="btn" id="sel-x">Close</button></div>
+
+  <div id="compass" class="panel"><svg viewBox="-50 -50 100 100" width="92" height="92">
+    <circle r="46" fill="#f1e2b5" stroke="#5b3a18" stroke-width="3"/><circle r="36" fill="none" stroke="#5b3a18" stroke-width="1" stroke-dasharray="2 3"/>
+    <path d="M0,-40 L7,0 L0,40 L-7,0Z" fill="#b8272c" opacity=".9"/><path d="M-40,0 L0,-7 L40,0 L0,7Z" fill="#3a230f" opacity=".85"/>
+    <path d="M0,-40 L7,0 L-7,0Z" fill="#e24b4b"/><circle r="4" fill="#e2b857" stroke="#3a230f"/>
+    <g font-family="Cinzel,serif" font-weight="900" font-size="10" fill="#3a230f" text-anchor="middle"><text y="-30">N</text><text y="36">S</text><text x="31" y="3.5">E</text><text x="-31" y="3.5">W</text></g></svg></div>
+  <div id="status" class="panel"><i></i><span id="st-t">Hover the map · Click to Travel Here</span></div>
+  <div id="quick" class="panel"><button class="btn" id="q-you">You</button><button class="btn" id="q-pin">Pin</button><button class="btn on" id="q-rail">Rail</button></div>
+  <div id="scale" class="panel"><span id="sc-t">SCALE: 50 BLOCKS</span><b id="sc-b"></b></div>
+  <div id="zoom" class="panel"><button class="btn" id="z-in">＋ In</button><button class="btn" id="z-out">－ Out</button><button class="btn" id="z-you">◎ You</button><button class="btn" id="z-reset">⟲ Reset</button></div>
+  <div id="toast" class="panel"></div>
+</div>
+
+<script>
+/* ========= CONFIG — edit freely =========
+   Waypoints use MAP pixel coords (px,py). World coords: X=(px-1140)/2.63, Z=(py-790)/2.63 (Citadel = 0,0).
+   Easiest: replace DATA with your real world coords using wp(name, X, Z, cat, tint). */
+const ORIGIN={x:1140,y:790}, PPB=2.63;
+const wpx=(n,px,py,cat,tint)=>({n,px,py,cat,tint,X:Math.round((px-ORIGIN.x)/PPB),Z:Math.round((py-ORIGIN.y)/PPB)});
+const DATA=[
+ wpx('GUILIN',865,395,'nature'),wpx('PANDA RESERVE',800,437,'nature'),wpx('MT FUJI',693,448,'nature'),
+ wpx('TOKYO',715,495,'city'),wpx('TOKYO',735,527,'city'),wpx('TOKYO TOWER',677,543,'monument'),wpx('SENSO-JI',733,569,'monument'),
+ wpx('FUSHIMI INARI',641,684,'monument'),wpx('GYEONGBOKGUNG',938,435,'monument'),wpx('SEOUL',1003,435,'city'),
+ wpx('GEUNJEONGJEON',968,461,'monument'),wpx('SEOUL',970,488,'city'),wpx('KING SEJONG',969,516,'monument'),
+ wpx('CHEONGGYECHEON',970,545,'nature'),wpx('FORBIDDEN CITY',878,456,'monument'),wpx('TERRACOTTA',868,527,'monument'),
+ wpx('ALPS',1135,474,'nature'),wpx('LONDON',1056,585,'city'),wpx('EIFFEL',1209,637,'monument'),wpx('CITADEL',1140,790,'transit'),
+ wpx('TAJ MAHAL',1350,382,'monument'),wpx('HOLLYWOOD',1574,474,'monument'),wpx('HOLLYWOOD',1608,538,'monument'),wpx('HOLLYWOOD',1537,577,'monument'),
+ wpx('RADIATOR SPRINGS',1690,690,'city','red'),wpx('McQUEEN',1650,730,'monument'),wpx('NEO YORK',1403,785,'city'),
+ wpx('DUBAI',1590,890,'city'),wpx('PALM JUMEIRAH',1700,910,'transit'),wpx('PALM JUMEIRAH',1820,885,'monument','yellow'),
+ wpx('PALM JUMEIRAH',1985,905,'monument'),wpx('ATLANTIS RESORT',1992,935,'monument','red'),
+ wpx('WORLD ISLANDS',2060,850,'nature'),wpx('WORLD ISLANDS',2087,905,'nature'),wpx('THE WORLD ISLANDS',2140,968,'nature','yellow'),
+ wpx('BURJ AL ARAB',1719,1076,'monument','blue'),wpx('BLUEWATERS',1835,1140,'city'),wpx('AIN DUBAI WHEEL',1829,1192,'monument','blue'),
+ wpx('GIZA',733,860,'monument'),wpx('MEXICO CITY',864,955,'city')
+];
+const q=new URLSearchParams(location.search);
+const PLAYER={X:q.has('x')?+q.get('x'):-79,Z:q.has('z')?+q.get('z'):70,yaw:q.has('yaw')?+q.get('yaw'):200};
+const TINT={def:['#f1e2b5','#3a230f','#5b3a18'],red:['#f6c9c0','#8c1a14','#a3322a'],yellow:['#fff0a6','#5b4300','#b58a1a'],blue:['#cfe6f5','#17466e','#3b78a8']};
+/* ========================================= */
+
+const NS='http://www.w3.org/2000/svg', $=id=>document.getElementById(id);
+const toMap=(X,Z)=>[ORIGIN.x+X*PPB,ORIGIN.y+Z*PPB];
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+function smooth(p,closed=true){const n=p.length;let d=`M${p[0][0]},${p[0][1]}`;const L=closed?n:n-1;
+ for(let i=0;i<L;i++){const p0=p[(i-1+n)%n],p1=p[i],p2=p[(i+1)%n],p3=p[(i+2)%n];
+  d+=`C${p1[0]+(p2[0]-p0[0])/6},${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6},${p2[1]-(p3[1]-p1[1])/6} ${p2[0]},${p2[1]}`}
+ return d+(closed?'Z':'')}
+function pip(pt,poly){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const[a,b]=poly[i],[x,y]=poly[j];if((b>pt[1])!=(y>pt[1])&&pt[0]<(x-a)*(pt[1]-b)/(y-b)+a)c=!c}return c}
+
+/* ---------- Terrain ---------- */
+const island=[[640,430],[700,330],[900,300],[1100,270],[1300,250],[1500,290],[1620,360],[1665,520],[1645,700],[1625,860],[1600,1000],[1380,1070],[1262,1110],[1245,1260],[1170,1325],[1050,1285],[1030,1135],[900,1120],[760,1080],[640,1000],[615,800],[600,600]];
+const forest=[[790,340],[925,335],[955,565],[830,600],[775,520]];
+const desertNE=[[1240,385],[1430,312],[1565,335],[1625,430],[1645,640],[1500,685],[1340,640],[1250,520]];
+const city=[[1340,632],[1600,660],[1612,905],[1400,912],[1340,800]];
+const gizaR=[[655,842],[800,832],[935,905],[905,1035],[700,975]];
+const tokyoR=[[680,545],[780,560],[765,640],[690,655]];
+const peakDefs=[[1070,455,110],[1110,425,150],[1152,478,100],[1203,476,120],[1098,510,90],[1172,525,80],[1218,500,90]];
+function build(){
+ const S=$('map');let h='';
+ h+=`<defs>
+ <radialGradient id="sea" cx="50%" cy="46%" r="75%"><stop offset="0" stop-color="#1fa3b4"/><stop offset=".45" stop-color="#1678a0"/><stop offset="1" stop-color="#0a2a4d"/></radialGradient>
+ <linearGradient id="grass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fb24a"/><stop offset=".5" stop-color="#5d9a3a"/><stop offset="1" stop-color="#8aa84a"/></linearGradient>
+ <linearGradient id="desert" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e29a3f"/><stop offset="1" stop-color="#b9622a"/></linearGradient>
+ <linearGradient id="giza" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7743a"/><stop offset="1" stop-color="#8a3e1e"/></linearGradient>
+ <linearGradient id="slate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5c6a86"/><stop offset="1" stop-color="#2f3a56"/></linearGradient>
+ <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#bcd0e6"/></linearGradient>
+ <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="26"/></filter>
+ <filter id="blur30"><feGaussianBlur stdDeviation="26"/></filter><filter id="blur6"><feGaussianBlur stdDeviation="5"/></filter>
+ <filter id="paint" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="3" seed="2" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 .12  0 0 0 0 .09  0 0 0 0 .03  0 0 0 .55 -.18"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+ <filter id="drop"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity=".4"/></filter>
+ <pattern id="waves" width="90" height="46" patternUnits="userSpaceOnUse"><path d="M0,23 q11,-12 22,0 t22,0 t22,0 t22,0" fill="none" stroke="#ffffff" stroke-opacity=".09" stroke-width="2"/></pattern>
+ <clipPath id="clipI"><path d="${smooth(island)}"/></clipPath></defs>`;
+ h+=`<rect x="-2400" y="-1400" width="7200" height="4200" fill="url(#sea)"/><rect x="-2400" y="-1400" width="7200" height="4200" fill="url(#waves)"/>`;
+ // ocean decor
+ h+=`<g opacity=".95"><ellipse cx="2040" cy="905" rx="300" ry="190" fill="#3fd0c9" opacity=".35" filter="url(#blur30)"/><ellipse cx="1830" cy="1160" rx="130" ry="100" fill="#3fd0c9" opacity=".35" filter="url(#blur30)"/></g>`;
+ const ip=smooth(island);
+ h+=`<g filter="url(#rough)"><path d="${ip}" fill="none" stroke="#35c7c3" stroke-width="150" stroke-linejoin="round" opacity=".38" filter="url(#blur30)"/>
+ <path d="${ip}" fill="none" stroke="#7fe6d3" stroke-width="64" opacity=".55" filter="url(#blur6)"/>
+ <path d="${ip}" fill="#e6cd8a" stroke="#f2e2a8" stroke-width="30"/><path d="${ip}" fill="url(#grass)" stroke="#d1b878" stroke-width="4" transform="translate(1140 790) scale(.985) translate(-1140 -790)"/></g>`;
+ // regions (clipped)
+ h+=`<g clip-path="url(#clipI)"><g filter="url(#rough)">
+ <path d="${smooth(forest)}" fill="#244f2e"/><path d="${smooth(desertNE)}" fill="url(#desert)"/>
+ <path d="${smooth(city)}" fill="url(#slate)"/><path d="${smooth(gizaR)}" fill="url(#giza)"/><path d="${smooth(tokyoR)}" fill="#e977b4"/>
+ <path d="${smooth([[1045,990],[1250,990],[1250,1120],[1170,1170],[1050,1130]])}" fill="#e4cc86"/>
+ <rect x="1076" y="1105" width="156" height="170" rx="10" fill="#cc3a78"/><rect x="962" y="856" width="120" height="118" rx="14" fill="#f2cd4e"/>
+ <path d="${smooth([[930,500],[1020,500],[1022,570],[935,572]])}" fill="#3a9fd8"/>
+ <ellipse cx="710" cy="942" rx="22" ry="14" fill="#4cb8f0"/><rect x="1340" y="470" width="20" height="122" rx="6" fill="#3b8ed0"/>
+ <path d="${smooth([[1500,640],[1690,640],[1700,780],[1560,800]])}" fill="#bd5a28"/></g></g>`;
+ // grass tufts / painterly texture
+ h+=`<path d="${ip}" fill="#000" filter="url(#paint)" opacity=".5" clip-path="url(#clipI)"/>`;
+ // trees
+ let t='';let c=0;while(c<95){const p=[790+rnd()*165,335+rnd()*265];if(!pip(p,forest))continue;c++;t+=`<g transform="translate(${p[0]},${p[1]})"><path d="M-9,4 L0,-20 L9,4Z" fill="#1c6b3a"/><path d="M-7,-6 L0,-26 L7,-6Z" fill="#2c8a48"/><rect x="-1.5" y="4" width="3" height="5" fill="#4a2f17"/></g>`}
+ const meadows=[[1000,620,1300,780,40],[1100,860,1230,1000,22],[700,640,950,780,20],[1240,880,1560,1040,26]];
+ meadows.forEach(([a,b,c2,d,n])=>{for(let i=0;i<n;i++){const x=a+rnd()*(c2-a),y=b+rnd()*(d-b);if(!pip([x,y],island)||pip([x,y],city)||pip([x,y],desertNE))continue;t+=`<g transform="translate(${x},${y})"><circle r="9" fill="#2f7a35"/><circle cx="-3" cy="-3" r="5" fill="#4aa14a"/><rect x="-1.5" y="8" width="3" height="5" fill="#4a2f17"/></g>`}});
+ h+=`<g clip-path="url(#clipI)">${t}</g>`;
+ // city skyline (Neo York)
+ let sky='';for(let i=0;i<34;i++){const x=1360+rnd()*220,y=700+rnd()*190,w=10+rnd()*14,ht=18+rnd()*44;sky+=`<rect x="${x}" y="${y-ht}" width="${w}" height="${ht}" fill="${['#8fa1c4','#6f82aa','#a9b6d3'][i%3]}" stroke="#222c44" stroke-width="1.5"/><rect x="${x+2}" y="${y-ht+4}" width="3" height="3" fill="#ffe27a"/>`}
+ h+=`<g opacity=".92">${sky}</g>`;
+ // pyramids + oasis palms
+ h+=[[730,892,46],[766,926,36],[796,948,28]].map(([x,y,s])=>`<path d="M${x-s},${y} L${x},${y-s*1.15} L${x+s},${y}Z" fill="#d79a52" stroke="#7a431c" stroke-width="2"/><path d="M${x},${y-s*1.15} L${x+s},${y} L${x+s*.2},${y}Z" fill="#a8672d"/>`).join('');
+ // Taj Mahal marble
+ h+=`<g transform="translate(1350,385)"><rect x="-26" y="-10" width="52" height="22" rx="3" fill="#fbf6ea" stroke="#9a8f7a" stroke-width="2"/><circle cy="-14" r="12" fill="#fff" stroke="#9a8f7a" stroke-width="2"/><rect x="-36" y="-22" width="4" height="30" fill="#fff" stroke="#9a8f7a"/><rect x="32" y="-22" width="4" height="30" fill="#fff" stroke="#9a8f7a"/></g>`;
+ // mountains
+ h+=peakDefs.map(([x,y,s])=>`<g filter="url(#drop)"><path d="M${x-s*.55},${y} L${x},${y-s} L${x+s*.55},${y}Z" fill="#7a869c"/><path d="M${x},${y-s} L${x+s*.55},${y} L${x+s*.1},${y}Z" fill="#5a6580"/><path d="M${x-s*.2},${y-s*.62} L${x},${y-s} L${x+s*.2},${y-s*.62} L${x+s*.06},${y-s*.52} L${x-s*.04},${y-s*.62}Z" fill="url(#snow)"/></g>`).join('');
+ h+=`<ellipse cx="1108" cy="500" rx="38" ry="22" fill="#a9d9f5" stroke="#fff" stroke-width="3"/>`;
+ // volcano
+ h+=`<g filter="url(#drop)"><path d="M1105,445 L1148,372 L1215,372 L1262,445Z" fill="#3b3550"/><path d="M1215,372 L1262,445 L1200,445Z" fill="#251f38"/><ellipse cx="1181" cy="370" rx="34" ry="9" fill="#ff7a1f"/><ellipse cx="1181" cy="370" rx="20" ry="5" fill="#ffd86b"/>
+ <path d="M1170,376 q-8,30 -2,60" stroke="#ff6a1f" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M1196,376 q10,26 4,58" stroke="#ff6a1f" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+ <g fill="#fff" opacity=".6" filter="url(#blur6)"><circle cx="1188" cy="338" r="22"/><circle cx="1204" cy="308" r="26"/><circle cx="1190" cy="282" r="20"/></g>`;
+ // Fuji
+ h+=`<g transform="translate(693,440)"><path d="M-30,10 L0,-34 L30,10Z" fill="#6b7aa8"/><path d="M-11,-18 L0,-34 L11,-18 L4,-14 L-3,-18Z" fill="#fff"/></g>`;
+ // Palm Jumeirah
+ let pj='<ellipse cx="1800" cy="912" rx="205" ry="100" fill="#f0dfa0" stroke="#e9cf84" stroke-width="10"/>';
+ for(let i=-6;i<=6;i++){const a=i*0.2;const x2=1770+Math.cos(a)*190,y2=912+Math.sin(a)*92;pj+=`<path d="M1770,912 Q${(1770+x2)/2},${912+Math.sin(a)*40-6} ${x2},${y2}" stroke="#3f9a44" stroke-width="12" fill="none" stroke-linecap="round" opacity=".95"/>`}
+ pj+='<path d="M1590,912 H1775" stroke="#e8e0cf" stroke-width="12"/><path d="M1590,912 H1775" stroke="#8a7a58" stroke-width="2" stroke-dasharray="6 6"/>';
+ h+=`<g filter="url(#drop)">${pj}</g>`;
+ // World Islands
+ [[2040,862],[2065,832],[2090,885],[2110,845],[2060,905],[2140,968],[2118,915]].forEach(([x,y])=>{h+=`<circle cx="${x}" cy="${y}" r="15" fill="#f0dfa0" stroke="#58c9c4" stroke-width="6"/><circle cx="${x}" cy="${y}" r="7" fill="#4aa14a"/>`});
+ // Burj Al Arab, Bluewaters, wheel
+ h+=`<circle cx="1719" cy="1078" r="22" fill="#f6edc9" stroke="#58c9c4" stroke-width="7"/><path d="M1719,1090 L1719,1052 Q1731,1066 1719,1090" fill="#fff" stroke="#6a8aa8" stroke-width="2"/>
+ <circle cx="1829" cy="1175" r="28" fill="#f6edc9" stroke="#58c9c4" stroke-width="7"/><circle cx="1829" cy="1175" r="18" fill="none" stroke="#6a5cd8" stroke-width="3"/><path d="M1829,1157 V1193 M1811,1175 H1847 M1816,1162 L1842,1188 M1842,1162 L1816,1188" stroke="#6a5cd8" stroke-width="2"/>
+ <path d="M1605,1030 q60,10 96,40" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none"/><path d="M1600,1105 q130,20 210,60" stroke="#fff" stroke-opacity=".6" stroke-width="2" fill="none"/>`;
+ // roads
+ const road=d=>`<path d="${d}" fill="none" stroke="#7a4d22" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#f1d28a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`;
+ h+=road('M1140,790 V1215')+road('M1140,790 V625 L960,565')+road('M1140,630 L1338,510')+road('M1140,790 H1540')+road('M1100,820 L930,925');
+ h+=`<g id="rail">${[`M1150,850 C1162,905 1182,1000 1205,1022 L1470,1048`,`M1150,850 L1262,872 L1425,870 L1450,885 V1000 L1486,1004`,`M1450,870 L1600,998`].map(d=>`<path d="${d}" fill="none" stroke="#6a2d10" stroke-width="9" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#ffb13b" stroke-width="5" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="3 8"/>`).join('')}<rect x="1464" y="1036" width="12" height="26" rx="5" fill="#2f7fe0" stroke="#fff" stroke-width="2"/></g>`;
+ // Citadel
+ h+=`<g filter="url(#drop)"><circle cx="1140" cy="790" r="56" fill="#2f78d6" stroke="#f1d28a" stroke-width="7"/><circle cx="1140" cy="790" r="36" fill="#cfe9f7"/><circle cx="1140" cy="790" r="15" fill="#6fa77a"/><rect x="1082" y="784" width="12" height="12" fill="#eee"/><rect x="1186" y="784" width="12" height="12" fill="#eee"/></g>`;
+ // ships & sea creatures
+ const ship=(x,y,r)=>`<g transform="translate(${x},${y}) rotate(${r})" filter="url(#drop)"><path d="M-34,0 L34,0 L24,14 L-24,14Z" fill="#6b3f1d" stroke="#2a1a0c" stroke-width="2"/><rect x="-1.5" y="-40" width="3" height="40" fill="#3a230f"/><path d="M3,-38 L30,-8 L3,-8Z" fill="#fff6dc" stroke="#9a8f7a"/><path d="M-3,-34 L-22,-8 L-3,-8Z" fill="#f1e2b5" stroke="#9a8f7a"/></g>`;
+ h+=ship(530,392,-18)+ship(1722,352,-24)+ship(1000,1380,8);
+ h+=`<g fill="none" stroke="#3a6b3a" stroke-width="12" stroke-linecap="round"><path d="M2000,230 q-20,-50 10,-70 q30,-20 40,20" stroke="#5a7a2a"/><path d="M2060,240 q10,-60 45,-70 q30,-6 24,26" stroke="#4a6a24"/></g><ellipse cx="2040" cy="250" rx="70" ry="14" fill="#fff" opacity=".4" filter="url(#blur6)"/>
+ <g transform="translate(1262,1405)"><ellipse rx="64" ry="18" fill="#fff" opacity=".5" filter="url(#blur6)"/><path d="M-30,0 q10,-34 34,-22 q22,10 8,26Z" fill="#2d8f6e" stroke="#154a36" stroke-width="2"/><path d="M-62,-4 q10,-24 22,-6 M30,-6 q16,-26 32,-8" stroke="#fff" stroke-width="3" fill="none"/></g>`;
+ // grid ticks
+ for(let X=-250;X<=300;X+=50){const x=ORIGIN.x+X*PPB;h+=`<line x1="${x}" y1="-300" x2="${x}" y2="1700" stroke="#fff" stroke-opacity=".05"/>`;h+=`<text x="${x+4}" y="${ORIGIN.y+14}" font-family="Cinzel" font-size="13" fill="#fff" fill-opacity=".35">${X}</text>`}
+ for(let Z=-250;Z<=250;Z+=50){const y=ORIGIN.y+Z*PPB;h+=`<line y1="${y}" x1="-300" y2="${y}" x2="2800" stroke="#fff" stroke-opacity=".05"/>`}
+ h+=`<g id="markers"></g>`;
+ S.innerHTML=h;
+}
+build();
+
+/* ---------- Markers ---------- */
+const M=$('markers');let marks=[];
+function mk(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e}
+DATA.forEach((d,i)=>{
+ const g=mk('g',{class:'wp'},M);const c=TINT[d.tint||'def'];
+ mk('ellipse',{cx:0,cy:1,rx:7,ry:3,fill:'#000','fill-opacity':.35},g);
+ mk('line',{x1:0,y1:0,x2:0,y2:-32,stroke:'#2a1a0c','stroke-width':3,'stroke-linecap':'round'},g);
+ mk('path',{class:'pen',d:'M1,-32 L26,-24 L1,-16Z',fill:'#d6262c',stroke:'#7a1015','stroke-width':1.5,'stroke-linejoin':'round'},g);
+ const w=d.n.length*8.4+18;const lab=mk('g',{class:'lab'},g);
+ mk('rect',{x:-w/2,y:-62,width:w,height:21,rx:3,fill:c[0],stroke:c[2],'stroke-width':2},lab);
+ const tx=mk('text',{x:0,y:-47,'text-anchor':'middle','font-family':'Cinzel,serif','font-weight':700,'font-size':12,fill:c[1]},lab);tx.textContent=d.n;
+ g.addEventListener('pointerdown',e=>e.stopPropagation());
+ marks.push({g,lab,d,w,i,i2:d.cat==='monument'?0:d.cat==='city'?1:2});
+});
+const you=mk('g',{},M);
+you.innerHTML=`<circle r="26" fill="#ff5a4d" fill-opacity=".18"/><circle r="17" fill="#173b6a" fill-opacity=".85" stroke="#9fd8ff" stroke-width="3"/><g id="arrow"><path d="M0,-11 L9,9 L0,4 L-9,9Z" fill="#fff" stroke="#d6262c" stroke-width="2"/></g>
+<g transform="translate(0,-44)"><rect x="-58" y="-11" width="116" height="21" rx="3" fill="#173b6a" stroke="#ffd24a" stroke-width="2"/><text y="4" text-anchor="middle" font-family="Cinzel,serif" font-weight="900" font-size="11" fill="#ffd24a">YOU [LAKSHYA]</text></g>`;
+const pin=mk('g',{style:'display:none'},M);
+pin.innerHTML=`<circle r="6" fill="#ffd24a" stroke="#2a1a0c" stroke-width="2"/><circle r="14" fill="none" stroke="#ffd24a" stroke-width="2" stroke-dasharray="4 4"/>`;
+
+/* ---------- View ---------- */
+const app=$('app'),svg=$('map');
+const st={cx:1150,cy:790,k:1,filter:'all',sel:null,pin:null,rail:true};
+let W=1,H=1,vw=2400,vh=1360,vx=0,vy=0,sc=1;
+const clampK=k=>Math.max(.55,Math.min(7,k));
+function render(){
+ W=app.clientWidth;H=app.clientHeight;vw=2400/st.k;vh=vw*H/W;
+ st.cx=Math.max(-300,Math.min(2700,st.cx));st.cy=Math.max(-100,Math.min(1500,st.cy));
+ vx=st.cx-vw/2;vy=st.cy-vh/2;sc=vw/W;
+ svg.setAttribute('viewBox',`${vx} ${vy} ${vw} ${vh}`);
+ const placed=[];
+ const order=[...marks].sort((a,b)=>(b.i===st.sel)-(a.i===st.sel)||a.i2-b.i2||a.i-b.i);
+ order.forEach(m=>{
+  const d=m.d,vis=st.filter==='all'||st.filter===d.cat;
+  m.g.setAttribute('transform',`translate(${d.px},${d.py}) scale(${sc})`);
+  m.g.classList.toggle('dim',!vis);
+  const sx=(d.px-vx)/sc*1,sy=(d.py-vy)/sc;
+  const r=[sx-m.w/2,sy-62,m.w,22];
+  let show=vis&&sx>-80&&sx<W+80&&sy>-20&&sy<H+80;
+  if(show&&m.i!==st.sel){for(const p of placed){if(r[0]<p[0]+p[2]&&r[0]+r[2]>p[0]&&r[1]<p[1]+p[3]&&r[1]+r[3]>p[1]){show=false;break}}}
+  if(show)placed.push(r);
+  m.lab.style.display=show?'':'none';
+ });
+ const[px,py]=toMap(PLAYER.X,PLAYER.Z);you.setAttribute('transform',`translate(${px},${py}) scale(${sc})`);
+ $('arrow').setAttribute('transform',`rotate(${PLAYER.yaw})`);
+ if(st.pin){const[a,b]=toMap(st.pin.X,st.pin.Z);pin.style.display='';pin.setAttribute('transform',`translate(${a},${b}) scale(${sc})`)}else pin.style.display='none';
+ $('rail').style.display=st.rail?'':'none';
+ $('sc-b').style.width=(50*PPB/sc)+'px';
+}
+const s2m=(sx,sy)=>[vx+sx*sc,vy+sy*sc];
+function fly(cx,cy,k){const a={...st},t0=performance.now();const dur=550;
+ (function f(t){const u=Math.min(1,(t-t0)/dur),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+  st.cx=a.cx+(cx-a.cx)*e;st.cy=a.cy+(cy-a.cy)*e;st.k=a.k+(k-a.k)*e;render();if(u<1)requestAnimationFrame(f)})(t0)}
+function zoomAt(f,sx,sy){const[mx,my]=s2m(sx,sy);const nk=clampK(st.k*f);const nvw=2400/nk,nvh=nvw*H/W;
+ st.cx=mx-(sx/W-.5)*nvw;st.cy=my-(sy/H-.5)*nvh;st.k=nk;render()}
+const dist=(X,Z)=>Math.round(Math.hypot(X-PLAYER.X,Z-PLAYER.Z));
+
+/* ---------- Interaction ---------- */
+let drag=null;
+app.addEventListener('pointerdown',e=>{if(e.target.closest('.panel,.btn'))return;drag={x:e.clientX,y:e.clientY,cx:st.cx,cy:st.cy,moved:false};app.setPointerCapture(e.pointerId)});
+app.addEventListener('pointermove',e=>{
+ const r=app.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;
+ if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)drag.moved=true;if(drag.moved){app.classList.add('drag');st.cx=drag.cx-dx*sc;st.cy=drag.cy-dy*sc;render()}}
+ if(!e.target.closest('.panel')){
+  $('vl').style.display=$('hl').style.display='block';$('vl').style.left=sx+'px';$('hl').style.top=sy+'px';
+  const[mx,my]=s2m(sx,sy),X=Math.round((mx-ORIGIN.x)/PPB),Z=Math.round((my-ORIGIN.y)/PPB);
+  $('st-t').textContent=`[X: ${X}, Z: ${Z}] · ${dist(X,Z)}m from you · Click to Travel Here`}
+});
+app.addEventListener('pointerup',e=>{
+ const was=drag;drag=null;app.classList.remove('drag');
+ if(!was||was.moved||e.target.closest('.panel,.btn'))return;
+ const w=e.target.closest('.wp');if(w){select(marks.find(m=>m.g===w).i);return}
+ const r=app.getBoundingClientRect(),[mx,my]=s2m(e.clientX-r.left,e.clientY-r.top);
+ const X=Math.round((mx-ORIGIN.x)/PPB),Z=Math.round((my-ORIGIN.y)/PPB);
+ st.pin={X,Z};st.sel=null;showCard(`Dropped Pin`,X,Z);render()});
+app.addEventListener('pointerleave',()=>{$('vl').style.display=$('hl').style.display='none'});
+app.addEventListener('wheel',e=>{e.preventDefault();const r=app.getBoundingClientRect();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+window.addEventListener('resize',render);
+window.addEventListener('keydown',e=>{
+ if(e.target.tagName==='INPUT')return;
+ if(e.key==='Escape')closeMap();
+ const p=60*sc;if(e.key==='ArrowLeft'||e.key==='a'){st.cx-=p;render()}if(e.key==='ArrowRight'||e.key==='d'){st.cx+=p;render()}
+ if(e.key==='ArrowUp'||e.key==='w'){st.cy-=p;render()}if(e.key==='ArrowDown'||e.key==='s'){st.cy+=p;render()}
+ if(e.key==='+'||e.key==='=')zoomAt(1.3,W/2,H/2);if(e.key==='-')zoomAt(1/1.3,W/2,H/2)});
+
+/* ---------- UI ---------- */
+const tabsDef=[['all','All'],['monument','Monuments'],['city','Cities'],['transit','Transit'],['nature','Nature']];
+function buildTabs(){$('tabs').innerHTML='';tabsDef.forEach(([k,l])=>{const n=k==='all'?DATA.length:DATA.filter(d=>d.cat===k).length;
+ const b=document.createElement('button');b.className='btn'+(st.filter===k?' on':'');b.textContent=k==='all'?`${l} (${n})`:l;
+ b.onclick=()=>{st.filter=k;buildTabs();buildList();render()};$('tabs').appendChild(b)})}
+function buildList(){const term=$('q').value.trim().toLowerCase();const L=$('list');L.innerHTML='';
+ DATA.map((d,i)=>[d,i]).filter(([d])=>(st.filter==='all'||d.cat===st.filter)&&d.n.toLowerCase().includes(term)).sort((a,b)=>a[0].n.localeCompare(b[0].n)).forEach(([d,i])=>{
+  const r=document.createElement('div');r.innerHTML=`${d.n}<span>${dist(d.X,d.Z)}m</span>`;r.onclick=()=>select(i);L.appendChild(r)})}
+function showCard(name,X,Z){$('sel-n').textContent=name;$('sel-c').textContent=`X: ${X}, Z: ${Z} · ${dist(X,Z)}m from you`;$('sel').classList.add('show');$('sel').dataset.x=X;$('sel').dataset.z=Z;$('sel').dataset.n=name}
+function select(i){const d=DATA[i];st.sel=i;st.pin=null;showCard(d.n,d.X,d.Z);fly(d.px,d.py-20,Math.max(st.k,2));}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
+function travel(X,Z,n){toast(`✦ Travelling to ${n} · X ${X}, Z ${Z}`);
+ window.CraftMap.onTravel&&window.CraftMap.onTravel({x:X,z:Z,name:n});
+ try{parent!==window&&parent.postMessage({source:'craftme-map',type:'travel',x:X,z:Z,name:n},'*')}catch(_){}
+ window.dispatchEvent(new CustomEvent('craftme:travel',{detail:{x:X,z:Z,name:n}}))}
+function closeMap(){window.CraftMap.onClose&&window.CraftMap.onClose();try{parent!==window&&parent.postMessage({source:'craftme-map',type:'close'},'*')}catch(_){}
+ window.dispatchEvent(new CustomEvent('craftme:close'))}
+$('sel-go').onclick=()=>{const s=$('sel').dataset;travel(+s.x,+s.z,s.n)};
+$('sel-x').onclick=()=>{$('sel').classList.remove('show');st.sel=null;st.pin=null;render()};
+$('wpbtn').onclick=()=>$('drawer').classList.toggle('open');$('esc').onclick=closeMap;$('q').oninput=buildList;
+$('z-in').onclick=()=>zoomAt(1.4,W/2,H/2);$('z-out').onclick=()=>zoomAt(1/1.4,W/2,H/2);
+const goYou=()=>{const[x,y]=toMap(PLAYER.X,PLAYER.Z);fly(x,y,Math.max(st.k,2))};
+$('z-you').onclick=goYou;$('q-you').onclick=goYou;
+$('q-pin').onclick=()=>{if(st.pin){const[x,y]=toMap(st.pin.X,st.pin.Z);fly(x,y,Math.max(st.k,2))}else toast('Click the map to drop a pin')};
+$('q-rail').onclick=e=>{st.rail=!st.rail;e.target.classList.toggle('on',st.rail);render()};
+$('z-reset').onclick=()=>fly(1150,790,1);
+$('wpn').textContent=DATA.length;
+
+/* Public API for the game */
+window.CraftMap={onTravel:null,onClose:null,
+ setPlayer(X,Z,yaw){PLAYER.X=X;PLAYER.Z=Z;if(yaw!=null)PLAYER.yaw=yaw;$('you-coords').textContent=`📍 X: ${Math.round(X)}, Z: ${Math.round(Z)}`;render()},
+ waypoints:DATA};
+$('you-coords').textContent=`📍 X: ${PLAYER.X}, Z: ${PLAYER.Z}`;
+buildTabs();buildList();render();
+</script>
+</body>
+</html>
