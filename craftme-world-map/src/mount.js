@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { DATA, PLAYER } from './data.js';
 import { createContext } from './context.js';
 import { createTerrainMesh, createWaterMesh, H, clamp } from './terrain.js';
@@ -197,11 +200,66 @@ export function mountMap(container, options = {}) {
     VW = app.clientWidth || window.innerWidth;
     VH = app.clientHeight || window.innerHeight;
     if (renderer) renderer.setSize(VW, VH);
+    if (composer) composer.setSize(VW, VH);
     camera.aspect = VW / VH;
     camera.updateProjectionMatrix();
   }
   window.addEventListener('resize', resize);
   resize();
+
+  // Bloom Postprocessing Setup
+  let composer = null;
+  try {
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(VW, VH),
+      0.62, // strength
+      0.35, // radius
+      0.82  // threshold
+    );
+    composer.addPass(bloomPass);
+  } catch (err) {
+    console.warn('EffectComposer initialization skipped, falling back to standard renderer:', err);
+    composer = null;
+  }
+
+  // Day / Night Atmosphere and Lighting Controller
+  function updateSky(t) {
+    const c0 = new THREE.Color('#4f9bd9').lerp(new THREE.Color('#070c18'), t);
+    const c1 = new THREE.Color('#a9d4ee').lerp(new THREE.Color('#10192e'), t);
+    const c2 = new THREE.Color('#d9ecf5').lerp(new THREE.Color('#192642'), t);
+    const gr = bgCtx.createLinearGradient(0, 0, 0, 256);
+    gr.addColorStop(0, '#' + c0.getHexString());
+    gr.addColorStop(0.55, '#' + c1.getHexString());
+    gr.addColorStop(1, '#' + c2.getHexString());
+    bgCtx.fillStyle = gr;
+    bgCtx.fillRect(0, 0, 2, 256);
+    bgTex.needsUpdate = true;
+
+    if (scene.fog) {
+      scene.fog.color.copy(new THREE.Color('#a9d0e6').lerp(new THREE.Color('#0f182c'), t));
+    }
+    if (ctx.sun) {
+      ctx.sun.color.copy(new THREE.Color('#fff0d2').lerp(new THREE.Color('#6f88c9'), t));
+      ctx.sun.intensity = THREE.MathUtils.lerp(2.6, 0.35, t);
+    }
+    if (ctx.hemiLight) {
+      ctx.hemiLight.color.copy(new THREE.Color('#dcecff').lerp(new THREE.Color('#182542'), t));
+      ctx.hemiLight.groundColor.copy(new THREE.Color('#4d7a3a').lerp(new THREE.Color('#080d16'), t));
+      ctx.hemiLight.intensity = THREE.MathUtils.lerp(1.05, 0.28, t);
+    }
+    if (ctx.waterMat && ctx.waterMat.uniforms.cD) {
+      ctx.waterMat.uniforms.cD.value.copy(new THREE.Color('#9cc4dc').lerp(new THREE.Color('#0d1726'), t));
+    }
+    if (ctx.night && ctx.night.registry) {
+      for (const reg of ctx.night.registry) {
+        if (reg.mat) {
+          reg.mat.emissiveIntensity = THREE.MathUtils.lerp(reg.dayIntensity, reg.nightIntensity, t);
+        }
+      }
+    }
+  }
 
   // Animation Loop State
   let animId = null;
@@ -289,10 +347,33 @@ export function mountMap(container, options = {}) {
     const scB = container.querySelector('#sc-b');
     if (scB) scB.style.width = (50 / upp) + 'px';
 
+    // Smooth day/night cycle transition
+    if (ctx.night) {
+      if (ctx.night.target === undefined) ctx.night.target = 0;
+      if (Math.abs(ctx.night.t - ctx.night.target) > 0.001) {
+        ctx.night.t += (ctx.night.target - ctx.night.t) * 0.06;
+        updateSky(ctx.night.t);
+      }
+    }
+
+    // Distance LOD culling for models
+    if ((__fc % 30) === 0 && ctx.placedModels) {
+      const camPos = camera.position;
+      ctx.placedModels.forEach(m => {
+        if (m.userData && m.userData.hasLOD) {
+          m.visible = m.position.distanceTo(camPos) < 1400;
+        }
+      });
+    }
+
     ui.updateLabels(VW, VH);
     if ((__fc = (__fc + 1) | 0) % 2 === 0) ui.drawMini();
 
-    renderer.render(scene, camera);
+    if (composer) {
+      composer.render();
+    } else {
+      renderer.render(scene, camera);
+    }
   }
 
   animId = requestAnimationFrame(frame);
@@ -383,6 +464,10 @@ export function mountMap(container, options = {}) {
       }
     });
 
+    if (composer) {
+      composer.dispose();
+      composer = null;
+    }
     if (bgTex) bgTex.dispose();
     if (renderer) {
       renderer.dispose();

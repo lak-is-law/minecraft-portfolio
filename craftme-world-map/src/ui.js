@@ -24,7 +24,7 @@ export function createUI(container, ctx, callbacks = {}) {
         <div class="spacer"></div>
         <div class="brow"><div id="scale" class="panel"><span>50 blocks</span><b id="sc-b"></b></div><div id="zoom" class="panel"><button class="btn" id="z-in" title="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="btn" id="z-out" title="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><hr><button class="btn" id="z-you" title="Centre on you"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button><button class="btn" id="z-reset" title="Reset view"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button></div></div>
       </div>
-      <div id="quick" class="panel"><button class="btn" id="q-you"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>You</span></button><button class="btn" id="q-pin"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Pin</span></button><button class="btn" id="q-view"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg><span>Top view</span></button><button class="btn on" id="q-rail"><svg viewBox="0 0 24 24"><path d="M7 3 5 21M17 3l2 18M6 8h12M5.5 14h13"/></svg><span>Rail</span></button></div>
+      <div id="quick" class="panel"><button class="btn" id="q-you"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>You</span></button><button class="btn" id="q-pin"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Pin</span></button><button class="btn" id="q-view"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg><span>Top view</span></button><button class="btn on" id="q-rail"><svg viewBox="0 0 24 24"><path d="M7 3 5 21M17 3l2 18M6 8h12M5.5 14h13"/></svg><span>Rail</span></button><button class="btn" id="q-night"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span>Night</span></button></div>
       <div id="toast" class="panel"></div>
     </div>
   `;
@@ -102,15 +102,18 @@ export function createUI(container, ctx, callbacks = {}) {
   }
 
   function travel(X, Z, n) {
-    toast(`✦ Travelling to ${n} · X ${X}, Z ${Z}`);
-    if (window.CraftMap && window.CraftMap.onTravel) window.CraftMap.onTravel({ x: X, z: Z, name: n });
+    const wp = DATA.find(d => d.n === n && d.X === X && d.Z === Z) || DATA.find(d => d.n === n);
+    const target = (wp && wp.gameCoords) ? wp.gameCoords : [X, 2, Z];
+    toast(`✦ Travelling to ${n} · X ${target[0]}, Z ${target[2]}`);
+    const payload = { x: target[0], y: target[1], z: target[2], coords: target, name: n };
+    if (window.CraftMap && window.CraftMap.onTravel) window.CraftMap.onTravel(payload);
     try {
       if (typeof parent !== 'undefined' && parent !== window) {
-        parent.postMessage({ source: 'craftme-map', type: 'travel', x: X, z: Z, name: n }, '*');
+        parent.postMessage({ source: 'craftme-map', type: 'travel', ...payload }, '*');
       }
     } catch (_) {}
-    window.dispatchEvent(new CustomEvent('craftme:travel', { detail: { x: X, z: Z, name: n } }));
-    onTravel({ x: X, z: Z, name: n });
+    window.dispatchEvent(new CustomEvent('craftme:travel', { detail: payload }));
+    onTravel(payload);
   }
 
   function closeMap() {
@@ -274,6 +277,13 @@ export function createUI(container, ctx, callbacks = {}) {
       e.currentTarget.classList.toggle('on', ctx.railG.visible);
       toast(ctx.railG.visible ? 'Rail line shown' : 'Rail line hidden');
     }
+  };
+  $('q-night').onclick = e => {
+    ctx.night.target = ctx.night.target === 0 ? 1 : 0;
+    const isNight = ctx.night.target === 1;
+    e.currentTarget.classList.toggle('on', isNight);
+    e.currentTarget.querySelector('span').textContent = isNight ? 'Day' : 'Night';
+    toast(isNight ? '🌙 Nightfall falling across realms' : '☀️ Dawn breaking over the island');
   };
   $('z-reset').onclick = () => {
     const sp = new THREE.Spherical(HOME.d, HOME.phi, 0);

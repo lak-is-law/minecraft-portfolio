@@ -1167,6 +1167,11 @@ class Game {
       this.player.update(dt);
     }
 
+    // Live update map player coords every frame when open
+    if (this.modals.getMapInstance()) {
+      this.modals.getMapInstance()?.setPlayer(this.player.position.x, this.player.position.z, this.player.yaw);
+    }
+
     // 2. Update World effects (spinning gems, portal particles, NPC)
     this.world.update(now * 0.001, this.player.position);
 

@@ -3,6 +3,7 @@ import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
 import { COUNTRY_COAST_POINTS } from '../world/buildings';
 import { AdventureMapRenderer } from './adventureMap';
+import { mountWorldMap, MapInstance } from './worldMap';
 
 export interface NPCDialogOption {
   label: string;
@@ -131,6 +132,11 @@ export class ModalManager {
   private mapMouseUpCleanup: (() => void) | null = null;
   private mapResizeCleanup: (() => void) | null = null;
   private adventureMapRenderer: AdventureMapRenderer | null = null;
+  private mapInstance: MapInstance | null = null;
+
+  public getMapInstance(): MapInstance | null {
+    return this.mapInstance;
+  }
 
   constructor() {
     this.modalContainer = document.getElementById('modal-container')!;
@@ -176,6 +182,10 @@ export class ModalManager {
     if (this.mapResizeCleanup) {
       this.mapResizeCleanup();
       this.mapResizeCleanup = null;
+    }
+    if (this.mapInstance) {
+      this.mapInstance.dispose();
+      this.mapInstance = null;
     }
     if (this.adventureMapRenderer) {
       this.adventureMapRenderer.dispose();
@@ -464,276 +474,38 @@ export class ModalManager {
     return 'nature';
   }
 
-  // 5. Maximised World Map & Realm Atlas GUI (Interactive Real-time Canvas)
+  // 5. Maximised World Map & Realm Atlas GUI (Interactive Real-time 3D Canvas)
   public openFastTravelModal(
     playerPos?: { x: number; y: number; z: number },
     playerYaw?: number,
-    dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
-    trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
+    _dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
+    _trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[]
   ) {
     this.onModalOpen();
     this.modalContainer.classList.add('map-fullscreen');
+    this.modalContainer.style.display = 'flex';
+    this.modalContainer.innerHTML = '<div id="craftme-map-mount-root" style="width:100vw;height:100vh;position:fixed;top:0;left:0;z-index:999999;"></div>';
 
+    const mountRoot = document.getElementById('craftme-map-mount-root')!;
     const info = this.getPlayerInfo?.();
     const effectivePos = playerPos || info?.position || { x: 0, y: 2, z: 0 };
     const effectiveYaw = playerYaw ?? info?.yaw ?? 0;
-    const effectiveDragons = dragons || info?.dragons;
-    const effectiveTrains = trains || (info as any)?.trains;
 
-    const curX = Math.round(effectivePos.x);
-    const curZ = Math.round(effectivePos.z);
-
-    const destinationsHtml = PORTFOLIO_DATA.landmarks.map((lm, idx) => {
-      const cat = ModalManager.getLandmarkCategory(lm.tag);
-      const cleanTag = lm.tag.replace(/[\[\]]/g, '');
-      const px = effectivePos.x;
-      const pz = effectivePos.z;
-      const dist = Math.round(Math.hypot(lm.coords[0] - px, lm.coords[2] - pz));
-      return `
-        <div class="mc-waypoint-card" data-index="${idx}" data-name="${lm.name.toLowerCase()}" data-tag="${cleanTag.toLowerCase()}" data-cat="${cat}">
-          <div class="mc-waypoint-top">
-            <span class="mc-waypoint-tag">${cleanTag}</span>
-            <span class="mc-waypoint-coords">X: ${lm.coords[0]} · Z: ${lm.coords[2]}</span>
-          </div>
-          <div class="mc-waypoint-title">${lm.name}</div>
-          <div class="mc-waypoint-desc">${lm.desc}</div>
-          <div class="mc-waypoint-actions">
-            <span class="mc-waypoint-dist">📍 ${dist}m</span>
-            <button class="mc-waypoint-warp-btn mc-map-chip-btn" data-index="${idx}" title="Fast Travel to ${lm.name}">WARP ↗</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    this.modalContainer.innerHTML = `
-      <div class="mc-game-map-modal">
-        <!-- Floating Top HUD Header -->
-        <header class="mc-game-map-hud-header">
-          <div class="mc-game-map-hud-left">
-            <div class="mc-map-title-badge">
-              <span class="mc-map-badge-icon">🗺️</span>
-              <div class="mc-map-title-group">
-                <h1 class="mc-map-hud-title">WORLD OF LAKSHYA</h1>
-                <span class="mc-map-hud-coords" id="map-live-coords">📍 X: ${curX}, Z: ${curZ}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mc-game-map-hud-center">
-            <div class="mc-map-filter-group" id="mc-map-filter-group">
-              <button class="mc-map-filter-btn active" data-filter="all">ALL (39)</button>
-              <button class="mc-map-filter-btn" data-filter="monuments">🏛️ MONUMENTS</button>
-              <button class="mc-map-filter-btn" data-filter="cities">🏙️ CITIES</button>
-              <button class="mc-map-filter-btn" data-filter="transit">🚆 TRANSIT</button>
-              <button class="mc-map-filter-btn" data-filter="nature">🌲 NATURE</button>
-            </div>
-          </div>
-
-          <div class="mc-game-map-hud-right">
-            <button class="mc-hud-action-btn mc-btn-sidebar-toggle" id="btn-toggle-sidebar" title="Toggle Waypoints Directory">
-              📋 WAYPOINTS <span class="mc-badge-count" id="mc-badge-count">39</span>
-            </button>
-            <button class="mc-hud-action-btn mc-btn-close-map" id="mc-modal-close" title="Close Map (ESC)">
-              ✕ ESC
-            </button>
-          </div>
-        </header>
-
-        <!-- Fullscreen Interactive Canvas Viewport -->
-        <div class="mc-game-map-viewport" id="mc-max-map-canvas-container">
-          <canvas id="max-realm-canvas"></canvas>
-          <div class="mc-map-badges-layer" id="mc-map-badges-layer"></div>
-          <!-- Vintage Nautical Compass Rose (Bottom Left - Matching Reference Image) -->
-          <div class="mc-map-compass-rose" id="mc-map-compass-rose">
-            <div class="mc-compass-dial">
-              <span class="mc-compass-cardinal mc-cardinal-n">N</span>
-              <span class="mc-compass-cardinal mc-cardinal-e">E</span>
-              <span class="mc-compass-cardinal mc-cardinal-s">S</span>
-              <span class="mc-compass-cardinal mc-cardinal-w">W</span>
-              <div class="mc-compass-needle"></div>
-              <div class="mc-compass-center-gem"></div>
-            </div>
-          </div>
-          <div class="mc-map-tooltip-card" id="mc-map-tooltip-card"></div>
-        </div>
-
-        <!-- Floating Bottom HUD Footer -->
-        <footer class="mc-game-map-hud-footer">
-          <div class="mc-hud-footer-left">
-            <div class="mc-map-status-pill">
-              <span class="mc-status-radar-pulse"></span>
-              <span class="cursor-val" id="map-cursor-coords">Select a waypoint or click anywhere to Fast Travel</span>
-            </div>
-            <div class="mc-map-legend-pills">
-              <span class="mc-legend-pill"><i class="atlas-key-dot atlas-key-player"></i> YOU</span>
-              <span class="mc-legend-pill"><i class="atlas-key-dot atlas-key-place"></i> PIN</span>
-              <span class="mc-legend-pill"><i class="atlas-key-line"></i> RAIL</span>
-            </div>
-          </div>
-
-          <div class="mc-hud-footer-right">
-            <div class="mc-map-nav-tools">
-              <button class="mc-map-tool-btn" id="btn-map-zoom-in" type="button" title="Zoom in (+)">➕ IN</button>
-              <button class="mc-map-tool-btn" id="btn-map-zoom-out" type="button" title="Zoom out (-)">➖ OUT</button>
-              <button class="mc-map-tool-btn" id="btn-map-locate-player" type="button" title="Center camera on your position">🎯 YOU</button>
-              <button class="mc-map-tool-btn" id="btn-map-reset" type="button" title="Reset camera view">⟲ RESET</button>
-            </div>
-          </div>
-        </footer>
-
-        <!-- Sleek Collapsible Waypoints Sidebar Drawer -->
-        <aside class="mc-game-map-sidebar" id="mc-map-sidebar">
-          <div class="mc-sidebar-header">
-            <div class="mc-sidebar-top-row">
-              <div class="mc-sidebar-heading">
-                <span class="mc-sidebar-icon">📍</span>
-                <h3>FAST TRAVEL ATLAS</h3>
-              </div>
-              <button class="mc-sidebar-close-btn" id="btn-close-sidebar" title="Close Sidebar">✕</button>
-            </div>
-            <div class="mc-sidebar-search-wrap">
-              <input type="text" id="map-waypoint-search" class="mc-sidebar-search-input" placeholder="🔍 Search 39 destinations..." autocomplete="off" />
-            </div>
-          </div>
-          <div class="mc-sidebar-list" id="mc-sidebar-list">
-            ${destinationsHtml}
-          </div>
-        </aside>
-      </div>
-    `;
-
-    this.modalContainer.style.display = 'flex';
-    document.getElementById('mc-modal-close')?.addEventListener('click', () => this.close());
-
-    // Sidebar drawer toggle
-    const sidebar = document.getElementById('mc-map-sidebar');
-    const toggleBtn = document.getElementById('btn-toggle-sidebar');
-    const closeSidebarBtn = document.getElementById('btn-close-sidebar');
-
-    const toggleSidebar = (force?: boolean) => {
-      if (!sidebar) return;
-      const isOpen = force !== undefined ? force : !sidebar.classList.contains('open');
-      if (isOpen) {
-        sidebar.classList.add('open');
-        toggleBtn?.classList.add('active');
-      } else {
-        sidebar.classList.remove('open');
-        toggleBtn?.classList.remove('active');
-      }
-      sound.playClick();
-    };
-
-    toggleBtn?.addEventListener('click', () => toggleSidebar());
-    closeSidebarBtn?.addEventListener('click', () => toggleSidebar(false));
-
-    // Connect waypoint cards: clicking card pans to it, clicking warp button teleports
-    const cards = document.querySelectorAll('.mc-waypoint-card') as NodeListOf<HTMLElement>;
-    cards.forEach(card => {
-      const idx = parseInt(card.getAttribute('data-index') || '0', 10);
-      const lm = PORTFOLIO_DATA.landmarks[idx];
-      if (!lm) return;
-
-      card.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest('.mc-waypoint-warp-btn')) {
-          e.stopPropagation();
-          sound.playLevelUp();
-          this.onTeleportRequest?.(lm.coords as [number, number, number]);
-          this.close();
-          return;
-        }
-
-        // Pan map camera to this landmark
-        if ((window as any).__mcMapPanTo) {
-          (window as any).__mcMapPanTo(lm.coords, lm);
-        }
-      });
-    });
-
-    // Search filter input & category filtering
-    const searchInput = document.getElementById('map-waypoint-search') as HTMLInputElement;
-    const filterCards = () => {
-      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-      const activeFilterBtn = document.querySelector('.mc-map-filter-btn.active');
-      const activeFilter = activeFilterBtn?.getAttribute('data-filter') || 'all';
-      let count = 0;
-
-      cards.forEach(card => {
-        const name = card.getAttribute('data-name') || '';
-        const tag = card.getAttribute('data-tag') || '';
-        const cat = card.getAttribute('data-cat') || 'all';
-        const matchesSearch = query === '' || name.includes(query) || tag.includes(query);
-        const matchesFilter = activeFilter === 'all' || cat === activeFilter;
-        if (matchesSearch && matchesFilter) {
-          card.style.display = 'flex';
-          count++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-
-      const badgeCount = document.getElementById('mc-badge-count');
-      if (badgeCount) badgeCount.textContent = count.toString();
-    };
-
-    searchInput?.addEventListener('input', filterCards);
-
-    // Render Canvas and attach hover/click interactions
-    this.initMaximizedMapCanvas(effectivePos, effectiveYaw, effectiveDragons, effectiveTrains, filterCards);
-  }
-
-  private initMaximizedMapCanvas(
-    playerPos?: { x: number; y: number; z: number },
-    playerYaw?: number,
-    _dragons?: { position: { x: number; y: number; z: number }; config: { name: string; eyeColor: number; bodyColor: number } }[],
-    _trains?: { position: { x: number; y: number; z: number }; rotation: { y: number } }[],
-    onFilterChange?: () => void
-  ) {
-    const canvas = document.getElementById('max-realm-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
-    const tooltipEl = document.getElementById('mc-map-tooltip-card');
-    const containerEl = document.getElementById('mc-max-map-canvas-container');
-    if (!containerEl) return;
-
-    const effectivePos = playerPos || { x: 0, y: 2, z: 0 };
-    const effectiveYaw = playerYaw ?? 0;
-
-    // Instantiate 3D Isometric Adventure Island Map (Matching Image 2 Reference)
-    this.adventureMapRenderer = new AdventureMapRenderer({
-      canvas,
-      container: containerEl,
-      badgesContainer: document.getElementById('mc-map-badges-layer'),
-      tooltipEl,
-      cursorCoordsEl: document.getElementById('map-cursor-coords'),
-      liveCoordsEl: document.getElementById('map-live-coords'),
-      playerPos: effectivePos,
-      playerYaw: effectiveYaw,
-      onTeleport: (coords) => {
+    this.mapInstance = mountWorldMap(mountRoot, {
+      onTravel: (dest) => {
+        const coords: [number, number, number] = dest.coords || [dest.x, dest.y || 2, dest.z];
+        sound.playLevelUp();
         this.onTeleportRequest?.(coords);
+        this.close();
       },
       onClose: () => {
         this.close();
-      },
-      getLandmarkCategory: ModalManager.getLandmarkCategory
+      }
     });
 
-    // Expose camera pan for external interaction (e.g. sidebar card click)
-    (window as any).__mcMapPanTo = (coords: [number, number, number], lm: any) => {
-      this.adventureMapRenderer?.panToLandmark(coords, lm);
-    };
-
-    // Category filter buttons hookup
-    document.querySelectorAll('.mc-map-filter-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        document.querySelectorAll('.mc-map-filter-btn').forEach(b => b.classList.remove('active'));
-        target.classList.add('active');
-        const filter = (target.getAttribute('data-filter') || 'all') as any;
-        this.adventureMapRenderer?.setFilter(filter);
-        onFilterChange?.();
-        sound.playClick();
-      });
-    });
+    if (this.mapInstance) {
+      this.mapInstance.setPlayer(effectivePos.x, effectivePos.z, effectiveYaw);
+    }
   }
 
   // 6. Sign / Notice Modal
