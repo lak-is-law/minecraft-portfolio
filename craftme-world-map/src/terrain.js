@@ -357,51 +357,6 @@ export function createTerrainMesh(ctx, prebakedHeights = null) {
     metalness: 0
   });
 
-  // Soft moving cloud shadows via onBeforeCompile
-  terrainMat.onBeforeCompile = shader => {
-    shader.uniforms.uCloudTime = { value: 0 };
-    ctx.tickers.push(t => {
-      shader.uniforms.uCloudTime.value = t;
-    });
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <common>',
-      `#include <common>
-      varying vec3 vWorldPosition;`
-    );
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <worldpos_vertex>',
-      `#include <worldpos_vertex>
-      vWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;`
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <common>',
-      `#include <common>
-      varying vec3 vWorldPosition;
-      uniform float uCloudTime;
-      float hashNoise(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-      }
-      float smoothNoise(vec2 p) {
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        return mix(mix(hashNoise(i), hashNoise(i + vec2(1.0, 0.0)), u.x),
-                   mix(hashNoise(i + vec2(0.0, 1.0)), hashNoise(i + vec2(1.0, 1.0)), u.x), u.y);
-      }
-      float cloudShadow(vec2 p, float t) {
-        vec2 uv = p * 0.003 + vec2(t * 0.012, t * 0.006);
-        float n = smoothNoise(uv * 4.0) * 0.6 + smoothNoise(uv * 8.0) * 0.4;
-        return smoothstep(0.40, 0.75, n);
-      }`
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <dithering_fragment>',
-      `#include <dithering_fragment>
-      float cShadow = cloudShadow(vWorldPosition.xz, uCloudTime);
-      gl_FragColor.rgb *= mix(1.0, 0.74, cShadow);`
-    );
-  };
-
   const terrain = new THREE.Mesh(tg, terrainMat);
   terrain.receiveShadow = true;
   terrain.castShadow = true;

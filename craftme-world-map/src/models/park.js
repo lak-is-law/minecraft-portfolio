@@ -75,11 +75,13 @@ export function build(g0, ctx) {
 
   ctx.tickers.push(t => {
     carts.forEach((c, i) => {
-      const u = ((t * 0.045) - i * 0.012 + 1) % 1,
+      const u = Math.min(0.9999, Math.max(0, (((t * 0.045) - i * 0.012) % 1 + 1) % 1)),
             q = cv.getPointAt(u),
             n = cv.getPointAt((u + 0.004) % 1);
-      c.position.set(q.x, q.y + 0.55, q.z);
-      c.rotation.y = Math.atan2(n.x - q.x, n.z - q.z);
+      if (q && n) {
+        c.position.set(q.x, q.y + 0.55, q.z);
+        c.rotation.y = Math.atan2(n.x - q.x, n.z - q.z);
+      }
     });
   });
 

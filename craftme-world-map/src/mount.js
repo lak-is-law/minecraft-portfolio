@@ -1,7 +1,4 @@
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { DATA, PLAYER } from './data.js';
 import { createContext } from './context.js';
 import { createTerrainMesh, createWaterMesh, H, clamp } from './terrain.js';
@@ -200,29 +197,11 @@ export function mountMap(container, options = {}) {
     VW = app.clientWidth || window.innerWidth;
     VH = app.clientHeight || window.innerHeight;
     if (renderer) renderer.setSize(VW, VH);
-    if (composer) composer.setSize(VW, VH);
     camera.aspect = VW / VH;
     camera.updateProjectionMatrix();
   }
   window.addEventListener('resize', resize);
   resize();
-
-  // Bloom Postprocessing Setup
-  let composer = null;
-  try {
-    composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(VW, VH),
-      0.62, // strength
-      0.35, // radius
-      0.82  // threshold
-    );
-    composer.addPass(bloomPass);
-  } catch (err) {
-    console.warn('EffectComposer initialization skipped, falling back to standard renderer:', err);
-    composer = null;
-  }
 
   // Day / Night Atmosphere and Lighting Controller
   function updateSky(t) {
@@ -270,7 +249,7 @@ export function mountMap(container, options = {}) {
   function frame(now) {
     if (isPaused) return;
     animId = requestAnimationFrame(frame);
-    const t = (now - clock0) / 1000;
+    const t = Math.max(0, (now - clock0) / 1000);
 
     ui.stepTween(now);
     controls.update();
@@ -305,10 +284,12 @@ export function mountMap(container, options = {}) {
 
     // Train on rail curve
     if (ctx.railCurve && ctx.train) {
-      const u = (t * 0.02) % 1;
+      const u = Math.min(0.9999, Math.max(0, ((t * 0.02) % 1 + 1) % 1));
       const p = ctx.railCurve.getPoint(u), tg = ctx.railCurve.getTangent(u);
-      ctx.train.position.set(p.x, H(p.x, p.z, ctx) + 1.9, p.z);
-      ctx.train.rotation.y = Math.atan2(tg.x, tg.z) + Math.PI;
+      if (p && tg) {
+        ctx.train.position.set(p.x, H(p.x, p.z, ctx) + 1.9, p.z);
+        ctx.train.rotation.y = Math.atan2(tg.x, tg.z) + Math.PI;
+      }
     }
 
     // Ships & Sea Monster
@@ -357,9 +338,9 @@ export function mountMap(container, options = {}) {
     }
 
     // Distance LOD culling for models
-    if ((__fc % 30) === 0 && ctx.placedModels) {
+    if ((__fc % 30) === 0 && ctx.placedModels && ctx.placedModels.children) {
       const camPos = camera.position;
-      ctx.placedModels.forEach(m => {
+      ctx.placedModels.children.forEach(m => {
         if (m.userData && m.userData.hasLOD) {
           m.visible = m.position.distanceTo(camPos) < 1400;
         }
@@ -369,11 +350,7 @@ export function mountMap(container, options = {}) {
     ui.updateLabels(VW, VH);
     if ((__fc = (__fc + 1) | 0) % 2 === 0) ui.drawMini();
 
-    if (composer) {
-      composer.render();
-    } else {
-      renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
   }
 
   animId = requestAnimationFrame(frame);
@@ -464,10 +441,6 @@ export function mountMap(container, options = {}) {
       }
     });
 
-    if (composer) {
-      composer.dispose();
-      composer = null;
-    }
     if (bgTex) bgTex.dispose();
     if (renderer) {
       renderer.dispose();
