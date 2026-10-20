@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { VoxelWorld, ProjectBanner } from '../world/world';
 import { sound } from './audio';
 import { Project } from '../data/portfolioData';
+import { safeOpenUrl } from '../utils/security';
 
 const SPAWN_POSITION = new THREE.Vector3(0, 2, -4);
 
@@ -262,7 +263,7 @@ export class Player {
           }
           if (banner.project.liveUrl) {
             try {
-              window.open(banner.project.liveUrl, '_blank');
+              safeOpenUrl(banner.project.liveUrl, '_blank');
               // Free cursor immediately so user can navigate to the newly opened tab!
               if (document.pointerLockElement) {
                 document.exitPointerLock();
@@ -296,6 +297,11 @@ export class Player {
         this.triggerSwing();
         this.handleRightClick();
       }
+    });
+
+    // Prevent default context menu on the 3D canvas so right-clicking interacts smoothly in-game instead of triggering browser "Inspect"
+    this.domElement.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
     });
 
     // Prevent context menu while pointer locked
@@ -2127,7 +2133,7 @@ export class Player {
         this.onHammerBanner(banner.project);
       }
       if (banner.project.liveUrl) {
-        window.open(banner.project.liveUrl, '_blank');
+        safeOpenUrl(banner.project.liveUrl, '_blank');
       }
       return;
     }
@@ -2169,10 +2175,9 @@ export class Player {
       return;
     }
     // Proximity fallback: check if player is facing an NPC within 8.0 blocks
-    const origin = this.camera.position.clone();
-    const dir = new THREE.Vector3();
-    this.camera.getWorldDirection(dir);
-    const hit = this.world.checkNPCHit(origin, dir, 8.0);
+    const origin = this.camera.position;
+    this.camera.getWorldDirection(this.scratchRayDir);
+    const hit = this.world.checkNPCHit(origin, this.scratchRayDir, 8.0);
     if (hit && this.onInteract) {
       this.triggerSwing();
       this.onInteract({

@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { TX0, TX1, TZ0, TZ1, STEP, nx, nz, T, colorAt } from '../src/terrain.js';
-import { createContext } from '../src/context.js';
-import { DATA } from '../src/data.js';
+import { TX0, TX1, TZ0, TZ1, STEP, nx, nz, T, colorAt } from '../src/map/terrain.js';
+import { createContext } from '../src/map/context.js';
+import { DATA } from '../src/map/data.js';
 import * as THREE from 'three';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,16 +52,9 @@ for (let j = 0; j < nz; j++) {
 }
 
 // Write to public/heightmap.bin
-const outDirs = [
-  path.resolve(__dirname, '../public'),
-  path.resolve(__dirname, '../../public/map')
-];
-
-outDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const hFile = path.join(dir, 'heightmap.bin');
-  fs.writeFileSync(hFile, Buffer.from(heights.buffer));
-  console.log(`Saved ${heights.byteLength} bytes to ${hFile}`);
-});
-
-console.log('Heightmap baking complete!');
+const publicDir = path.resolve(__dirname, '../public');
+if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+const hFile = path.join(publicDir, 'heightmap.bin');
+fs.writeFileSync(hFile, Buffer.from(heights.buffer));
+console.log(`Saved ${heights.byteLength} bytes to ${hFile}`);
+console.log('✓ Heightmap baking complete!');

@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/verify-map-headless.js",
+    "bake:heightmap": "node scripts/bake-heightmap.js",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "three": "^0.170.0"

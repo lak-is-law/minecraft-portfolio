@@ -1,0 +1,661 @@
+/* ==========================================================
+   MINECRAFT THEMED MODAL DIALOGS
+   ========================================================== */
+#modal-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+body.modal-open #mc-touch-controls,
+body.modal-open #pause-overlay,
+body.driving-vehicle #pause-overlay,
+body.racing-active #pause-overlay {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.mc-dialog {
+  background: #262626;
+  border: 4px solid #525252;
+  box-shadow: inset -4px -4px #171717, inset 4px 4px #737373, 0 12px 36px rgba(0,0,0,0.8);
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mc-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #404040;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.mc-dialog-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mc-item-icon {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.mc-dialog-title {
+  font-size: 15px;
+  color: #facc15;
+  text-shadow: 2px 2px 0 #000;
+  margin-bottom: 4px;
+}
+
+.mc-dialog-subtitle {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.mc-close-btn {
+  background: #dc2626;
+  border: 2px solid #f87171;
+  color: #fff;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.mc-close-btn:hover {
+  background: #ef4444;
+}
+
+.mc-dialog-body {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mc-metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mc-metric-badge {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+  padding: 6px 10px;
+  font-size: 9px;
+  color: #93c5fd;
+  border-radius: 3px;
+}
+
+.mc-section-heading {
+  font-size: 11px;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.mc-text-p {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.mc-tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mc-tag {
+  background: #334155;
+  border: 1px solid #64748b;
+  padding: 4px 8px;
+  font-size: 8px;
+  color: #cbd5e1;
+  border-radius: 2px;
+}
+
+.mc-dialog-footer {
+  border-top: 3px solid #404040;
+  padding-top: 14px;
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Buttons */
+.mc-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.mc-btn-green {
+  background: #16a34a;
+  border: 2px solid #22c55e;
+  color: #fff;
+  box-shadow: inset -2px -2px #14532d, inset 2px 2px #86efac;
+}
+
+.mc-btn-green:hover {
+  background: #22c55e;
+}
+
+.mc-btn-blue {
+  background: #2563eb;
+  border: 2px solid #3b82f6;
+  color: #fff;
+  box-shadow: inset -2px -2px #1e3a8a, inset 2px 2px #93c5fd;
+}
+
+.mc-btn-blue:hover {
+  background: #3b82f6;
+}
+
+.mc-btn-stone {
+  background: #525252;
+  border: 2px solid #737373;
+  color: #fff;
+  box-shadow: inset -2px -2px #262626, inset 2px 2px #a3a3a3;
+}
+
+.mc-btn-stone:hover {
+  background: #737373;
+}
+
+.mc-btn-gold {
+  background: #ca8a04;
+  border: 2px solid #fef08a;
+  color: #fff;
+  box-shadow: inset -2px -2px #854d0e, inset 2px 2px #fde047;
+}
+
+.mc-btn-gold:hover {
+  background: #eab308;
+}
+
+/* ==========================================================
+   MINECRAFT NPC DIALOGUE SYSTEM
+   ========================================================== */
+.mc-npc-dialog {
+  max-width: 620px;
+  background: #1e1e1e;
+  border: 4px solid #4a4a4a;
+  box-shadow: inset -4px -4px #121212, inset 4px 4px #707070, 0 16px 48px rgba(0,0,0,0.85);
+  animation: mcNpcPopIn 0.18s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes mcNpcPopIn {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mc-npc-dialog-header {
+  border-bottom: 3px solid #383838;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.mc-npc-avatar-box {
+  width: 58px;
+  height: 58px;
+  background: #141414;
+  border: 3px solid #6b7280;
+  box-shadow: inset -2px -2px #0a0a0a, inset 2px 2px #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mc-npc-animal-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.mc-npc-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mc-npc-name-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mc-npc-title {
+  font-size: 16px;
+  color: #facc15;
+  text-shadow: 2px 2px 0 #000;
+  margin: 0;
+}
+
+.mc-npc-level-badge {
+  font-size: 9px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #fff;
+  padding: 3px 7px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 1px 1px 0 #000;
+  letter-spacing: 0.5px;
+}
+
+.mc-npc-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.mc-npc-dialog-body {
+  gap: 14px;
+  padding-right: 4px;
+}
+
+/* Speech Balloon */
+.mc-npc-speech-bubble {
+  background: #14181f;
+  border: 3px solid #334155;
+  box-shadow: inset -2px -2px #0b0f14, inset 2px 2px #475569;
+  border-radius: 4px;
+  padding: 14px 16px;
+  color: #f8fafc;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  position: relative;
+  min-height: 60px;
+  white-space: pre-wrap;
+}
+
+.mc-npc-speech-bubble::before {
+  content: '💬 ';
+  margin-right: 2px;
+}
+
+/* Response options */
+.mc-npc-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-npc-option-btn {
+  width: 100%;
+  text-align: left;
+  min-height: 48px;
+  padding: 10px 14px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.08s ease;
+  font-family: monospace;
+  touch-action: manipulation;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mc-npc-option-btn:hover {
+  transform: translateX(3px);
+  filter: brightness(1.1);
+}
+
+.mc-npc-option-arrow {
+  color: #facc15;
+  font-weight: bold;
+}
+
+.mc-npc-dialog-footer {
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid #383838;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.mc-npc-footer-hint {
+  font-size: 9px;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* ==========================================================
+   CHEST GUI SPECIFICS
+   ========================================================== */
+.mc-chest-gui {
+  background: #c6c6c6;
+  border: 4px solid #fff;
+  box-shadow: inset -4px -4px #555, 0 12px 36px rgba(0,0,0,0.8);
+  width: 100%;
+  max-width: 580px;
+  padding: 18px;
+  border-radius: 4px;
+  color: #373737;
+}
+
+.mc-chest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 14px;
+  color: #373737;
+}
+
+.mc-chest-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+  background: #8b8b8b;
+  border: 3px solid #373737;
+  padding: 8px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+
+.mc-slot {
+  width: 48px;
+  height: 48px;
+  background: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow: inset 2px 2px #373737, inset -2px -2px #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.mc-slot:hover {
+  background: #a3a3a3;
+}
+
+.mc-slot-item {
+  font-size: 24px;
+}
+
+.mc-slot-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 7px;
+  color: #facc15;
+  font-weight: bold;
+}
+
+.mc-chest-loot-action {
+  background: #e5e5e5;
+  border: 2px solid #a3a3a3;
+  padding: 14px;
+  border-radius: 3px;
+}
+
+.mc-resume-preview-info h3 {
+  font-size: 12px;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.mc-resume-preview-info p {
+  font-size: 9px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.mc-chest-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ==========================================================
+   SKILLS & BREWING GUI
+   ========================================================== */
+.mc-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mc-brew-category {
+  background: #171717;
+  border: 2px solid #404040;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.mc-brew-title {
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.mc-brew-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-skill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mc-skill-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #e2e8f0;
+}
+
+.mc-skill-pct {
+  color: #facc15;
+}
+
+.mc-skill-bar {
+  width: 100%;
+  height: 6px;
+  background: #262626;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mc-skill-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ==========================================================
+   FAST TRAVEL MAP GUI
+   ========================================================== */
+.mc-map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mc-landmark-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #171717;
+  border: 2px solid #404040;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+.mc-landmark-icon {
+  font-size: 28px;
+}
+
+.mc-landmark-info {
+  flex: 1;
+}
+
+.mc-landmark-info h4 {
+  font-size: 11px;
+  color: #facc15;
+  margin-bottom: 4px;
+}
+
+.mc-landmark-info p {
+  font-size: 9px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.mc-landmark-coords {
+  font-size: 8px;
+  color: #38bdf8;
+  font-family: monospace;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .mc-hotbar-slot {
+    width: 36px;
+    height: 36px;
+  }
+  .mc-status-bars, .mc-xp-container {
+    width: 330px;
+  }
+  .mc-skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==========================================================
+   CREATIVE BLOCK PALETTE MODAL
+   ========================================================== */
+.mc-palette-dialog {
+  max-width: 640px;
+  width: 95vw;
+}
+
+.mc-palette-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.mc-palette-section {
+  margin-bottom: 14px;
+}
+
+.mc-palette-category-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #38bdf8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mc-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.mc-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #18181b;
+  border: 2px solid #3f3f46;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #f8fafc;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+}
+
+.mc-palette-item:hover {
+  background: #27272a;
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+.mc-palette-item.active {
+  border-color: #22c55e;
+  background: #064e3b;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.mc-palette-swatch {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: inset 1px 1px rgba(255, 255, 255, 0.25), inset -1px -1px rgba(0, 0, 0, 0.4);
+}
+
+.mc-palette-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mc-palette-footer-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: #94a3b8;
+}

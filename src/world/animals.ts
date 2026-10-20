@@ -38,11 +38,17 @@ export class AnimalManager {
   public update(time: number, playerPos: THREE.Vector3) {
     for (let i = 0; i < this.animals.length; i++) {
       const animal = this.animals[i];
+      const dx = animal.group.position.x - playerPos.x;
+      const dz = animal.group.position.z - playerPos.z;
+      const distSq = dx * dx + dz * dz;
+
+      // Distance culling: beyond 50m, skip mesh updates & limb animation
+      if (distSq > 2500) continue;
+
       animal.update(time, playerPos);
 
-      // Proximity interaction sound check
-      const dist = animal.group.position.distanceTo(playerPos);
-      if (dist < 4.0 && time - this.lastSoundTime > 6.0) {
+      // Proximity interaction sound check (< 4m => distSq < 16)
+      if (distSq < 16.0 && time - this.lastSoundTime > 6.0) {
         this.lastSoundTime = time;
         sound.playAnimalSound(animal.type);
       }

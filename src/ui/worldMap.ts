@@ -1,5 +1,4 @@
-// @ts-ignore
-import { mountMap as mountMapFn } from '../../craftme-world-map/src/mount.js';
+import { mountMap as mountMapFn } from '../map/mount.js';
 
 export interface MapInstance {
   setPlayer: (x: number, z: number, yaw?: number) => void;

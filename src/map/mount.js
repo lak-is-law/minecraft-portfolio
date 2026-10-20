@@ -21,9 +21,10 @@ export function mountMap(container, options = {}) {
     throw e;
   }
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.domElement.style.imageRendering = '-webkit-optimize-contrast';
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.25;
   ctx.renderer = renderer;
@@ -147,15 +148,17 @@ export function mountMap(container, options = {}) {
   sun.target.position.set(80, 0, 0);
   sun.castShadow = true;
   sun.shadow.mapSize.set(4096, 4096);
+  sun.shadow.autoUpdate = false;
+  sun.shadow.needsUpdate = true;
   const sc = sun.shadow.camera;
-  sc.left = -480;
-  sc.right = 480;
-  sc.top = 330;
-  sc.bottom = -330;
+  sc.left = -340;
+  sc.right = 340;
+  sc.top = 220;
+  sc.bottom = -220;
   sc.near = 50;
   sc.far = 1200;
-  sun.shadow.bias = -0.0004;
-  sun.shadow.normalBias = 0.6;
+  sun.shadow.bias = -0.00015;
+  sun.shadow.normalBias = 0.035;
   scene.add(sun, sun.target);
   ctx.sun = sun;
 
@@ -196,13 +199,21 @@ export function mountMap(container, options = {}) {
   function resize() {
     VW = app.clientWidth || window.innerWidth;
     VH = app.clientHeight || window.innerHeight;
-    if (renderer) renderer.setSize(VW, VH);
+    if (renderer) {
+      renderer.setSize(VW, VH);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    }
     camera.aspect = VW / VH;
     camera.updateProjectionMatrix();
+    if (ui.onWindowResize) ui.onWindowResize();
   }
   window.addEventListener('resize', resize);
   resize();
 
+  const dialEl = container.querySelector('#dial');
+  const scBEl = container.querySelector('#sc-b');
+
+  let lastShadowUpdate = 0;
   // Day / Night Atmosphere and Lighting Controller
   function updateSky(t) {
     const c0 = new THREE.Color('#4f9bd9').lerp(new THREE.Color('#070c18'), t);
@@ -222,6 +233,13 @@ export function mountMap(container, options = {}) {
     if (ctx.sun) {
       ctx.sun.color.copy(new THREE.Color('#fff0d2').lerp(new THREE.Color('#6f88c9'), t));
       ctx.sun.intensity = THREE.MathUtils.lerp(2.6, 0.35, t);
+      if (ctx.sun.shadow) {
+        const now = performance.now();
+        if (now - lastShadowUpdate > 60) {
+          ctx.sun.shadow.needsUpdate = true;
+          lastShadowUpdate = now;
+        }
+      }
     }
     if (ctx.hemiLight) {
       ctx.hemiLight.color.copy(new THREE.Color('#dcecff').lerp(new THREE.Color('#182542'), t));
@@ -245,6 +263,8 @@ export function mountMap(container, options = {}) {
   let isPaused = false;
   let __fc = 0;
   const clock0 = performance.now();
+  const lastCamPos = new THREE.Vector3();
+  const lastTarPos = new THREE.Vector3();
 
   function frame(now) {
     if (isPaused) return;
@@ -287,7 +307,7 @@ export function mountMap(container, options = {}) {
       const u = Math.min(0.9999, Math.max(0, ((t * 0.02) % 1 + 1) % 1));
       const p = ctx.railCurve.getPoint(u), tg = ctx.railCurve.getTangent(u);
       if (p && tg) {
-        ctx.train.position.set(p.x, H(p.x, p.z, ctx) + 1.9, p.z);
+        ctx.train.position.set(p.x, (p.y != null && p.y > 0 ? p.y : H(p.x, p.z, ctx)) + 1.9, p.z);
         ctx.train.rotation.y = Math.atan2(tg.x, tg.z) + Math.PI;
       }
     }
@@ -320,13 +340,11 @@ export function mountMap(container, options = {}) {
 
     if (ctx.lava) ctx.lava.intensity = 800 + Math.sin(t * 5) * 160;
 
-    const dial = container.querySelector('#dial');
-    if (dial) dial.style.transform = `rotate(${controls.getAzimuthalAngle() * 180 / Math.PI}deg)`;
+    if (dialEl) dialEl.style.transform = `rotate(${controls.getAzimuthalAngle() * 180 / Math.PI}deg)`;
 
     const dd = camera.position.distanceTo(controls.target);
     const upp = 2 * dd * Math.tan(camera.fov * Math.PI / 360) / VH;
-    const scB = container.querySelector('#sc-b');
-    if (scB) scB.style.width = (50 / upp) + 'px';
+    if (scBEl) scBEl.style.width = (50 / upp) + 'px';
 
     // Smooth day/night cycle transition
     if (ctx.night) {
@@ -347,7 +365,19 @@ export function mountMap(container, options = {}) {
       });
     }
 
-    ui.updateLabels(VW, VH);
+    const camChanged = Math.abs(camera.position.x - lastCamPos.x) > 0.05 ||
+                       Math.abs(camera.position.y - lastCamPos.y) > 0.05 ||
+                       Math.abs(camera.position.z - lastCamPos.z) > 0.05 ||
+                       Math.abs(controls.target.x - lastTarPos.x) > 0.05 ||
+                       Math.abs(controls.target.z - lastTarPos.z) > 0.05;
+    if (camChanged) {
+      lastCamPos.copy(camera.position);
+      lastTarPos.copy(controls.target);
+      ui.updateLabels(VW, VH);
+    } else if ((__fc % 15) === 0) {
+      ui.updateLabels(VW, VH);
+    }
+
     if ((__fc = (__fc + 1) | 0) % 2 === 0) ui.drawMini();
 
     renderer.render(scene, camera);
@@ -357,6 +387,8 @@ export function mountMap(container, options = {}) {
 
   // Inbound postMessage listener
   const onWindowMessage = e => {
+    // Validate source origin to protect against untrusted origin manipulation
+    if (e.origin && e.origin !== window.location.origin && !e.origin.endsWith('.lakshya.uk') && !e.origin.includes('localhost') && !e.origin.includes('127.0.0.1')) return;
     if (!e.data || e.data.source !== 'craftme-game') return;
     const { type, x, z, yaw } = e.data;
     if (type === 'open') {
@@ -413,7 +445,8 @@ export function mountMap(container, options = {}) {
   // Signal ready to parent
   try {
     if (typeof parent !== 'undefined' && parent !== window) {
-      parent.postMessage({ source: 'craftme-map', type: 'ready', waypoints: DATA.length }, '*');
+      const targetOrigin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '*';
+      parent.postMessage({ source: 'craftme-map', type: 'ready', waypoints: DATA.length }, targetOrigin);
     }
   } catch (_) {}
 

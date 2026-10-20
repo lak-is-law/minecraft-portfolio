@@ -94,6 +94,8 @@ export class VoxelWorld {
   private scratchNpcBox = new THREE.Box3();
   private scratchBoxCenter = new THREE.Vector3();
   private scratchBoxSize = new THREE.Vector3();
+  private scratchCenter = new THREE.Vector3();
+  private scratchToTarget = new THREE.Vector3();
 
   constructor(scene: THREE.Scene, textureManager: TextureManager) {
     this.scene = scene;
@@ -385,8 +387,8 @@ export class VoxelWorld {
         }
       }
       // 2. Proximity check for touch screens (forgiving tap radius)
-      const toTarget = center.clone().sub(rayOrigin);
-      const proj = toTarget.dot(this.scratchRay.direction);
+      this.scratchToTarget.subVectors(center, rayOrigin);
+      const proj = this.scratchToTarget.dot(this.scratchRay.direction);
       if (proj > 0.3 && proj < closestDist) {
         const perpDist = this.scratchRay.distanceToPoint(center);
         const touchRadius = Math.max(boxW, boxD) * 1.35;
@@ -398,8 +400,8 @@ export class VoxelWorld {
     };
 
     if (this.npcMesh) {
-      const center = new THREE.Vector3(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z);
-      testTarget(center, 1.6, 2.4, 1.6, () => ({
+      this.scratchCenter.set(this.npcMesh.position.x, this.npcMesh.position.y + 1.0, this.npcMesh.position.z);
+      testTarget(this.scratchCenter, 1.6, 2.4, 1.6, () => ({
         type: 'npc',
         id: 'lakshya_guide',
         position: this.npcMesh!.position.clone(),
@@ -408,8 +410,8 @@ export class VoxelWorld {
     }
 
     if (this.dogMesh) {
-      const center = new THREE.Vector3(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z);
-      testTarget(center, 1.4, 1.2, 1.4, () => ({
+      this.scratchCenter.set(this.dogMesh.position.x, this.dogMesh.position.y + 0.45, this.dogMesh.position.z);
+      testTarget(this.scratchCenter, 1.4, 1.2, 1.4, () => ({
         type: 'dog',
         id: 'roger',
         position: this.dogMesh!.position.clone(),
@@ -418,8 +420,8 @@ export class VoxelWorld {
     }
 
     if (this.catMesh) {
-      const center = new THREE.Vector3(this.catMesh.position.x, this.catMesh.position.y + 0.35, this.catMesh.position.z);
-      testTarget(center, 1.2, 1.0, 1.2, () => ({
+      this.scratchCenter.set(this.catMesh.position.x, this.catMesh.position.y + 0.35, this.catMesh.position.z);
+      testTarget(this.scratchCenter, 1.2, 1.0, 1.2, () => ({
         type: 'npc',
         id: 'oreo_cat',
         position: this.catMesh!.position.clone(),
@@ -429,8 +431,8 @@ export class VoxelWorld {
 
     if (this.mcQueenManager && this.mcQueenManager.group) {
       const qPos = this.mcQueenManager.getPosition();
-      const center = new THREE.Vector3(qPos.x, qPos.y + 0.6, qPos.z);
-      testTarget(center, 2.4, 1.8, 3.6, () => ({
+      this.scratchCenter.set(qPos.x, qPos.y + 0.6, qPos.z);
+      testTarget(this.scratchCenter, 2.4, 1.8, 3.6, () => ({
         type: 'npc',
         id: 'lightning_mcqueen',
         position: qPos.clone(),
@@ -440,8 +442,8 @@ export class VoxelWorld {
 
     if (this.mcQueenManager && this.mcQueenManager.hudsonGroup) {
       const hPos = this.mcQueenManager.getHudsonPosition();
-      const hCenter = new THREE.Vector3(hPos.x, hPos.y + 0.6, hPos.z);
-      testTarget(hCenter, 2.5, 1.8, 3.8, () => ({
+      this.scratchCenter.set(hPos.x, hPos.y + 0.6, hPos.z);
+      testTarget(this.scratchCenter, 2.5, 1.8, 3.8, () => ({
         type: 'npc',
         id: 'doc_hudson',
         position: hPos.clone(),
@@ -449,10 +451,12 @@ export class VoxelWorld {
       }));
     }
 
+    const reachPlusEightSq = (reach + 8.0) * (reach + 8.0);
+
     if (this.animalManager && this.animalManager.animals) {
       for (const animal of this.animalManager.animals) {
         const aPos = animal.group.position;
-        if (rayOrigin.distanceTo(aPos) > reach + 8.0) continue;
+        if (rayOrigin.distanceToSquared(aPos) > reachPlusEightSq) continue;
 
         let h = 1.8;
         let w = 1.8;
@@ -467,8 +471,8 @@ export class VoxelWorld {
           w = 1.4;
         }
 
-        const center = new THREE.Vector3(aPos.x, aPos.y + h * 0.5, aPos.z);
-        testTarget(center, w, h, w, () => ({
+        this.scratchCenter.set(aPos.x, aPos.y + h * 0.5, aPos.z);
+        testTarget(this.scratchCenter, w, h, w, () => ({
           type: 'animal',
           id: `animal_${animal.type}_${animal.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
           position: aPos.clone(),
@@ -483,9 +487,9 @@ export class VoxelWorld {
     if (this.worldCitizens) {
       for (const citizen of this.worldCitizens) {
         const cPos = citizen.mesh.position;
-        if (rayOrigin.distanceTo(cPos) > reach + 8.0) continue;
-        const center = new THREE.Vector3(cPos.x, cPos.y + 1.0, cPos.z);
-        testTarget(center, 1.4, 2.2, 1.4, () => ({
+        if (rayOrigin.distanceToSquared(cPos) > reachPlusEightSq) continue;
+        this.scratchCenter.set(cPos.x, cPos.y + 1.0, cPos.z);
+        testTarget(this.scratchCenter, 1.4, 2.2, 1.4, () => ({
           type: 'npc',
           id: `citizen_${citizen.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
           position: cPos.clone(),
@@ -2463,7 +2467,12 @@ export class VoxelWorld {
 
     for (let i = 0; i < this.worldCitizens.length; i++) {
       const c = this.worldCitizens[i];
-      const dist = c.mesh.position.distanceTo(playerPos);
+      const dx = playerPos.x - c.mesh.position.x;
+      const dz = playerPos.z - c.mesh.position.z;
+      const distSq = dx * dx + dz * dz;
+
+      // Distance culling: beyond 50m, skip mesh updates & limb animation
+      if (distSq > 2500) continue;
 
       // Subtle breathing & idle idle limb movement
       const breath = Math.sin(time * 2.2 + i * 1.5) * 0.02;
@@ -2473,10 +2482,8 @@ export class VoxelWorld {
       c.armL.rotation.x = Math.sin(time * 1.8 + i) * 0.08;
       c.armR.rotation.x = -Math.sin(time * 1.8 + i) * 0.08;
 
-      if (dist < 12) {
+      if (distSq < 144) { // < 12m
         // Look towards player when nearby
-        const dx = playerPos.x - c.mesh.position.x;
-        const dz = playerPos.z - c.mesh.position.z;
         const targetAngle = Math.atan2(dx, dz);
         // Smooth head rotation towards player
         c.mesh.rotation.y = THREE.MathUtils.lerp(c.mesh.rotation.y, targetAngle, 0.05);

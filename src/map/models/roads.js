@@ -6,7 +6,7 @@ import { box } from './helpers.js';
 export function ribbon(ptsPx, width, color, yoff, ctx, opts = {}) {
   const pts = ptsPx.map(p => {
     const w = W2(p);
-    return new THREE.Vector3(w[0], 0, w[1]);
+    return new THREE.Vector3(w[0], H(w[0], w[1], ctx), w[1]);
   });
   const cv = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
   const n = Math.max(8, Math.round(cv.getLength() / 1.4));

@@ -209,6 +209,7 @@ export function createUI(container, ctx, callbacks = {}) {
       s.x = X;
       s.z = Z;
       s.n = name;
+      markBlockersDirty();
     }
   }
 
@@ -239,17 +240,22 @@ export function createUI(container, ctx, callbacks = {}) {
   };
   $('sel-x').onclick = () => {
     $('sel').classList.remove('show');
+    markBlockersDirty();
     ctx.selected = null;
     ctx.pin = null;
     if (ctx.pinG) ctx.pinG.visible = false;
   };
-  $('wpbtn').onclick = () => $('drawer').classList.toggle('open');
+  $('wpbtn').onclick = () => {
+    $('drawer').classList.toggle('open');
+    markBlockersDirty();
+  };
   $('esc').onclick = closeMap;
   $('q').oninput = buildList;
   $('q').addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       $('q').blur();
       $('drawer').classList.remove('open');
+      markBlockersDirty();
     }
   });
 
@@ -538,7 +544,9 @@ export function createUI(container, ctx, callbacks = {}) {
   if (mmC) mmC.addEventListener('pointerdown', onMinimapPointerDown);
 
   /* Label collision & decluttering */
-  let __m = 0, __bf = 0, blk = [];
+  let __m = 0, blk = [];
+  let blockersDirty = true;
+  const markBlockersDirty = () => { blockersDirty = true; };
   const BLK_IDS = ['title', 'tabs', 'top-r', 'sel', 'drawer', 'status', 'mini', 'quick', 'zoom', 'scale'];
   function refreshBlockers() {
     blk = [];
@@ -550,9 +558,13 @@ export function createUI(container, ctx, callbacks = {}) {
         blk.push([r.left - 6, r.top - 6, r.width + 12, r.height + 12]);
       }
     }
+    blockersDirty = false;
   }
 
   const v3 = new THREE.Vector3();
+  let cachedFlagsOrder = null;
+  let lastOrderSelected = -1;
+  let lastOrderHovered = -1;
   function updateLabels(VW, VH) {
     if (!ctx.camera) return;
     if (!__m) {
@@ -566,7 +578,7 @@ export function createUI(container, ctx, callbacks = {}) {
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { __m = 0; });
       }
     }
-    if (!(__bf++ % 12)) refreshBlockers();
+    if (blockersDirty) refreshBlockers();
     const inter = (a, b) => a[0] < b[0] + b[2] && a[0] + a[2] > b[0] && a[1] < b[1] + b[3] && a[1] + a[3] > b[1];
     const placed = [];
     const hit = r => { for (const p of placed) if (inter(r, p)) return true; return false; };
@@ -578,11 +590,16 @@ export function createUI(container, ctx, callbacks = {}) {
     const yHit = yv && !hitB(yr);
     if (yHit) placed.push(yr);
 
-    const order = [...ctx.flags].sort((a, b) =>
-      (b.i === ctx.selected) - (a.i === ctx.selected) ||
-      (b.i === ctx.hovered) - (a.i === ctx.hovered) ||
-      a.pri - b.pri || a.i - b.i
-    );
+    if (!cachedFlagsOrder || lastOrderSelected !== ctx.selected || lastOrderHovered !== ctx.hovered) {
+      lastOrderSelected = ctx.selected;
+      lastOrderHovered = ctx.hovered;
+      cachedFlagsOrder = [...ctx.flags].sort((a, b) =>
+        (b.i === ctx.selected) - (a.i === ctx.selected) ||
+        (b.i === ctx.hovered) - (a.i === ctx.hovered) ||
+        a.pri - b.pri || a.i - b.i
+      );
+    }
+    const order = cachedFlagsOrder;
 
     for (const f of order) {
       v3.copy(f.top).project(ctx.camera);
@@ -613,21 +630,30 @@ export function createUI(container, ctx, callbacks = {}) {
         }
       }
 
-      f.el.style.display = show ? '' : 'none';
+      const dispStr = show ? '' : 'none';
+      if (f.el.style.display !== dispStr) f.el.style.display = dispStr;
       if (show) {
         f.el.classList.toggle('mini', mini);
         f.el.classList.toggle('hov', f.i === ctx.hovered && f.i !== ctx.selected);
-        f.el.style.left = Math.round(f.sx) + 'px';
-        f.el.style.top = Math.round(f.sy) + 'px';
+        const lx = Math.round(f.sx) + 'px';
+        const ly = Math.round(f.sy) + 'px';
+        if (f.el.style.left !== lx) f.el.style.left = lx;
+        if (f.el.style.top !== ly) f.el.style.top = ly;
         f.el.classList.toggle('sel', f.i === ctx.selected);
-        f.el.style.zIndex = f.i === ctx.selected ? 6 : f.i === ctx.hovered ? 7 : 3 - f.pri;
+        const zi = f.i === ctx.selected ? '6' : f.i === ctx.hovered ? '7' : String(3 - f.pri);
+        if (f.el.style.zIndex !== zi) f.el.style.zIndex = zi;
       }
       f.g.visible = match;
     }
 
-    youEl.style.display = yHit ? '' : 'none';
-    youEl.style.left = Math.round(yx) + 'px';
-    youEl.style.top = Math.round(yy) + 'px';
+    const yDispStr = yHit ? '' : 'none';
+    if (youEl.style.display !== yDispStr) youEl.style.display = yDispStr;
+    if (yHit) {
+      const yxStr = Math.round(yx) + 'px';
+      const yyStr = Math.round(yy) + 'px';
+      if (youEl.style.left !== yxStr) youEl.style.left = yxStr;
+      if (youEl.style.top !== yyStr) youEl.style.top = yyStr;
+    }
 
     const ri = ctx.selected != null ? ctx.selected : ctx.hovered;
     if (ri != null && ri >= 0 && ctx.flags[ri]) {
@@ -790,6 +816,7 @@ export function createUI(container, ctx, callbacks = {}) {
     bindCanvasListeners,
     unbindCanvasListeners,
     toast,
-    app
+    app,
+    onWindowResize: markBlockersDirty
   };
 }

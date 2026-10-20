@@ -1,6 +1,6 @@
-import { DATA } from '../craftme-world-map/src/data.js';
-import { createContext } from '../craftme-world-map/src/context.js';
-import { createTerrainMesh, createWaterMesh, H } from '../craftme-world-map/src/terrain.js';
+import { DATA } from '../src/map/data.js';
+import { createContext } from '../src/map/context.js';
+import { createTerrainMesh, createWaterMesh, H } from '../src/map/terrain.js';
 import * as THREE from 'three';
 
 console.log('--- Verifying World of Lakshya Map Data & Math ---');

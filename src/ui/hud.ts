@@ -4,6 +4,7 @@ import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
 import { RaceChallengeState } from '../world/lightningMcQueen';
 import { COUNTRY_COAST_POINTS } from '../world/buildings';
+import { escapeHtml } from '../utils/security';
 
 export interface HotbarSlot {
   id: string;
@@ -34,6 +35,12 @@ export class HUDManager {
   private lastMinimapUpdate: number = 0;
   private minimapZoom: number = 1.0;
   private readonly zoomLevels: number[] = [0.75, 1.0, 1.5, 2.2];
+  private cachedMinimapCanvas: HTMLCanvasElement | null = null;
+  private cachedMinimapScale: number = -1;
+  private readonly cachedOriginX: number = 400;
+  private readonly cachedOriginZ: number = 400;
+  private readonly cachedWidth: number = 850;
+  private readonly cachedHeight: number = 850;
 
   // Callbacks
   public onDayNightToggle?: () => void;
@@ -241,6 +248,7 @@ export class HUDManager {
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const nextIdx = currentIdx >= 0 ? Math.min(this.zoomLevels.length - 1, currentIdx + 1) : 1;
       this.minimapZoom = this.zoomLevels[nextIdx];
+      this.cachedMinimapScale = -1;
       updateZoomUi();
       sound.playClick();
     };
@@ -251,6 +259,7 @@ export class HUDManager {
       const currentIdx = this.zoomLevels.indexOf(this.minimapZoom);
       const prevIdx = currentIdx >= 0 ? Math.max(0, currentIdx - 1) : 1;
       this.minimapZoom = this.zoomLevels[prevIdx];
+      this.cachedMinimapScale = -1;
       updateZoomUi();
       sound.playClick();
     };
@@ -369,29 +378,31 @@ export class HUDManager {
     if (target.targetBanner) {
       const p = target.targetBanner.project;
       const action = document.body.classList.contains('touch-device') ? '[MINE] HIT BANNER' : '[HAMMER: LEFT CLICK]';
-      promptEl.innerHTML = `<span class="mc-key-badge" style="background:#ef4444;color:#fff;">${action}</span> Launch Live Site: <strong>${p.title}</strong> [OPEN]`;
+      const safeTitle = escapeHtml(p.title);
+      promptEl.innerHTML = `<span class="mc-key-badge" style="background:#ef4444;color:#fff;">${action}</span> Launch Live Site: <strong>${safeTitle}</strong> [OPEN]`;
     } else if (target.interactable) {
       const inter = target.interactable;
+      const safeTitle = escapeHtml(inter.title || '');
       if (inter.type === 'project') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> View Project: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> View Project: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'chest') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'experience') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'leadership') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'research') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect Research: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect Research: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'interests') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Explore: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Explore: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'languages') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Inspect: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'minigame') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Builder Arena: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Builder Arena: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'skills') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Open: <strong>Alchemy & Potions Guide</strong>`;
       } else if (inter.type === 'sign') {
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Read Sign: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Read Sign: <strong>${safeTitle}</strong>`;
       } else if (inter.type === 'teleport') {
         promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> Enter: <strong>Nether Portal</strong>`;
       } else if (inter.type === 'npc') {
@@ -400,7 +411,7 @@ export class HUDManager {
         const isAnimal = inter.id?.startsWith('animal_');
         const isCitizen = inter.id?.startsWith('citizen_');
         const actionVerb = isDog ? 'Pet Dog / Ask Roger' : (isLakshya ? 'Talk & Resume' : (isAnimal ? 'Talk / Observe' : (isCitizen ? 'Talk with Resident' : 'Talk with')));
-        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${inter.title}</strong>`;
+        promptEl.innerHTML = `<span class="mc-key-badge">${useBadge}</span> ${actionVerb}: <strong>${safeTitle}</strong>`;
       }
     } else {
       promptEl.innerHTML = document.body.classList.contains('touch-device')
@@ -439,6 +450,499 @@ export class HUDManager {
         <div>Profile: Lakshya (SRMIST Chennai)</div>
       </div>
     `;
+  }
+
+  // Pre-render static world map geometry into an offscreen canvas cache
+  private renderCachedMinimap(scale: number) {
+    if (!this.cachedMinimapCanvas) {
+      this.cachedMinimapCanvas = document.createElement('canvas');
+      this.cachedMinimapCanvas.width = this.cachedWidth;
+      this.cachedMinimapCanvas.height = this.cachedHeight;
+    }
+    const ctx = this.cachedMinimapCanvas.getContext('2d');
+    if (!ctx) return;
+    this.cachedMinimapScale = scale;
+    ctx.clearRect(0, 0, this.cachedWidth, this.cachedHeight);
+
+    const originX = this.cachedOriginX;
+    const originZ = this.cachedOriginZ;
+    const minimapZoom = scale / 0.40;
+
+    // Organic Non-Uniform Continental Country Coastline Geometry matching 3D World
+    const makeCountryPath = (scaleOffset = 0) => {
+      ctx.beginPath();
+      COUNTRY_COAST_POINTS.forEach(([x, z], i) => {
+        const dist = Math.hypot(x, z);
+        const nx = dist > 0 ? (x / dist) * scaleOffset : 0;
+        const nz = dist > 0 ? (z / dist) * scaleOffset : 0;
+        const px = originX + (x + nx) * scale;
+        const pz = originZ + (z + nz) * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
+      ctx.closePath();
+    };
+
+    // Turquoise Coral Reef Shallow Shelf
+    makeCountryPath(7);
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+    ctx.fill();
+
+    // Coastal Surf Foam Line
+    makeCountryPath(2);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Golden beach shoreline fringe
+    makeCountryPath(0);
+    ctx.fillStyle = '#dfc47b';
+    ctx.fill();
+
+    // Clip all terrain and biomes strictly inside the country landmass
+    ctx.save();
+    makeCountryPath(-2);
+    ctx.clip();
+
+    // Base interior plains (Rich vibrant grass)
+    ctx.fillStyle = '#427e28';
+    ctx.fillRect(originX - 220 * scale, originZ - 220 * scale, 440 * scale, 440 * scale);
+
+    // Draw Country Territories on Minimap Radar
+    const drawMiniCountry = (poly: [number, number][], color: string) => {
+      ctx.beginPath();
+      poly.forEach(([x, z], i) => {
+        const px = originX + x * scale;
+        const pz = originZ + z * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    };
+
+    // 1. India (Subcontinent Peninsula - terracotta sandstone)
+    drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
+    // 2. China (Northern Pine Arc & Dragon Pagoda)
+    drawMiniCountry([[-134, -78], [-134, -98], [-140, -135], [-120, -172], [-84, -170], [-82, -135], [-82, -80], [-105, -78], [-134, -78]], '#1e3f20');
+    // 3. Japan (Archipelago - Sakura Blossom)
+    drawMiniCountry([[-178, -58], [-168, -52], [-148, -64], [-136, -78], [-136, -92], [-146, -98], [-162, -88], [-178, -68], [-178, -58]], '#f472b6');
+    // 4. South Korea (Joseon Peninsula)
+    drawMiniCountry([[-80, -82], [-80, -132], [-65, -132], [-46, -122], [-46, -88], [-60, -82], [-80, -82]], '#0284c7');
+    // 5. UK (British Isles)
+    drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#dc2626');
+    // 6. France (L’Hexagone)
+    drawMiniCountry([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], '#38bdf8');
+    // 7. USA (Las Vegas Strip, Broadway & Hollywood)
+    drawMiniCountry([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#334155');
+    // 8. Mexico (Mesoamerican Horn - terracotta)
+    drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
+    // 9. Egypt (Sahara desert dunes)
+    drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
+    // 10. UAE (Dubai Waterfront & Coastal Promenade)
+    drawMiniCountry([[150, 20], [182, 20], [185, 42], [182, 60], [178, 80], [150, 80]], '#0d9488');
+    // 12. Sunflower Valley
+    drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
+    // Pier & Beach Boardwalk
+    drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#dfc47b');
+    drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#db2777');
+
+    // 11. SWISS CONFEDERATION · FROSTPEAK ALPS
+    drawMiniCountry([[-32, -128], [24, -128], [18, -84], [-28, -84], [-32, -128]], '#164e32');
+    drawMiniCountry([[-28, -124], [20, -124], [15, -88], [-24, -88], [-28, -124]], '#475569');
+    drawMiniCountry([[-24, -122], [18, -122], [12, -92], [-18, -92], [-24, -122]], '#7dd3fc');
+    drawMiniCountry([[-24, -122], [-4, -122], [-6, -92], [-20, -92], [-24, -122]], '#f8fafc');
+    drawMiniCountry([[-14, -118], [8, -118], [2, -98], [-10, -98], [-14, -118]], '#ffffff');
+
+    // Lake Serenity
+    ctx.fillStyle = '#bae6fd';
+    ctx.beginPath();
+    ctx.ellipse(originX - 10 * scale, originZ - 112 * scale, 9 * scale, 6 * scale, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Chalet de Lakshya timber ski lodge footprint
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(originX - 22 * scale, originZ - 90 * scale, 8 * scale, 8 * scale);
+
+    // SWISS FLAG BADGE
+    const swissFlagX = originX - 18 * scale;
+    const swissFlagZ = originZ - 86 * scale;
+    const sFlagSize = Math.max(9, 14 * scale);
+    ctx.save();
+    ctx.fillStyle = '#d52b1e';
+    ctx.fillRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
+    ctx.fillStyle = '#ffffff';
+    const sArm = sFlagSize * 0.22;
+    const sLen = sFlagSize * 0.65;
+    ctx.fillRect(swissFlagX - sArm / 2, swissFlagZ - sLen / 2, sArm, sLen);
+    ctx.fillRect(swissFlagX - sLen / 2, swissFlagZ - sArm / 2, sLen, sArm);
+    ctx.restore();
+
+    // Yamuna river in India
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 5 * scale;
+    ctx.beginPath();
+    ctx.moveTo(originX + 75 * scale, originZ - 60 * scale);
+    ctx.quadraticCurveTo(originX + 85 * scale, originZ - 100 * scale, originX + 75 * scale, originZ - 160 * scale);
+    ctx.stroke();
+
+    // Taj Mahal marble dome footprint
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
+
+    // Giza Pyramids in Egypt
+    const drawMiniPyramid = (px: number, pz: number, sz: number) => {
+      const rx = originX + px * scale;
+      const rz = originZ + pz * scale;
+      const s = sz * scale;
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.moveTo(rx, rz - s);
+      ctx.lineTo(rx - s, rz + s);
+      ctx.lineTo(rx, rz + s);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.moveTo(rx, rz - s);
+      ctx.lineTo(rx, rz + s);
+      ctx.lineTo(rx + s, rz + s);
+      ctx.closePath();
+      ctx.fill();
+    };
+    drawMiniPyramid(-155, 36, 9);
+    drawMiniPyramid(-142, 48, 7);
+    drawMiniPyramid(-132, 58, 5);
+
+    // Great Wall in China
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 3.5 * scale;
+    ctx.beginPath();
+    ctx.moveTo(originX - 134 * scale, originZ - 138 * scale);
+    ctx.quadraticCurveTo(originX - 108 * scale, originZ - 130 * scale, originX - 84 * scale, originZ - 138 * scale);
+    ctx.stroke();
+
+    // Hollywood ridge in USA
+    ctx.fillStyle = 'rgba(215,168,121,.9)';
+    ctx.beginPath();
+    ctx.ellipse(originX + 165 * scale, originZ - 100 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hollywood Boulevard Walk of Fame
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.4 * scale;
+    ctx.beginPath();
+    ctx.moveTo(originX + 161 * scale, originZ - 84 * scale);
+    ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
+    ctx.stroke();
+
+    ctx.restore(); // restore mainland country clip
+
+    // RADIATOR SPRINGS RACEWAY
+    const trackLeft = originX + 172 * scale;
+    const trackTop = originZ - 54 * scale;
+    const trackW = 56 * scale;
+    const trackH = 42 * scale;
+    const cornerR = 6 * scale;
+
+    ctx.save();
+    ctx.fillStyle = '#78350f';
+    for (let px = 196; px <= 228; px += 8) {
+      ctx.fillRect(originX + px * scale - 1.5, originZ - 55 * scale, 3, 5);
+      ctx.fillRect(originX + px * scale - 1.5, originZ - 12 * scale, 3, 5);
+    }
+
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    if (typeof (ctx as any).roundRect === 'function') {
+      (ctx as any).roundRect(trackLeft, trackTop, trackW, trackH, cornerR);
+    } else {
+      ctx.rect(trackLeft, trackTop, trackW, trackH);
+    }
+    ctx.fill();
+
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = Math.max(1.5, 2.5 * scale);
+    ctx.stroke();
+
+    const infieldLeft = originX + 180 * scale;
+    const infieldTop = originZ - 46 * scale;
+    const infieldW = 40 * scale;
+    const infieldH = 26 * scale;
+    const infieldR = 4 * scale;
+
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    if (typeof (ctx as any).roundRect === 'function') {
+      (ctx as any).roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldR);
+    } else {
+      ctx.rect(infieldLeft, infieldTop, infieldW, infieldH);
+    }
+    ctx.fill();
+    ctx.strokeStyle = '#f8fafc';
+    ctx.lineWidth = Math.max(1.0, 1.5 * scale);
+    ctx.stroke();
+
+    ctx.fillStyle = '#b45309';
+    ctx.beginPath();
+    ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 12 * scale, 7 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 7 * scale, 4 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = Math.max(1, 1.4 * scale);
+    ctx.setLineDash([3 * scale, 3 * scale]);
+    ctx.beginPath();
+    if (typeof (ctx as any).roundRect === 'function') {
+      (ctx as any).roundRect(trackLeft + 4 * scale, trackTop + 4 * scale, trackW - 8 * scale, trackH - 8 * scale, cornerR * 0.7);
+    } else {
+      ctx.rect(trackLeft + 4 * scale, trackTop + 4 * scale, trackW - 8 * scale, trackH - 8 * scale);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const sfX = originX + 190 * scale;
+    const sfTop = originZ - 18 * scale;
+    const sfH = 6 * scale;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(sfX - 1.5, sfTop, 3, sfH);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(sfX - 1.5, sfTop, 3, sfH * 0.5);
+    ctx.restore();
+
+    // DUBAI PALM JUMEIRAH & ARABIAN GULF ARCHIPELAGO
+    ctx.save();
+    const pRootX = originX + 176 * scale;
+    const pRootZ = originZ + 46 * scale;
+    const pTrunkEndX = originX + 236 * scale;
+
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
+    ctx.beginPath();
+    const crescentCenterX = originX + 252 * scale;
+    ctx.ellipse(crescentCenterX, pRootZ, 78 * scale, 40 * scale, 0, -Math.PI * 0.72, Math.PI * 0.72);
+    ctx.lineTo(pRootX, pRootZ + 12 * scale);
+    ctx.lineTo(pRootX, pRootZ - 12 * scale);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = '#dfc47b';
+    ctx.lineWidth = Math.max(2.5, 5.0 * scale);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pRootX, pRootZ);
+    ctx.lineTo(pTrunkEndX, pRootZ);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = Math.max(0.8, 1.4 * scale);
+    ctx.beginPath();
+    ctx.moveTo(pRootX, pRootZ);
+    ctx.lineTo(pTrunkEndX, pRootZ);
+    ctx.stroke();
+
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.arc(originX + 213 * scale, pRootZ, Math.max(1.8, 2.6 * scale), 0, Math.PI * 2);
+    ctx.fill();
+
+    const frondDefs = [
+      { xRoot: 236, xTip: 288, dz: 30 },
+      { xRoot: 238, xTip: 292, dz: 26 },
+      { xRoot: 240, xTip: 296, dz: 22 },
+      { xRoot: 242, xTip: 300, dz: 18 },
+      { xRoot: 244, xTip: 302, dz: 14 },
+      { xRoot: 246, xTip: 302, dz: 11 },
+      { xRoot: 248, xTip: 298, dz: 8 },
+      { xRoot: 250, xTip: 292, dz: 5 }
+    ];
+
+    ctx.strokeStyle = '#dfc47b';
+    ctx.lineWidth = Math.max(1.2, 2.4 * scale);
+    for (const f of frondDefs) {
+      const rootFrondX = originX + f.xRoot * scale;
+      const tipX = originX + f.xTip * scale;
+      const spreadZ = f.dz * scale;
+      const ctrlX = originX + (f.xRoot + 8) * scale;
+
+      ctx.beginPath();
+      ctx.moveTo(rootFrondX, pRootZ);
+      ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(rootFrondX, pRootZ);
+      ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#c2a661';
+    ctx.lineWidth = Math.max(2.2, 3.8 * scale);
+    ctx.beginPath();
+    ctx.ellipse(crescentCenterX, pRootZ, 72 * scale, 34 * scale, 0, -Math.PI * 0.70, Math.PI * 0.70);
+    ctx.stroke();
+
+    ctx.fillStyle = '#f43f5e';
+    ctx.beginPath();
+    ctx.arc(originX + 324 * scale, pRootZ, Math.max(2.5, 4.0 * scale), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(originX + 324 * scale, pRootZ, Math.max(1.2, 1.8 * scale), 0, Math.PI * 2);
+    ctx.fill();
+
+    const burjX = originX + 220 * scale;
+    const burjZ = originZ + 110 * scale;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.lineWidth = Math.max(0.8, 1.4 * scale);
+    ctx.beginPath();
+    ctx.moveTo(originX + 176 * scale, originZ + 90 * scale);
+    ctx.quadraticCurveTo(originX + 195 * scale, originZ + 105 * scale, burjX, burjZ);
+    ctx.stroke();
+    ctx.fillStyle = '#dfc47b';
+    ctx.beginPath();
+    ctx.arc(burjX, burjZ, Math.max(3.5, 5.5 * scale), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(burjX, burjZ, Math.max(2, 3.2 * scale), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#eab308';
+    ctx.beginPath();
+    ctx.arc(burjX + 2 * scale, burjZ - 2 * scale, Math.max(1, 1.5 * scale), 0, Math.PI * 2);
+    ctx.fill();
+
+    const blueX = originX + 262 * scale;
+    const blueZ = originZ + 146 * scale;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = Math.max(0.8, 1.2 * scale);
+    ctx.beginPath();
+    ctx.moveTo(originX + 176 * scale, originZ + 120 * scale);
+    ctx.lineTo(blueX, blueZ);
+    ctx.stroke();
+    ctx.fillStyle = '#dfc47b';
+    ctx.beginPath();
+    ctx.ellipse(blueX, blueZ, Math.max(4.5, 7.5 * scale), Math.max(3.5, 5.5 * scale), 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#e0e7ff';
+    ctx.lineWidth = Math.max(1.2, 1.8 * scale);
+    ctx.beginPath();
+    ctx.arc(blueX, blueZ, Math.max(3, 4.8 * scale), 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#e2cb87';
+    const worldIslands = [
+      [360, 46, 4.5], [380, 68, 3.8], [350, 24, 3.5], [380, 28, 3.2]
+    ];
+    for (const [wx, wz, wr] of worldIslands) {
+      ctx.beginPath();
+      ctx.arc(originX + wx * scale, originZ + wz * scale, Math.max(2, wr * scale), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Main Roads
+    const drawMiniRoad = (points: [number, number][]) => {
+      ctx.beginPath();
+      points.forEach(([x, z], i) => {
+        const px = originX + x * scale;
+        const pz = originZ + z * scale;
+        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
+      });
+      ctx.stroke();
+    };
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = Math.max(2.4, 3.2 * minimapZoom);
+    drawMiniRoad([[0, -20], [0, -65]]);
+    drawMiniRoad([[20, 0], [150, 0]]);
+    drawMiniRoad([[2, -60], [74, -106]]);
+    drawMiniRoad([[-2, -55], [-70, -85]]);
+    drawMiniRoad([[-20, 0], [-79, 50]]);
+    drawMiniRoad([[0, 20], [0, 160]]);
+
+    ctx.strokeStyle = '#f8fafc';
+    ctx.lineWidth = Math.max(1.2, 1.8 * minimapZoom);
+    drawMiniRoad([[0, -20], [0, -65]]);
+    drawMiniRoad([[20, 0], [150, 0]]);
+    drawMiniRoad([[2, -60], [74, -106]]);
+    drawMiniRoad([[-2, -55], [-70, -85]]);
+    drawMiniRoad([[-20, 0], [-79, 50]]);
+    drawMiniRoad([[0, 20], [0, 160]]);
+
+    // Island Express Railway Transit Loop
+    const railWaypoints = [
+      [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
+      [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
+      [144, 98], [112, 98], [80, 96], [50, 92], [24, 88],
+      [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
+    ];
+    ctx.save();
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = Math.max(2.8, 3.8 * minimapZoom);
+    ctx.setLineDash([2, 4]);
+    ctx.beginPath();
+    railWaypoints.forEach(([wx, wz], idx) => {
+      const rx = originX + wx * scale;
+      const rz = originZ + wz * scale;
+      if (idx === 0) ctx.moveTo(rx, rz); else ctx.lineTo(rx, rz);
+    });
+    ctx.closePath();
+    ctx.stroke();
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = Math.max(1.2, 1.8 * minimapZoom);
+    ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.restore();
+
+    // Railway Station Markers
+    const stations = [
+      [58, 33], [116, 28], [128, 48], [24, 88], [8, 22]
+    ];
+    stations.forEach(([sx, sz]) => {
+      const px = originX + sx * scale;
+      const pz = originZ + sz * scale;
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(px, pz, Math.max(2, 2.8 * minimapZoom), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    // Central Citadel Moat, 4 Bridges & Hub
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 20 * scale, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(originX - 2 * scale, originZ - 23 * scale, 4 * scale, 6 * scale);
+    ctx.fillRect(originX - 2 * scale, originZ + 17 * scale, 4 * scale, 6 * scale);
+    ctx.fillRect(originX + 17 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
+    ctx.fillRect(originX - 23 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
+
+    ctx.fillStyle = '#64748b';
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(originX, originZ, 3.5 * scale, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   // Update Minimap radar (with Biomes, Landmarks, Live Dragons, and Island Express Trains)
@@ -529,518 +1033,12 @@ export class HUDManager {
     ctx.rect(0, 0, w, h);
     ctx.clip();
 
-    // Organic Non-Uniform Continental Country Coastline Geometry matching 3D World
-    const makeCountryPath = (scaleOffset = 0) => {
-      ctx.beginPath();
-      COUNTRY_COAST_POINTS.forEach(([x, z], i) => {
-        const dist = Math.hypot(x, z);
-        const nx = dist > 0 ? (x / dist) * scaleOffset : 0;
-        const nz = dist > 0 ? (z / dist) * scaleOffset : 0;
-        const px = originX + (x + nx) * scale;
-        const pz = originZ + (z + nz) * scale;
-        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
-      });
-      ctx.closePath();
-    };
-
-    // Turquoise Coral Reef Shallow Shelf
-    makeCountryPath(7);
-    ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
-    ctx.fill();
-
-    // Coastal Surf Foam Line
-    makeCountryPath(2);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-
-    // Golden beach shoreline fringe
-    makeCountryPath(0);
-    ctx.fillStyle = '#dfc47b';
-    ctx.fill();
-
-    // Clip all terrain and biomes strictly inside the country landmass
-    ctx.save();
-    makeCountryPath(-2);
-    ctx.clip();
-
-    // Base interior plains (Rich vibrant grass)
-    ctx.fillStyle = '#427e28';
-    ctx.fillRect(originX - 220 * scale, originZ - 220 * scale, 440 * scale, 440 * scale);
-
-    // Draw Country Territories on Minimap Radar
-    const drawMiniCountry = (poly: [number, number][], color: string) => {
-      ctx.beginPath();
-      poly.forEach(([x, z], i) => {
-        const px = originX + x * scale;
-        const pz = originZ + z * scale;
-        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
-      });
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-    };
-
-    // 1. India (Subcontinent Peninsula - terracotta sandstone)
-    drawMiniCountry([[35, -70], [80, -70], [130, -75], [160, -95], [175, -135], [150, -170], [115, -185], [75, -185], [35, -165], [25, -130], [28, -95], [35, -70]], '#b45309');
-    // 2. China (Northern Pine Arc & Dragon Pagoda)
-    drawMiniCountry([[-134, -78], [-134, -98], [-140, -135], [-120, -172], [-84, -170], [-82, -135], [-82, -80], [-105, -78], [-134, -78]], '#1e3f20');
-    // 3. Japan (Archipelago - Sakura Blossom)
-    drawMiniCountry([[-178, -58], [-168, -52], [-148, -64], [-136, -78], [-136, -92], [-146, -98], [-162, -88], [-178, -68], [-178, -58]], '#f472b6');
-    // 4. South Korea (Joseon Peninsula)
-    drawMiniCountry([[-80, -82], [-80, -132], [-65, -132], [-46, -122], [-46, -88], [-60, -82], [-80, -82]], '#0284c7');
-    // 5. UK (British Isles)
-    drawMiniCountry([[-45, -55], [-20, -55], [-18, -80], [-35, -85], [-45, -70], [-45, -55]], '#dc2626');
-    // 6. France (L’Hexagone)
-    drawMiniCountry([[12, -25], [42, -25], [50, -55], [32, -65], [15, -55], [10, -35], [12, -25]], '#38bdf8');
-    // 7. USA (Las Vegas Strip, Broadway & Hollywood)
-    drawMiniCountry([[75, -60], [145, -60], [175, -45], [175, 25], [145, 45], [115, 45], [85, 25], [75, -10], [75, -60]], '#334155');
-    // 8. Mexico (Mesoamerican Horn - terracotta)
-    drawMiniCountry([[-185, 30], [-135, 25], [-85, 40], [-70, 75], [-105, 95], [-145, 80], [-185, 55], [-185, 30]], '#9a3412');
-    // 9. Egypt (Sahara desert dunes)
-    drawMiniCountry([[-175, 20], [-135, 20], [-135, 60], [-175, 60], [-175, 20]], '#eab308');
-    // 10. UAE (Dubai Waterfront & Coastal Promenade)
-    drawMiniCountry([[150, 20], [182, 20], [185, 42], [182, 60], [178, 80], [150, 80]], '#0d9488');
-    // 12. Sunflower Valley
-    drawMiniCountry([[-65, 30], [-25, 30], [-25, 65], [-65, 65], [-65, 30]], '#facc15');
-    // Pier & Beach Boardwalk
-    drawMiniCountry([[-40, 75], [40, 75], [40, 210], [-40, 210]], '#dfc47b');
-    drawMiniCountry([[-25, 120], [35, 120], [35, 185], [-25, 185]], '#db2777');
-
-    // =========================================================================
-    // 11. SWISS CONFEDERATION · FROSTPEAK ALPS (Elevation Relief Shading)
-    // =========================================================================
-    // Alpine evergreen foothills
-    drawMiniCountry([[-32, -128], [24, -128], [18, -84], [-28, -84], [-32, -128]], '#164e32');
-    // Rocky crags base
-    drawMiniCountry([[-28, -124], [20, -124], [15, -88], [-24, -88], [-28, -124]], '#475569');
-    // Glacial ice slope (SE shadow)
-    drawMiniCountry([[-24, -122], [18, -122], [12, -92], [-18, -92], [-24, -122]], '#7dd3fc');
-    // Sunlit alpine snow slope (NW highlight)
-    drawMiniCountry([[-24, -122], [-4, -122], [-6, -92], [-20, -92], [-24, -122]], '#f8fafc');
-    // Summit ridge pristine snowcaps
-    drawMiniCountry([[-14, -118], [8, -118], [2, -98], [-10, -98], [-14, -118]], '#ffffff');
-
-    // Lake Serenity (natural frozen ice rink in the alpine bowl)
-    ctx.fillStyle = '#bae6fd';
-    ctx.beginPath();
-    ctx.ellipse(originX - 10 * scale, originZ - 112 * scale, 9 * scale, 6 * scale, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#0284c7';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Chalet de Lakshya timber ski lodge footprint
-    ctx.fillStyle = '#78350f';
-    ctx.fillRect(originX - 22 * scale, originZ - 90 * scale, 8 * scale, 8 * scale);
-
-    // SWISS FLAG BADGE 🇨🇭 (Frostpeak Alps Chalet Plinth)
-    const swissFlagX = originX - 18 * scale;
-    const swissFlagZ = originZ - 86 * scale;
-    const sFlagSize = Math.max(9, 14 * scale);
-    ctx.save();
-    ctx.fillStyle = '#d52b1e'; // Official Swiss Red
-    ctx.fillRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(swissFlagX - sFlagSize / 2, swissFlagZ - sFlagSize / 2, sFlagSize, sFlagSize);
-    // Swiss White Greek Cross
-    ctx.fillStyle = '#ffffff';
-    const sArm = sFlagSize * 0.22;
-    const sLen = sFlagSize * 0.65;
-    ctx.fillRect(swissFlagX - sArm / 2, swissFlagZ - sLen / 2, sArm, sLen);
-    ctx.fillRect(swissFlagX - sLen / 2, swissFlagZ - sArm / 2, sLen, sArm);
-    ctx.restore();
-
-    // Yamuna river in India
-    ctx.strokeStyle = '#0284c7';
-    ctx.lineWidth = 5 * scale;
-    ctx.beginPath();
-    ctx.moveTo(originX + 75 * scale, originZ - 60 * scale);
-    ctx.quadraticCurveTo(originX + 85 * scale, originZ - 100 * scale, originX + 75 * scale, originZ - 160 * scale);
-    ctx.stroke();
-
-    // Taj Mahal marble dome footprint
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(originX + 70 * scale, originZ - 152 * scale, 12 * scale, 12 * scale);
-
-    // Giza Pyramids in Egypt (isometric shaded triangles)
-    const drawMiniPyramid = (px: number, pz: number, sz: number) => {
-      const rx = originX + px * scale;
-      const rz = originZ + pz * scale;
-      const s = sz * scale;
-      // Sunlit NW side
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.moveTo(rx, rz - s);
-      ctx.lineTo(rx - s, rz + s);
-      ctx.lineTo(rx, rz + s);
-      ctx.closePath();
-      ctx.fill();
-      // Shaded SE side
-      ctx.fillStyle = '#b45309';
-      ctx.beginPath();
-      ctx.moveTo(rx, rz - s);
-      ctx.lineTo(rx, rz + s);
-      ctx.lineTo(rx + s, rz + s);
-      ctx.closePath();
-      ctx.fill();
-    };
-    drawMiniPyramid(-155, 36, 9); // Khufu
-    drawMiniPyramid(-142, 48, 7); // Khafre
-    drawMiniPyramid(-132, 58, 5); // Menkaure
-
-    // Great Wall in China (stone ramparts with watchtowers)
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 3.5 * scale;
-    ctx.beginPath();
-    ctx.moveTo(originX - 134 * scale, originZ - 138 * scale);
-    ctx.quadraticCurveTo(originX - 108 * scale, originZ - 130 * scale, originX - 84 * scale, originZ - 138 * scale);
-    ctx.stroke();
-
-    // Hollywood ridge in USA
-    ctx.fillStyle = 'rgba(215,168,121,.9)';
-    ctx.beginPath();
-    ctx.ellipse(originX + 165 * scale, originZ - 100 * scale, 22 * scale, 14 * scale, -.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Hollywood Boulevard Walk of Fame
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2.4 * scale;
-    ctx.beginPath();
-    ctx.moveTo(originX + 161 * scale, originZ - 84 * scale);
-    ctx.lineTo(originX + 161 * scale, originZ - 54 * scale);
-    ctx.stroke();
-
-    ctx.restore(); // restore mainland country clip
-
-    // =========================================================================
-    // RADIATOR SPRINGS RACEWAY (Authentic 3D Circuit Geometry X: 172..228, Z: -54..-12)
-    // =========================================================================
-    const drawMiniRaceway = () => {
-      ctx.save();
-      const trackLeft = originX + 172 * scale;
-      const trackTop = originZ - 54 * scale;
-      const trackW = 56 * scale;
-      const trackH = 42 * scale;
-      const cornerR = 6 * scale;
-
-      // Pier pilings over water for X > 194
-      ctx.fillStyle = '#78350f';
-      for (let px = 196; px <= 228; px += 8) {
-        ctx.fillRect(originX + px * scale - 1.5, originZ - 55 * scale, 3, 5);
-        ctx.fillRect(originX + px * scale - 1.5, originZ - 12 * scale, 3, 5);
-      }
-
-      // Outer Asphalt Track Surface
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.roundRect(trackLeft, trackTop, trackW, trackH, cornerR);
-      ctx.fill();
-
-      // Outer Red & White Rumble Curbs
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = Math.max(1.5, 2.5 * scale);
-      ctx.stroke();
-
-      // Infield (Desert Sand & Willy's Butte Red Mesa)
-      const infieldLeft = originX + 180 * scale;
-      const infieldTop = originZ - 46 * scale;
-      const infieldW = 40 * scale;
-      const infieldH = 26 * scale;
-      const infieldR = 4 * scale;
-
-      // Inner Red & White Kerbs
-      ctx.fillStyle = '#d97706'; // Desert sand
-      ctx.beginPath();
-      ctx.roundRect(infieldLeft, infieldTop, infieldW, infieldH, infieldR);
-      ctx.fill();
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = Math.max(1.0, 1.5 * scale);
-      ctx.stroke();
-
-      // Willy's Butte Mesa Rock in Infield
-      ctx.fillStyle = '#b45309';
-      ctx.beginPath();
-      ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 12 * scale, 7 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#78350f';
-      ctx.beginPath();
-      ctx.ellipse(originX + 200 * scale, originZ - 33 * scale, 7 * scale, 4 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Centerline Gold Racing Markings
-      ctx.strokeStyle = '#eab308';
-      ctx.lineWidth = Math.max(1, 1.4 * scale);
-      ctx.setLineDash([3 * scale, 3 * scale]);
-      ctx.beginPath();
-      ctx.roundRect(trackLeft + 4 * scale, trackTop + 4 * scale, trackW - 8 * scale, trackH - 8 * scale, cornerR * 0.7);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Start / Finish Checkered Line (X = 190, Z = -15)
-      const sfX = originX + 190 * scale;
-      const sfTop = originZ - 18 * scale;
-      const sfH = 6 * scale;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(sfX - 1.5, sfTop, 3, sfH);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(sfX - 1.5, sfTop, 3, sfH * 0.5);
-
-      ctx.restore();
-    };
-    drawMiniRaceway();
-
-    // =========================================================================
-    // DUBAI PALM JUMEIRAH & ARABIAN GULF ARCHIPELAGO (Authentic 3D Coordinates)
-    // =========================================================================
-    const drawMiniPalmJumeirah = () => {
-      ctx.save();
-      const pRootX = originX + 176 * scale;
-      const pRootZ = originZ + 46 * scale;
-      const pTrunkEndX = originX + 236 * scale;
-
-      // Turquoise Coral Reef Lagoon Shallows
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.28)';
-      ctx.beginPath();
-      const crescentCenterX = originX + 252 * scale;
-      ctx.ellipse(crescentCenterX, pRootZ, 78 * scale, 40 * scale, 0, -Math.PI * 0.72, Math.PI * 0.72);
-      ctx.lineTo(pRootX, pRootZ + 12 * scale);
-      ctx.lineTo(pRootX, pRootZ - 12 * scale);
-      ctx.closePath();
-      ctx.fill();
-
-      // 1. Palm Trunk & Flared Gateway Base
-      ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = Math.max(2.5, 5.0 * scale);
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(pRootX, pRootZ);
-      ctx.lineTo(pTrunkEndX, pRootZ);
-      ctx.stroke();
-
-      // Monorail cyan line
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = Math.max(0.8, 1.4 * scale);
-      ctx.beginPath();
-      ctx.moveTo(pRootX, pRootZ);
-      ctx.lineTo(pTrunkEndX, pRootZ);
-      ctx.stroke();
-
-      // Palm Tower / Nakheel Mall on Trunk (213, 46)
-      ctx.fillStyle = '#0284c7';
-      ctx.beginPath();
-      ctx.arc(originX + 213 * scale, pRootZ, Math.max(1.8, 2.6 * scale), 0, Math.PI * 2);
-      ctx.fill();
-
-      // 16 Parametric Curved Fronds (8 pairs fanning accurately within Z in [16, 76])
-      const frondDefs = [
-        { xRoot: 236, xTip: 288, dz: 30 },
-        { xRoot: 238, xTip: 292, dz: 26 },
-        { xRoot: 240, xTip: 296, dz: 22 },
-        { xRoot: 242, xTip: 300, dz: 18 },
-        { xRoot: 244, xTip: 302, dz: 14 },
-        { xRoot: 246, xTip: 302, dz: 11 },
-        { xRoot: 248, xTip: 298, dz: 8 },
-        { xRoot: 250, xTip: 292, dz: 5 }
-      ];
-
-      ctx.strokeStyle = '#dfc47b';
-      ctx.lineWidth = Math.max(1.2, 2.4 * scale);
-      for (const f of frondDefs) {
-        const rootFrondX = originX + f.xRoot * scale;
-        const tipX = originX + f.xTip * scale;
-        const spreadZ = f.dz * scale;
-        const ctrlX = originX + (f.xRoot + 8) * scale;
-
-        // North frond
-        ctx.beginPath();
-        ctx.moveTo(rootFrondX, pRootZ);
-        ctx.quadraticCurveTo(ctrlX, pRootZ - spreadZ * 0.7, tipX, pRootZ - spreadZ);
-        ctx.stroke();
-
-        // South frond
-        ctx.beginPath();
-        ctx.moveTo(rootFrondX, pRootZ);
-        ctx.quadraticCurveTo(ctrlX, pRootZ + spreadZ * 0.7, tipX, pRootZ + spreadZ);
-        ctx.stroke();
-      }
-
-      // Detached Crescent Breakwater Barrier (Rx = 72, Rz = 34, Center = 252, 46, sweeps to X = 210)
-      ctx.strokeStyle = '#c2a661';
-      ctx.lineWidth = Math.max(2.2, 3.8 * scale);
-      ctx.beginPath();
-      ctx.ellipse(crescentCenterX, pRootZ, 72 * scale, 34 * scale, 0, -Math.PI * 0.70, Math.PI * 0.70);
-      ctx.stroke();
-
-      // Atlantis The Palm Resort Plinth Marker
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath();
-      ctx.arc(originX + 324 * scale, pRootZ, Math.max(2.5, 4.0 * scale), 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.arc(originX + 324 * scale, pRootZ, Math.max(1.2, 1.8 * scale), 0, Math.PI * 2);
-      ctx.fill();
-
-      // 2. Burj Al Arab Private Island (220, 110) & Causeway
-      const burjX = originX + 220 * scale;
-      const burjZ = originZ + 110 * scale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.lineWidth = Math.max(0.8, 1.4 * scale);
-      ctx.beginPath();
-      ctx.moveTo(originX + 176 * scale, originZ + 90 * scale);
-      ctx.quadraticCurveTo(originX + 195 * scale, originZ + 105 * scale, burjX, burjZ);
-      ctx.stroke();
-      ctx.fillStyle = '#dfc47b';
-      ctx.beginPath();
-      ctx.arc(burjX, burjZ, Math.max(3.5, 5.5 * scale), 0, Math.PI * 2);
-      ctx.fill();
-      // Sail silhouette
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(burjX, burjZ, Math.max(2, 3.2 * scale), 0, Math.PI * 2);
-      ctx.fill();
-      // Helipad marker
-      ctx.fillStyle = '#eab308';
-      ctx.beginPath();
-      ctx.arc(burjX + 2 * scale, burjZ - 2 * scale, Math.max(1, 1.5 * scale), 0, Math.PI * 2);
-      ctx.fill();
-
-      // 3. Bluewaters Island & Ain Dubai Wheel (262, 146)
-      const blueX = originX + 262 * scale;
-      const blueZ = originZ + 146 * scale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = Math.max(0.8, 1.2 * scale);
-      ctx.beginPath();
-      ctx.moveTo(originX + 176 * scale, originZ + 120 * scale);
-      ctx.lineTo(blueX, blueZ);
-      ctx.stroke();
-      ctx.fillStyle = '#dfc47b';
-      ctx.beginPath();
-      ctx.ellipse(blueX, blueZ, Math.max(4.5, 7.5 * scale), Math.max(3.5, 5.5 * scale), 0.3, 0, Math.PI * 2);
-      ctx.fill();
-      // Ain Dubai observation wheel ring
-      ctx.strokeStyle = '#e0e7ff';
-      ctx.lineWidth = Math.max(1.2, 1.8 * scale);
-      ctx.beginPath();
-      ctx.arc(blueX, blueZ, Math.max(3, 4.8 * scale), 0, Math.PI * 2);
-      ctx.stroke();
-
-      // 4. The World Islands Archipelago
-      ctx.fillStyle = '#e2cb87';
-      const worldIslands = [
-        [360, 46, 4.5], [380, 68, 3.8], [350, 24, 3.5], [380, 28, 3.2]
-      ];
-      for (const [wx, wz, wr] of worldIslands) {
-        ctx.beginPath();
-        ctx.arc(originX + wx * scale, originZ + wz * scale, Math.max(2, wr * scale), 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.restore();
-    };
-    drawMiniPalmJumeirah();
-
-    // Main Roads (Double-line Minecraft gravel and paved highway)
-    const drawMiniRoad = (points: [number, number][]) => {
-      ctx.beginPath();
-      points.forEach(([x, z], i) => {
-        const px = originX + x * scale;
-        const pz = originZ + z * scale;
-        if (i === 0) ctx.moveTo(px, pz); else ctx.lineTo(px, pz);
-      });
-      ctx.stroke();
-    };
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    // Dark stone border
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = Math.max(2.4, 3.2 * this.minimapZoom);
-    drawMiniRoad([[0, -20], [0, -65]]);
-    drawMiniRoad([[20, 0], [150, 0]]);
-    drawMiniRoad([[2, -60], [74, -106]]);
-    drawMiniRoad([[-2, -55], [-70, -85]]);
-    drawMiniRoad([[-20, 0], [-79, 50]]);
-    drawMiniRoad([[0, 20], [0, 160]]);
-    // Light cobblestone / sandstone fill
-    ctx.strokeStyle = '#f8fafc';
-    ctx.lineWidth = Math.max(1.2, 1.8 * this.minimapZoom);
-    drawMiniRoad([[0, -20], [0, -65]]);
-    drawMiniRoad([[20, 0], [150, 0]]);
-    drawMiniRoad([[2, -60], [74, -106]]);
-    drawMiniRoad([[-2, -55], [-70, -85]]);
-    drawMiniRoad([[-20, 0], [-79, 50]]);
-    drawMiniRoad([[0, 20], [0, 160]]);
-
-    // Island Express Railway Transit Loop (Twin rails with sleeper ties)
-    const railWaypoints = [
-      [58, 33], [74, 33], [92, 33], [104, 32], [116, 28], [124, 38],
-      [128, 48], [144, 50], [158, 64], [174, 78], [180, 88], [174, 98],
-      [144, 98], [112, 98], [80, 96], [50, 92], [24, 88],
-      [12, 74], [8, 54], [6, 36], [8, 22], [22, 22], [38, 27], [48, 32]
-    ];
-    ctx.save();
-    // Sleeper ties
-    ctx.strokeStyle = '#78350f';
-    ctx.lineWidth = Math.max(2.8, 3.8 * this.minimapZoom);
-    ctx.setLineDash([2, 4]);
-    ctx.beginPath();
-    railWaypoints.forEach(([wx, wz], idx) => {
-      const rx = originX + wx * scale;
-      const rz = originZ + wz * scale;
-      if (idx === 0) ctx.moveTo(rx, rz); else ctx.lineTo(rx, rz);
-    });
-    ctx.closePath();
-    ctx.stroke();
-    // Steel rails
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = Math.max(1.2, 1.8 * this.minimapZoom);
-    ctx.setLineDash([]);
-    ctx.stroke();
-    ctx.restore();
-
-    // Railway Station Markers on Minimap
-    const stations = [
-      [58, 33], [116, 28], [128, 48], [24, 88], [8, 22]
-    ];
-    stations.forEach(([sx, sz]) => {
-      const px = originX + sx * scale;
-      const pz = originZ + sz * scale;
-      ctx.fillStyle = '#fbbf24';
-      ctx.beginPath();
-      ctx.arc(px, pz, Math.max(2, 2.8 * this.minimapZoom), 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#78350f';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    });
-
-    // Central Citadel Moat, 4 Bridges & Hub
-    ctx.strokeStyle = '#0284c7';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(originX, originZ, 20 * scale, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // 4 Moat Bridges
-    ctx.fillStyle = '#cbd5e1';
-    ctx.fillRect(originX - 2 * scale, originZ - 23 * scale, 4 * scale, 6 * scale);
-    ctx.fillRect(originX - 2 * scale, originZ + 17 * scale, 4 * scale, 6 * scale);
-    ctx.fillRect(originX + 17 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
-    ctx.fillRect(originX - 23 * scale, originZ - 2 * scale, 6 * scale, 4 * scale);
-
-    ctx.fillStyle = '#64748b';
-    ctx.beginPath();
-    ctx.arc(originX, originZ, 16 * scale, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#facc15';
-    ctx.beginPath();
-    ctx.arc(originX, originZ, 3.5 * scale, 0, Math.PI * 2);
-    ctx.fill();
+    if (!this.cachedMinimapCanvas || this.cachedMinimapScale !== scale) {
+      this.renderCachedMinimap(scale);
+    }
+    if (this.cachedMinimapCanvas) {
+      ctx.drawImage(this.cachedMinimapCanvas, originX - this.cachedOriginX, originZ - this.cachedOriginZ);
+    }
 
     // Radar Range Rings and Crosshair Grid Lines
     ctx.strokeStyle = 'rgba(56, 189, 248, 0.14)';
@@ -1255,14 +1253,17 @@ export class HUDManager {
     const chatContainer = document.getElementById('mc-chat-log');
     if (!chatContainer) return;
 
+    const safeSender = escapeHtml(sender);
+    const safeText = escapeHtml(text);
+
     // Highlight Minecraft coordinate tokens like [X: 4, Y: 2, Z: 8] or [X: -54, Z: -12]
-    const formattedText = text.replace(/\[X:\s*([-\d.]+)(?:,\s*Y:\s*([-\d.]+))?,\s*Z:\s*([-\d.]+)\]/g, (match) => {
+    const formattedText = safeText.replace(/\[X:\s*([-\d.]+)(?:,\s*Y:\s*([-\d.]+))?,\s*Z:\s*([-\d.]+)\]/g, (match) => {
       return `<span class="mc-chat-coords">${match}</span>`;
     });
 
     const msgEl = document.createElement('div');
     msgEl.className = 'mc-chat-msg';
-    msgEl.innerHTML = `<span class="mc-chat-sender">&lt;${sender}&gt;</span> ${formattedText}`;
+    msgEl.innerHTML = `<span class="mc-chat-sender">&lt;${safeSender}&gt;</span> ${formattedText}`;
     chatContainer.appendChild(msgEl);
 
     chatContainer.scrollTop = chatContainer.scrollHeight;

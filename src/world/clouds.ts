@@ -33,6 +33,11 @@ export class CloudManager {
   private driftZ = 0;
   private readonly windSpeedX = 1.35;
   private readonly windSpeedZ = 0.22;
+  private lastUploadedDriftX = 0;
+  private lastUploadedDriftZ = 0;
+  private lastUploadedPlayerX = 0;
+  private lastUploadedPlayerZ = 0;
+  private hasInitializedPositions = false;
 
   // Colors & Materials
   private readonly cloudMaterial: THREE.MeshBasicMaterial;
@@ -90,6 +95,11 @@ export class CloudManager {
 
     // Initial positioning
     this.updatePositions(new THREE.Vector3(0, 0, 0));
+    this.lastUploadedPlayerX = 0;
+    this.lastUploadedPlayerZ = 0;
+    this.lastUploadedDriftX = 0;
+    this.lastUploadedDriftZ = 0;
+    this.hasInitializedPositions = true;
   }
 
   /**
@@ -380,8 +390,26 @@ export class CloudManager {
     this.driftX += dt * this.windSpeedX;
     this.driftZ += dt * this.windSpeedZ;
 
-    // 2. Toroidal position update around player
-    this.updatePositions(playerPosition);
+    // 2. Toroidal position update around player (throttled to avoid per-frame GPU matrix re-upload)
+    const deltaDrift = Math.hypot(this.driftX - this.lastUploadedDriftX, this.driftZ - this.lastUploadedDriftZ);
+    const deltaPlayer = Math.hypot(playerPosition.x - this.lastUploadedPlayerX, playerPosition.z - this.lastUploadedPlayerZ);
+
+    if (!this.hasInitializedPositions || deltaDrift > 16 || deltaPlayer > 16) {
+      this.lastUploadedDriftX = this.driftX;
+      this.lastUploadedDriftZ = this.driftZ;
+      this.lastUploadedPlayerX = playerPosition.x;
+      this.lastUploadedPlayerZ = playerPosition.z;
+      this.group.position.set(0, 0, 0);
+      this.updatePositions(playerPosition);
+      this.hasInitializedPositions = true;
+    } else {
+      // Smooth continuous drift via parent group translation (0 GPU matrix uploads)
+      this.group.position.set(
+        this.driftX - this.lastUploadedDriftX,
+        0,
+        this.driftZ - this.lastUploadedDriftZ
+      );
+    }
 
     // 3. Dynamic atmospheric & weather color tinting
     const baseSkyTint = this.computeAtmosphericColor(dayNightAngle);

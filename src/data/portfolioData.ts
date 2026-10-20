@@ -1,3 +1,5 @@
+import { deepFreeze } from '../utils/security';
+
 export interface Project {
   id: string;
   title: string;
@@ -41,7 +43,7 @@ export interface Achievement {
   type: 'Award' | 'Hackathon' | 'Leadership';
 }
 
-export const PORTFOLIO_DATA = {
+export const PORTFOLIO_DATA = deepFreeze({
   profile: {
     name: "Lakshya",
     title: "Software Engineer & Designer",
@@ -503,4 +505,4 @@ export const PORTFOLIO_DATA = {
     { name: "Switzerland · Frostpeak Alps 🇨🇭 Ski Lodge & Summit", coords: [-2, 9, -100], tag: "[ALPS]", desc: "Snow-capped Swiss Alpine peaks, Chalet de Lakshya timber ski lodge, Lake Serenity ice rink, Swiss Confederation flagpole, cable car gondola, and high summit observatory" },
     { name: "Sunflower Valley · Windmill & Farmstead", coords: [-45, 2, 48], tag: "[VALLEY]", desc: "Rustic 4-sail Dutch windmill, golden wheat and sunflower fields, countryside barn, and peaceful agricultural valley" }
   ]
-};
+});

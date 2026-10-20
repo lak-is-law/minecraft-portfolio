@@ -359,7 +359,7 @@ export function createTerrainMesh(ctx, prebakedHeights = null) {
 
   const terrain = new THREE.Mesh(tg, terrainMat);
   terrain.receiveShadow = true;
-  terrain.castShadow = true;
+  terrain.castShadow = false;
   ctx.terrain = terrain;
   ctx.pos = pos;
   ctx.col = col;

@@ -29,3 +29,8 @@ pnpm-debug.log*
 Thumbs.db
 .vercel
 .env*
+
+# Test output artifacts
+tests/*.png
+test-results/
+playwright-report/
