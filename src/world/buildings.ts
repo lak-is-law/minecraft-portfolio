@@ -151,8 +151,9 @@ export class WorldBuilder {
     if (dist > coastR) {
       return 0; // Ocean water at Y = 0
     }
-    // Sandy beach shoreline fringe
-    if (dist > coastR - 8) {
+    // Sandy beach shoreline fringe (exempt Mount Fuji sacred volcanic cone)
+    const isFujiArea = Math.hypot((x - (-185)) / 17, (z - (-125)) / 17) <= 1.0;
+    if (dist > coastR - 8 && !isFujiArea) {
       return 1; // Sandy beach
     }
 
@@ -3661,17 +3662,21 @@ export class WorldBuilder {
     });
 
     // Summit Caldera Beacon & Torii on Crater Rim
-    this.setBlock(fujiX, 26, fujiZ, 'obsidian'); // Crater floor
-    this.setBlock(fujiX, 27, fujiZ, 'magma_block'); // Geothermal volcanic vent
-    this.setBlock(fujiX, 28, fujiZ, 'beacon'); // Celestial skyward beam
-    // Summit Torii Gate at Crater Edge
-    this.setBlock(fujiX + 3, 27, fujiZ, 'red_terracotta');
-    this.setBlock(fujiX + 5, 27, fujiZ, 'red_terracotta');
-    this.setBlock(fujiX + 3, 28, fujiZ, 'red_terracotta');
-    this.setBlock(fujiX + 5, 28, fujiZ, 'red_terracotta');
+    const craterFloorY = Math.max(1, this.getTerrainHeight(fujiX, fujiZ));
+    this.setBlock(fujiX, craterFloorY + 1, fujiZ, 'obsidian'); // Crater floor
+    this.setBlock(fujiX, craterFloorY + 2, fujiZ, 'magma_block'); // Geothermal volcanic vent
+    this.setBlock(fujiX, craterFloorY + 3, fujiZ, 'beacon'); // Celestial skyward beam
+    // Summit Torii Gate at Crater Edge firmly anchored down to mountain rock
+    for (const tx of [fujiX + 3, fujiX + 5]) {
+      const tyBase = this.getTerrainHeight(tx, fujiZ);
+      for (let y = tyBase; y <= 26; y++) {
+        this.setBlock(tx, y, fujiZ, 'obsidian');
+      }
+      this.setBlock(tx, 27, fujiZ, 'red_terracotta');
+      this.setBlock(tx, 28, fujiZ, 'red_terracotta');
+      this.setBlock(tx, 29, fujiZ, 'gold_block');
+    }
     this.setBlock(fujiX + 4, 29, fujiZ, 'red_terracotta');
-    this.setBlock(fujiX + 3, 29, fujiZ, 'gold_block');
-    this.setBlock(fujiX + 5, 29, fujiZ, 'gold_block');
 
     // =========================================================================
     // 2. SHIBUYA 12-LANE SCRAMBLE CROSSING (Busiest Intersection on Earth)
@@ -3856,17 +3861,22 @@ export class WorldBuilder {
       const tx = inariX - i * 2;
       const tz = inariZ - i * 2;
       const ty = 2 + Math.floor(i / 3);
-      // Stone trail floor
-      this.setBlock(tx, ty - 1, tz, 'stone_bricks');
+      // Stone trail floor anchored down to terrain
+      const ghTrail = this.getTerrainHeight(tx, tz);
+      for (let y = Math.min(1, ghTrail); y < ty; y++) {
+        this.setBlock(tx, y, tz, 'stone_bricks');
+      }
 
-      // Torii Pillars
-      this.setBlock(tx - 1, ty, tz + 1, 'red_terracotta');
-      this.setBlock(tx - 1, ty + 1, tz + 1, 'red_terracotta');
-      this.setBlock(tx - 1, ty + 2, tz + 1, 'red_terracotta');
+      // Torii Pillars firmly anchored down to terrain slope
+      const ghL = this.getTerrainHeight(tx - 1, tz + 1);
+      for (let y = Math.min(1, ghL); y <= ty + 2; y++) {
+        this.setBlock(tx - 1, y, tz + 1, (y < ty) ? 'stone_bricks' : 'red_terracotta');
+      }
 
-      this.setBlock(tx + 1, ty, tz - 1, 'red_terracotta');
-      this.setBlock(tx + 1, ty + 1, tz - 1, 'red_terracotta');
-      this.setBlock(tx + 1, ty + 2, tz - 1, 'red_terracotta');
+      const ghR = this.getTerrainHeight(tx + 1, tz - 1);
+      for (let y = Math.min(1, ghR); y <= ty + 2; y++) {
+        this.setBlock(tx + 1, y, tz - 1, (y < ty) ? 'stone_bricks' : 'red_terracotta');
+      }
 
       // Top Lintel
       this.setBlock(tx - 1, ty + 3, tz + 1, 'gold_block');
@@ -3879,7 +3889,10 @@ export class WorldBuilder {
     const shrineZ = inariZ - 18;
     for (let dx = -3; dx <= 3; dx++) {
       for (let dz = -3; dz <= 3; dz++) {
-        this.setBlock(shrineX + dx, 4, shrineZ + dz, 'stone_bricks');
+        const gh = this.getTerrainHeight(shrineX + dx, shrineZ + dz);
+        for (let y = Math.min(1, gh); y <= 4; y++) {
+          this.setBlock(shrineX + dx, y, shrineZ + dz, 'stone_bricks');
+        }
       }
     }
     // Shrine Sanctuary Pavilion (Vermilion with curved roof)
@@ -4827,7 +4840,7 @@ export class WorldBuilder {
     const kx = -165;
     const kz = 36;
     const kBaseHalf = 10; // 21x21 footprint
-    const kHeight = 15; // steps from Y = 1 to Y = 16
+    const kHeight = 10; // steps from Y = 1 to Y = 11 (half = 0 at apex Y = 11)
 
     // Stepped Pyramid Shell with Grand Interior Corridors
     for (let step = 0; step <= kHeight; step++) {
@@ -4859,8 +4872,8 @@ export class WorldBuilder {
       }
     }
     // Solid Golden Pyramidion Capstone at top crowned with beacon beam!
-    this.setBlock(kx, 2 + kHeight, kz, 'gold_block');
-    this.setBlock(kx, 3 + kHeight, kz, 'beacon');
+    this.setBlock(kx, 12, kz, 'gold_block');
+    this.setBlock(kx, 13, kz, 'beacon');
 
     // Hollow Interior Pharaoh's Burial Chamber Details at (kx, kz)
     // King's Red Granite Chamber Walls & Lapis Inlays
@@ -4901,38 +4914,38 @@ export class WorldBuilder {
     // 6. Pyramid of Khafre at (-148, 48) - 15x15 base with preserved casing peak
     const kfX = -148;
     const kfZ = 48;
-    for (let step = 0; step <= 10; step++) {
+    for (let step = 0; step <= 7; step++) {
       const half = 7 - step;
       const y = 1 + step;
       if (half < 0) break;
       for (let dx = -half; dx <= half; dx++) {
         for (let dz = -half; dz <= half; dz++) {
-          if (Math.abs(dx) === half || Math.abs(dz) === half || step === 10) {
+          if (Math.abs(dx) === half || Math.abs(dz) === half || step === 7) {
             // Polished limestone casing remnant at top
-            this.setBlock(kfX + dx, y, kfZ + dz, (step >= 8) ? 'smooth_stone' : 'sandstone');
+            this.setBlock(kfX + dx, y, kfZ + dz, (step >= 5) ? 'smooth_stone' : 'sandstone');
           }
         }
       }
     }
-    this.setBlock(kfX, 12, kfZ, 'gold_block');
-    this.setBlock(kfX, 13, kfZ, 'sea_lantern');
+    this.setBlock(kfX, 9, kfZ, 'gold_block');
+    this.setBlock(kfX, 10, kfZ, 'sea_lantern');
 
     // 7. Pyramid of Menkaure at (-175, 20) - 11x11 base with Red Granite lower courses
     const mkX = -175;
     const mkZ = 20;
-    for (let step = 0; step <= 7; step++) {
+    for (let step = 0; step <= 5; step++) {
       const half = 5 - step;
       const y = 1 + step;
       if (half < 0) break;
       for (let dx = -half; dx <= half; dx++) {
         for (let dz = -half; dz <= half; dz++) {
-          if (Math.abs(dx) === half || Math.abs(dz) === half) {
+          if (Math.abs(dx) === half || Math.abs(dz) === half || step === 5) {
             this.setBlock(mkX + dx, y, mkZ + dz, (step <= 2) ? 'red_sandstone' : 'sandstone');
           }
         }
       }
     }
-    this.setBlock(mkX, 9, mkZ, 'gold_block');
+    this.setBlock(mkX, 7, mkZ, 'gold_block');
 
     // 8. Desert Oasis & Bedouin Encampment at (-142, 46)
     const oasX = -142;
@@ -5047,7 +5060,8 @@ export class WorldBuilder {
             this.setBlock(bkX + dx, y, bkZ + dz, 'quartz_block');
           } else {
             const isEdge = Math.abs(dx) === 2 || Math.abs(dz) === 2;
-            this.setBlock(bkX + dx, y, bkZ + dz, isEdge ? 'cyber_glass' : 'air');
+            const isSpireCore = (y === 47 && dx === 0 && dz === 0);
+            this.setBlock(bkX + dx, y, bkZ + dz, isSpireCore ? 'quartz_block' : isEdge ? 'cyber_glass' : 'air');
           }
         }
       }
@@ -5853,24 +5867,29 @@ export class WorldBuilder {
     }
     this.setBlock(bwX, wheelCenterY, bwZ, 'sea_lantern');
 
-    // Circular Wheel Rim & Spokes (In Y-Z plane)
+    // Continuous Circular Wheel Rim (In Y-Z plane)
+    for (let deg = 0; deg < 360; deg += 2) {
+      const rad = (deg * Math.PI) / 180;
+      const ry = Math.round(wheelCenterY + wheelRadius * Math.sin(rad));
+      const rz = Math.round(bwZ + wheelRadius * Math.cos(rad));
+      this.setBlock(bwX, ry, rz, 'quartz_block');
+    }
+
+    // Radial Spokes & Passenger Observation Capsules
     const numCapsules = 16;
     for (let i = 0; i < numCapsules; i++) {
       const theta = (i / numCapsules) * Math.PI * 2;
       const capY = Math.round(wheelCenterY + wheelRadius * Math.sin(theta));
       const capZ = Math.round(bwZ + wheelRadius * Math.cos(theta));
 
-      // Spoke
-      for (let r = 2; r < wheelRadius; r += 2) {
+      // Continuous Spoke from hub to rim
+      for (let r = 1; r < wheelRadius; r++) {
         const spY = Math.round(wheelCenterY + r * Math.sin(theta));
         const spZ = Math.round(bwZ + r * Math.cos(theta));
         this.setBlock(bwX, spY, spZ, 'iron_block');
       }
 
-      // Wheel Rim
-      this.setBlock(bwX, capY, capZ, 'quartz_block');
-
-      // Passenger Observation Capsule
+      // Passenger Observation Capsule (anchored firmly onto the rim)
       this.setBlock(bwX - 1, capY, capZ, 'cyber_glass');
       this.setBlock(bwX + 1, capY, capZ, 'cyber_glass');
       this.setBlock(bwX, capY, capZ, 'sea_lantern');
@@ -6199,7 +6218,7 @@ export class WorldBuilder {
     // B. Hall Structure (Y = 4 to 18)
     for (let x = fcX - 7; x <= fcX + 7; x += 3) {
       for (let z = fcZ - 5; z <= fcZ + 5; z += 5) {
-        for (let y = 4; y <= 10; y++) this.setBlock(x, y, z, 'red_terracotta');
+        for (let y = 4; y <= 11; y++) this.setBlock(x, y, z, 'red_terracotta');
       }
     }
     for (let x = fcX - 7; x <= fcX + 7; x++) {
@@ -6214,6 +6233,12 @@ export class WorldBuilder {
           this.setBlock(x, 10, z, 'gold_block');
           if (edgeD === 2) this.setBlock(x, 11, z, 'red_terracotta');
         }
+      }
+    }
+    // Solid floor/ceiling at Y = 11 supporting the Upper Clerestory & Roof
+    for (let x = fcX - 6; x <= fcX + 6; x++) {
+      for (let z = fcZ - 4; z <= fcZ + 4; z++) {
+        this.setBlock(x, 11, z, 'red_terracotta');
       }
     }
 
@@ -6399,7 +6424,22 @@ export class WorldBuilder {
       const rad = (deg * Math.PI) / 180;
       const cx = Math.round(thX + Math.cos(rad) * 6);
       const cz = Math.round(thZ + Math.sin(rad) * 6);
-      for (let y = 3; y <= 7; y++) this.setBlock(cx, y, cz, 'red_terracotta');
+      for (let y = 3; y <= 8; y++) this.setBlock(cx, y, cz, 'red_terracotta');
+    }
+    // Tier 2 Supporting Pillar Drum Ring (Y = 8 to 13, radius 3.5)
+    for (let deg = 0; deg < 360; deg += 30) {
+      const rad = (deg * Math.PI) / 180;
+      const cx = Math.round(thX + Math.cos(rad) * 3.5);
+      const cz = Math.round(thZ + Math.sin(rad) * 3.5);
+      for (let y = 8; y <= 13; y++) this.setBlock(cx, y, cz, 'red_terracotta');
+    }
+    // Tier 3 Supporting Cylindrical Core (Y = 13 to 16, radius 1.8)
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        if (Math.hypot(dx, dz) <= 1.8) {
+          for (let y = 13; y <= 16; y++) this.setBlock(thX + dx, y, thZ + dz, 'red_terracotta');
+        }
+      }
     }
     for (let dx = -7; dx <= 7; dx++) {
       for (let dz = -7; dz <= 7; dz++) {
@@ -6600,6 +6640,11 @@ export class WorldBuilder {
       if (Math.abs(d) % 8 === 0) {
         this.setBlock(cx + 8, 4, cz + d, 'lantern');
         this.setBlock(cx - 8, 4, cz + d, 'lantern');
+        // Upright timber plaza lamp posts supporting the strings & lanterns down to the plaza
+        for (let y = 2; y <= 3; y++) {
+          this.setBlock(cx + 8, y, cz + d, 'oak_fence');
+          this.setBlock(cx - 8, y, cz + d, 'oak_fence');
+        }
       }
     }
 
@@ -7746,20 +7791,37 @@ export class WorldBuilder {
       this.setBlock(x, fwCenterY, fwz, 'iron_block');
     }
 
-    // Ferris Wheel Rim & Spokes
-    for (let deg = 0; deg < 360; deg += 15) {
+    // Continuous Twin Circular Rims (In Y-Z plane at fwx - 2 and fwx + 2)
+    for (let deg = 0; deg < 360; deg += 2) {
       const rad = (deg * Math.PI) / 180;
       const ry = Math.round(fwCenterY + Math.sin(rad) * fwRadius);
       const rz = Math.round(fwz + Math.cos(rad) * fwRadius);
       this.setBlock(fwx - 2, ry, rz, 'gold_block');
       this.setBlock(fwx + 2, ry, rz, 'gold_block');
-      // Crossbeams every 30 deg
-      if (deg % 30 === 0) {
-        this.setBlock(fwx, ry, rz, 'glowstone');
-        // Passenger Gondolas at bottom/sides
-        this.setBlock(fwx, ry - 1, rz, 'red_terracotta');
-        this.setBlock(fwx, ry - 2, rz, 'gold_block');
+    }
+
+    // Radial Spokes connecting axle to rims, crossbeams, and passenger gondolas
+    for (let deg = 0; deg < 360; deg += 30) {
+      const rad = (deg * Math.PI) / 180;
+      const ry = Math.round(fwCenterY + Math.sin(rad) * fwRadius);
+      const rz = Math.round(fwz + Math.cos(rad) * fwRadius);
+
+      // Continuous radial spokes on both wheels
+      for (let r = 1; r < fwRadius; r++) {
+        const sy = Math.round(fwCenterY + Math.sin(rad) * r);
+        const sz = Math.round(fwz + Math.cos(rad) * r);
+        this.setBlock(fwx - 2, sy, sz, 'iron_block');
+        this.setBlock(fwx + 2, sy, sz, 'iron_block');
       }
+
+      // Crossbeams connecting the twin wheels
+      for (let x = fwx - 2; x <= fwx + 2; x++) {
+        this.setBlock(x, ry, rz, (x === fwx) ? 'glowstone' : 'gold_block');
+      }
+
+      // Passenger Gondolas firmly suspended from crossbeams
+      this.setBlock(fwx, ry - 1, rz, 'red_terracotta');
+      this.setBlock(fwx, ry - 2, rz, 'gold_block');
     }
 
     // Carnival Carousel at (-10, 138)
@@ -7773,6 +7835,12 @@ export class WorldBuilder {
           this.setBlock(carX + dx, 2, carZ + dz, 'smooth_stone');
           // Striped Tent Roof
           this.setBlock(carX + dx, 6, carZ + dz, (Math.atan2(dz, dx) > 0) ? 'red_terracotta' : 'quartz_block');
+          // Perimeter wooden support poles holding up the tent roof
+          if (d >= 5.0 && (Math.abs(dx) === 4 || Math.abs(dz) === 4)) {
+            for (let y = 3; y <= 5; y++) {
+              this.setBlock(carX + dx, y, carZ + dz, 'oak_fence');
+            }
+          }
         }
       }
     }
@@ -9175,13 +9243,26 @@ export class WorldBuilder {
             if (row === 6 || row === 3 || row === 0) {
               this.setBlock(x, y, signZ - 2, 'iron_block');
             }
+            if (row === 6) {
+              // Anchor structural scaffolding legs down to mountain terrain
+              const gh = this.getTerrainHeight(x, signZ);
+              for (let fy = gh; fy < signBaseY; fy++) {
+                this.setBlock(x, fy, signZ - 1, 'oak_fence');
+                this.setBlock(x, fy, signZ - 2, 'iron_block');
+              }
+            }
           }
         }
       }
 
-      // Ground spotlights in front of each letter
-      this.setBlock(signCursorX + 1, signBaseY - 1, signZ + 2, 'sea_lantern');
-      this.setBlock(signCursorX + 2, signBaseY - 1, signZ + 2, 'sea_lantern');
+      // Ground spotlights in front of each letter with solid stone pedestals down to mountain slope
+      for (const sx of [signCursorX + 1, signCursorX + 2]) {
+        const gh = this.getTerrainHeight(sx, signZ + 2);
+        for (let fy = gh; fy < signBaseY - 1; fy++) {
+          this.setBlock(sx, fy, signZ + 2, 'smooth_stone');
+        }
+        this.setBlock(sx, signBaseY - 1, signZ + 2, 'sea_lantern');
+      }
       signCursorX += 4; // next letter
     }
 
@@ -11445,6 +11526,11 @@ export class WorldBuilder {
         this.setBlock(px, y, cz + 7, 'quartz_pillar');
       }
     }
+    // Longitudinal arch beams connecting the pylon piers along both canopy edges at Y = 11
+    for (let x = cx - 11; x <= cx + 11; x++) {
+      this.setBlock(x, 11, cz - 7, 'quartz_block');
+      this.setBlock(x, 11, cz + 7, 'quartz_block');
+    }
     for (let x = cx - 11; x <= cx + 11; x++) {
       for (let z = cz - 7; z <= cz + 7; z++) {
         const dist = Math.abs(z - cz);
@@ -11456,6 +11542,9 @@ export class WorldBuilder {
         }
       }
       if (x % 4 === 0) {
+        // Vertical suspension iron chains connecting chandelier lantern to vault ceiling apex at Y = 13
+        this.setBlock(x, 12, cz, 'iron_block');
+        this.setBlock(x, 11, cz, 'iron_block');
         this.setBlock(x, 10, cz, 'glowstone');
       }
     }
@@ -12155,8 +12244,11 @@ export class WorldBuilder {
     for (let step = 0; step <= 15; step++) {
       const stepZ = -142 - step;
       const stepY = 20 + Math.round((step / 15) * 8);
-      for (let dx = -1; dx <= 1; dx++) {
-        this.setBlock(sumX + dx, stepY, stepZ, 'smooth_stone');
+      for (let dx = -2; dx <= 2; dx++) {
+        const gh = this.getTerrainHeight(sumX + dx, stepZ);
+        for (let fy = gh; fy <= stepY; fy++) {
+          this.setBlock(sumX + dx, fy, stepZ, (Math.abs(dx) === 2) ? 'stone_bricks' : 'smooth_stone');
+        }
       }
       if (step % 4 === 0) {
         this.setBlock(sumX - 2, stepY + 1, stepZ, 'iron_block');
@@ -12171,6 +12263,10 @@ export class WorldBuilder {
       for (let dz = -6; dz <= 6; dz++) {
         const d = Math.hypot(dx, dz);
         if (d <= 6) {
+          const gh = this.getTerrainHeight(sumX + dx, sumZ + dz);
+          for (let fy = gh; fy < sumY; fy++) {
+            this.setBlock(sumX + dx, fy, sumZ + dz, 'stone_bricks');
+          }
           this.setBlock(sumX + dx, sumY, sumZ + dz, (d <= 2) ? 'diamond_block' : (d <= 5) ? 'quartz_block' : 'stone_bricks');
           if (d >= 5.2 && d <= 6) {
             this.setBlock(sumX + dx, sumY + 1, sumZ + dz, 'iron_block'); // Safety guardrail
@@ -13625,8 +13721,8 @@ export class WorldBuilder {
       }
     }
 
-    // E. Western Spring Cavern / Mountain Intake (X in [-180, -175])
-    for (let x = startX - 4; x <= startX; x++) {
+    // E. Western Spring Cavern / Mountain Intake (X in [-184, -181])
+    for (let x = startX - 4; x < startX; x++) {
       for (let z = centerZ - 4; z <= centerZ + 4; z++) {
         for (let y = -1; y <= waterLevelY + 2; y++) {
           const isOuter = (x === startX - 4 || Math.abs(z - centerZ) === 4);

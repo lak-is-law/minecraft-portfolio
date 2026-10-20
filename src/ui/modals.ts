@@ -1,8 +1,6 @@
 import { PORTFOLIO_DATA, Project, Experience } from '../data/portfolioData';
 import { sound } from '../engine/audio';
 import { ASSETS } from './assets';
-import { COUNTRY_COAST_POINTS } from '../world/buildings';
-import { AdventureMapRenderer } from './adventureMap';
 import { mountWorldMap, MapInstance } from './worldMap';
 
 export interface NPCDialogOption {
@@ -128,10 +126,6 @@ export class ModalManager {
   public onTeleportRequest?: (coords: [number, number, number]) => void;
   public onOpenBlockPaletteRequest?: () => void;
   public getPlayerInfo?: () => { position: { x: number; y: number; z: number }; yaw: number; dragons?: any[]; trains?: any[] };
-  private mapAnimId: number | null = null;
-  private mapMouseUpCleanup: (() => void) | null = null;
-  private mapResizeCleanup: (() => void) | null = null;
-  private adventureMapRenderer: AdventureMapRenderer | null = null;
   private mapInstance: MapInstance | null = null;
 
   public getMapInstance(): MapInstance | null {
@@ -171,25 +165,9 @@ export class ModalManager {
   }
 
   public close(preventPauseOverlay: boolean = false) {
-    if (this.mapAnimId !== null) {
-      cancelAnimationFrame(this.mapAnimId);
-      this.mapAnimId = null;
-    }
-    if (this.mapMouseUpCleanup) {
-      this.mapMouseUpCleanup();
-      this.mapMouseUpCleanup = null;
-    }
-    if (this.mapResizeCleanup) {
-      this.mapResizeCleanup();
-      this.mapResizeCleanup = null;
-    }
     if (this.mapInstance) {
       this.mapInstance.dispose();
       this.mapInstance = null;
-    }
-    if (this.adventureMapRenderer) {
-      this.adventureMapRenderer.dispose();
-      this.adventureMapRenderer = null;
     }
     delete (window as any).__mcMapPanTo;
     this.isOpen = false;
