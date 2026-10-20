@@ -1,11 +1,13 @@
 <!-- engine-telemetry: active -->
 
-
 ---
 
-## License & Commercial Use Restrictions
+## 🔒 Proprietary Software & All Rights Reserved
 
-This project and its assets are licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+**Copyright © 2026 Lakshya Agarwal. All Rights Reserved.**
 
-- **Permitted**: Personal exploration, educational use, academic research, and non-commercial forks.
-- **Prohibited**: Any commercial use, selling, monetizing, or utilizing this software/assets to generate revenue or provide commercial services without explicit prior written authorization from Lakshya Agarwal.
+This project is **strictly proprietary software** reserved exclusively for commercialization.
+
+- ⛔ **Zero-Use Policy**: No license or permission is granted for **any** use (commercial, personal, academic, or non-commercial).
+- ⛔ **No Copying or Forking**: You may NOT clone, modify, distribute, deploy, host, reverse engineer, or create derivative works from this repository.
+- 💼 **Commercial Inquiries**: For commercial licensing, enterprise deployment, or business inquiries, contact [contact@lakshya.uk](mailto:contact@lakshya.uk).
