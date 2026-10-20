@@ -46,7 +46,6 @@ mine/
 │   │   ├── style.css                 # World map isolated styles
 │   │   └── models/                   # 37 Landmark and environment procedural voxel meshes
 │   ├── ui/                           # Presentation & DOM HUD layer
-│   │   ├── adventureMap.ts           # 2D Canvas radar map
 │   │   ├── assets.ts                 # SVG icons & avatar markup
 │   │   ├── hud.ts                    # Hotbar, crosshair, health/hunger/XP, F3 debug
 │   │   ├── installPrompt.ts          # PWA installation manager & iOS banner
