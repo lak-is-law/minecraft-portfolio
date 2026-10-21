@@ -1944,6 +1944,7 @@ export class WorldBuilder {
       this.setBlock(cx + dx, 10, dz, 'sea_lantern');
     }
     this.setBlock(cx, 6, cz + 70, 'gold_block');
+    this.setBlock(cx, 2, cz + 71, 'quartz_pillar'); // Sign podium base
     this.setBlock(cx, 3, cz + 71, 'quartz_block', {
       type: 'sign',
       title: 'Darwaza-i-Rauza · Great Gate',
@@ -3822,11 +3823,15 @@ export class WorldBuilder {
       this.setBlock(yokoX, 1, z, 'smooth_stone');
       this.setBlock(yokoX - 1, 1, z, 'cobblestone');
       this.setBlock(yokoX + 1, 1, z, 'cobblestone');
-      // Overhead strung red paper lanterns every 3 blocks
+      // Overhead strung red paper lanterns with timber post frames every 3 blocks
       if (z % 3 === 0) {
-        this.setBlock(yokoX - 2, 4, z, 'red_terracotta');
-        this.setBlock(yokoX + 2, 4, z, 'red_terracotta');
-        this.setBlock(yokoX, 4, z, 'lantern');
+        for (let y = 2; y <= 3; y++) {
+          this.setBlock(yokoX - 2, y, z, 'oak_fence');
+          this.setBlock(yokoX + 2, y, z, 'oak_fence');
+        }
+        for (let x = yokoX - 2; x <= yokoX + 2; x++) {
+          this.setBlock(x, 4, z, (x === yokoX) ? 'lantern' : 'oak_fence');
+        }
       }
     }
     // West Side: Yakitori & Craft Beer Izakaya Bar
@@ -4374,6 +4379,8 @@ export class WorldBuilder {
     this.setBlock(hx - 2, 6, hz - 4, 'quartz_block'); // White Moon
     this.setBlock(hx + 2, 6, hz - 4, 'redstone_block'); // Red Sun
     for (let sx = hx - 2; sx <= hx + 2; sx++) this.setBlock(sx, 5, hz - 4, 'lapis_block'); // Five Peaks
+    this.setBlock(hx, 7, hz - 3, 'iron_block'); // Canopy support
+    this.setBlock(hx, 8, hz - 3, 'gold_block');
     this.setBlock(hx, 9, hz - 3, 'glowstone'); // Twin dragon ceiling canopy
 
     this.setBlock(hx, 4, hz + 8, 'stone_bricks', {
@@ -4899,8 +4906,10 @@ export class WorldBuilder {
     this.setBlock(kx + 3, 2, kz, 'gold_block');
     this.setBlock(kx + 3, 3, kz, 'lantern');
 
-    // Grand Gallery Ascending Corridor Lighting
+    // Grand Gallery Ascending Corridor Lighting hanging from stone ceiling
+    this.setBlock(kx, 5, kz - 4, 'iron_block');
     this.setBlock(kx, 4, kz - 4, 'sea_lantern');
+    this.setBlock(kx, 5, kz - 8, 'iron_block');
     this.setBlock(kx, 4, kz - 8, 'sea_lantern');
     this.setBlock(kx - 1, 3, kz - kBaseHalf + 1, 'lantern');
     this.setBlock(kx + 1, 3, kz - kBaseHalf + 1, 'lantern');
