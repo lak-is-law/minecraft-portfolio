@@ -13,7 +13,8 @@ mine/
 ├── docs/                             # Engineering documentation & reference
 │   ├── architecture.md               # System design & module contracts (this document)
 │   ├── changelog.md                  # Release log
-│   ├── MIGRATION_PROMPT.md           # Preserved world map migration spec
+│   ├── archive/                      # Historical specs & prompts
+│   │   └── MIGRATION_PROMPT.md
 │   └── reference/                    # Reference SVG diagrams and assets
 ├── public/                           # Static assets served directly by Vite
 │   ├── heightmap.bin                 # Prebaked world elevation cache (357 KB)
@@ -39,12 +40,15 @@ mine/
 │   ├── map/                          # 3D World Map Subsystem
 │   │   ├── context.js                # Centralized map context & state
 │   │   ├── data.js                   # 46 waypoints with verified 3D game coordinates
-│   │   ├── heightmapLoader.js        # Prebaked binary heightmap fetcher with procedural fallback
 │   │   ├── mount.js                  # Map lifecycle & mount engine
 │   │   ├── terrain.js                # Procedural mesh, water shader & height sampling
 │   │   ├── ui.js                     # Glass HUD, tabs, waypoints list, minimap
 │   │   ├── style.css                 # World map isolated styles
-│   │   └── models/                   # 37 Landmark and environment procedural voxel meshes
+│   │   └── models/                   # Modular 3D voxel models
+│   │       ├── landmarks/            # 31 Regional world monuments & cities
+│   │       ├── environment/          # Roads, trees, ships, atmosphere
+│   │       ├── helpers.js            # Shared geometry & material builders
+│   │       └── index.js              # Landmark registry and dispatcher
 │   ├── ui/                           # Presentation & DOM HUD layer
 │   │   ├── assets.ts                 # SVG icons & avatar markup
 │   │   ├── hud.ts                    # Hotbar, crosshair, health/hunger/XP, F3 debug
